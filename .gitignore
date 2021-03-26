@@ -1,0 +1,16 @@
+#ignore environmet
+/film_hobo_env/
+
+#ignore other files
+full_requirements.txt
+
+#ignore ide files
+/.idea/
+/.vscode
+
+#ignore pyc files
+*.pyc
+*/media/
+*_settings.py
+
+
