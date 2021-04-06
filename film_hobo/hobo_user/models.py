@@ -2,7 +2,22 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
+# from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
+
+# from phone_field import PhoneField
+
+
+# class InitialIntrestedUsers():
+#     """
+#     database table to store basic details of initial intrested users
+#     """
+#     first_name = models.CharField(_('first name'), max_length=150, blank=True)
+#     middle_name = models.CharField(_('middle name'),
+#                                    max_length=150, blank=True)
+#     last_name = models.CharField(_('last name'), max_length=150, blank=True)
+#     email = models.EmailField(_('email address'), unique=True)
+#     phone = PhoneField(blank=True, help_text='Contact phone number')
 
 
 class CustomUserManager(BaseUserManager):
@@ -17,7 +32,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(username=email, email=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -59,23 +74,57 @@ class CustomUser(AbstractUser):
     ]
 
     ATHLETIC = 'ATH'
+    SLENDER = 'SLE'
+    MEDIUM = 'MED'
+    HEAVY = 'HEA'
     PHYSIQUE_CHOICES = [
-        (ATHLETIC, 'Athletic')
+        (ATHLETIC, 'Athletic'),
+        (SLENDER, 'Slender'),
+        (MEDIUM, 'Medium'),
+        (HEAVY, 'Heavy')
     ]
 
+    AUBURN_OR_RED = 'AUR'
     BLACK = 'BLA'
-    HAIR_COLOR_CHOICES = [
-        (BLACK, 'Black')
-    ]
-
-    BUZZ_CUT = 'BUZ'
-    HAIR_LENGTH_CHOICES = [
-        (BUZZ_CUT, 'Buzz Cut')
-    ]
-
+    BLONDE = 'BLO'
     BROWN = 'BRO'
+    SALT_AND_PEPPER = 'SAP'
+    GRAY_OR_WHITE = 'GOW'
+    HAIR_COLOR_CHOICES = [
+        (AUBURN_OR_RED, 'Auburn/Red'),
+        (BLACK, 'Black'),
+        (BLONDE, 'Blonde'),
+        (BROWN, 'Brown'),
+        (SALT_AND_PEPPER, 'Salt and Pepper'),
+        (GRAY_OR_WHITE, 'Gray/White')
+    ]
+
+    BALD_OR_SHAVED = 'BOS'
+    SHORT = 'SHO'
+    MEDIUM = 'MED'
+    LONG = 'LON'
+    CURLY = 'CUR'
+    AFRO = 'AFR'
+    HAIR_LENGTH_CHOICES = [
+        (BALD_OR_SHAVED, 'Bald/Shaved'),
+        (SHORT, 'Short'),
+        (MEDIUM, 'Medium'),
+        (LONG, 'Long'),
+        (CURLY, 'Curly'),
+        (AFRO, 'Afro')
+    ]
+
+    BLACK = 'BLK'
+    BROWN = 'BRO'
+    BLUE = 'BLU'
+    GREEN = 'GRE'
+    HASEL = 'HAS'
     EYES_CHOICES = [
-        (BROWN, 'Brown')
+        (BLACK, 'Black'),
+        (BROWN, 'Brown'),
+        (BLUE, 'Blue'),
+        (GREEN, 'Green'),
+        (HASEL, 'Hasel')
     ]
 
     first_name = models.CharField(_('first name'), max_length=150, blank=True)
@@ -185,6 +234,21 @@ class AthleticSkillInline(models.Model):
                                 on_delete=models.CASCADE)
     athletic_skill = models.ForeignKey("hobo_user.AthleticSkill",
                                        on_delete=models.CASCADE)
+
+    # function to prevent duplicate options from saveing
+    # def clean(self):
+    #     temp_list = []
+    #     final_list = []
+    #     hobo_user_id = self.creator_id
+    #     athletic_skill_id = self.athletic_skill_id
+
+    #     selected_skills = AthleticSkillInline.objects.filter(
+    #         creator_id=hobo_user_id)
+    #     for selected_skill in selected_skills:
+    #         temp_list.append(selected_skill.athletic_skill_id)
+    #         temp_list.append(athletic_skill_id)
+    #         final_list.extend(temp_list)
+    #     print("temp_list", final_list)
 
     class Meta:
         verbose_name = 'Athletic Skill'

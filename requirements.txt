@@ -4,6 +4,7 @@ django-npm==1.0.0
 django-pipeline==2.0.6
 django-rest-auth==0.9.5
 django-import-export==2.5.0
+django-phone-field==1.8.1
 django-rest-auth[with_social]
 djangorestframework==3.12.3
 djangorestframework-simplejwt==4.6.0

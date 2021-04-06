@@ -151,3 +151,11 @@ REST_FRAMEWORK = {
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 AUTH_USER_MODEL = 'hobo_user.CustomUser'
+
+# settings to remove 'username' field from django-allauth
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None

@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    </head>
+    <body>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.email }}. Thanks for logging in.</p>
+            <p>{{ user.get_full_name }}</p>
+        {% else %}
+            <p>Welcome, new user. Please log in.</p>
+        {% endif %}
+        </form>
+    </body>
+</html>
