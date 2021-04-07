@@ -2,22 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
-# from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
-
-# from phone_field import PhoneField
-
-
-# class InitialIntrestedUsers():
-#     """
-#     database table to store basic details of initial intrested users
-#     """
-#     first_name = models.CharField(_('first name'), max_length=150, blank=True)
-#     middle_name = models.CharField(_('middle name'),
-#                                    max_length=150, blank=True)
-#     last_name = models.CharField(_('last name'), max_length=150, blank=True)
-#     email = models.EmailField(_('email address'), unique=True)
-#     phone = PhoneField(blank=True, help_text='Contact phone number')
 
 
 class CustomUserManager(BaseUserManager):
@@ -127,11 +112,11 @@ class CustomUser(AbstractUser):
         (HASEL, 'Hasel')
     ]
 
-    first_name = models.CharField(_('first name'), max_length=150, blank=True)
-    middle_name = models.CharField(_('middle name'),
+    first_name = models.CharField(_('First Name'), max_length=150, blank=True)
+    middle_name = models.CharField(_('Middle Name'),
                                    max_length=150, blank=True)
-    last_name = models.CharField(_('last name'), max_length=150, blank=True)
-    email = models.EmailField(_('email address'), unique=True)
+    last_name = models.CharField(_('Last Name'), max_length=150, blank=True)
+    email = models.EmailField(_('Email'), unique=True)
     bio = models.TextField(_("Bio"), null=True, blank=True)
     imdb_url = models.URLField(_("IMDB URL"),
                                null=True,

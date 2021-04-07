@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework.authtoken',
     'import_export',
+    'phonenumber_field',
 
+    'initial_user',
     'hobo_user',
 ]
 
