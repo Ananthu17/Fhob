@@ -208,6 +208,7 @@ class EthnicAppearanceInline(models.Model):
     class Meta:
         verbose_name = 'Ethnic Appearance'
         verbose_name_plural = 'EthnicAppearances'
+        unique_together = [("creator", "ethnic_appearance")]
 
     def __str__(self):
         return str(self.id)
