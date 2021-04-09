@@ -1,5 +1,6 @@
 from django.urls import path
 
+
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView
 

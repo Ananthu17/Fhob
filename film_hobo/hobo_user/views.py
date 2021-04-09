@@ -2,15 +2,20 @@
 import json
 import requests
 
+from authemail import wrapper
+from authemail.models import SignupCode
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
+from rest_framework.authtoken.models import Token
 
 from .forms import SignUpForm
 from .models import CustomUser
@@ -49,6 +54,7 @@ class CustomUserSignupHobo(APIView):
 
     def post(self, request):
         form = SignUpForm(request.POST)
+        must_validate_email = getattr(settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
             if not request.POST._mutable:
@@ -61,6 +67,12 @@ class CustomUserSignupHobo(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+
+                if must_validate_email:
+                    ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                    signup_code.send_signup_email()
+
                 return render(request, 'user_pages/user_home.html',
                               {'user': new_user})
             else:
