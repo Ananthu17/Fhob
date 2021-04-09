@@ -73,7 +73,7 @@ class CustomUserSignupHobo(APIView):
                     signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
                     signup_code.send_signup_email()
 
-                return render(request, 'user_pages/user_home.html',
+                return render(request, 'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
