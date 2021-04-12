@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% if title %}
+    <title>Film Hobo - {{ title }}</title>
+    {% else %}
+        <title>Film Hobo</title>
+    {% endif %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static 'initial_user/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <div class="container-fluid">
+        <div class="row no-wrap justify-content-between align-items-center landing-top-row">
+            <div class="col-md-12 col-xs-12 text-center">
+                <img src="{% static 'initial_user/img/Film Hobo Logo.jpg' %}" class="img-fluid landing-logo">
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row no-wrap justify-content-between align-items-center">
+            <div class="col-md-3 text-center">
+                <img src="{% static 'initial_user/img/mask.PNG' %}" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <div class="landing-des mt-4">Surf <span class="landing-des-orng">Film</span>Hobo to advance your film
+                    career.</div>
+                <div class="landing-des">With an ocean of possibilities at your disposal to create,
+                    collaborate and showcase your talent,you will be in the
+                    right place at the right time.</div>
+            </div>
+            <div class="col-md-3 text-center">
+                <img src="{% static 'initial_user/img/photograph.PNG' %}" class="img-fluid">
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="landing-blu-sec">
+             We are looking for a number of active actors, filmmakers, and production companies to test the Film Hobo portal before
+             we go live. Randomly chosen professional will get a free year of premium membership. If you are interested in this
+             oppurtunity, please jump on board and join our waiting list. We will send invitations when the site is operational
+             and ready for testing.
+            </div>
+        </div>
+          {% if messages %}
+            {% for message in messages %}
+                <div class="mt-3 alert alert-{{ message.tags }}">
+                {{ message }}
+                </div>
+            {% endfor %}
+          {% endif %}
+          {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>
+</body>

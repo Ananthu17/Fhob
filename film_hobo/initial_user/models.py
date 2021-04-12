@@ -23,15 +23,16 @@ class InitialIntrestedUsers(models.Model):
                                    max_length=150, blank=True)
     last_name = models.CharField(_('Last Name'), max_length=150)
     email = models.EmailField(_('Email Address'), unique=True)
-    phone = PhoneNumberField(_('Contact Phone Number'), blank=True)
+    phone = PhoneNumberField(_('Contact Phone Number'), unique=True,
+                             blank=True)
     designation = models.ManyToManyField(Designation,
                                          verbose_name=_('Designations'),
                                          blank=True,
                                          )
 
     class Meta:
-        verbose_name = 'Initial Intrested User'
-        verbose_name_plural = 'Initial Intrested Users'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
     def __str__(self):
         return self.email

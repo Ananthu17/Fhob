@@ -2,8 +2,8 @@ import ast
 import json
 import requests
 
+from django.contrib import messages
 from django.shortcuts import render
-from django.http.response import HttpResponse
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .forms import InitialUserForm
-from .models import InitialIntrestedUsers
 from .serializers import InitialIntrestedUsersSerializer
 
 
@@ -25,11 +24,12 @@ class InitialUserDetailSaveAPI(APIView):
 
 class InitialUserDetailSavePage(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'landing_pages/landing.html'
+    template_name = 'landing_pages/landing_home.html'
 
     def get(self, request):
         form = InitialUserForm()
-        return render(request, 'landing_pages/landing.html', {'form': form})
+        return render(request, 'landing_pages/landing_home.html',
+                      {'form': form})
 
     def post(self, request):
         form = InitialUserForm(request.POST)
@@ -47,10 +47,12 @@ class InitialUserDetailSavePage(APIView):
              data=json.dumps(json_dict),
              headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
-                new_intrested_user = InitialIntrestedUsers.objects.get(
-                           email=request.POST['email'])
-                return render(request, 'user_pages/user_home.html',
-                              {'user': new_intrested_user})
+                message = "Thank you for pre-registering, " \
+                 "we will let you know when the website is up and running"
+                messages.success(request, message)
             else:
-                return HttpResponse('Could not save data')
-        return render(request, 'user_pages/signup_hobo.html', {'form': form})
+                error_messages = ast.literal_eval(user_response.text)
+                _, message = error_messages.popitem()
+                messages.error(request, message[0])
+        return render(request, 'landing_pages/landing_home.html',
+                      {'form': form})

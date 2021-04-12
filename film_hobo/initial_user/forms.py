@@ -1,5 +1,12 @@
 from django import forms
+from django.forms import ModelMultipleChoiceField
 from .models import Designation, InitialIntrestedUsers
+
+
+class MyMultipleModelChoiceField(ModelMultipleChoiceField):
+
+    def label_from_instance(self, obj):
+        return obj
 
 
 class InitialUserForm(forms.Form):
@@ -13,6 +20,7 @@ class InitialUserForm(forms.Form):
                              help_text='')
     phone = forms.CharField(max_length=50)
     designation_id = forms.ModelMultipleChoiceField(
+        label="Are you",
         queryset=Designation.objects.all(),
         widget=forms.CheckboxSelectMultiple)
 
