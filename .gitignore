@@ -12,3 +12,7 @@ full_requirements.txt
 *.pyc
 */media/
 *_settings.py
+
+#ignore migration folders
+film_hobo/hobo_user/migrations/
+film_hobo/initial_user/migrations/
