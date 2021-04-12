@@ -65,6 +65,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
 admin.site.site_header = "Film Hobo Admin"
 admin.site.site_title = "Film Hobo Admin Portal"
 admin.site.index_title = "Welcome to Film Hobo Admin Portal"
+admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)

@@ -1,4 +1,4 @@
-Django==3.1.7
+Django==3.1
 django-environ==0.4.5
 django-npm==1.0.0
 django-pipeline==2.0.6
@@ -6,7 +6,8 @@ django-rest-auth==0.9.5
 django-import-export==2.5.0
 django-phonenumber-field==5.0.0
 django-rest-auth[with_social]
-djangorestframework==3.12.3
+django-rest-authemail==2.0.6
+djangorestframework==3.11.0
 djangorestframework-simplejwt==4.6.0
 jsmin==2.2.2
 psycopg2-binary==2.8.6
