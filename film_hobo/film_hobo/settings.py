@@ -39,13 +39,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_auth',
+    'rest_framework',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'rest_auth.registration',
     'rest_framework.authtoken',
     'import_export',
+
     'phonenumber_field',
+    'authemail',
+    'allauth.socialaccount',
 
     'initial_user',
     'hobo_user',
@@ -161,3 +165,15 @@ AUTH_USER_MODEL = 'hobo_user.CustomUser'
 ACCOUNT_USERNAME_REQUIRED = False
 
 # ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# Email settings
+AUTH_EMAIL_VERIFICATION = True
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_FROM = os.environ.get('AUTHEMAIL_DEFAULT_EMAIL_FROM')
+EMAIL_HOST_USER = os.environ.get('AUTHEMAIL_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('AUTHEMAIL_EMAIL_HOST_PASSWORD')
+EMAIL_BCC = os.environ.get('AUTHEMAIL_DEFAULT_EMAIL_BCC')
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
