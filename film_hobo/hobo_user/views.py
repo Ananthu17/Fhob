@@ -24,31 +24,6 @@ from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 
-# class ExtendedLoginView(AuthLoginView):
-#     template_name = 'user_pages/login.html'
-
-#     def get(self, request):
-#         form = LoginForm()
-#         return render(request, 'user_pages/login.html', {'form': form})
-
-#     def post(self, request, *args, **kwargs):
-#         form = LoginForm(data=request.POST)
-#         print("-------",request.POST)
-#         if form.is_valid():
-#             self.request = request
-#             self.serializer = self.get_serializer(data=self.request.data,
-#                                                 context={'request': request})
-#             self.serializer.is_valid(raise_exception=True)
-#             self.login()
-#             user_response = self.get_response()
-#             if user_response.status_code == 200:
-#                 return render(request, 'user_pages/user_home.html',
-#                             {'user': request.user})
-#             else:
-#                 return HttpResponse('Could not login')
-#         return render(request, 'user_pages/login.html', {'form': form})
-
-
 class ExtendedLoginView(AuthLoginView):
 
     def post(self, request, *args, **kwargs):
@@ -63,10 +38,16 @@ class ExtendedLoginView(AuthLoginView):
 
 class ExtendedLogoutView(AuthLogoutView):
 
+    def get(self, request, *args, **kwargs):
+        if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
+            response = self.logout(request)
+        else:
+            response = self.http_method_not_allowed(request, *args, **kwargs)
+        return self.finalize_response(request, response, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
-        print("---------------",request.user)
         return self.logout(request)
-    
+   
 
 class CustomUserLogin(APIView):
     renderer_classes = [TemplateHTMLRenderer]
@@ -168,7 +149,7 @@ class HomePage(APIView):
     template_name = 'user_pages/user_home.html'
 
     def get(self, request):
-        return Response({})
+        return Response({'request':request})
 
 
 class CustomUserList(APIView):
