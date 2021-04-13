@@ -10,6 +10,7 @@ try:
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
+from .adapters import CustomUserAccountAdapter
 from .models import CustomUser
 
 
@@ -47,7 +48,7 @@ class RegisterSerializer(serializers.Serializer):
     )
     middle_name = serializers.CharField(
         max_length=150,
-        allow_blank=True,
+        required=False,
     )
     last_name = serializers.CharField(
         max_length=150,
@@ -97,10 +98,13 @@ class RegisterSerializer(serializers.Serializer):
         }
 
     def save(self, request):
-        adapter = get_adapter()
+        adapter = CustomUserAccountAdapter()
         user = adapter.new_user(request)
         self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
+        user.first_name = self.cleaned_data.get('first_name')
+        user.middle_name = self.cleaned_data.get('middle_name')
+        user.last_name = self.cleaned_data.get('last_name')
         return user

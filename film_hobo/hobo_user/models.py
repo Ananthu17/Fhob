@@ -112,10 +112,12 @@ class CustomUser(AbstractUser):
         (HASEL, 'Hasel')
     ]
 
-    first_name = models.CharField(_('First Name'), max_length=150, blank=True)
+    first_name = models.CharField(_('First Name'),
+                                  max_length=150, null=True, blank=True)
     middle_name = models.CharField(_('Middle Name'),
-                                   max_length=150, blank=True)
-    last_name = models.CharField(_('Last Name'), max_length=150, blank=True)
+                                   max_length=150, null=True, blank=True)
+    last_name = models.CharField(_('Last Name'),
+                                 max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
     bio = models.TextField(_("Bio"), null=True, blank=True)
     imdb_url = models.URLField(_("IMDB URL"),

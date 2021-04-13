@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
 
-from .forms import SignUpForm
+from .forms import SignUpForm, SignUpFormCompany
 from .models import CustomUser
 from .serializers import CustomUserSerializer, RegisterSerializer
 
@@ -128,3 +128,13 @@ class CustomUserDetail(APIView):
             return Response({'serializer': serializer, 'profile': profile})
         serializer.save()
         return redirect('profile-list')
+
+
+class CustomUserSignupCompany(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'user_pages/signup_company.html'
+
+    def get(self, request):
+        form = SignUpFormCompany()
+        return render(request, 'user_pages/signup_company.html',
+                      {'form': form})
