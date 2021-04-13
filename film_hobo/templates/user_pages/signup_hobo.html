@@ -1,11 +1,15 @@
-{{ form.media.css }}
+
 <html>
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    </head>
+        {{ form.media.css }}
+      </head>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>
+    
     <script>
     </script>
+   
     <body>
       <div class="container">
         <h2>Sign up - Hobo</h2>
@@ -29,13 +33,15 @@
     </body>
 </html>
 
+
 {{ form.media.js }}
 <script>
-     $('#date_of_birth').datepicker({
-                changeMonth: true,
-                changeYear: true,
-                showButtonPanel: true,
-                dateFormat: "d/m/yy"
-            });
-
+  $(document).ready(function() {
+    $(function () {
+              $('#date_of_birth').datetimepicker({
+                format: 'DD/MM/YYYY'
+                });
+             });
+});
+   
 </script>

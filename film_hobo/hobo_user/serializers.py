@@ -28,7 +28,9 @@ class LoginSerializer(serializers.Serializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email']
+        fields = ['email','first_name','middle_name','last_name',
+                'password1','password2','phone_number','date_of_birth',
+                'address','country']
 
 
 # # overide default registerserializer

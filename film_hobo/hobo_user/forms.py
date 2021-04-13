@@ -29,9 +29,6 @@ class LoginForm(AuthenticationForm):
 
 
 class SignUpIndieProForm(UserCreationForm):
-    # date_of_birth = forms.DateField(
-    #         widget=DatePickerInput(format='%d/%m/%Y')
-    #     )
 
     class Meta:
         model = CustomUser
@@ -39,16 +36,10 @@ class SignUpIndieProForm(UserCreationForm):
                   'password1', 'password2', 'phone_number', 
                   'date_of_birth', 'address', 'country')
         
-        # widgets = {
-        #     'date_of_birth': DatePickerInput(
-        #         options={
-        #             "format": "DD/MM/YYYY", # moment date-time format
-        #             "showClose": True,
-        #             "showClear": True,
-        #             "showTodayButton": True,
-        #         }
-        #     ),
-        # }
         def __init__(self, *args, **kwargs):
             super(SignUpIndieProForm, self).__init__(*args, **kwargs)
             self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+
+        widgets = {
+                    'date_of_birth': DateTimePickerInput(format='%d/%m/%Y'),
+                }
