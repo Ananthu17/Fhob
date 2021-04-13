@@ -2,7 +2,8 @@ from django.urls import path
 
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
-                   CustomUserDetail, HomePage, ExtendedRegisterView
+                   CustomUserDetail, HomePage, ExtendedRegisterView, \
+                   ExtendedLoginView, ExtendedLogoutView
 
 app_name = "hobo_user"
 
@@ -14,4 +15,8 @@ urlpatterns = [
     path('login/', CustomUserLogin.as_view(), name="login"),
     path('user_list/', CustomUserList.as_view(), name="user_list"),
     path('user_detail/', CustomUserDetail.as_view(), name="user_detail"),
+    path('authentication/', ExtendedLoginView.as_view(),
+         name='user_login'),
+    path('logout/', ExtendedLogoutView.as_view(),
+         name='user_logout'),
 ]

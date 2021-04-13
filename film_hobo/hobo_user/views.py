@@ -16,10 +16,90 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
+from rest_auth.views import LoginView as AuthLoginView
+from rest_auth.views import LogoutView as AuthLogoutView
 
-from .forms import SignUpForm
+from .forms import SignUpForm, LoginForm
 from .models import CustomUser
 from .serializers import CustomUserSerializer
+
+
+# class ExtendedLoginView(AuthLoginView):
+#     template_name = 'user_pages/login.html'
+
+#     def get(self, request):
+#         form = LoginForm()
+#         return render(request, 'user_pages/login.html', {'form': form})
+
+#     def post(self, request, *args, **kwargs):
+#         form = LoginForm(data=request.POST)
+#         print("-------",request.POST)
+#         if form.is_valid():
+#             self.request = request
+#             self.serializer = self.get_serializer(data=self.request.data,
+#                                                 context={'request': request})
+#             self.serializer.is_valid(raise_exception=True)
+#             self.login()
+#             user_response = self.get_response()
+#             if user_response.status_code == 200:
+#                 return render(request, 'user_pages/user_home.html',
+#                             {'user': request.user})
+#             else:
+#                 return HttpResponse('Could not login')
+#         return render(request, 'user_pages/login.html', {'form': form})
+
+
+class ExtendedLoginView(AuthLoginView):
+
+    def post(self, request, *args, **kwargs):
+        self.request = request
+        self.serializer = self.get_serializer(data=self.request.data,
+                                              context={'request': request})
+        self.serializer.is_valid(raise_exception=True)
+        self.login()
+        print("hello",request.user)
+        return self.get_response()
+
+
+class ExtendedLogoutView(AuthLogoutView):
+
+    def post(self, request, *args, **kwargs):
+        print("---------------",request.user)
+        return self.logout(request)
+    
+
+class CustomUserLogin(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'user_pages/login.html'
+
+    def get(self, request):
+        form = LoginForm()
+        return render(request, 'user_pages/login.html', {'form': form})
+
+    def post(self, request):
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/authentication/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json'})
+            
+            print("hello",request.user)
+            # print("user_response--- ",user_response. __dict__ )
+            if user_response.status_code == 200:
+                response_json = user_response.json()
+                token = response_json['key']
+                token = Token.objects.get(key=token)
+                user = CustomUser.objects.get(id=token.user_id)
+                request.user = user
+                return render(request, 'user_pages/user_home.html',
+                            {'user': user})
+            else:
+                return HttpResponse('Could not login')
+        else:
+            print("Invalid")
+            print(form.errors)
+        return render(request, 'user_pages/login.html', {'form': form})
 
 
 class ExtendedRegisterView(RegisterView):
@@ -81,14 +161,6 @@ class CustomUserSignupHobo(APIView):
 
     class Meta:
         model = get_user_model()
-
-
-class CustomUserLogin(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'user_pages/login.html'
-
-    def get(self, request):
-        return Response({})
 
 
 class HomePage(APIView):
