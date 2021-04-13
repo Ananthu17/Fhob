@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     'initial_user',
     'hobo_user',
+    'bootstrap_datepicker_plus',
 ]
 
 SITE_ID = 1

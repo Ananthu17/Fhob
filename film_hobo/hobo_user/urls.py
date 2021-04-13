@@ -3,7 +3,8 @@ from django.urls import path
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView
+                   ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
+                   CustomUserSignupIndieProPage
 
 app_name = "hobo_user"
 
@@ -19,4 +20,8 @@ urlpatterns = [
          name='user_login'),
     path('logout/', ExtendedLogoutView.as_view(),
          name='user_logout'),
+    path('choose-membership/', ChooseMembershipPage.as_view(),
+         name='choose-membership'),
+    path('signup_indie_pro/', CustomUserSignupIndieProPage.as_view(),
+         name='signup_indie_pro'),
 ]

@@ -1,3 +1,4 @@
+{{ form.media.css }}
 <html>
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -6,6 +7,7 @@
     <script>
     </script>
     <body>
+      <div class="container">
         <h2>Sign up - Hobo</h2>
         <form method="post">
           {% csrf_token %}
@@ -23,5 +25,17 @@
           {% endfor %}
           <button type="submit">Sign up</button>
         </form>
+      </div>
     </body>
 </html>
+
+{{ form.media.js }}
+<script>
+     $('#date_of_birth').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: "d/m/yy"
+            });
+
+</script>
