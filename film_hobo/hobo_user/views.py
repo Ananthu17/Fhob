@@ -19,18 +19,18 @@ from rest_framework.authtoken.models import Token
 
 from .forms import SignUpForm
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, RegisterSerializer
 
 
 class ExtendedRegisterView(RegisterView):
-    # serializer_class = CustomUserSerializer
+    serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         # data_to_serialize = request.data
         # if data_to_serialize['i_agree'] == 'on':
         #     data_to_serialize['i_agree'] = True
         # serializer = self.get_serializer(data=data_to_serialize)
-        serializer = self.get_serializer(data=request.data)
+        serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -39,13 +39,13 @@ class ExtendedRegisterView(RegisterView):
                         status=status.HTTP_201_CREATED,
                         headers=headers)
 
-    def get_serializer(self, *args, **kwargs):
-        """
-        overide default serializer
-        """
-        serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-        return serializer_class(*args, **kwargs)
+    # def get_serializer(self, *args, **kwargs):
+    #     """
+    #     overide default serializer
+    #     """
+    #     serializer_class = self.get_serializer_class()
+    #     kwargs.setdefault('context', self.get_serializer_context())
+    #     return serializer_class(*args, **kwargs)
 
 
 class CustomUserSignupHobo(APIView):
