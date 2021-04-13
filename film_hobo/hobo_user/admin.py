@@ -28,6 +28,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
                              'email', 'password')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
+        ('Membership', {'fields': ('membership',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender',)}),
         ('Height', {'fields': ('feet', 'inch')}),

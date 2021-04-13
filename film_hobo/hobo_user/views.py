@@ -2,20 +2,17 @@
 import json
 import requests
 
-from authemail import wrapper
-from authemail.models import SignupCode
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
 
+from authemail.models import SignupCode
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
-from rest_framework.authtoken.models import Token
 
 from .forms import SignUpForm, SignUpFormCompany
 from .models import CustomUser
@@ -38,14 +35,6 @@ class ExtendedRegisterView(RegisterView):
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
                         headers=headers)
-
-    # def get_serializer(self, *args, **kwargs):
-    #     """
-    #     overide default serializer
-    #     """
-    #     serializer_class = self.get_serializer_class()
-    #     kwargs.setdefault('context', self.get_serializer_context())
-    #     return serializer_class(*args, **kwargs)
 
 
 class CustomUserSignupHobo(APIView):
@@ -79,7 +68,8 @@ class CustomUserSignupHobo(APIView):
                         new_user, ipaddr)
                     signup_code.send_signup_email()
 
-                return render(request, 'user_pages/user_email_verification.html',
+                return render(request,
+                              'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')

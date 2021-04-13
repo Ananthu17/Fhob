@@ -4,6 +4,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -132,6 +134,14 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
     )
+    phone = PhoneNumberField(_('Contact Phone Number'), unique=True,
+                             blank=True)
+    date_of_birth = models.DateField(_("Date of Birth"), null=True)
+    address = models.CharField(_("Address"), max_length=1024, null=True,
+                               blank=True)
+    country = models.CharField(_("Country"),
+                               max_length=150,
+                               null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
     directional_skill = models.FloatField(_("Directional Skill"), null=True,
                                           blank=True)
