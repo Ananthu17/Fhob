@@ -26,6 +26,10 @@ class ExtendedRegisterView(RegisterView):
     # serializer_class = CustomUserSerializer
 
     def create(self, request, *args, **kwargs):
+        # data_to_serialize = request.data
+        # if data_to_serialize['i_agree'] == 'on':
+        #     data_to_serialize['i_agree'] = True
+        # serializer = self.get_serializer(data=data_to_serialize)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)

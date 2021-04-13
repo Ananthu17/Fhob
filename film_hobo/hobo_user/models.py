@@ -124,6 +124,12 @@ class CustomUser(AbstractUser):
     membership = models.CharField(_("Membership Type"),
                                   choices=MEMBERSHIP_CHOICES,
                                   max_length=150, default=HOBO)
+    i_agree = models.BooleanField(
+        _('I Agree'),
+        default=True,
+        help_text=_(
+            'Designates whether the user accepted the terms and conditions.'),
+    )
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
     directional_skill = models.FloatField(_("Directional Skill"), null=True,
                                           blank=True)
@@ -221,24 +227,10 @@ class AthleticSkillInline(models.Model):
     athletic_skill = models.ForeignKey("hobo_user.AthleticSkill",
                                        on_delete=models.CASCADE)
 
-    # function to prevent duplicate options from saveing
-    # def clean(self):
-    #     temp_list = []
-    #     final_list = []
-    #     hobo_user_id = self.creator_id
-    #     athletic_skill_id = self.athletic_skill_id
-
-    #     selected_skills = AthleticSkillInline.objects.filter(
-    #         creator_id=hobo_user_id)
-    #     for selected_skill in selected_skills:
-    #         temp_list.append(selected_skill.athletic_skill_id)
-    #         temp_list.append(athletic_skill_id)
-    #         final_list.extend(temp_list)
-    #     print("temp_list", final_list)
-
     class Meta:
         verbose_name = 'Athletic Skill'
         verbose_name_plural = 'Athletic Skills'
+        unique_together = [("creator", "athletic_skill")]
 
     def __str__(self):
         return str(self.id)

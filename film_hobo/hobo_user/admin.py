@@ -27,6 +27,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
     fieldsets = (
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
                              'email', 'password')}),
+        ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender',)}),
         ('Height', {'fields': ('feet', 'inch')}),
