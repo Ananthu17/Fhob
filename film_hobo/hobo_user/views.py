@@ -58,7 +58,8 @@ class CustomUserSignupHobo(APIView):
 
     def post(self, request):
         form = SignUpForm(request.POST)
-        must_validate_email = getattr(settings, "AUTH_EMAIL_VERIFICATION", True)
+        must_validate_email = getattr(
+            settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
             if not request.POST._mutable:
@@ -74,7 +75,8 @@ class CustomUserSignupHobo(APIView):
 
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                    signup_code = SignupCode.objects.create_signup_code(
+                        new_user, ipaddr)
                     signup_code.send_signup_email()
 
                 return render(request, 'user_pages/user_email_verification.html',
