@@ -12,7 +12,11 @@
    
     <body>
       <div class="container">
-        <h2>Sign up - Hobo</h2>
+        {% if request.GET.choice %}
+        <h2>Sign up - {{request.GET.choice}}</h2>
+        {% else%}
+        <h2>Sign up - hobo</h2>
+        {% endif %}
         <form method="post">
           {% csrf_token %}
           {% for field in form %}
