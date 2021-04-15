@@ -46,7 +46,7 @@ class ExtendedLogoutView(AuthLogoutView):
 
     def post(self, request, *args, **kwargs):
         return self.logout(request)
-   
+
 
 class CustomUserLogin(APIView):
     renderer_classes = [TemplateHTMLRenderer]
@@ -108,6 +108,7 @@ class ExtendedRegisterIndieProView(RegisterView):
         serializer = RegisterSerializer(data=request.data)
         print("request.data....",request.data)
         serializer.is_valid()
+        print("serializer....",serializer)
         print("errors....",serializer.errors)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
@@ -228,7 +229,6 @@ class CustomUserSignupIndieProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                
                 # if must_validate_email:
                 #     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                 #     signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
@@ -238,7 +238,8 @@ class CustomUserSignupIndieProView(APIView):
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
-        return render(request, 'user_pages/signup_indie_pro.html', {'form': form})
+        return render(request, 'user_pages/signup_indie_pro.html',
+                      {'form': form})
 
     class Meta:
         model = get_user_model()

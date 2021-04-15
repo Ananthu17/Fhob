@@ -147,7 +147,7 @@ class RegisterIndieProSerializer(serializers.Serializer):
         max_length=15,
     )
     date_of_birth = serializers.DateField(format="%Y-%m-%d")
-    # country = CountrySerializer(read_only=True)
+    country = CountrySerializer(read_only=True)
     membership = serializers.StringRelatedField()
     address = serializers.CharField()
     i_agree = serializers.BooleanField( required=True)
@@ -156,7 +156,7 @@ class RegisterIndieProSerializer(serializers.Serializer):
         model = CustomUser
         fields = ['email','username','first_name','middle_name','last_name',
         'password1', 'password2', 'phone_number', 'address', 'date_of_birth',
-        'membership','i_agree']
+        'membership','i_agree', 'country']
 
     # def validate_first_name(self, first_name):
     #     return first_name
@@ -189,12 +189,11 @@ class RegisterIndieProSerializer(serializers.Serializer):
                 _("You must accept our terms and conditions!!"))
         return i_agree
 
-    def validate_i_agree(self, i_agree):
-        if i_agree != True:
-            print("You must accept our terms and conditions!!")
-            raise serializers.ValidationError(
-                _("You must accept our terms and conditions!!"))
-        return i_agree
+    # def validate_country(self, country):
+    #     if country:
+    #         obj = Country.objects.get(pk=country)
+    #         print(obj)
+    #     return country
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -217,7 +216,7 @@ class RegisterIndieProSerializer(serializers.Serializer):
             'phone_number': self.validated_data.get('phone_number', ''),
             'address': self.validated_data.get('address', ''),
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
-            # 'country': self.validated_data.get('country', ''),
+            'country': self.validated_data.get('country', ''),
             'membership': self.validated_data.get('membership', ''),
             'i_agree': self.validated_data.get('i_agree', ''),
         }
