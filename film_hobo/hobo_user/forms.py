@@ -1,6 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
+from bootstrap_datepicker_plus import DateTimePickerInput, DatePickerInput
 
 
 class SignUpForm(UserCreationForm):
@@ -21,6 +22,30 @@ class SignUpForm(UserCreationForm):
                   'password1', 'password2', 'i_agree')
 
 
+class LoginForm(AuthenticationForm):
+
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'password1')
+
+
+class SignUpIndieProForm(UserCreationForm):
+
+    class Meta:
+        model = CustomUser
+        fields = ('first_name', 'middle_name', 'last_name', 'email',
+                  'password1', 'password2', 'phone_number', 
+                  'date_of_birth', 'address', 'country')
+        
+        def __init__(self, *args, **kwargs):
+            super(SignUpIndieProForm, self).__init__(*args, **kwargs)
+            self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+
+        widgets = {
+                    'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
+                }
+
+
 class SignUpFormCompany(forms.Form):
     company_name = forms.CharField(max_length=150, required=False,
                                    help_text='')
@@ -36,3 +61,4 @@ class SignUpFormCompany(forms.Form):
                                 help_text='')
     date_of_birth = forms.DateField()
     user_address = forms.Textarea()
+

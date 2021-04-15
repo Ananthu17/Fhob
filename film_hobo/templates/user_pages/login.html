@@ -6,6 +6,17 @@
     </head>
     <body>
         <h1>Login</h1>
+        <form method="post">
+            {% csrf_token %}
+            <p> {{ form.non_field_errors }}</p>
+            <p>
+                Email {{form.username}}
+                {{form.username.errors}}
+            </p>
+            <p>
+                Password {{form.password}}
+                {{form.password.errors}}
+            </p>
             <button type="submit" class="btn btn-default">Sign in</button>
         </form>
     </body>

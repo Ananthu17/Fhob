@@ -1,3 +1,7 @@
+
+from datetime import date
+from phonenumber_field.modelfields import PhoneNumberField
+
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
@@ -166,7 +170,19 @@ class CustomUser(AbstractUser):
     eyes = models.CharField(_("Eyes"),
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
-
+    phone_number = PhoneNumberField(_("Phone Number"),null=True, 
+                                blank=True, unique=True)
+    date_of_birth = models.DateField(_("Date of Birth"),default=date.today,
+                                blank=True, null=True)
+    address = models.TextField(_("Address"), null=True, blank=True)
+    country = models.ForeignKey("hobo_user.Country", 
+                        on_delete=models.SET_NULL, 
+                        related_name = 'user_country',
+                        verbose_name=_("Country"),
+                        blank=True, null=True)
+    # address = models.CharField(_("Address"), max_length=1024, null=True,
+    #                            blank=True)
+                               
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -373,3 +389,14 @@ class Editor(models.Model):
 
 class Makeup(models.Model):
     makeup = models.CharField(max_length=1000)
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.name)
+    
+    class Meta:
+        verbose_name = 'Country'
+        verbose_name_plural = 'Countries'

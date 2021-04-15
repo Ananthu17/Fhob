@@ -6,9 +6,10 @@ from import_export.admin import ImportExportModelAdmin
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     EthnicAppearanceInline, AthleticSkill, \
                     AthleticSkillInline, PromoCode, Team, Actor, Writer, \
-                    Producer, Director, Editor, Makeup
+                    Producer, Director, Editor, Makeup, Country
 
-from .importexport import EthnicAppearanceResource, AthleticSkillResource
+from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
+                    CountryResource
 
 
 class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -30,7 +31,8 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Membership', {'fields': ('membership',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
-        ('Personal Details', {'fields': ('gender',)}),
+        ('Personal Details', {'fields': ('gender','date_of_birth','phone_number',
+                            'address','country')}),
         ('Height', {'fields': ('feet', 'inch')}),
         ('Weight', {'fields': ('lbs',)}),
         ('Age-Playing Range', {'fields': ('start_age', 'stop_age')}),
@@ -89,3 +91,8 @@ class EthnicAppearanceAdmin(ImportExportModelAdmin):
 @admin.register(AthleticSkill)
 class AthleticSkillAdmin(ImportExportModelAdmin):
     resource_class = AthleticSkillResource
+
+
+@admin.register(Country)
+class CountryAdmin(ImportExportModelAdmin):
+    resource_class = CountryResource
