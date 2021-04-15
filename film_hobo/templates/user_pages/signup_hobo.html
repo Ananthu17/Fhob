@@ -31,6 +31,9 @@
               {% endfor %}
             </p>
           {% endfor %}
+          {% if request.GET.choice %}
+          <input type="hidden" name="membership" value="{{request.GET.choice}}"/>
+          {% endif %}
           <button type="submit">Sign up</button>
         </form>
       </div>
@@ -43,7 +46,7 @@
   $(document).ready(function() {
     $(function () {
               $('#date_of_birth').datetimepicker({
-                format: 'DD/MM/YYYY'
+                format: 'YYYY-MM-DD'
                 });
              });
 });

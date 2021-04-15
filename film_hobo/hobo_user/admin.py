@@ -28,6 +28,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
     fieldsets = (
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
                              'email', 'password')}),
+        ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender','date_of_birth','phone_number',
                             'address','country')}),

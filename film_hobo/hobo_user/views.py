@@ -21,7 +21,7 @@ from rest_auth.views import LogoutView as AuthLogoutView
 
 from .forms import SignUpForm, LoginForm, SignUpIndieProForm
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, RegisterSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -84,10 +84,14 @@ class CustomUserLogin(APIView):
 
 
 class ExtendedRegisterView(RegisterView):
-    # serializer_class = CustomUserSerializer
+    serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        # data_to_serialize = request.data
+        # if data_to_serialize['i_agree'] == 'on':
+        #     data_to_serialize['i_agree'] = True
+        # serializer = self.get_serializer(data=data_to_serialize)
+        serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -96,13 +100,13 @@ class ExtendedRegisterView(RegisterView):
                         status=status.HTTP_201_CREATED,
                         headers=headers)
 
-    def get_serializer(self, *args, **kwargs):
-        """
-        overide default serializer
-        """
-        serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-        return serializer_class(*args, **kwargs)
+    # def get_serializer(self, *args, **kwargs):
+    #     """
+    #     overide default serializer
+    #     """
+    #     serializer_class = self.get_serializer_class()
+    #     kwargs.setdefault('context', self.get_serializer_context())
+    #     return serializer_class(*args, **kwargs)
 
 
 class CustomUserSignupHobo(APIView):
@@ -213,11 +217,11 @@ class CustomUserSignupIndieProPage(APIView):
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
                 
-                if choice == 'indie':
-                    new_user.membership = CustomUser.INDIE
-                else:
-                    new_user.membership = CustomUser.PRO
-                new_user.save()
+                # if choice == 'indie':
+                #     new_user.membership = CustomUser.INDIE
+                # else:
+                #     new_user.membership = CustomUser.PRO
+                # new_user.save()
 
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')

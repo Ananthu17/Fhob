@@ -14,11 +14,12 @@ class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254,
                              help_text='Required. Inform a ' +
                              'valid email address.')
+    i_agree = forms.BooleanField(required=True, widget=forms.CheckboxInput())
 
     class Meta:
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
-                  'password1', 'password2')
+                  'password1', 'password2', 'i_agree')
 
 
 class LoginForm(AuthenticationForm):
@@ -41,5 +42,6 @@ class SignUpIndieProForm(UserCreationForm):
             self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
 
         widgets = {
-                    'date_of_birth': DateTimePickerInput(format='%d/%m/%Y'),
+                    'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
                 }
+
