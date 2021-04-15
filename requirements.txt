@@ -11,5 +11,6 @@ django-rest-authemail==2.0.6
 djangorestframework==3.11.0
 djangorestframework-simplejwt==4.6.0
 jsmin==2.2.2
+phonenumbers==8.12.21
 psycopg2-binary==2.8.6
 zappa==0.52.0
