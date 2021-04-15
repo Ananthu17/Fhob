@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
-from bootstrap_datepicker_plus import DateTimePickerInput, DatePickerInput
+from bootstrap_datepicker_plus import DateTimePickerInput
 
 
 class SignUpForm(UserCreationForm):
@@ -30,16 +30,18 @@ class LoginForm(AuthenticationForm):
 
 
 class SignUpIndieProForm(UserCreationForm):
+    i_agree = forms.BooleanField(widget=forms.CheckboxInput())
 
     class Meta:
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
-                  'password1', 'password2', 'phone_number', 
-                  'date_of_birth', 'address', 'country')
-        
+                  'password1', 'password2', 'phone_number',
+                  'address', 'i_agree', 'date_of_birth', 'country')
+
         def __init__(self, *args, **kwargs):
             super(SignUpIndieProForm, self).__init__(*args, **kwargs)
             self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+            self.fields['i_agree'].required = True
 
         widgets = {
                     'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
@@ -61,4 +63,3 @@ class SignUpFormCompany(forms.Form):
                                 help_text='')
     date_of_birth = forms.DateField()
     user_address = forms.Textarea()
-

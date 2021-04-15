@@ -1,54 +1,28 @@
 
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        {{ form.media.css }}
-      </head>
-    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>
-
-    <script>
-    </script>
-
-    <body>
-      <div class="container">
-        {% if request.GET.choice %}
-        <h2>Sign up - {{request.GET.choice}}</h2>
-        {% else%}
-        <h2>Sign up - hobo</h2>
-        {% endif %}
-        <form method="post">
-          {% csrf_token %}
-          {% for field in form %}
-            <p>
-              {{ field.label_tag }}<br>
-              {{ field }}
-              {% if field.help_text %}
-                <small style="color: grey">{{ field.help_text }}</small>
-              {% endif %}
-              {% for error in field.errors %}
-                <p style="color: red">{{ error }}</p>
-              {% endfor %}
-            </p>
-          {% endfor %}
-          {% if request.GET.choice %}
-          <input type="hidden" name="membership" value="{{request.GET.choice}}"/>
-          {% endif %}
-          <button type="submit">Sign up</button>
-        </form>
-      </div>
-    </body>
+  <head>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    </head>
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+  <script>
+  </script>
+  <body>
+      <h2>Sign up - hobo</h2>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <p>
+            {{ field.label_tag }}<br>
+            {{ field }}
+            {% if field.help_text %}
+              <small style="color: grey">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+              <p style="color: red">{{ error }}</p>
+            {% endfor %}
+          </p>
+        {% endfor %}
+        <button type="submit">Sign up</button>
+      </form>
+  </body>
 </html>
-
-
-{{ form.media.js }}
-<script>
-  $(document).ready(function() {
-    $(function () {
-              $('#date_of_birth').datetimepicker({
-                format: 'YYYY-MM-DD'
-                });
-             });
-});
-
-</script>
