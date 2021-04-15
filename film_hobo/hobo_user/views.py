@@ -20,7 +20,7 @@ from rest_auth.views import LogoutView as AuthLogoutView
 from .forms import SignUpForm, LoginForm, SignUpIndieProForm, \
     SignUpFormCompany
 from .models import CustomUser
-from .serializers import CustomUserSerializer, RegisterSerializer
+from .serializers import CustomUserSerializer, RegisterSerializer, RegisterIndieProSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -91,6 +91,24 @@ class ExtendedRegisterView(RegisterView):
         #     data_to_serialize['i_agree'] = True
         # serializer = self.get_serializer(data=data_to_serialize)
         serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
+        user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(self.get_response_data(user),
+                        status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+
+class ExtendedRegisterIndieProView(RegisterView):
+    serializer_class = RegisterIndieProSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = RegisterSerializer(data=request.data)
+        print("request.data....",request.data)
+        serializer.is_valid()
+        print("errors....",serializer.errors)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -185,13 +203,13 @@ class ChooseMembershipPage(APIView):
         return Response({})
 
 
-class CustomUserSignupIndieProPage(APIView):
+class CustomUserSignupIndieProView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'user_pages/signup_hobo.html'
+    template_name = 'user_pages/signup_indie_pro.html'
 
     def get(self, request):
         form = SignUpIndieProForm()
-        return render(request, 'user_pages/signup_hobo.html', {'form': form})
+        return render(request, 'user_pages/signup_indie_pro.html', {'form': form})
 
     def post(self, request):
         form = SignUpIndieProForm(request.POST)
@@ -204,29 +222,23 @@ class CustomUserSignupIndieProPage(APIView):
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration/',
+                            'http://127.0.0.1:8000/hobo_user/registration_indie_pro/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
                 
-                # if choice == 'indie':
-                #     new_user.membership = CustomUser.INDIE
-                # else:
-                #     new_user.membership = CustomUser.PRO
-                # new_user.save()
-
-                if must_validate_email:
-                    ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
-                    signup_code.send_signup_email()
+                # if must_validate_email:
+                #     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+                #     signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                #     signup_code.send_signup_email()
 
                 return render(request, 'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
-        return render(request, 'user_pages/signup_hobo.html', {'form': form})
+        return render(request, 'user_pages/signup_indie_pro.html', {'form': form})
 
     class Meta:
         model = get_user_model()

@@ -30,16 +30,18 @@ class LoginForm(AuthenticationForm):
 
 
 class SignUpIndieProForm(UserCreationForm):
+    i_agree = forms.BooleanField(widget=forms.CheckboxInput())
 
     class Meta:
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number', 
-                  'date_of_birth', 'address', 'country')
+                  'address','i_agree','date_of_birth', 'country')
         
         def __init__(self, *args, **kwargs):
             super(SignUpIndieProForm, self).__init__(*args, **kwargs)
             self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+            self.fields['i_agree'].required = True
 
         widgets = {
                     'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
