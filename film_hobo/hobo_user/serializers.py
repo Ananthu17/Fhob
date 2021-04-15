@@ -10,7 +10,7 @@ try:
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
-from .adapters import CustomUserAccountAdapter
+from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
 from .models import CustomUser, Country
 
 
@@ -128,44 +128,36 @@ class RegisterIndieProSerializer(serializers.Serializer):
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
         required=allauth_settings.USERNAME_REQUIRED
     )
-    email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=True)
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(
         max_length=150,
         required=True,
     )
     middle_name = serializers.CharField(
         max_length=150,
-        allow_blank=True,
+        allow_blank=True, required=False
     )
     last_name = serializers.CharField(
         max_length=150,
         required=True,
     )
     phone_number = serializers.CharField(
-        max_length=15,
+        max_length=15, required=True
     )
-    date_of_birth = serializers.DateField(format="%Y-%m-%d")
-    country = CountrySerializer(read_only=True)
+    date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
     membership = serializers.StringRelatedField()
-    address = serializers.CharField()
-    i_agree = serializers.BooleanField( required=True)
+    address = serializers.CharField(required=True)
+    country = serializers.CharField(required=True)
+    i_agree = serializers.BooleanField(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['email','username','first_name','middle_name','last_name',
-        'password1', 'password2', 'phone_number', 'address', 'date_of_birth',
-        'membership','i_agree', 'country']
+        fields = ['email', 'username', 'first_name', 'middle_name', 'last_name',
+                 'password1', 'password2', 'phone_number', 'address',
+                 'date_of_birth', 'membership', 'i_agree', 'country']
 
-    # def validate_first_name(self, first_name):
-    #     return first_name
-
-    # def validate_middle_name(self, middle_name):
-    #     return middle_name
-
-    # def validate_last_name(self, last_name):
-    #     return last_name
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -184,16 +176,10 @@ class RegisterIndieProSerializer(serializers.Serializer):
 
     def validate_i_agree(self, i_agree):
         if i_agree != True:
-            print("You must accept our terms and conditions!!")
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
 
-    # def validate_country(self, country):
-    #     if country:
-    #         obj = Country.objects.get(pk=country)
-    #         print(obj)
-    #     return country
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -205,7 +191,6 @@ class RegisterIndieProSerializer(serializers.Serializer):
         pass
 
     def get_cleaned_data(self):
-        print("country----: ",self.validated_data.get('country', ''))
         return {
             'username': self.validated_data.get('username', ''),
             'password1': self.validated_data.get('password1', ''),
@@ -222,11 +207,11 @@ class RegisterIndieProSerializer(serializers.Serializer):
         }
 
     def save(self, request):
-        adapter = CustomUserAccountAdapter()
+        adapter = CustomIndieProUserAdapter()
         user = adapter.new_user(request)
-        print("______self.get_cleaned_data()___: ",self.get_cleaned_data())
         self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
+
