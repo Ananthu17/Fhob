@@ -8,6 +8,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -116,10 +118,12 @@ class CustomUser(AbstractUser):
         (HASEL, 'Hasel')
     ]
 
-    first_name = models.CharField(_('First Name'), max_length=150, blank=True)
+    first_name = models.CharField(_('First Name'),
+                                  max_length=150, null=True, blank=True)
     middle_name = models.CharField(_('Middle Name'),
-                                   max_length=150, blank=True)
-    last_name = models.CharField(_('Last Name'), max_length=150, blank=True)
+                                   max_length=150, null=True, blank=True)
+    last_name = models.CharField(_('Last Name'),
+                                 max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
     bio = models.TextField(_("Bio"), null=True, blank=True)
     imdb_url = models.URLField(_("IMDB URL"),
@@ -178,7 +182,9 @@ class CustomUser(AbstractUser):
                         related_name = 'user_country',
                         verbose_name=_("Country"),
                         blank=True, null=True)
-
+    # address = models.CharField(_("Address"), max_length=1024, null=True,
+    #                            blank=True)
+                               
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

@@ -2,14 +2,12 @@
 import json
 import requests
 
-from authemail import wrapper
-from authemail.models import SignupCode
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
 
+from authemail.models import SignupCode
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -19,7 +17,8 @@ from rest_framework.authtoken.models import Token
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 
-from .forms import SignUpForm, LoginForm, SignUpIndieProForm
+from .forms import SignUpForm, LoginForm, SignUpIndieProForm, \
+    SignUpFormCompany
 from .models import CustomUser
 from .serializers import CustomUserSerializer, RegisterSerializer
 
@@ -100,14 +99,6 @@ class ExtendedRegisterView(RegisterView):
                         status=status.HTTP_201_CREATED,
                         headers=headers)
 
-    # def get_serializer(self, *args, **kwargs):
-    #     """
-    #     overide default serializer
-    #     """
-    #     serializer_class = self.get_serializer_class()
-    #     kwargs.setdefault('context', self.get_serializer_context())
-    #     return serializer_class(*args, **kwargs)
-
 
 class CustomUserSignupHobo(APIView):
     renderer_classes = [TemplateHTMLRenderer]
@@ -119,7 +110,8 @@ class CustomUserSignupHobo(APIView):
 
     def post(self, request):
         form = SignUpForm(request.POST)
-        must_validate_email = getattr(settings, "AUTH_EMAIL_VERIFICATION", True)
+        must_validate_email = getattr(
+            settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
             if not request.POST._mutable:
@@ -135,10 +127,12 @@ class CustomUserSignupHobo(APIView):
 
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                    signup_code = SignupCode.objects.create_signup_code(
+                        new_user, ipaddr)
                     signup_code.send_signup_email()
 
-                return render(request, 'user_pages/user_email_verification.html',
+                return render(request,
+                              'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
@@ -236,3 +230,14 @@ class CustomUserSignupIndieProPage(APIView):
 
     class Meta:
         model = get_user_model()
+
+
+class CustomUserSignupCompany(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'user_pages/signup_company.html'
+
+    def get(self, request):
+        form = SignUpFormCompany()
+        return render(request, 'user_pages/signup_company.html',
+                      {'form': form})
+

@@ -45,3 +45,20 @@ class SignUpIndieProForm(UserCreationForm):
                     'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
                 }
 
+
+class SignUpFormCompany(forms.Form):
+    company_name = forms.CharField(max_length=150, required=False,
+                                   help_text='')
+    comapny_address = forms.Textarea()
+    comapny_website = forms.URLField()
+    company_phone = forms.CharField()
+
+    first_name = forms.CharField(max_length=150, required=True,
+                                 help_text='')
+    middle_name = forms.CharField(max_length=150, required=False,
+                                  help_text='')
+    last_name = forms.CharField(max_length=150, required=False,
+                                help_text='')
+    date_of_birth = forms.DateField()
+    user_address = forms.Textarea()
+

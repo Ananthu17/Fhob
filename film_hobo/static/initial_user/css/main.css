@@ -136,9 +136,10 @@
     height: 290px;
 }
 .landing-logo{
-    height: 228px;
-    width: 250px;
+    height: 240px;
     border-radius: 58%;
+    position: relative;
+    top: 32px;
 }
 .landing-des{
     font-family: "Caliban Std";
