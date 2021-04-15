@@ -31,7 +31,7 @@ class ExtendedLoginView(AuthLoginView):
                                               context={'request': request})
         self.serializer.is_valid(raise_exception=True)
         self.login()
-        print("hello",request.user)
+        print("hello", request.user)
         return self.get_response()
 
 
@@ -46,7 +46,7 @@ class ExtendedLogoutView(AuthLogoutView):
 
     def post(self, request, *args, **kwargs):
         return self.logout(request)
-   
+
 
 class CustomUserLogin(APIView):
     renderer_classes = [TemplateHTMLRenderer]
@@ -63,8 +63,8 @@ class CustomUserLogin(APIView):
                             'http://127.0.0.1:8000/hobo_user/authentication/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
-            
-            print("hello",request.user)
+
+            print("hello", request.user)
             # print("user_response--- ",user_response. __dict__ )
             if user_response.status_code == 200:
                 response_json = user_response.json()
@@ -73,7 +73,7 @@ class CustomUserLogin(APIView):
                 user = CustomUser.objects.get(id=token.user_id)
                 request.user = user
                 return render(request, 'user_pages/user_home.html',
-                            {'user': user})
+                              {'user': user})
             else:
                 return HttpResponse('Could not login')
         else:
@@ -90,6 +90,7 @@ class ExtendedRegisterView(RegisterView):
         # if data_to_serialize['i_agree'] == 'on':
         #     data_to_serialize['i_agree'] = True
         # serializer = self.get_serializer(data=data_to_serialize)
+        import pdb;pdb.set_trace()
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
@@ -195,8 +196,9 @@ class CustomUserSignupIndieProPage(APIView):
 
     def post(self, request):
         form = SignUpIndieProForm(request.POST)
-        choice = request.GET.get('choice')
-        must_validate_email = getattr(settings, "AUTH_EMAIL_VERIFICATION", True)
+        # choice = request.GET.get('choice')
+        must_validate_email = getattr(
+            settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
             print(request.POST)
@@ -210,7 +212,7 @@ class CustomUserSignupIndieProPage(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                
+
                 # if choice == 'indie':
                 #     new_user.membership = CustomUser.INDIE
                 # else:
@@ -219,11 +221,13 @@ class CustomUserSignupIndieProPage(APIView):
 
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                    signup_code = SignupCode.objects.create_signup_code(
+                        new_user, ipaddr)
                     signup_code.send_signup_email()
 
-                return render(request, 'user_pages/user_email_verification.html',
-                              {'user': new_user})
+                return render(
+                    request, 'user_pages/user_email_verification.html',
+                    {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
         return render(request, 'user_pages/signup_hobo.html', {'form': form})
@@ -240,4 +244,3 @@ class CustomUserSignupCompany(APIView):
         form = SignUpFormCompany()
         return render(request, 'user_pages/signup_company.html',
                       {'form': form})
-

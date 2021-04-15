@@ -32,5 +32,5 @@ urlpatterns = [
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
     path('api/accounts/', include('authemail.urls')),
     path('signup/verify/', SignupVerify.as_view(),
-        name='authemail-signup-verify'),
+         name='authemail-signup-verify'),
 ]

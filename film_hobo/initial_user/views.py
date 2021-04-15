@@ -47,8 +47,9 @@ class InitialUserDetailSavePage(APIView):
              data=json.dumps(json_dict),
              headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
-                message = "Thank you for pre-registering, " \
-                 "we will let you know when the website is up and running"
+                message = "Thank you for your help and consideration! " \
+                 "We will be in contact when the site is up and ready. " \
+                 "Sincerely, Film Hobo team."
                 messages.success(request, message)
             else:
                 error_messages = ast.literal_eval(user_response.text)

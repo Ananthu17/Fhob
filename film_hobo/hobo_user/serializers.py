@@ -29,7 +29,7 @@ class LoginSerializer(serializers.Serializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email',]
+        fields = ['email', ]
 
 
 # overide default registerserializer
@@ -54,21 +54,6 @@ class RegisterSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
-
-    # class Meta:
-    #     model = CustomUser
-    #     fields = ['email','username','first_name','middle_name','last_name'
-    #     'password1', 'password2', 'phone_number','date_of_birth', 'address',
-    #     'country']
-
-    # def validate_first_name(self, first_name):
-    #     return first_name
-
-    # def validate_middle_name(self, middle_name):
-    #     return middle_name
-
-    # def validate_last_name(self, last_name):
-    #     return last_name
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -102,10 +87,6 @@ class RegisterSerializer(serializers.Serializer):
             'first_name': self.validated_data.get('first_name', ''),
             'middle_name': self.validated_data.get('middle_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
-            'phone_number': self.validated_data.get('phone_number', ''),
-            'address': self.validated_data.get('address', ''),
-            'date_of_birth': self.validated_data.get('date_of_birth', ''),
-            'country': self.validated_data.get('country', ''),
         }
 
     def save(self, request):
