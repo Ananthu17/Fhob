@@ -36,7 +36,7 @@ class SignUpIndieProForm(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number', 
-                  'address','i_agree','date_of_birth', 'country')
+                  'address','i_agree','date_of_birth')
         
         def __init__(self, *args, **kwargs):
             super(SignUpIndieProForm, self).__init__(*args, **kwargs)

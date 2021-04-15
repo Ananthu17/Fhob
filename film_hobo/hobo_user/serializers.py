@@ -189,6 +189,13 @@ class RegisterIndieProSerializer(serializers.Serializer):
                 _("You must accept our terms and conditions!!"))
         return i_agree
 
+    def validate_i_agree(self, i_agree):
+        if i_agree != True:
+            print("You must accept our terms and conditions!!")
+            raise serializers.ValidationError(
+                _("You must accept our terms and conditions!!"))
+        return i_agree
+
     def validate(self, data):
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
@@ -210,7 +217,7 @@ class RegisterIndieProSerializer(serializers.Serializer):
             'phone_number': self.validated_data.get('phone_number', ''),
             'address': self.validated_data.get('address', ''),
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
-            'country': self.validated_data.get('country', ''),
+            # 'country': self.validated_data.get('country', ''),
             'membership': self.validated_data.get('membership', ''),
             'i_agree': self.validated_data.get('i_agree', ''),
         }
