@@ -161,9 +161,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 AUTH_USER_MODEL = 'hobo_user.CustomUser'
 
 # settings to remove 'username' field from django-allauth
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 
 # ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -174,8 +174,12 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_FROM = os.environ.get('AUTHEMAIL_DEFAULT_EMAIL_FROM')
-EMAIL_HOST_USER = os.environ.get('AUTHEMAIL_EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('AUTHEMAIL_EMAIL_HOST_PASSWORD')
-EMAIL_BCC = os.environ.get('AUTHEMAIL_DEFAULT_EMAIL_BCC')
+EMAIL_FROM = os.environ.get(
+    'AUTHEMAIL_DEFAULT_EMAIL_FROM', 'avin@techversantinfo.com')
+EMAIL_HOST_USER = os.environ.get(
+    'AUTHEMAIL_EMAIL_HOST_USER', 'avin@techversantinfo.com')
+EMAIL_HOST_PASSWORD = os.environ.get(
+    'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
+EMAIL_BCC = os.environ.get(
+    'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

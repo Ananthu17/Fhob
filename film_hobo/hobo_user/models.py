@@ -172,7 +172,7 @@ class CustomUser(AbstractUser):
                             null=True, blank=True)
     phone_number = PhoneNumberField(_("Phone Number"), null=True,
                                     blank=True, unique=True)
-    date_of_birth = models.DateField(_("Date of Birth"), default=date.today,
+    date_of_birth = models.DateField(_("Date of Birth"),
                                      blank=True, null=True)
     address = models.TextField(_("Address"), null=True, blank=True)
     country = models.ForeignKey("hobo_user.Country",

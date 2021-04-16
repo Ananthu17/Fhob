@@ -10,8 +10,15 @@ try:
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
+from django.contrib.auth import get_user_model, authenticate
+from django.conf import settings
+from rest_framework import exceptions
+
 from .adapters import CustomUserAccountAdapter
 from .models import CustomUser, Country
+
+
+UserModel = get_user_model()
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -21,26 +28,16 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(
-        max_length=100,
-        style={'placeholder': 'Email', 'autofocus': True}
-    )
-    password = serializers.CharField(
-        max_length=100,
-        style={'input_type': 'password', 'placeholder': 'Password'}
-    )
-    remember_me = serializers.BooleanField()
-
-
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', ]
 
 
-# overide default registerserializer
 class RegisterSerializer(serializers.Serializer):
+    """
+    overide the rest-auth RegisterSerializer for hobo user registration
+    """
     username = serializers.CharField(
         max_length=get_username_max_length(),
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
@@ -66,15 +63,6 @@ class RegisterSerializer(serializers.Serializer):
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
                   'last_name', 'password1', 'password2']
-
-    # def validate_first_name(self, first_name):
-    #     return first_name
-
-    # def validate_middle_name(self, middle_name):
-    #     return middle_name
-
-    # def validate_last_name(self, last_name):
-    #     return last_name
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -120,8 +108,10 @@ class RegisterSerializer(serializers.Serializer):
         return user
 
 
-# overide default registerserializer
 class RegisterIndieProSerializer(serializers.Serializer):
+    """
+    overide the rest-auth RegisterSerializer for indie/pro user registration
+    """
     username = serializers.CharField(
         max_length=get_username_max_length(),
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
@@ -157,15 +147,6 @@ class RegisterIndieProSerializer(serializers.Serializer):
                   'last_name', 'password1', 'password2', 'phone_number',
                   'address', 'date_of_birth', 'membership', 'i_agree',
                   'country']
-
-    # def validate_first_name(self, first_name):
-    #     return first_name
-
-    # def validate_middle_name(self, middle_name):
-    #     return middle_name
-
-    # def validate_last_name(self, last_name):
-    #     return last_name
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -230,3 +211,103 @@ class RegisterIndieProSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(style={'input_type': 'password'})
+
+    def authenticate(self, **kwargs):
+        return authenticate(self.context['request'], **kwargs)
+
+    def _validate_email(self, email, password):
+        user = None
+
+        if email and password:
+            user = self.authenticate(email=email, password=password)
+        else:
+            msg = _('Must include "email" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        return user
+
+    def _validate_username(self, username, password):
+        user = None
+
+        if username and password:
+            user = self.authenticate(username=username, password=password)
+        else:
+            msg = _('Must include "username" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        return user
+
+    def _validate_username_email(self, username, email, password):
+        user = None
+
+        if email and password:
+            user = self.authenticate(email=email, password=password)
+        elif username and password:
+            user = self.authenticate(username=username, password=password)
+        else:
+            msg = _(
+                'Must include "email" and "password".')
+            raise exceptions.ValidationError(msg)
+
+        return user
+
+    def validate(self, attrs):
+        username = attrs.get('username')
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        user = None
+
+        if 'allauth' in settings.INSTALLED_APPS:
+            from allauth.account import app_settings
+
+            # Authentication through email
+            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+                user = self._validate_email(email, password)
+
+            # Authentication through username
+            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+                user = self._validate_username(username, password)
+
+            # Authentication through either username or email
+            else:
+                user = self._validate_username_email(username, email, password)
+
+        else:
+            # Authentication without using allauth
+            if email:
+                try:
+                    username = UserModel.objects.get(
+                        email__iexact=email).get_username()
+                except UserModel.DoesNotExist:
+                    pass
+
+            if username:
+                user = self._validate_username_email(username, '', password)
+
+        # Did we get back an active user?
+        if user:
+            if not user.is_active:
+                msg = _('User account is disabled.')
+                raise exceptions.ValidationError(msg)
+        else:
+            msg = _('Unable to log in with provided credentials.')
+            raise exceptions.ValidationError(msg)
+
+        # If required, is the email verified?
+        if 'rest_auth.registration' in settings.INSTALLED_APPS:
+            from allauth.account import app_settings
+            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+                email_address = user.emailaddress_set.get(email=user.email)
+                if not email_address.verified:
+                    raise serializers.ValidationError(
+                        _('E-mail is not verified.'))
+
+        attrs['user'] = user
+        return attrs

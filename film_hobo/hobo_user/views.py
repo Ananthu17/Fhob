@@ -1,8 +1,9 @@
 
+import ast
 import json
 import requests
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
@@ -31,8 +32,7 @@ class ExtendedLoginView(AuthLoginView):
         self.serializer = self.get_serializer(data=self.request.data,
                                               context={'request': request})
         self.serializer.is_valid(raise_exception=True)
-        self.login()
-        print("hello", request.user)
+        self.login(request, self.user)
         return self.get_response()
 
 
@@ -54,19 +54,35 @@ class CustomUserLogin(APIView):
     template_name = 'user_pages/login.html'
 
     def get(self, request):
-        form = LoginForm()
-        return render(request, 'user_pages/login.html', {'form': form})
+        if request.user.is_anonymous:
+            form = LoginForm()
+            return render(request, 'user_pages/login.html', {'form': form})
+        else:
+            return render(request, 'user_pages/user_home.html',
+                          {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
+        input_json_data_dict = ast.literal_eval(json.dumps(request.POST))
+        input_json_data_dict['email'] = input_json_data_dict['username']
+        del input_json_data_dict['username']
         if form.is_valid():
             user_response = requests.post(
                             'http://127.0.0.1:8000/hobo_user/authentication/',
-                            data=json.dumps(request.POST),
+                            data=json.dumps(input_json_data_dict),
                             headers={'Content-type': 'application/json'})
 
-            print("hello", request.user)
-            # print("user_response--- ",user_response. __dict__ )
+            # email = input_json_data_dict['email']
+            # password = input_json_data_dict['password']
+            # user = authenticate(request, email=email, password=password)
+
+            # if user is not None:
+            #     login(request, user)
+            #     return render(request, 'user_pages/user_home.html',
+            #                   {'user': user})
+            # else:
+            #     pass
+
             if user_response.status_code == 200:
                 response_json = user_response.json()
                 token = response_json['key']
@@ -77,10 +93,6 @@ class CustomUserLogin(APIView):
                               {'user': user})
             else:
                 return HttpResponse('Could not login')
-        else:
-            print("Invalid")
-            print(form.errors)
-        return render(request, 'user_pages/login.html', {'form': form})
 
 
 class ExtendedRegisterView(RegisterView):
