@@ -21,7 +21,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieProForm, \
     SignUpFormCompany
 from .models import CustomUser
 from .serializers import CustomUserSerializer, RegisterSerializer, \
-    RegisterIndieProSerializer
+    RegisterIndieProSerializer, TokenSerializer, \
+    SignupCodeSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -207,11 +208,13 @@ class CustomUserSignupIndieProView(APIView):
 
     def get(self, request):
         form = SignUpIndieProForm()
-        return render(request, 'user_pages/signup_indie_pro.html', {'form': form})
+        return render(request, 'user_pages/signup_indie_pro.html',
+                      {'form': form})
 
     def post(self, request):
         form = SignUpIndieProForm(request.POST)
-        must_validate_email = getattr(settings, "AUTH_EMAIL_VERIFICATION", True)
+        must_validate_email = getattr(
+            settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
             print(request.POST)
@@ -227,10 +230,12 @@ class CustomUserSignupIndieProView(APIView):
                            email=request.POST['email'])
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                    signup_code = SignupCode.objects.create_signup_code(new_user, ipaddr)
+                    signup_code = SignupCode.objects.create_signup_code(
+                            new_user, ipaddr)
                     signup_code.send_signup_email()
 
-                return render(request, 'user_pages/user_email_verification.html',
+                return render(request,
+                              'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
                 return HttpResponse('Could not save data')
@@ -249,3 +254,38 @@ class CustomUserSignupCompany(APIView):
         form = SignUpFormCompany()
         return render(request, 'user_pages/signup_company.html',
                       {'form': form})
+
+
+class SendEmailVerificationView(APIView):
+    serializer_class = TokenSerializer
+
+    def post(self, request):
+        must_validate_email = getattr(settings,
+                                      'AUTH_EMAIL_VERIFICATION', True)
+        key = request.POST['key']
+        if must_validate_email:
+            user_token = Token.objects.get(key=key)
+            user = user_token.user
+            ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+            signup_code = SignupCode.objects.create_signup_code(
+                        user, ipaddr)
+            signup_code.send_signup_email()
+            response = {'message': 'Email send', 'signup_code': signup_code.code}
+        else:
+            response = {'message': 'Email not send'}
+        return Response(response)
+
+
+class EmailVerificationStatusView(APIView):
+    serializer_class = SignupCodeSerializer
+
+    def post(self, request):
+        code = request.POST['code']
+        try:
+            code = SignupCode.objects.get(code=code)
+            if code:
+                response = {'verified': False}
+        except SignupCode.DoesNotExist:
+            response = {'verified': True}
+        return Response(response)
+

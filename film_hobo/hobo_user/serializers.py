@@ -12,6 +12,8 @@ except ImportError:
 
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
 from .models import CustomUser, Country
+from authemail.models import SignupCode
+from rest_framework.authtoken.models import Token
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -215,3 +217,18 @@ class RegisterIndieProSerializer(serializers.Serializer):
         setup_user_email(request, user, [])
         return user
 
+
+class TokenSerializer(serializers.ModelSerializer):
+    key = serializers.CharField(required=True)
+
+    class Meta:
+        model = Token
+        fields = ['key',]
+
+
+class SignupCodeSerializer(serializers.ModelSerializer):
+    code = serializers.CharField(required=True)
+
+    class Meta:
+        model = SignupCode
+        fields = ['code', ]
