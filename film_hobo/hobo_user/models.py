@@ -393,6 +393,12 @@ class Makeup(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=1000)
 
+    def clean(self):
+        country_match = Country.objects.filter(
+            name=self.__dict__['name'])
+        if country_match:
+            raise ValidationError('country already exists')
+
     def __str__(self):
         return str(self.name)
 
