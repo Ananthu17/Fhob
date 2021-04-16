@@ -42,6 +42,15 @@ class SignUpIndieProForm(UserCreationForm):
             super(SignUpIndieProForm, self).__init__(*args, **kwargs)
             self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
             self.fields['i_agree'].required = True
+            self.fields['first_name'].required = True
+            self.fields['last_name'].required = True
+            self.fields['email'].required = True
+            self.fields['password1'].required = True
+            self.fields['password2'].required = True
+            self.fields['phone_number'].required = True
+            self.fields['address'].required = True
+            self.fields['date_of_birth'].required = True
+            self.fields['country'].required = True
 
         widgets = {
                     'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),

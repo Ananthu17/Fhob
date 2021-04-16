@@ -14,8 +14,10 @@ from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from rest_framework import exceptions
 
-from .adapters import CustomUserAccountAdapter
+from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
 from .models import CustomUser, Country
+from authemail.models import SignupCode
+from rest_framework.authtoken.models import Token
 
 
 UserModel = get_user_model()
@@ -117,29 +119,29 @@ class RegisterIndieProSerializer(serializers.Serializer):
         min_length=allauth_settings.USERNAME_MIN_LENGTH,
         required=allauth_settings.USERNAME_REQUIRED
     )
-    email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=True)
+    password1 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(
         max_length=150,
         required=True,
     )
     middle_name = serializers.CharField(
         max_length=150,
-        allow_blank=True,
+        allow_blank=True, required=False
     )
     last_name = serializers.CharField(
         max_length=150,
         required=True,
     )
     phone_number = serializers.CharField(
-        max_length=15,
+        max_length=15, required=True
     )
-    date_of_birth = serializers.DateField(format="%Y-%m-%d")
-    country = CountrySerializer(read_only=True)
+    date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
     membership = serializers.StringRelatedField()
-    address = serializers.CharField()
-    i_agree = serializers.BooleanField(required=True)
+    address = serializers.CharField(required=True)
+    country = serializers.CharField(required=True)
+    i_agree = serializers.BooleanField(required=False)
 
     class Meta:
         model = CustomUser
@@ -164,17 +166,10 @@ class RegisterIndieProSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate_i_agree(self, i_agree):
-        if i_agree is not True:
-            print("You must accept our terms and conditions!!")
+        if i_agree != True:
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
-
-    # def validate_country(self, country):
-    #     if country:
-    #         obj = Country.objects.get(pk=country)
-    #         print(obj)
-    #     return country
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -186,7 +181,6 @@ class RegisterIndieProSerializer(serializers.Serializer):
         pass
 
     def get_cleaned_data(self):
-        print("country----: ", self.validated_data.get('country', ''))
         return {
             'username': self.validated_data.get('username', ''),
             'password1': self.validated_data.get('password1', ''),
@@ -203,9 +197,8 @@ class RegisterIndieProSerializer(serializers.Serializer):
         }
 
     def save(self, request):
-        adapter = CustomUserAccountAdapter()
+        adapter = CustomIndieProUserAdapter()
         user = adapter.new_user(request)
-        print("______self.get_cleaned_data()___: ", self.get_cleaned_data())
         self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         self.custom_signup(request, user)
@@ -311,3 +304,19 @@ class LoginSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    key = serializers.CharField(required=True)
+
+    class Meta:
+        model = Token
+        fields = ['key', ]
+
+
+class SignupCodeSerializer(serializers.ModelSerializer):
+    code = serializers.CharField(required=True)
+
+    class Meta:
+        model = SignupCode
+        fields = ['code', ]
