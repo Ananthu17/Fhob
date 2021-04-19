@@ -6,7 +6,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ExtendedLoginView, ExtendedLogoutView, \
                    ChooseMembershipPage, CustomUserSignupIndieProView, \
                    CustomUserSignupCompany, ExtendedRegisterIndieProView, \
-                   SendEmailVerificationView, EmailVerificationStatusView
+                   SendEmailVerificationView, EmailVerificationStatusView, \
+                   ExtendedRegisterCompanyView
 
 
 app_name = "hobo_user"
@@ -16,6 +17,8 @@ urlpatterns = [
          name='user_register'),
     path('registration_indie_pro/', ExtendedRegisterIndieProView.as_view(),
          name='user_register_indie_pro'),
+    path('registration_company/', ExtendedRegisterCompanyView.as_view(),
+         name='user_register_company'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),

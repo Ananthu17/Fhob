@@ -19,7 +19,10 @@ class InitialUserDetailSaveAPI(APIView):
         serializer = InitialIntrestedUsersSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
-        return Response(status=status.HTTP_201_CREATED)
+        message = "Thank you for your help and consideration! " \
+                  "We will be in contact when the site is up and ready. " \
+                  "Sincerely, Film Hobo team."
+        return Response([{"status": message}], status=status.HTTP_201_CREATED)
 
 
 class InitialUserDetailSavePage(APIView):

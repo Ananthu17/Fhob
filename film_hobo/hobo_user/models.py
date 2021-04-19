@@ -136,6 +136,16 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
     )
+    company_name = models.CharField(_("Company Name"), max_length=500,
+                                    null=True, blank=True)
+    company_address = models.TextField(_("Address"), null=True, blank=True)
+    company_website = models.URLField(_("Company Website"),
+                                      null=True,
+                                      blank=True)
+    company_phone = PhoneNumberField(_("Phone Number"), null=True,
+                                     unique=True)
+    title = models.CharField(_('Title'),
+                             max_length=150, null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
     directional_skill = models.FloatField(_("Directional Skill"), null=True,
                                           blank=True)
@@ -172,7 +182,7 @@ class CustomUser(AbstractUser):
                             null=True, blank=True)
     phone_number = PhoneNumberField(_("Phone Number"), null=True,
                                     unique=True)
-    date_of_birth = models.DateField(_("Date of Birth"), default=date.today,
+    date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
     address = models.TextField(_("Address"), null=True)
     country = models.ForeignKey("hobo_user.Country",

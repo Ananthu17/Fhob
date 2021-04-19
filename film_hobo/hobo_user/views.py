@@ -23,7 +23,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieProForm, \
 from .models import CustomUser
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieProSerializer, TokenSerializer, \
-    SignupCodeSerializer
+    SignupCodeSerializer, RegisterCompanySerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -33,7 +33,7 @@ class ExtendedLoginView(AuthLoginView):
         self.serializer = self.get_serializer(data=self.request.data,
                                               context={'request': request})
         self.serializer.is_valid(raise_exception=True)
-        self.login(request, self.user)
+        self.login()
         return self.get_response()
 
 
@@ -105,6 +105,23 @@ class ExtendedRegisterView(RegisterView):
         #     data_to_serialize['i_agree'] = True
         # serializer = self.get_serializer(data=data_to_serialize)
         serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
+        user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(self.get_response_data(user),
+                        status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+
+class ExtendedRegisterCompanyView(RegisterView):
+    serializer_class = RegisterCompanySerializer
+
+    def create(self, request, *args, **kwargs):
+        user_input_data = request.data
+        user_input_data['membership'] = CustomUser.MEMBERSHIP_CHOICES[3][0]
+        serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)

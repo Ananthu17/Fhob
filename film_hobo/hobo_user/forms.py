@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser
 from bootstrap_datepicker_plus import DateTimePickerInput
+from bootstrap_datepicker_plus import DatePickerInput
 
 
 class SignUpForm(UserCreationForm):
@@ -63,9 +64,9 @@ class SignUpFormCompany(forms.Form):
     """
     company_name = forms.CharField(label="Company Name", max_length=150,
                                    required=False, help_text='')
-    comapny_address = forms.CharField(label="Address", help_text="",
+    company_address = forms.CharField(label="Address", help_text="",
                                       widget=forms.Textarea())
-    comapny_website = forms.URLField(label="Website")
+    company_website = forms.URLField(label="Website")
     company_phone = forms.CharField(label="Phone")
     """
     personal details
@@ -80,7 +81,9 @@ class SignUpFormCompany(forms.Form):
     email = forms.EmailField(label="Email", max_length=254,
                              help_text='Required. Inform a ' +
                              'valid email address.')
-    date_of_birth = forms.DateField()
+    date_of_birth = forms.DateField(
+         widget=DateTimePickerInput(format='%m/%d/%Y')
+     )
     user_address = forms.CharField(label="Address", help_text="",
                                    widget=forms.Textarea())
     country = forms.CharField(label="Country")

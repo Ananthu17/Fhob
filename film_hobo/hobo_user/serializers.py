@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from phonenumber_field.serializerfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
 
 try:
@@ -14,7 +15,8 @@ from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from rest_framework import exceptions
 
-from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
+from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
+                      CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -320,3 +322,91 @@ class SignupCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignupCode
         fields = ['code', ]
+
+
+class RegisterCompanySerializer(serializers.ModelSerializer):
+    """
+    overide the rest-auth RegisterSerializer for hobo user registration
+    """
+    username = serializers.CharField(
+        max_length=get_username_max_length(),
+        min_length=allauth_settings.USERNAME_MIN_LENGTH,
+        required=allauth_settings.USERNAME_REQUIRED
+    )
+    email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True,
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    company_name = serializers.CharField()
+    company_address = serializers.CharField()
+    company_website = serializers.URLField()
+    company_phone = PhoneNumberField()
+    title = serializers.CharField()
+    membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
+
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'username', 'first_name', 'middle_name',
+                  'last_name', 'password1', 'password2', 'company_name',
+                  'company_address', 'company_website', 'company_phone',
+                  'title', 'membership']
+
+    def validate_username(self, username):
+        username = get_adapter().clean_username(username)
+        return username
+
+    def validate_email(self, email):
+        email = get_adapter().clean_email(email)
+        if allauth_settings.UNIQUE_EMAIL:
+            if email and email_address_exists(email):
+                raise serializers.ValidationError(_(
+                    "A user is already registered with this e-mail address."))
+        return email
+
+    def validate_password1(self, password):
+        return get_adapter().clean_password(password)
+
+    def validate(self, data):
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError(
+                _("The two password fields didn't match."))
+        return data
+
+    def custom_signup(self, request, user):
+        pass
+
+    def get_cleaned_data(self):
+        return {
+            'username': self.validated_data.get('username', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'email': self.validated_data.get('email', ''),
+            'first_name': self.validated_data.get('first_name', ''),
+            'middle_name': self.validated_data.get('middle_name', ''),
+            'last_name': self.validated_data.get('last_name', ''),
+            'company_name': self.validated_data.get('company_name', ''),
+            'company_address': self.validated_data.get('company_address', ''),
+            'company_website': self.validated_data.get('company_website', ''),
+            'company_phone': self.validated_data.get('company_phone', ''),
+            'title': self.validated_data.get('title', ''),
+            'membership': self.validated_data.get('membership', ''),
+        }
+
+    def save(self, request):
+        adapter = CustomCompanyUserAccountAdapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+        adapter.save_user(request, user, self)
+        self.custom_signup(request, user)
+        setup_user_email(request, user, [])
+        return user
