@@ -6,10 +6,12 @@ from import_export.admin import ImportExportModelAdmin
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     EthnicAppearanceInline, AthleticSkill, \
                     AthleticSkillInline, PromoCode, Team, Actor, Writer, \
-                    Producer, Director, Editor, Makeup, Country
+                    Producer, Director, Editor, Makeup, Country, \
+                    IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
+                    CompanyPaymentDetails
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource
+                    CountryResource, GuildMembershipResource
 
 
 class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -29,7 +31,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
                              'email', 'password')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
-        ('Membership', {'fields': ('membership',)}),
+        ('Membership', {'fields': ('membership','guild_membership')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender','date_of_birth','phone_number',
                             'address','country')}),
@@ -81,6 +83,9 @@ admin.site.register(Producer)
 admin.site.register(Director)
 admin.site.register(Editor)
 admin.site.register(Makeup)
+admin.site.register(IndiePaymentDetails)
+admin.site.register(ProPaymentDetails)
+admin.site.register(CompanyPaymentDetails)
 
 
 @admin.register(EthnicAppearance)
@@ -96,3 +101,8 @@ class AthleticSkillAdmin(ImportExportModelAdmin):
 @admin.register(Country)
 class CountryAdmin(ImportExportModelAdmin):
     resource_class = CountryResource
+
+
+@admin.register(GuildMembership)
+class GuildMembershipAdmin(ImportExportModelAdmin):
+    resource_class = GuildMembershipResource

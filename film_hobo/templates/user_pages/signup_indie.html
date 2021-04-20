@@ -6,13 +6,13 @@
       </head>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>
-    
+
     <script>
     </script>
-   
+
     <body>
       <div class="container">
-        <h2>Sign up - {{request.GET.choice}}</h2>
+        <h2>Sign up - Indie</h2>
         <form method="post">
           {% csrf_token %}
           {% for field in form %}
@@ -27,11 +27,8 @@
               {% endfor %}
             </p>
           {% endfor %}
-          {% if request.GET.choice == 'indie' %}
           <input type="hidden" name="membership" value="IND"/>
-          {% else %}
-          <input type="hidden" name="membership" value="PRO"/>
-          {% endif %}
+
           <button type="submit">Sign up</button>
         </form>
       </div>
