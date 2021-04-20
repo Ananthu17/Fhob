@@ -7,7 +7,11 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
+from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
+# from django.core import serializers
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -16,14 +20,16 @@ from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
+from rest_framework.decorators import api_view
 
 from authemail.views import SignupVerify
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm
-from .models import CustomUser
+from .models import CustomUser, IndiePaymentDetails
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
-    SignupCodeSerializer
+    SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
+    ProPaymentSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -394,5 +400,73 @@ class ExtendedSignupVerify(SignupVerify):
                           {'content': content})
 
 
+class PaymentPlanAPI(APIView):
+    serializer_class = PaymentPlanSerializer
 
+    def post(self, request):
+        serializer = PaymentPlanSerializer(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            email = data_dict['email']
+            user = CustomUser.objects.get(email=email)
+            if 'payment_plan' in data_dict:
+                payment_plan = data_dict['payment_plan']
+                if payment_plan == 'monthly':
+                    user.payment_plan = CustomUser.MONTHLY
+                if payment_plan == 'annually':
+                    user.payment_plan = CustomUser.ANNUALLY
+                user.save()
+                response = {'message': 'Payment Plan Added', 'status':
+                            status.HTTP_200_OK}
+            else:
+                user.payment_plan = CustomUser.FREE
+                user.save()
+                response = {'message': 'Payment Plan Empty', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            response = {'message': serializer.errors,
+                        'status': status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class IndiePaymentDetailsAPI(APIView):
+    serializer_class = IndiePaymentSerializer
+
+    def get(self, request):
+        return Response({})
+
+
+class SelectPaymentPlanIndieView(TemplateView):
+    template_name = 'user_pages/payment_plan_indie.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # user_response = requests.get(
+        #         'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/')
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user_response = requests.post(
+                    'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                    data=json.dumps(request.POST),
+                    headers={'Content-type': 'application/json'})
+        print(user_response)
+        return HttpResponseRedirect(reverse('hobo_user:user_home'))
+
+
+class SelectPaymentPlanProView(TemplateView):
+    template_name = 'user_pages/payment_plan_pro.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json'})
+        print(user_response)
+        return HttpResponseRedirect(reverse('hobo_user:user_home'))
 

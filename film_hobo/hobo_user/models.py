@@ -54,6 +54,14 @@ class CustomUser(AbstractUser):
         (PRO, 'Pro'),
         (PRODUCTION_COMPANY, 'Production Company')
     ]
+    MONTHLY = 'monthly'
+    ANNUALLY = 'annually'
+    FREE = ''
+    PAYMENT_PLAN_CHOICES = [
+        (MONTHLY, 'Monthly'),
+        (ANNUALLY, 'Annually'),
+        (FREE, '-------')
+    ]
 
     MALE = 'MAL'
     FEMALE = 'FEM'
@@ -174,7 +182,7 @@ class CustomUser(AbstractUser):
                             null=True, blank=True)
     phone_number = PhoneNumberField(_("Phone Number"), null=True,
                                     unique=True)
-    date_of_birth = models.DateField(_("Date of Birth"), default=date.today,
+    date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
     address = models.TextField(_("Address"), null=True)
     country = models.ForeignKey("hobo_user.Country",
@@ -188,6 +196,11 @@ class CustomUser(AbstractUser):
                                               verbose_name=_("Guild Membership"
                                                              )
                                               )
+    payment_plan = models.CharField(_("Payment Plan"),
+                                    choices=PAYMENT_PLAN_CHOICES,
+                                    max_length=150,
+                                    null=True,
+                                    default=FREE)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -414,9 +427,11 @@ class GuildMembership(models.Model):
     def __str__(self):
         return str(self.membership)
 
+
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    amount = models.IntegerField(_('Annual billing amount'))
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
     estimated_tax = models.IntegerField(_('Valid for days'))
 
     class Meta:
@@ -426,16 +441,19 @@ class IndiePaymentDetails(SingletonModel):
 
 class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    amount = models.IntegerField(_('Annual billing amount'))
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
     estimated_tax = models.IntegerField(_('Valid for days'))
 
     class Meta:
         verbose_name = 'Pro Members Payment Detail'
         verbose_name_plural = 'Pro Members Payment Details'
 
+
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    amount = models.IntegerField(_('Annual billing amount'))
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
     estimated_tax = models.IntegerField(_('Valid for days'))
 
     class Meta:

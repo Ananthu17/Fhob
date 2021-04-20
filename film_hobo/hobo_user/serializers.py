@@ -11,7 +11,8 @@ except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
 
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
-from .models import CustomUser, Country, GuildMembership
+from .models import CustomUser, Country, GuildMembership, \
+    IndiePaymentDetails, ProPaymentDetails
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -341,3 +342,27 @@ class SignupCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SignupCode
         fields = ['code', ]
+
+
+class PaymentPlanSerializer(serializers.Serializer):
+    payment_plan = serializers.CharField(required=False)
+    email = serializers.CharField(required=True)
+
+
+class IndiePaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndiePaymentDetails
+        fields = ['free_days', 'annual_amount', 'monthly_amount',
+                  'estimated_tax']
+
+
+class ProPaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProPaymentDetails
+        fields = ['free_days', 'annual_amount', 'monthly_amount',
+                  'estimated_tax']
+
+
+
