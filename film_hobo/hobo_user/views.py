@@ -542,26 +542,6 @@ class PaymentProView(TemplateView):
         return context
 
 
-# class CheckPromoCodeView(View, JSONResponseMixin):
-
-#     def get(self, *args, **kwargs):
-#         context = dict()
-#         promocode = self.request.GET.get('promo_code',None)
-#         try:
-#             promocode = PromoCode.objects.get(promo_code=promocode)
-#             life_span = promocode.life_span
-#             validity = promocode.valid_from + datetime.timedelta(
-#                        days=life_span)
-#             today = timezone.now()
-#             if today <= validity:
-#                 context['message'] = "Promo Code Applied"
-#             else:
-#                 context['message'] = "Promo Code Expired"
-#         except PromoCode.DoesNotExist:
-#             context['message'] = "Invalid Promo Code"
-#         return self.render_json_response(context)
-
-
 class CheckPromoCodeAPI(APIView):
     serializer_class = PromoCodeSerializer
 
