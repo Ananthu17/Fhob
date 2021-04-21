@@ -3,7 +3,7 @@ import json
 import requests
 from authemail.models import SignupCode
 
-from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
@@ -83,7 +83,10 @@ class CustomUserLogin(APIView):
                 return render(request, 'user_pages/user_home.html',
                               {'user': user})
             else:
-                return HttpResponse('Could not login')
+                return HttpResponse(
+                    'Unable to log in with provided credentials.')
+        else:
+            return render(request, 'user_pages/login.html', {'form': form})
 
 
 class ExtendedRegisterView(RegisterView):
