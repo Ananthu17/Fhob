@@ -164,4 +164,10 @@
     height: 100px;
     background-color: #3fa9f5;
 }
- /* landing page end */
+.mask-height{
+    height:145px;
+}
+.camera-height{
+    height:125px;
+}
+/*landing page end*/

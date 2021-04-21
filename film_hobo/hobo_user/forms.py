@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser
+from .models import CustomUser, Country
 from bootstrap_datepicker_plus import DateTimePickerInput
 from bootstrap_datepicker_plus import DatePickerInput
 
@@ -86,6 +86,7 @@ class SignUpFormCompany(forms.Form):
      )
     user_address = forms.CharField(label="Address", help_text="",
                                    widget=forms.Textarea())
-    country = forms.CharField(label="Country")
+    country = forms.ChoiceField(label="Country")
     password1 = forms.CharField(label="Password", max_length=150)
     password2 = forms.CharField(label="Repeat Password", max_length=150)
+

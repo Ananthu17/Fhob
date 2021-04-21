@@ -4,6 +4,7 @@ import json
 import requests
 
 from django.contrib.auth import get_user_model, authenticate, login
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
@@ -68,28 +69,11 @@ class CustomUserLogin(APIView):
         input_json_data_dict['email'] = input_json_data_dict['username']
         del input_json_data_dict['username']
         if form.is_valid():
-            user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/authentication/',
-                            data=json.dumps(input_json_data_dict),
-                            headers={'Content-type': 'application/json'})
-
-            # email = input_json_data_dict['email']
-            # password = input_json_data_dict['password']
-            # user = authenticate(request, email=email, password=password)
-
-            # if user is not None:
-            #     login(request, user)
-            #     return render(request, 'user_pages/user_home.html',
-            #                   {'user': user})
-            # else:
-            #     pass
-
-            if user_response.status_code == 200:
-                response_json = user_response.json()
-                token = response_json['key']
-                token = Token.objects.get(key=token)
-                user = CustomUser.objects.get(id=token.user_id)
-                request.user = user
+            email = input_json_data_dict['email']
+            password = input_json_data_dict['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
                 return render(request, 'user_pages/user_home.html',
                               {'user': user})
             else:

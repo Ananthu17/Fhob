@@ -348,6 +348,12 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+    phone = PhoneNumberField()
+    date_of_birth = serializers.DateField()
+    address = serializers.CharField()
+    country = serializers.CharField()
+
+    # company details
     company_name = serializers.CharField()
     company_address = serializers.CharField()
     company_website = serializers.URLField()
@@ -358,9 +364,10 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
-                  'last_name', 'password1', 'password2', 'company_name',
-                  'company_address', 'company_website', 'company_phone',
-                  'title', 'membership']
+                  'last_name', 'password1', 'password2', 'phone',
+                  'date_of_birth', 'address', 'country',
+                  'company_name', 'company_address', 'company_website',
+                  'company_phone', 'title', 'membership']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -394,6 +401,10 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
             'first_name': self.validated_data.get('first_name', ''),
             'middle_name': self.validated_data.get('middle_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
+            'phone': self.validated_data.get('phone', ''),
+            'date_of_birth': self.validated_data.get('date_of_birth', ''),
+            'address': self.validated_data.get('address', ''),
+            'country': self.validated_data.get('country', ''),
             'company_name': self.validated_data.get('company_name', ''),
             'company_address': self.validated_data.get('company_address', ''),
             'company_website': self.validated_data.get('company_website', ''),
