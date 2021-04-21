@@ -1,17 +1,21 @@
 import ast
 import json
 import requests
+import datetime
+from django.utils import timezone
 from authemail.models import SignupCode
+from braces.views import JSONResponseMixin
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.core import serializers
 
-# from django.core import serializers
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -25,11 +29,12 @@ from rest_framework.decorators import api_view
 from authemail.views import SignupVerify
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm
-from .models import CustomUser, IndiePaymentDetails
+from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
+                    PromoCode
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
-    ProPaymentSerializer
+    ProPaymentSerializer, PromoCodeSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -417,7 +422,7 @@ class PaymentPlanAPI(APIView):
                     user.payment_plan = CustomUser.ANNUALLY
                 user.save()
                 response = {'message': 'Payment Plan Added', 'status':
-                            status.HTTP_200_OK}
+                            status.HTTP_200_OK, 'email': email}
             else:
                 user.payment_plan = CustomUser.FREE
                 user.save()
@@ -433,7 +438,18 @@ class IndiePaymentDetailsAPI(APIView):
     serializer_class = IndiePaymentSerializer
 
     def get(self, request):
-        return Response({})
+        payment_details = IndiePaymentDetails.get_solo()
+        serializer = IndiePaymentSerializer(payment_details)
+        return Response(serializer.data)
+
+
+class ProPaymentDetailsAPI(APIView):
+    serializer_class = ProPaymentSerializer
+
+    def get(self, request):
+        payment_details = ProPaymentDetails.get_solo()
+        serializer = ProPaymentSerializer(payment_details)
+        return Response(serializer.data)
 
 
 class SelectPaymentPlanIndieView(TemplateView):
@@ -441,9 +457,14 @@ class SelectPaymentPlanIndieView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # user_response = requests.get(
-        #         'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/')
-
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['monthly_amount'] = payment_details['monthly_amount']
+        context['annual_amount'] = payment_details['annual_amount']
         return context
 
     def post(self, request, *args, **kwargs):
@@ -451,8 +472,11 @@ class SelectPaymentPlanIndieView(TemplateView):
                     'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
                     data=json.dumps(request.POST),
                     headers={'Content-type': 'application/json'})
-        print(user_response)
-        return HttpResponseRedirect(reverse('hobo_user:user_home'))
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        email = response['email']
+        return HttpResponseRedirect("/hobo_user/payment_indie?email="+email)
 
 
 class SelectPaymentPlanProView(TemplateView):
@@ -460,6 +484,14 @@ class SelectPaymentPlanProView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['monthly_amount'] = payment_details['monthly_amount']
+        context['annual_amount'] = payment_details['annual_amount']
         return context
 
     def post(self, request, *args, **kwargs):
@@ -467,6 +499,95 @@ class SelectPaymentPlanProView(TemplateView):
                             'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
-        print(user_response)
-        return HttpResponseRedirect(reverse('hobo_user:user_home'))
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        email = response['email']
+        return HttpResponseRedirect("/hobo_user/payment_pro?email="+email)
 
+
+class PaymentIndieView(TemplateView):
+    template_name = 'user_pages/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['payment_details'] = payment_details
+        context['payment_plan'] = user.payment_plan
+        return context
+
+
+class PaymentProView(TemplateView):
+    template_name = 'user_pages/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['payment_details'] = payment_details
+        context['payment_plan'] = user.payment_plan
+        return context
+
+
+# class CheckPromoCodeView(View, JSONResponseMixin):
+
+#     def get(self, *args, **kwargs):
+#         context = dict()
+#         promocode = self.request.GET.get('promo_code',None)
+#         try:
+#             promocode = PromoCode.objects.get(promo_code=promocode)
+#             life_span = promocode.life_span
+#             validity = promocode.valid_from + datetime.timedelta(
+#                        days=life_span)
+#             today = timezone.now()
+#             if today <= validity:
+#                 context['message'] = "Promo Code Applied"
+#             else:
+#                 context['message'] = "Promo Code Expired"
+#         except PromoCode.DoesNotExist:
+#             context['message'] = "Invalid Promo Code"
+#         return self.render_json_response(context)
+
+
+class CheckPromoCodeAPI(APIView):
+    serializer_class = PromoCodeSerializer
+
+    def post(self, request):
+        serializer = PromoCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            promocode = data_dict['promo_code']
+            print('promocode',promocode)
+            try:
+                promocode = PromoCode.objects.get(promo_code=promocode)
+                life_span = promocode.life_span
+                validity = promocode.valid_from + datetime.timedelta(
+                        days=life_span)
+                today = timezone.now()
+                if today <= validity:
+                    response = {'message': 'Promo Code Applied', 'status':
+                                status.HTTP_200_OK}
+                else:
+                    response = {'message': 'Promo Code Expired', 'status':
+                                status.HTTP_200_OK}
+            except PromoCode.DoesNotExist:
+                response = {'message': 'Invalid Promo Code', 'status':
+                            status.HTTP_200_OK}
+        else:
+            response = {'message': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)

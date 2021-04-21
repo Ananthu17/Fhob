@@ -1,4 +1,5 @@
 import json
+from django.utils import timezone
 from datetime import date
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -379,6 +380,8 @@ class PromoCode(models.Model):
     promo_code = models.CharField(max_length=1000)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
+    valid_from = models.DateTimeField(_('Valid From'),
+                                      default=timezone.now)
     life_span = models.IntegerField(_('Valid for days'), null=True)
 
 
@@ -432,7 +435,7 @@ class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
@@ -443,7 +446,7 @@ class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Pro Members Payment Detail'
@@ -454,7 +457,7 @@ class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Company Payment Detail'

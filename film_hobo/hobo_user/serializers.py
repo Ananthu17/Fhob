@@ -12,7 +12,7 @@ except ImportError:
 
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter
 from .models import CustomUser, Country, GuildMembership, \
-    IndiePaymentDetails, ProPaymentDetails
+    IndiePaymentDetails, ProPaymentDetails, PromoCode
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -363,6 +363,13 @@ class ProPaymentSerializer(serializers.ModelSerializer):
         model = ProPaymentDetails
         fields = ['free_days', 'annual_amount', 'monthly_amount',
                   'estimated_tax']
+
+
+class PromoCodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PromoCode
+        fields = ['promo_code', 'created_time', 'valid_from', 'life_span']
 
 
 

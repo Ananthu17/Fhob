@@ -1,0 +1,46 @@
+{% load rest_framework %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <h3>Payment:</h3>
+                    <p>First {{ payment_details.free_days }} days free</p>
+                    {% if payment_plan == 'monthly' %}
+                        <p>Amount: ${{ payment_details.monthly_amount }} (billed monthly)</p>
+                    {% elif payment_plan == 'annually' %}
+                        <p>Amount: ${{ payment_details.annual_amount }} (billed annually)</p>
+                    {% else %}
+                        <p>Choose Payment plan to Proceed</p>
+                    {% endif %}
+                    <p>Estimated Tax:$ {{ payment_details.estimated_tax }}</p>
+                    <p>Promo Code</p>
+                    <input type="text" value="" id="promocode" name="promocode" />
+                    <input type="button" id="apply_promocode" value="Apply" />
+                    <p class="promo_code_status"></p>
+            </div>
+        </div>
+        <script>
+            $('body').on('click' , '#apply_promocode', function(){
+                $('.promo_code_status').html("");
+                var promocode = $("#promocode").val();
+                var data_dict = {};
+                if(promocode){
+                    data_dict['promo_code']=promocode
+                }
+                $.post('/hobo_user/check-promocode-api/',data_dict)
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            $('.promo_code_status').html(data['message']);
+                        }
+                    });
+                });
+        </script>
+    </body>
+</html>

@@ -12,9 +12,9 @@
                         <input type="hidden" name="email" value="{{ request.GET.email }}"/>
                         {% csrf_token %}
                         <input type="radio" id="monthly" name="payment_plan" value="monthly">
-                        <label for="monthly">Monthly</label><br>
+                        <label for="monthly">Monthly ${{monthly_amount}}</label><br>
                         <input type="radio" id="annually" name="payment_plan" value="annually">
-                        <label for="annually">Annually</label><br>
+                        <label for="annually">Annually ${{annual_amount}}</label><br>
                         <input type="submit" value="Next">
                     </form>
                     <p>You can add a Company Membership to your Individual account
