@@ -1,0 +1,37 @@
+{% load rest_framework %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                {% if content.status == 200 and content.user_membership == 'IND' %}
+                    <p>Email address verified.</p>
+                    <a href = "{% url 'hobo_user:payment_plan_indie' %}?email={{content.email}}">Complete Registration Process</a>
+
+                {% elif content.status == 200 and content.user_membership == 'PRO' %}
+                    <p>Email address verified.</p>
+                    <a href = "{% url 'hobo_user:payment_plan_pro' %}?email={{content.email}}">Complete Registration Process</a>
+
+                {% elif content.status == 200 and content.user_membership == 'COM' %}
+                    <p>Email address verified.</p>
+                    <a href = "">Complete Registration Process</a>
+
+                {% elif content.status == 200 and content.user_membership == 'HOB' %}
+                    <p>Email address verified.</p>
+                    <a href = "{% url 'hobo_user:login' %}">Login</a>
+
+                {% else %}
+                    <p>Invalid Link.</p>
+                    <a href = "{% url 'hobo_user:login' %}">Login</a>
+                {% endif %}
+
+                {% for obj in queryset %}
+                  {{ obj.membership }}
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>

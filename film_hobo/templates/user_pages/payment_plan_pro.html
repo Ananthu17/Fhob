@@ -1,0 +1,26 @@
+{% load rest_framework %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <h3>Select payment plan:</h3>
+                    <form action="." method='POST'>
+                        <input type="hidden" name="email" value="{{ request.GET.email }}"/>
+                        {% csrf_token %}
+                        <input type="radio" id="monthly" name="payment_plan" value="monthly">
+                        <label for="monthly">Monthly</label><br>
+                        <input type="radio" id="annually" name="payment_plan" value="annually">
+                        <label for="annually">Annually</label><br>
+                        <input type="submit" value="Next">
+                    </form>
+                    <p>You can add a Company Membership to your Individual account
+                        at any time. Use the same email when you sign up for the Company
+                        Membership and get a 20% discount.</p>
+            </div>
+        </div>
+    </body>
+</html>

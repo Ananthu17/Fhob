@@ -30,6 +30,7 @@ class CustomIndieProUserAdapter(DefaultAccountAdapter):
         """
 
         country_id = request.data.get('country', '')
+        guild_membership_id = request.data.get('guild_membership_id', '')
 
         user = super().save_user(request, user, form, False)
         user_field(user, 'first_name', request.data.get('first_name', ''))
@@ -43,6 +44,9 @@ class CustomIndieProUserAdapter(DefaultAccountAdapter):
         user_field(user, 'address', request.data.get('address', ''))
         user_field(user, 'membership', request.data.get('membership', ''))
         user.save()
+        if guild_membership_id is not None:
+            for item in guild_membership_id:
+                user.guild_membership.add(item)
         if country_id is not None:
             country = Country.objects.get(pk=country_id)
             user.country = country

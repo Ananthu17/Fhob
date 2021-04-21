@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from authemail.views import SignupVerify
+from hobo_user.views import ExtendedSignupVerify
 
 from rest_framework_simplejwt import views as jwt_views
 
@@ -31,6 +31,6 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
     path('api/accounts/', include('authemail.urls')),
-    path('signup/verify/', SignupVerify.as_view(),
+    path('signup/verify/', ExtendedSignupVerify.as_view(),
          name='authemail-signup-verify'),
 ]

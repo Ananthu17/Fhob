@@ -183,4 +183,3 @@ EMAIL_HOST_PASSWORD = os.environ.get(
     'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
 EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

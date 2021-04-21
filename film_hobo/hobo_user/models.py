@@ -1,5 +1,3 @@
-
-from datetime import date
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.db import models
@@ -7,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+
+from solo.models import SingletonModel
 
 
 class CustomUserManager(BaseUserManager):
@@ -51,6 +51,14 @@ class CustomUser(AbstractUser):
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
         (PRODUCTION_COMPANY, 'Production Company')
+    ]
+    MONTHLY = 'monthly'
+    ANNUALLY = 'annually'
+    FREE = ''
+    PAYMENT_PLAN_CHOICES = [
+        (MONTHLY, 'Monthly'),
+        (ANNUALLY, 'Annually'),
+        (FREE, '-------')
     ]
 
     MALE = 'MAL'
@@ -190,8 +198,17 @@ class CustomUser(AbstractUser):
                                 related_name='user_country',
                                 verbose_name=_("Country"),
                                 null=True)
-    # address = models.CharField(_("Address"), max_length=1024, null=True,
-    #                            blank=True)
+    guild_membership = models.ManyToManyField('hobo_user.GuildMembership',
+                                              blank=True,
+                                              related_name='guild_membership',
+                                              verbose_name=_("Guild Membership"
+                                                             )
+                                              )
+    payment_plan = models.CharField(_("Payment Plan"),
+                                    choices=PAYMENT_PLAN_CHOICES,
+                                    max_length=150,
+                                    null=True,
+                                    default=FREE)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -370,6 +387,7 @@ class PromoCode(models.Model):
     promo_code = models.CharField(max_length=1000)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
+    life_span = models.IntegerField(_('Valid for days'), null=True)
 
 
 class Team(models.Model):
@@ -415,3 +433,43 @@ class Country(models.Model):
     class Meta:
         verbose_name = 'Country'
         verbose_name_plural = 'Countries'
+
+
+class GuildMembership(models.Model):
+    membership = models.CharField(_("Membership Type"), max_length=250)
+
+    def __str__(self):
+        return str(self.membership)
+
+
+class IndiePaymentDetails(SingletonModel):
+    free_days = models.CharField(_('First free days'), max_length=250)
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
+    estimated_tax = models.IntegerField(_('Valid for days'))
+
+    class Meta:
+        verbose_name = 'Indie Members Payment Detail'
+        verbose_name_plural = 'Indie Members Payment Details'
+
+
+class ProPaymentDetails(SingletonModel):
+    free_days = models.CharField(_('First free days'), max_length=250)
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
+    estimated_tax = models.IntegerField(_('Valid for days'))
+
+    class Meta:
+        verbose_name = 'Pro Members Payment Detail'
+        verbose_name_plural = 'Pro Members Payment Details'
+
+
+class CompanyPaymentDetails(SingletonModel):
+    free_days = models.CharField(_('First free days'), max_length=250)
+    annual_amount = models.IntegerField(_('Annual billing amount'))
+    monthly_amount = models.IntegerField(_('Monthly billing amount'))
+    estimated_tax = models.IntegerField(_('Valid for days'))
+
+    class Meta:
+        verbose_name = 'Company Payment Detail'
+        verbose_name_plural = 'Company Payment Details'
