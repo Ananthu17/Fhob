@@ -470,7 +470,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
-    phone = PhoneNumberField()
+    phone_number = PhoneNumberField()
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
     country = serializers.CharField()
@@ -486,7 +486,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
-                  'last_name', 'password1', 'password2', 'phone',
+                  'last_name', 'password1', 'password2', 'phone_number',
                   'date_of_birth', 'address', 'country',
                   'company_name', 'company_address', 'company_website',
                   'company_phone', 'title', 'membership']
@@ -506,6 +506,24 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     def validate_password1(self, password):
         return get_adapter().clean_password(password)
 
+    def validate_phone_number(self, phone_number):
+        try:
+            match = CustomUser.objects.get(phone_number=phone_number)
+            if match:
+                raise serializers.ValidationError(_(
+                    "A user is already registered with this phone number."))
+        except CustomUser.DoesNotExist:
+            return phone_number
+
+    def validate_company_phone(self, company_phone):
+        try:
+            match = CustomUser.objects.get(company_phone=company_phone)
+            if match:
+                raise serializers.ValidationError(_(
+                    "A company is already registered with this phone number."))
+        except CustomUser.DoesNotExist:
+            return company_phone
+
     def validate(self, data):
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
@@ -523,7 +541,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
             'first_name': self.validated_data.get('first_name', ''),
             'middle_name': self.validated_data.get('middle_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
-            'phone': self.validated_data.get('phone', ''),
+            'phone_number': self.validated_data.get('phone_number', ''),
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
             'address': self.validated_data.get('address', ''),
             'country': self.validated_data.get('country', ''),

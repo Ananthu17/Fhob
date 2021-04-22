@@ -89,6 +89,17 @@ class CustomUserLogin(APIView):
             return render(request, 'user_pages/login.html', {'form': form})
 
 
+class CustomUserLogout(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'user_pages/login.html'
+
+    def get(self, request):
+        pass
+
+    def post(self, request):
+        pass
+
+
 class ExtendedRegisterView(RegisterView):
     serializer_class = RegisterSerializer
 

@@ -69,7 +69,7 @@ class CustomCompanyUserAccountAdapter(DefaultAccountAdapter):
         user_field(user, 'last_name', request.data.get('last_name', ''))
         user_field(user, 'email', request.data.get('email', ''))
         user_field(user, 'password1', request.data.get('password1', ''))
-        user_field(user, 'phone', request.data.get('phone', ''))
+        user_field(user, 'phone_number', request.data.get('phone_number', ''))
         user_field(user, 'date_of_birth', request.data.get('date_of_birth', ''))
         user_field(user, 'address', request.data.get('address', ''))
         user_field(user, 'company_name', request.data.get('company_name', ''))
