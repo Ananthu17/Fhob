@@ -10,7 +10,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ExtendedRegisterProView, SelectPaymentPlanIndieView, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
-                   PaymentProView, PaymentIndieView, CheckPromoCodeAPI
+                   PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
+                   SettingsView, GeneralSettingsUpdateAPI
 
 
 app_name = "hobo_user"
@@ -59,5 +60,9 @@ urlpatterns = [
          name='payment_indie'),
     path('check-promocode-api/', CheckPromoCodeAPI.as_view(),
          name='check-promocode-api'),
+    path('settings/', SettingsView.as_view(),
+         name='settings'),
+    path('general-settings-update-api/', GeneralSettingsUpdateAPI.as_view(),
+         name='general-settings-update-api'),
 
 ]

@@ -372,4 +372,23 @@ class PromoCodeSerializer(serializers.ModelSerializer):
         fields = ['promo_code', 'created_time', 'valid_from', 'life_span']
 
 
+class GeneralSettingsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True, required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    user_id = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
 

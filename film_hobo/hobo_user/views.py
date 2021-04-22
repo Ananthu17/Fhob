@@ -4,18 +4,16 @@ import requests
 import datetime
 from django.utils import timezone
 from authemail.models import SignupCode
-from braces.views import JSONResponseMixin
 
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http.response import HttpResponse
 from django.conf import settings
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.core import serializers
+from django.contrib import messages
 
-from rest_framework import generics
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -24,7 +22,6 @@ from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
-from rest_framework.decorators import api_view
 
 from authemail.views import SignupVerify
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
@@ -34,7 +31,7 @@ from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
-    ProPaymentSerializer, PromoCodeSerializer
+    ProPaymentSerializer, PromoCodeSerializer, GeneralSettingsSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -289,7 +286,8 @@ class CustomUserSignupProView(APIView):
         if form.is_valid():
             json_response = json.dumps(request.POST)
             json_dict = ast.literal_eval(json_response)
-            guild_membership_id_response = form.cleaned_data['guild_membership_id']
+            guild_membership_id_response = form.cleaned_data[
+                          'guild_membership_id']
             guild_membership_ids = []
             for guild_id in guild_membership_id_response:
                 guild_membership_ids.append(str(guild_id.id))
@@ -351,7 +349,8 @@ class SendEmailVerificationView(APIView):
                 signup_code = SignupCode.objects.create_signup_code(
                             user, ipaddr)
                 signup_code.send_signup_email()
-                response = {'message': 'Email send', 'signup_code': signup_code.code}
+                response = {'message': 'Email send', 'signup_code':
+                            signup_code.code}
             else:
                 response = {'message': 'Email not send'}
         else:
@@ -550,7 +549,6 @@ class CheckPromoCodeAPI(APIView):
         if serializer.is_valid():
             data_dict = serializer.data
             promocode = data_dict['promo_code']
-            print('promocode',promocode)
             try:
                 promocode = PromoCode.objects.get(promo_code=promocode)
                 life_span = promocode.life_span
@@ -571,3 +569,94 @@ class CheckPromoCodeAPI(APIView):
                         status.HTTP_400_BAD_REQUEST}
 
         return Response(response)
+
+
+class GeneralSettingsUpdateAPI(APIView):
+    serializer_class = GeneralSettingsSerializer
+
+    def post(self, request):
+        serializer = GeneralSettingsSerializer(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print("data_dict", data_dict)
+            try:
+                id = data_dict['user_id']
+                user = CustomUser.objects.get(pk=id)
+                if 'first_name' in data_dict:
+                    user.first_name = data_dict['first_name']
+                if 'middle_name' in data_dict:
+                    user.middle_name = data_dict['middle_name']
+                if 'last_name' in data_dict:
+                    user.last_name = data_dict['last_name']
+                if 'email' in data_dict:
+                    email = data_dict['email']
+                    try:
+                        all_users = CustomUser.objects.exclude(pk=id)
+                        match = all_users.get(email=email)
+                        if match:
+                            response = {
+                             'email_validation_error':
+                             'User with this email id already exists',
+                             'status': status.HTTP_400_BAD_REQUEST
+                              }
+                    except CustomUser.DoesNotExist:
+                        user.email = data_dict['email']
+                        user.save()
+                        response = {'message': 'General Settings Updated',
+                                    'status': status.HTTP_200_OK}
+                else:
+                    user.save()
+                    response = {'message': 'General Settings Updated',
+                                'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': 'Invalid id', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class SettingsView(TemplateView):
+    template_name = 'user_pages/settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # user = self.request.user
+        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        context['user'] = user
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # user = self.request.user
+        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['user_id'] = user.id
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/general-settings-update-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        error_messages = dict()
+
+        if 'errors' in response:
+            if 'first_name' in response['errors']:
+                error_messages['first_name'] = "This field is required"
+            if 'last_name' in response['errors']:
+                error_messages['last_name'] = "This field is required"
+            if 'email' in response['errors']:
+                error_messages['email'] = "This field is required"
+        elif 'email_validation_error' in response:
+            error_messages['email'] = response['email_validation_error']
+        else:
+            messages.success(self.request, 'General Settings Updated')
+        # user = self.request.user
+        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        return render(request, 'user_pages/settings.html',
+                      {'message': error_messages, 'user': user})
