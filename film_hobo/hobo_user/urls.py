@@ -4,14 +4,14 @@ from rest_auth.views import LoginView
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserLogout, \
                    CustomUserList, CustomUserDetail, HomePage, \
-                   ExtendedRegisterView, ExtendedLoginView, \
-                   ExtendedLogoutView, ChooseMembershipPage, \
-                   CustomUserSignupCompany, SendEmailVerificationView, \
-                   EmailVerificationStatusView, ExtendedRegisterCompanyView, \
-                   ExtendedRegisterIndieView, CustomUserSignupProView, \
-                   CustomUserSignupIndieView, ExtendedRegisterProView, \
-                   SelectPaymentPlanIndieView, PaymentPlanAPI, \
-                   SelectPaymentPlanProView, IndiePaymentDetailsAPI
+                   ExtendedRegisterView, ExtendedLogoutView, \
+                   ChooseMembershipPage, CustomUserSignupCompany, \
+                   SendEmailVerificationView, EmailVerificationStatusView, \
+                   ExtendedRegisterCompanyView, ExtendedRegisterIndieView, \
+                   CustomUserSignupProView, CustomUserSignupIndieView, \
+                   ExtendedRegisterProView, SelectPaymentPlanIndieView, \
+                   PaymentPlanAPI, SelectPaymentPlanProView, \
+                   IndiePaymentDetailsAPI
 
 
 app_name = "hobo_user"

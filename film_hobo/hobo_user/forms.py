@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from bootstrap_datepicker_plus import DateTimePickerInput
+from phonenumber_field.formfields import PhoneNumberField
+
 
 from .models import CustomUser, GuildMembership
 
@@ -116,10 +118,11 @@ class SignUpFormCompany(forms.Form):
                                   help_text='')
     last_name = forms.CharField(max_length=150, required=False,
                                 help_text='')
-    title = forms.CharField(label="Title", max_length=150)
+    title = forms.CharField(label="Your Title", max_length=150)
     email = forms.EmailField(label="Email", max_length=254,
                              help_text='Required. Inform a ' +
                              'valid email address.')
+    phone_number = PhoneNumberField(label="Phone")
     date_of_birth = forms.DateField(
          widget=DateTimePickerInput(format='%m/%d/%Y')
      )

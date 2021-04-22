@@ -23,18 +23,80 @@
         <h2>Sign up - Company</h2>
         <form method="post">
           {% csrf_token %}
-          {% for field in form %}
-            <p>
-              {{ field.label_tag }}<br>
-              {{ field }}
-              {% if field.help_text %}
-                <small style="color: grey">{{ field.help_text }}</small>
-              {% endif %}
-              {% for error in field.errors %}
-                <p style="color: red">{{ error }}</p>
-              {% endfor %}
-            </p>
-          {% endfor %}
+          <p>
+            <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label><br>
+            <input type="text" name="{{ form.company_name.name }}" maxlength="150" id="{{ form.company_name.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.company_address.id_for_label }}">{{ form.company_address.label }}</label><br>
+            <textarea name="{{ form.company_address.name }}" cols="40" rows="10" required="" id="{{ form.company_address.id_for_label }}"></textarea>
+          </p>
+          <p>
+            <label for="{{ form.company_website.id_for_label }}">{{ form.company_website.label }}</label><br>
+            <input type="text" name="{{ form.company_website.name }}" maxlength="150" id="{{ form.company_website.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.company_phone.id_for_label }}">{{ form.company_phone.label }}</label><br>
+            <input type="text" name="{{ form.company_phone.name }}" maxlength="150" id="{{ form.company_phone.id_for_label }}">
+          </p>
+          <h3>Your Information</h3>
+          <p>
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label><br>
+            <input type="text" name="{{ form.first_name.name }}" maxlength="150" id="{{ form.first_name.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.middle_name.id_for_label }}">{{ form.middle_name.label }}</label><br>
+            <input type="text" name="{{ form.middle_name.name }}" maxlength="150" id="{{ form.middle_name.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label><br>
+            <input type="text" name="{{ form.last_name.name }}" maxlength="150" id="{{ form.last_name.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label><br>
+            <input type="text" name="{{ form.title.name }}" maxlength="150" id="{{ form.title.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label><br>
+            <input type="text" name="{{ form.email.name }}" maxlength="150" id="{{ form.email.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label><br>
+            <input type="text" name="{{ form.phone_number.name }}" maxlength="150" id="{{ form.phone_number.id_for_label }}">
+          </p>
+          <p>
+          <label for="{{ form.country.id_for_label }}">{{ form.country.label }}</label><br>
+          <select name="gender" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+            <option value="{{ country.id }}">-Select-</option>
+            {% for country in countries %}
+               <option value="{{ country.id }}">{{ country }}</option>
+            {% endfor %}
+            </select>
+          </p>
+          <p>
+            <label for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }}</label><br>
+            {{ form.date_of_birth }}
+          </p>
+          <p>
+            <label for="{{ form.user_address.id_for_label }}">{{ form.user_address.label }}</label><br>
+            <textarea name="{{ form.user_address.name }}" cols="40" rows="10" required="" id="{{ form.user_address.id_for_label }}"></textarea>
+          </p>
+          <p>
+            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label><br>
+            <input type="text" name="{{ form.password1.name }}" maxlength="150" id="{{ form.password1.id_for_label }}">
+          </p>
+          <p>
+            <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label><br>
+            <input type="text" name="{{ form.password2.name }}" maxlength="150" id="{{ form.password2.id_for_label }}">
+          </p>
+            {% if field.help_text %}
+              <small style="color: grey">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+              <p style="color: red">{{ error }}</p>
+            {% endfor %}
+          </p>
+
           <button type="submit">Sign up</button>
         </form>
       </div>

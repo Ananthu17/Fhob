@@ -26,7 +26,7 @@ from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm
-from .models import CustomUser
+from .models import CustomUser, Country
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     TokenSerializer, \
     SignupCodeSerializer, RegisterCompanySerializer, \
@@ -350,8 +350,9 @@ class CustomUserSignupCompany(APIView):
 
     def get(self, request):
         form = SignUpFormCompany()
+        countries = Country.objects.all()
         return render(request, 'user_pages/signup_company.html',
-                      {'form': form})
+                      {'form': form, 'countries': countries})
 
 
 class SendEmailVerificationView(APIView):
