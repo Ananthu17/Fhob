@@ -3,14 +3,15 @@ import json
 import requests
 from authemail.models import SignupCode
 
-from django.contrib.auth import get_user_model, authenticate, login, logout
-
-from django.shortcuts import get_object_or_404, render, redirect
-from django.http.response import HttpResponse
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth.views import LoginView as DjangoLogin
+from django.contrib.auth.views import LogoutView as DjangoLogout
 from django.http import HttpResponseRedirect
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from django.views.generic import TemplateView
 
 # from django.core import serializers
 from rest_framework import status
@@ -57,7 +58,7 @@ class ExtendedLogoutView(AuthLogoutView):
         return self.logout(request)
 
 
-class CustomUserLogin(APIView):
+class CustomUserLogin(DjangoLogin):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'user_pages/login.html'
 
@@ -89,15 +90,12 @@ class CustomUserLogin(APIView):
             return render(request, 'user_pages/login.html', {'form': form})
 
 
-class CustomUserLogout(APIView):
+class CustomUserLogout(DjangoLogout):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'user_pages/login.html'
+    template_name = 'user_pages/logout.html'
 
-    def get(self, request):
-        pass
-
-    def post(self, request):
-        pass
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
 
 class ExtendedRegisterView(RegisterView):
