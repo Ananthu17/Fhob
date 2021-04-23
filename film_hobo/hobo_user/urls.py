@@ -2,7 +2,7 @@ from django.urls import path
 
 from rest_auth.views import LoginView
 
-
+from .views import *
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
                    ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
@@ -15,7 +15,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, GeneralSettingsUpdateAPI, \
                    CustomUserLogout, ExtendedRegisterCompanyView, \
-                   ChangePasswordView
+                   ChangePasswordAPI
 
 
 app_name = "hobo_user"
@@ -50,7 +50,7 @@ urlpatterns = [
          name='check-promocode-api'),
     path('general-settings-update-api/', GeneralSettingsUpdateAPI.as_view(),
          name='general-settings-update-api'),
-    path('change-password-api/', ChangePasswordView.as_view(),
+    path('change-password-api/', ChangePasswordAPI.as_view(),
          name='change-password-api'),
 
     # web-view endpoints
@@ -78,7 +78,7 @@ urlpatterns = [
          name='payment_indie'),
     path('settings/', SettingsView.as_view(),
          name='settings'),
-
-
+    path('settings-change-password/', ChangePasswordView.as_view(),
+         name='settings-change-password'),
 
 ]

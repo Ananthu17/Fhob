@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from bootstrap_datepicker_plus import DateTimePickerInput
+from phonenumber_field.formfields import PhoneNumberField
+
 
 from .models import CustomUser, GuildMembership
 from django.contrib.auth.forms import PasswordChangeForm
@@ -116,10 +118,11 @@ class SignUpFormCompany(forms.Form):
                                   help_text='')
     last_name = forms.CharField(max_length=150, required=False,
                                 help_text='')
-    title = forms.CharField(label="Title", max_length=150)
+    user_title = forms.CharField(label="Your Title", max_length=150)
     email = forms.EmailField(label="Email", max_length=254,
                              help_text='Required. Inform a ' +
                              'valid email address.')
+    phone_number = PhoneNumberField(label="Phone")
     date_of_birth = forms.DateField(
          widget=DateTimePickerInput(format='%m/%d/%Y')
      )
@@ -130,27 +133,8 @@ class SignUpFormCompany(forms.Form):
     password2 = forms.CharField(label="Repeat Password", max_length=150)
 
 
-class ChangePasswordForm(PasswordChangeForm):
-    pass
-    #     **SetPasswordForm.error_messages,
-    #     'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
-    # }
-    # old_password = forms.CharField(
-    #     label=_("Old password"),
-    #     strip=False,
-    #     widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': True}),
-    # )
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput())
+    new_password1 = forms.CharField(widget=forms.PasswordInput())
+    new_password2 = forms.CharField(widget=forms.PasswordInput())
 
-    # field_order = ['old_password', 'new_password1', 'new_password2']
-
-    # def clean_old_password(self):
-    #     """
-    #     Validate that the old_password field is correct.
-    #     """
-    #     old_password = self.cleaned_data["old_password"]
-    #     if not self.user.check_password(old_password):
-    #         raise ValidationError(
-    #             self.error_messages['password_incorrect'],
-    #             code='password_incorrect',
-    #         )
-    #     return old_password

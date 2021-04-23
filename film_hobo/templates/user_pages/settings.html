@@ -4,7 +4,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3>General Account Settings</h3>
+                    <h3>General Account Settings {{request.user}}</h3>
                     <form method="post" action="{% url 'hobo_user:settings' %}">
                         {% csrf_token %}
                     <p>First Name:
@@ -37,7 +37,39 @@
                 </div>
             </div>
             <div class="row">
-                {{change_password_form}}
+                <form method="post" action="{% url 'hobo_user:settings-change-password' %}">
+                    {% csrf_token %}
+                    <p>{{change_password_form.old_password.label}}
+                     {{change_password_form.old_password}}
+                     {% if change_password_errors.old_password %}
+                     {% for err in change_password_errors.old_password %}
+                         <p>{{ err}}</p>
+                     {% endfor %}
+                 {% endif %}
+                    </p>
+                    <p>
+                    {{change_password_form.new_password1.label}}
+                    {{change_password_form.new_password1}}
+                    {% if change_password_errors.new_password1 %}
+                        {% for err in change_password_errors.new_password1 %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    </p>
+                    <P>
+                     {{change_password_form.new_password2.label}}
+                     {{change_password_form.new_password2}}
+                     {% if change_password_errors.new_password2 %}
+                        {% for err in change_password_errors.new_password2 %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                     {% endif %}
+                    </p>
+                     <input type = "submit" value = "Save" id="save_password">
+                     {% if change_password_messages %}
+                            <p>{{ change_password_messages}}</p>
+                     {% endif %}
+                </form>
             </div>
         </div>
 

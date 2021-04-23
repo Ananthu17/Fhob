@@ -33,9 +33,11 @@ from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
-    SignUpFormCompany, SignUpProForm, ChangePasswordForm
+    SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
+    SignUpFormCompany, SignUpProForm
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
-                    PromoCode
+                    PromoCode, Country
+
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
@@ -360,8 +362,28 @@ class CustomUserSignupCompany(APIView):
 
     def get(self, request):
         form = SignUpFormCompany()
+        countries = Country.objects.all()
         return render(request, 'user_pages/signup_company.html',
-                      {'form': form})
+                      {'form': form, 'countries': countries})
+
+    def post(self, request):
+        form = SignUpFormCompany(request.POST)
+        countries = Country.objects.all()
+        if form.is_valid():
+            obj = CustomUser()
+            # company details
+            obj.company_name = form.cleaned_data['company_name']
+            obj.company_address = form.cleaned_data['company_address']
+            obj.company_website = form.cleaned_data['company_website']
+            obj.company_phone = form.cleaned_data['company_phone']
+            # personal details
+            obj.first_name = form.cleaned_data['first_name']
+            obj.save()
+            return render(request, 'user_pages/user_home.html',
+                          {'form': form, 'countries': countries})
+        else:
+            return render(request, 'user_pages/signup_company.html',
+                          {'form': form, 'countries': countries})
 
 
 class SendEmailVerificationView(APIView):
@@ -659,6 +681,7 @@ class SettingsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        context['change_password_form'] = ChangePasswordForm
         context['user'] = user
         return context
 
@@ -693,12 +716,58 @@ class SettingsView(TemplateView):
                       {'message': error_messages, 'user': user})
 
 
-class ChangePasswordView(AuthPasswordChangeView):
+class ChangePasswordAPI(AuthPasswordChangeView):
     permission_classes = (IsAuthenticated,)
+    # serializer_class = ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
-        print("request.user", self.request.user)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"detail": _("New password has been saved.")})
+        if serializer.is_valid():
+            user = request.user
+            print("user: ", user.email)
+            serializer.save()
+            response = {'message': 'New password has been saved.', 'status':
+                        status.HTTP_200_OK}
+        else:
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST,
+                        }
+
+        return Response(response)
+
+
+class ChangePasswordView(TemplateView):
+    template_name = 'user_pages/settings.html'
+    form_class = ChangePasswordForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        change_password_form = self.form_class
+        context['change_password_form'] = change_password_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        error_messages = {}
+        message = ""
+        change_password_form = self.form_class
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/change-password-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        print(response)
+        if response['message']:
+            message = response['message']
+        return render(request, 'user_pages/settings.html',
+                      {'change_password_messages': message,
+                       'user': user,
+                       'change_password_form': change_password_form,
+                       'change_password_errors': response})

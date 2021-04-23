@@ -150,7 +150,7 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ],
     'DATE_INPUT_FORMATS': ["%Y-%m-%d"],
 }
@@ -182,3 +182,5 @@ EMAIL_HOST_PASSWORD = os.environ.get(
     'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
 EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
+
+OLD_PASSWORD_FIELD_ENABLED = True
