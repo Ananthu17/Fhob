@@ -118,7 +118,7 @@ class SignUpFormCompany(forms.Form):
                                   help_text='')
     last_name = forms.CharField(max_length=150, required=False,
                                 help_text='')
-    title = forms.CharField(label="Your Title", max_length=150)
+    user_title = forms.CharField(label="Your Title", max_length=150)
     email = forms.EmailField(label="Email", max_length=254,
                              help_text='Required. Inform a ' +
                              'valid email address.')

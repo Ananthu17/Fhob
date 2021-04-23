@@ -354,6 +354,25 @@ class CustomUserSignupCompany(APIView):
         return render(request, 'user_pages/signup_company.html',
                       {'form': form, 'countries': countries})
 
+    def post(self, request):
+        form = SignUpFormCompany(request.POST)
+        countries = Country.objects.all()
+        if form.is_valid():
+            obj = CustomUser()
+            # company details
+            obj.company_name = form.cleaned_data['company_name']
+            obj.company_address = form.cleaned_data['company_address']
+            obj.company_website = form.cleaned_data['company_website']
+            obj.company_phone = form.cleaned_data['company_phone']
+            # personal details
+            obj.first_name = form.cleaned_data['first_name']
+            obj.save()
+            return render(request, 'user_pages/user_home.html',
+                          {'form': form, 'countries': countries})
+        else:
+            return render(request, 'user_pages/signup_company.html',
+                          {'form': form, 'countries': countries})
+
 
 class SendEmailVerificationView(APIView):
     serializer_class = TokenSerializer

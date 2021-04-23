@@ -53,8 +53,8 @@
             <input type="text" name="{{ form.last_name.name }}" maxlength="150" id="{{ form.last_name.id_for_label }}">
           </p>
           <p>
-            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label><br>
-            <input type="text" name="{{ form.title.name }}" maxlength="150" id="{{ form.title.id_for_label }}">
+            <label for="{{ form.user_title.id_for_label }}">{{ form.user_title.label }}</label><br>
+            <input type="text" name="{{ form.user_title.name }}" maxlength="150" id="{{ form.user_title.id_for_label }}">
           </p>
           <p>
             <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label><br>
@@ -66,7 +66,7 @@
           </p>
           <p>
           <label for="{{ form.country.id_for_label }}">{{ form.country.label }}</label><br>
-          <select name="gender" class="selectpicker" data-title="Select Gender" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+          <select id="{{ form.country.id_for_label }}" name="{{ form.country.name }}" class="selectpicker" data-title="Select Country" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
             <option value="{{ country.id }}">-Select-</option>
             {% for country in countries %}
                <option value="{{ country.id }}">{{ country }}</option>
