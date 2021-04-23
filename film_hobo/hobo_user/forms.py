@@ -5,7 +5,7 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 
-from .models import CustomUser, GuildMembership
+from .models import CustomUser, GuildMembership, Country
 
 
 class SignUpForm(UserCreationForm):
@@ -128,6 +128,7 @@ class SignUpFormCompany(forms.Form):
      )
     user_address = forms.CharField(label="Address", help_text="",
                                    widget=forms.Textarea())
-    country = forms.ChoiceField(label="Country")
+    country = forms.ModelChoiceField(
+        label="Country", queryset=Country.objects.all())
     password1 = forms.CharField(label="Password", max_length=150)
     password2 = forms.CharField(label="Repeat Password", max_length=150)

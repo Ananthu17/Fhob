@@ -356,7 +356,6 @@ class CustomUserSignupCompany(APIView):
 
     def post(self, request):
         form = SignUpFormCompany(request.POST)
-        countries = Country.objects.all()
         if form.is_valid():
             obj = CustomUser()
             # company details
@@ -366,12 +365,21 @@ class CustomUserSignupCompany(APIView):
             obj.company_phone = form.cleaned_data['company_phone']
             # personal details
             obj.first_name = form.cleaned_data['first_name']
+            obj.middle_name = form.cleaned_data['middle_name']
+            obj.last_name = form.cleaned_data['last_name']
+            obj.user_title = form.cleaned_data['user_title']
+            obj.email = form.cleaned_data['email']
+            obj.phone_number = form.cleaned_data['phone_number']
+            obj.date_of_birth = form.cleaned_data['date_of_birth']
+            obj.user_address = form.cleaned_data['user_address']
+            obj.country = form.cleaned_data['country']
+            obj.user_title = form.cleaned_data['password1']
             obj.save()
             return render(request, 'user_pages/user_home.html',
-                          {'form': form, 'countries': countries})
+                          {'form': form})
         else:
             return render(request, 'user_pages/signup_company.html',
-                          {'form': form, 'countries': countries})
+                          {'form': form})
 
 
 class SendEmailVerificationView(APIView):
