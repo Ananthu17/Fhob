@@ -1,5 +1,6 @@
 #ignore environmet
 /film_hobo_env/
+/zappa_env/
 
 #ignore other files
 full_requirements.txt

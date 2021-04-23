@@ -1,8 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import CustomUser, GuildMembership
-from bootstrap_datepicker_plus import DateTimePickerInput, DatePickerInput
 
+from bootstrap_datepicker_plus import DateTimePickerInput
+
+from .models import CustomUser, GuildMembership
+from django.contrib.auth.forms import PasswordChangeForm
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=100, required=False,
@@ -96,18 +98,59 @@ class SignUpProForm(UserCreationForm):
 
 
 class SignUpFormCompany(forms.Form):
-    company_name = forms.CharField(max_length=150, required=False,
-                                   help_text='')
-    comapny_address = forms.Textarea()
-    comapny_website = forms.URLField()
-    company_phone = forms.CharField()
-
+    """
+    company details
+    """
+    company_name = forms.CharField(label="Company Name", max_length=150,
+                                   required=False, help_text='')
+    company_address = forms.CharField(label="Address", help_text="",
+                                      widget=forms.Textarea())
+    company_website = forms.URLField(label="Website")
+    company_phone = forms.CharField(label="Phone")
+    """
+    personal details
+    """
     first_name = forms.CharField(max_length=150, required=True,
                                  help_text='')
     middle_name = forms.CharField(max_length=150, required=False,
                                   help_text='')
     last_name = forms.CharField(max_length=150, required=False,
                                 help_text='')
-    date_of_birth = forms.DateField()
-    user_address = forms.Textarea()
+    title = forms.CharField(label="Title", max_length=150)
+    email = forms.EmailField(label="Email", max_length=254,
+                             help_text='Required. Inform a ' +
+                             'valid email address.')
+    date_of_birth = forms.DateField(
+         widget=DateTimePickerInput(format='%m/%d/%Y')
+     )
+    user_address = forms.CharField(label="Address", help_text="",
+                                   widget=forms.Textarea())
+    country = forms.ChoiceField(label="Country")
+    password1 = forms.CharField(label="Password", max_length=150)
+    password2 = forms.CharField(label="Repeat Password", max_length=150)
 
+
+class ChangePasswordForm(PasswordChangeForm):
+    pass
+    #     **SetPasswordForm.error_messages,
+    #     'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
+    # }
+    # old_password = forms.CharField(
+    #     label=_("Old password"),
+    #     strip=False,
+    #     widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': True}),
+    # )
+
+    # field_order = ['old_password', 'new_password1', 'new_password2']
+
+    # def clean_old_password(self):
+    #     """
+    #     Validate that the old_password field is correct.
+    #     """
+    #     old_password = self.cleaned_data["old_password"]
+    #     if not self.user.check_password(old_password):
+    #         raise ValidationError(
+    #             self.error_messages['password_incorrect'],
+    #             code='password_incorrect',
+    #         )
+    #     return old_password

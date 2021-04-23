@@ -1,6 +1,8 @@
+
 import json
 from django.utils import timezone
 from datetime import date
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.db import models
@@ -9,8 +11,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -147,6 +149,16 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
     )
+    company_name = models.CharField(_("Company Name"), max_length=500,
+                                    null=True, blank=True)
+    company_address = models.TextField(_("Address"), null=True, blank=True)
+    company_website = models.URLField(_("Company Website"),
+                                      null=True,
+                                      blank=True)
+    company_phone = PhoneNumberField(_("Phone Number"), null=True,
+                                     unique=True)
+    title = models.CharField(_('Title'),
+                             max_length=150, null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
     directional_skill = models.FloatField(_("Directional Skill"), null=True,
                                           blank=True)
@@ -377,12 +389,23 @@ class ProjectReaction(models.Model):
 
 
 class PromoCode(models.Model):
+    FLAT_AMOUNT = 'flat_amount'
+    PERCENTAGE = 'percentage'
+    AMOUNT_TYPE = [
+        (FLAT_AMOUNT, 'Flat Amount'),
+        (PERCENTAGE, 'Percentage'),
+    ]
     promo_code = models.CharField(max_length=1000)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
-    valid_from = models.DateTimeField(_('Valid From'),
-                                      default=timezone.now)
-    life_span = models.IntegerField(_('Valid for days'), null=True)
+    valid_from = models.DateTimeField(_('Valid From'), null=True)
+    valid_to = models.DateTimeField(_('Valid To'),
+                                    null=True, blank=True)
+    life_span = models.IntegerField(_('Valid for days'), null=True, blank=True)
+    amount_type = models.CharField(_("Amount Type"),
+                                   choices=AMOUNT_TYPE,
+                                   max_length=150, default=FLAT_AMOUNT)
+    amount = models.IntegerField(_('Amount'))
 
 
 class Team(models.Model):
@@ -415,6 +438,12 @@ class Makeup(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=1000)
+
+    def clean(self):
+        country_match = Country.objects.filter(
+            name=self.__dict__['name'])
+        if country_match:
+            raise ValidationError('country already exists')
 
     def __str__(self):
         return str(self.name)

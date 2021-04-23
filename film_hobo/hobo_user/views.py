@@ -5,14 +5,19 @@ import datetime
 from django.utils import timezone
 from authemail.models import SignupCode
 
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, render, redirect
-from django.http.response import HttpResponse
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth.views import LoginView as DjangoLogin
+from django.contrib.auth.views import LogoutView as DjangoLogout
 from django.http import HttpResponseRedirect
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.contrib import messages
+from django.views.generic import TemplateView
+
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -22,16 +27,20 @@ from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
+from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
+
 
 from authemail.views import SignupVerify
+
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
-    SignUpFormCompany, SignUpProForm
+    SignUpFormCompany, SignUpProForm, ChangePasswordForm
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
-    ProPaymentSerializer, PromoCodeSerializer, GeneralSettingsSerializer
+    ProPaymentSerializer, PromoCodeSerializer, GeneralSettingsSerializer, \
+    RegisterCompanySerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -42,7 +51,6 @@ class ExtendedLoginView(AuthLoginView):
                                               context={'request': request})
         self.serializer.is_valid(raise_exception=True)
         self.login()
-        print("hello",request.user)
         return self.get_response()
 
 
@@ -59,38 +67,44 @@ class ExtendedLogoutView(AuthLogoutView):
         return self.logout(request)
 
 
-class CustomUserLogin(APIView):
+class CustomUserLogin(DjangoLogin):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'user_pages/login.html'
 
     def get(self, request):
-        form = LoginForm()
-        return render(request, 'user_pages/login.html', {'form': form})
+        if request.user.is_anonymous:
+            form = LoginForm()
+            return render(request, 'user_pages/login.html', {'form': form})
+        else:
+            return render(request, 'user_pages/user_home.html',
+                          {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
+        input_json_data_dict = ast.literal_eval(json.dumps(request.POST))
+        input_json_data_dict['email'] = input_json_data_dict['username']
+        del input_json_data_dict['username']
         if form.is_valid():
-            user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/authentication/',
-                            data=json.dumps(request.POST),
-                            headers={'Content-type': 'application/json'})
-            
-            print("hello",request.user)
-            # print("user_response--- ",user_response. __dict__ )
-            if user_response.status_code == 200:
-                response_json = user_response.json()
-                token = response_json['key']
-                token = Token.objects.get(key=token)
-                user = CustomUser.objects.get(id=token.user_id)
-                request.user = user
+            email = input_json_data_dict['email']
+            password = input_json_data_dict['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
                 return render(request, 'user_pages/user_home.html',
-                            {'user': user})
+                              {'user': user})
             else:
-                return HttpResponse('Could not login')
+                return HttpResponse(
+                    'Unable to log in with provided credentials.')
         else:
-            print("Invalid")
-            print(form.errors)
-        return render(request, 'user_pages/login.html', {'form': form})
+            return render(request, 'user_pages/login.html', {'form': form})
+
+
+class CustomUserLogout(DjangoLogout):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'user_pages/logout.html'
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
 
 class ExtendedRegisterView(RegisterView):
@@ -102,6 +116,23 @@ class ExtendedRegisterView(RegisterView):
         #     data_to_serialize['i_agree'] = True
         # serializer = self.get_serializer(data=data_to_serialize)
         serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
+        user = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        return Response(self.get_response_data(user),
+                        status=status.HTTP_201_CREATED,
+                        headers=headers)
+
+
+class ExtendedRegisterCompanyView(RegisterView):
+    serializer_class = RegisterCompanySerializer
+
+    def create(self, request, *args, **kwargs):
+        user_input_data = request.data
+        user_input_data['membership'] = CustomUser.MEMBERSHIP_CHOICES[3][0]
+        serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
@@ -246,9 +277,9 @@ class CustomUserSignupIndieView(APIView):
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration_indie/',
-                            data=json.dumps(request.POST),
-                            headers={'Content-type': 'application/json'})
+                'http://127.0.0.1:8000/hobo_user/registration_indie/',
+                data=json.dumps(request.POST),
+                headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
@@ -288,6 +319,7 @@ class CustomUserSignupProView(APIView):
             json_dict = ast.literal_eval(json_response)
             guild_membership_id_response = form.cleaned_data[
                           'guild_membership_id']
+
             guild_membership_ids = []
             for guild_id in guild_membership_id_response:
                 guild_membership_ids.append(str(guild_id.id))
@@ -298,9 +330,9 @@ class CustomUserSignupProView(APIView):
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration_pro/',
-                            data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json'})
+                'http://127.0.0.1:8000/hobo_user/registration_pro/',
+                data=json.dumps(json_dict),
+                headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
@@ -351,6 +383,7 @@ class SendEmailVerificationView(APIView):
                 signup_code.send_signup_email()
                 response = {'message': 'Email send', 'signup_code':
                             signup_code.code}
+
             else:
                 response = {'message': 'Email not send'}
         else:
@@ -373,7 +406,7 @@ class EmailVerificationStatusView(APIView):
             except SignupCode.DoesNotExist:
                 response = {'verified': True}
         else:
-            response = {'vefified': False, 'message':'Invalid Data'}
+            response = {'vefified': False, 'message': 'Invalid Data'}
         return Response(response)
 
 
@@ -395,12 +428,14 @@ class ExtendedSignupVerify(SignupVerify):
             content = {'message': 'Email address verified.', 'status':
                        status.HTTP_200_OK, 'email': email, 'user_membership':
                        user_membership}
-            return render(request, 'user_pages/email_verification_success.html',
+            return render(request,
+                          'user_pages/email_verification_success.html',
                           {'content': content})
         else:
             content = {'message': 'Invalid Link', 'status':
                        status.HTTP_400_BAD_REQUEST}
-            return render(request, 'user_pages/email_verification_success.html',
+            return render(request,
+                          'user_pages/email_verification_success.html',
                           {'content': content})
 
 
@@ -623,15 +658,12 @@ class SettingsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # user = self.request.user
-        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        user = self.request.user
         context['user'] = user
         return context
 
     def post(self, request, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # user = self.request.user
-        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        user = self.request.user
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
         json_dict['user_id'] = user.id
@@ -656,7 +688,17 @@ class SettingsView(TemplateView):
             error_messages['email'] = response['email_validation_error']
         else:
             messages.success(self.request, 'General Settings Updated')
-        # user = self.request.user
-        user = CustomUser.objects.get(email='roopagokul@gmail.com')
+        user = self.request.user
         return render(request, 'user_pages/settings.html',
                       {'message': error_messages, 'user': user})
+
+
+class ChangePasswordView(AuthPasswordChangeView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        print("request.user", self.request.user)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": _("New password has been saved.")})
