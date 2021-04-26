@@ -630,6 +630,7 @@ class CheckPromoCodeAPI(APIView):
 
 class GeneralSettingsUpdateAPI(APIView):
     serializer_class = GeneralSettingsSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = GeneralSettingsSerializer(data=request.data)
@@ -690,10 +691,13 @@ class SettingsView(TemplateView):
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
         json_dict['user_id'] = user.id
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.post(
                             'http://127.0.0.1:8000/hobo_user/general-settings-update-api/',
                             data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json'})
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
@@ -702,18 +706,22 @@ class SettingsView(TemplateView):
 
         if 'errors' in response:
             if 'first_name' in response['errors']:
-                error_messages['first_name'] = "This field is required"
+                error_messages['first_name'] = response['errors']['first_name']
             if 'last_name' in response['errors']:
-                error_messages['last_name'] = "This field is required"
+                error_messages['last_name'] = response['errors']['last_name']
             if 'email' in response['errors']:
-                error_messages['email'] = "This field is required"
+                error_messages['email'] = response['errors']['email']
+            return render(request, 'user_pages/settings.html',
+                          {'message': error_messages, 'user': user})
         elif 'email_validation_error' in response:
             error_messages['email'] = response['email_validation_error']
+            return render(request, 'user_pages/settings.html',
+                          {'message': error_messages, 'user': user})
         else:
             messages.success(self.request, 'General Settings Updated')
-        user = self.request.user
-        return render(request, 'user_pages/settings.html',
-                      {'message': error_messages, 'user': user})
+            return HttpResponseRedirect(reverse('hobo_user:settings'))
+
+        return HttpResponseRedirect(reverse('hobo_user:settings'))
 
 
 class ChangePasswordAPI(AuthPasswordChangeView):
@@ -727,8 +735,9 @@ class ChangePasswordAPI(AuthPasswordChangeView):
             user = request.user
             print("user: ", user.email)
             serializer.save()
-            response = {'message': 'New password has been saved.', 'status':
-                        status.HTTP_200_OK}
+            response = {'message':
+                        'New password has been saved. Please Login to continue',
+                        'status': status.HTTP_200_OK}
         else:
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST,
@@ -749,7 +758,6 @@ class ChangePasswordView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        error_messages = {}
         message = ""
         change_password_form = self.form_class
         key = Token.objects.get(user=user).key
@@ -764,8 +772,12 @@ class ChangePasswordView(TemplateView):
         response = ast.literal_eval(dict_str)
         response = dict(response)
         print(response)
-        if response['message']:
+        if 'message' in response:
             message = response['message']
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Password Changed Successfully')
+                return HttpResponseRedirect(reverse('hobo_user:settings'))
         return render(request, 'user_pages/settings.html',
                       {'change_password_messages': message,
                        'user': user,

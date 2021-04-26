@@ -10,7 +10,11 @@
                     <p>First Name:
                         <input type ="text" disabled id="first_name" name="first_name" value="{{user.first_name}}" />
                         <input type = "button" value = "Edit" id="edit_first_name">
-                        {{message.first_name}}
+                        {% if message.first_name %}
+                            {% for err in message.first_name %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
                     </p>
                     <p>Middle Name:
                         <input type ="text" disabled id="middle_name" name="middle_name" value="{{user.middle_name}}" />
@@ -19,12 +23,20 @@
                     <p>Last Name:
                         <input type ="text" disabled id="last_name" name="last_name" value="{{user.last_name}}" />
                         <input type = "button" value = "Edit" id="edit_last_name">
-                        {{message.last_name}}
+                        {% if message.last_name %}
+                            {% for err in message.last_name %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
                     </p>
                     <p>Email:
                         <input type ="email" disabled id="email" name="email" value="{{user.email}}" />
                         <input type = "button" value = "Edit" id="edit_email">
-                        {{message.email}}
+                        {% if message.email %}
+                            {% for err in message.email %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
                     </p>
                     <p>Password:
                         <input type ="text" disabled id="password" name="password" value="* * * * *" />
