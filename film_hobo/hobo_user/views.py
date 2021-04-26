@@ -712,11 +712,13 @@ class SettingsView(TemplateView):
             if 'email' in response['errors']:
                 error_messages['email'] = response['errors']['email']
             return render(request, 'user_pages/settings.html',
-                          {'message': error_messages, 'user': user})
+                          {'message': error_messages, 'user': user,
+                           'change_password_form': ChangePasswordForm})
         elif 'email_validation_error' in response:
             error_messages['email'] = response['email_validation_error']
             return render(request, 'user_pages/settings.html',
-                          {'message': error_messages, 'user': user})
+                          {'message': error_messages, 'user': user,
+                           'change_password_form': ChangePasswordForm})
         else:
             messages.success(self.request, 'General Settings Updated')
             return HttpResponseRedirect(reverse('hobo_user:settings'))
