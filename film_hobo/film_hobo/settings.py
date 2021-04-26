@@ -26,7 +26,7 @@ SECRET_KEY = 'qyi$gs%)7&cw$(y8e6at3g1%h#sk+jm7ak54dz!st3k!srca^^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', '5s3u3jnor6.execute-api.us-east-1.amazonaws.com']
 
 # Application definition
 
@@ -54,7 +54,10 @@ INSTALLED_APPS = [
     'initial_user',
     'hobo_user',
     'bootstrap_datepicker_plus',
+    'crispy_forms',
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SITE_ID = 1
 

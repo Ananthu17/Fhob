@@ -58,5 +58,6 @@ class InitialUserDetailSavePage(APIView):
                 error_messages = ast.literal_eval(user_response.text)
                 _, message = error_messages.popitem()
                 messages.error(request, message[0])
-        return render(request, 'landing_pages/landing_home.html',
-                      {'form': form})
+        else:
+            return render(request, 'landing_pages/landing_home.html',
+                          {'form': form})
