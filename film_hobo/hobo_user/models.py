@@ -214,6 +214,7 @@ class CustomUser(AbstractUser):
                                     max_length=150,
                                     null=True,
                                     default=FREE)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -491,3 +492,96 @@ class CompanyPaymentDetails(SingletonModel):
     class Meta:
         verbose_name = 'Company Payment Detail'
         verbose_name_plural = 'Company Payment Details'
+
+
+class DisabledAccount(models.Model):
+    REASON1 = 'reason1'
+    REASON2 = 'reason2'
+    REASON3 = 'reason3'
+    REASON4 = 'reason4'
+    REASON5 = 'reason5'
+    REASON_CHOICES = [
+        (REASON1, "I don't get any values from the network"),
+        (REASON2, "I lost my interest"),
+        (REASON3, "I have a privacy concern"),
+        (REASON4, "It is too expensive for me"),
+        (REASON5, "Other")
+    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='disabled_user',
+                             verbose_name=_("User"),
+                             null=True)
+
+    reason = models.CharField(_("Reason"),
+                              choices=REASON_CHOICES,
+                              max_length=150, default=REASON1)
+
+    def __str__(self):
+        return str(self.user)
+    class Meta:
+        verbose_name = 'Disabled Account'
+        verbose_name_plural = 'Disabled Accounts'
+
+
+class CustomUserSettings(models.Model):
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
+    MEMBERS_WITH_RATING_1_STAR = 'members_with_rating_1_star'
+    MEMBERS_WITH_RATING_2_STAR = 'members_with_rating_2_star'
+    MEMBERS_WITH_RATING_3_STAR = 'members_with_rating_3_star'
+    MEMBERS_WITH_RATING_4_STAR = 'members_with_rating_4_star'
+    MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+    NO_ONE = 'no_one'
+
+    ACCOUNT_STATUS_CHOICES = [
+        (ENABLED, 'Enabled'),
+        (DISABLED, 'Disabled'),
+    ]
+
+    ALL_MEMBERS = 'all_members'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+    PROFILE_VISIBILITY_CHOICES = [
+        (ALL_MEMBERS, 'All Members'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (NO_ONE, 'No One'),
+    ]
+
+    CONTACT_CHOICES = [
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (NO_ONE, 'No One'),
+    ]
+
+    account_status = models.CharField(_("Account Status"),
+                                      choices=ACCOUNT_STATUS_CHOICES,
+                                      max_length=150, default=ENABLED)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_settings',
+                             verbose_name=_("User"),
+                             null=True)
+    profile_visibility = models.CharField(_("Who can see my Profile"),
+                                          choices=PROFILE_VISIBILITY_CHOICES,
+                                          max_length=150, default=ALL_MEMBERS)
+    who_can_contact_me = models.CharField(_("Who can contact me"),
+                                          choices=CONTACT_CHOICES,
+                                          max_length=150,
+                                          default=MEMBERS_WITH_RATING_1_STAR)
+
+    class Meta:
+        verbose_name = 'Custom User Settings'
+        verbose_name_plural = 'Custom User Settings'
+
+    def __str__(self):
+        return str(self.user)

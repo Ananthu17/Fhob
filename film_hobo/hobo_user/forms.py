@@ -5,8 +5,9 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 
-from .models import CustomUser, GuildMembership
-from django.contrib.auth.forms import PasswordChangeForm
+from .models import CustomUser, GuildMembership, DisabledAccount, \
+    CustomUserSettings
+
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=100, required=False,
@@ -137,4 +138,15 @@ class ChangePasswordForm(forms.Form):
     old_password = forms.CharField(widget=forms.PasswordInput())
     new_password1 = forms.CharField(widget=forms.PasswordInput())
     new_password2 = forms.CharField(widget=forms.PasswordInput())
+
+
+class DisableAccountForm(forms.ModelForm):
+
+    class Meta:
+        model = DisabledAccount
+        fields = ('reason',)
+
+        widgets = {
+            'reason': forms.RadioSelect(),
+        }
 

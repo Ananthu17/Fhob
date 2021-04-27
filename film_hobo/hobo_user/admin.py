@@ -8,7 +8,7 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkillInline, PromoCode, Team, Actor, Writer, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
-                    CompanyPaymentDetails
+                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource
@@ -90,6 +90,8 @@ admin.site.register(Makeup)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
+admin.site.register(DisabledAccount)
+admin.site.register(CustomUserSettings)
 
 
 @admin.register(EthnicAppearance)

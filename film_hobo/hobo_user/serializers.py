@@ -18,7 +18,8 @@ from rest_framework import exceptions
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
-    IndiePaymentDetails, ProPaymentDetails, PromoCode
+    IndiePaymentDetails, ProPaymentDetails, PromoCode, \
+    DisabledAccount, CustomUserSettings
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -610,8 +611,34 @@ class GeneralSettingsSerializer(serializers.Serializer):
     )
 
 
-# class ChangePasswordSerializer(serializer.Serializer):
-#     old_password = serializers.CharField(max_length=128)
-#     new_password1 = serializers.CharField(max_length=128)
-#     new_password2 = serializers.CharField(max_length=128)
+class DisableAccountSerializer(serializers.ModelSerializer):
+    reason = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
 
+    class Meta:
+        model = DisabledAccount
+        fields = ['reason',]
+
+
+class PrivacySettingsSerializer(serializers.ModelSerializer):
+    profile_visibility = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    who_can_contact_me = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['profile_visibility', 'who_can_contact_me']
+
+
+class EnableAccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['account_status',]

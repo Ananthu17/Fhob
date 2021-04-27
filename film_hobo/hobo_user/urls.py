@@ -2,7 +2,7 @@ from django.urls import path
 
 from rest_auth.views import LoginView
 
-from .views import *
+
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
                    ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
@@ -15,7 +15,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, GeneralSettingsUpdateAPI, \
                    CustomUserLogout, ExtendedRegisterCompanyView, \
-                   ChangePasswordAPI
+                   ChangePasswordAPI, DisableAccountAPI, ChangePasswordView, \
+                   DisableAccountView, PrivacySettingsAPI, PrivacySettingsView, \
+                   EnableAccountView, EnableAccountAPI
+
 
 
 app_name = "hobo_user"
@@ -52,6 +55,12 @@ urlpatterns = [
          name='general-settings-update-api'),
     path('change-password-api/', ChangePasswordAPI.as_view(),
          name='change-password-api'),
+    path('disable-account-api/', DisableAccountAPI.as_view(),
+         name='disabled-account-api'),
+    path('privacy-settings-api/', PrivacySettingsAPI.as_view(),
+         name='privacy-settings-api'),
+    path('enable-account-api/', EnableAccountAPI.as_view(),
+         name='enable-account-api'),
 
     # web-view endpoints
     path('user_home/', HomePage.as_view(), name='user_home'),
@@ -80,5 +89,11 @@ urlpatterns = [
          name='settings'),
     path('settings-change-password/', ChangePasswordView.as_view(),
          name='settings-change-password'),
+    path('settings-disable-account/', DisableAccountView.as_view(),
+         name='settings-disable-account'),
+    path('privacy-settings/', PrivacySettingsView.as_view(),
+         name='privacy-settings'),
+    path('enable-account/', EnableAccountView.as_view(),
+         name='enable-account'),
 
 ]

@@ -34,15 +34,16 @@ from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
-    SignUpFormCompany, SignUpProForm
+    DisableAccountForm
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
-                    PromoCode, Country
+                    PromoCode, Country, DisabledAccount, CustomUserSettings
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
     ProPaymentSerializer, PromoCodeSerializer, GeneralSettingsSerializer, \
-    RegisterCompanySerializer
+    RegisterCompanySerializer, DisableAccountSerializer, \
+    PrivacySettingsSerializer, EnableAccountSerializer
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -122,6 +123,9 @@ class ExtendedRegisterView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        obj = CustomUserSettings()
+        obj.user = user
+        obj.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -139,6 +143,9 @@ class ExtendedRegisterCompanyView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        obj = CustomUserSettings()
+        obj.user = user
+        obj.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -153,6 +160,9 @@ class ExtendedRegisterIndieView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        obj = CustomUserSettings()
+        obj.user = user
+        obj.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -168,6 +178,9 @@ class ExtendedRegisterProView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        obj = CustomUserSettings()
+        obj.user = user
+        obj.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -274,7 +287,6 @@ class CustomUserSignupIndieView(APIView):
             settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
             customuser_username = request.POST['email']
-            print(request.POST)
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
@@ -463,6 +475,7 @@ class ExtendedSignupVerify(SignupVerify):
 
 class PaymentPlanAPI(APIView):
     serializer_class = PaymentPlanSerializer
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = PaymentPlanSerializer(data=request.data)
@@ -492,6 +505,7 @@ class PaymentPlanAPI(APIView):
 
 class IndiePaymentDetailsAPI(APIView):
     serializer_class = IndiePaymentSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         payment_details = IndiePaymentDetails.get_solo()
@@ -501,6 +515,7 @@ class IndiePaymentDetailsAPI(APIView):
 
 class ProPaymentDetailsAPI(APIView):
     serializer_class = ProPaymentSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         payment_details = ProPaymentDetails.get_solo()
@@ -513,9 +528,14 @@ class SelectPaymentPlanIndieView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.get(
                 'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
-                headers={'Content-type': 'application/json'})
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
@@ -524,10 +544,15 @@ class SelectPaymentPlanIndieView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        email = self.request.POST.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.post(
                     'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
                     data=json.dumps(request.POST),
-                    headers={'Content-type': 'application/json'})
+                    headers={'Content-type': 'application/json',
+                             'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
@@ -540,9 +565,14 @@ class SelectPaymentPlanProView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.get(
                 'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
-                headers={'Content-type': 'application/json'})
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
@@ -551,10 +581,15 @@ class SelectPaymentPlanProView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        email = self.request.POST.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.post(
                             'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
                             data=json.dumps(request.POST),
-                            headers={'Content-type': 'application/json'})
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
@@ -569,9 +604,12 @@ class PaymentIndieView(TemplateView):
         context = super().get_context_data(**kwargs)
         email = self.request.GET.get('email')
         user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.get(
                 'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
-                headers={'Content-type': 'application/json'})
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
@@ -587,9 +625,12 @@ class PaymentProView(TemplateView):
         context = super().get_context_data(**kwargs)
         email = self.request.GET.get('email')
         user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         user_response = requests.get(
                 'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
-                headers={'Content-type': 'application/json'})
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
@@ -600,6 +641,7 @@ class PaymentProView(TemplateView):
 
 class CheckPromoCodeAPI(APIView):
     serializer_class = PromoCodeSerializer
+    # permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         serializer = PromoCodeSerializer(data=request.data)
@@ -636,7 +678,6 @@ class GeneralSettingsUpdateAPI(APIView):
         serializer = GeneralSettingsSerializer(data=request.data)
         if serializer.is_valid():
             data_dict = serializer.data
-            print("data_dict", data_dict)
             try:
                 id = data_dict['user_id']
                 user = CustomUser.objects.get(pk=id)
@@ -654,7 +695,7 @@ class GeneralSettingsUpdateAPI(APIView):
                         if match:
                             response = {
                              'email_validation_error':
-                             'User with this email id already exists',
+                             ['User with this email id already exists',],
                              'status': status.HTTP_400_BAD_REQUEST
                               }
                     except CustomUser.DoesNotExist:
@@ -682,7 +723,10 @@ class SettingsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        user_settings = CustomUserSettings.objects.get(user=user)
+        context['user_settings'] = user_settings
         context['change_password_form'] = ChangePasswordForm
+        context['disable_account_form'] = DisableAccountForm
         context['user'] = user
         return context
 
@@ -735,7 +779,6 @@ class ChangePasswordAPI(AuthPasswordChangeView):
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
             user = request.user
-            print("user: ", user.email)
             serializer.save()
             response = {'message':
                         'New password has been saved. Please Login to continue',
@@ -773,15 +816,248 @@ class ChangePasswordView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         response = dict(response)
-        print(response)
         if 'message' in response:
             message = response['message']
         if 'status' in response:
             if response['status'] == 200:
-                messages.success(self.request, 'Password Changed Successfully')
-                return HttpResponseRedirect(reverse('hobo_user:settings'))
+                messages.success(self.request, 'Password Changed Successfully. Please login to continue')
+                return HttpResponseRedirect(reverse('hobo_user:user_login'))
         return render(request, 'user_pages/settings.html',
                       {'change_password_messages': message,
                        'user': user,
                        'change_password_form': change_password_form,
-                       'change_password_errors': response})
+                       'change_password_errors': response,
+                       'disable_account_form': DisableAccountForm})
+
+
+class DisableAccountAPI(APIView):
+    serializer_class = DisableAccountSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            user = self.request.user
+            user_email = user.email
+            reason = data_dict['reason']
+            try:
+                DisabledAccount.objects.get(
+                                user__email=user_email)
+                response = {
+                 'errors': "This account is already Disabled.",
+                 'status': status.HTTP_400_BAD_REQUEST}
+            except DisabledAccount.DoesNotExist:
+                obj = DisabledAccount()
+                obj.user = user
+                obj.reason = reason
+                obj.save()
+                user_settings = CustomUserSettings.objects.get(user=user)
+                user_settings.account_status = CustomUserSettings.DISABLED
+                user_settings.save()
+                response = {'message':
+                            'Account Disabled',
+                            'status': status.HTTP_200_OK}
+
+        else:
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class DisableAccountView(TemplateView):
+    template_name = 'user_pages/settings.html'
+    form_class = DisableAccountForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        disable_account_form = self.form_class
+        context['disable_account_form'] = disable_account_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        disable_account_form = self.form_class
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/disable-account-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Account Disabled')
+                return HttpResponseRedirect(reverse('hobo_user:enable-account'))
+        return render(request, 'user_pages/settings.html',
+                      {'disable_account_form': disable_account_form,
+                       'disable_account_errors': response})
+
+
+class PrivacySettingsAPI(APIView):
+    serializer_class = PrivacySettingsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            user = self.request.user
+            user_settings = CustomUserSettings.objects.get(user=user)
+            user_settings.profile_visibility = data_dict['profile_visibility']
+            user_settings.who_can_contact_me = data_dict['who_can_contact_me']
+            user_settings.save()
+            response = {'message': "Privacy Settings Updated", 'status':
+                        status.HTTP_200_OK}
+        else:
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class PrivacySettingsView(TemplateView):
+    template_name = 'user_pages/settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_settings = CustomUserSettings.objects.get(user=self.request.user)
+        context['user_settings'] = user_settings
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data_dict = self.request.POST
+        user_settings = CustomUserSettings.objects.get(user=self.request.user)
+        privacy_setting_errors = ""
+
+        if 'who_can_contact_me' in data_dict:
+            contact_members = data_dict['who_can_contact_me']
+            if(contact_members == 'members_with_rating' and 'rate' in data_dict):
+                rate = data_dict['rate']
+                if rate == '1':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if rate == '2':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if rate == '3':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if rate == '4':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if rate == '5':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif contact_members != 'members_with_rating':
+                contact_me = data_dict['who_can_contact_me']
+            else:
+                error_message = {"who_can_contact_me": ["Please provide ratings",]}
+                return render(request, 'user_pages/settings.html',
+                              {'privacy_setting_errors': error_message,
+                               'disable_account_form': DisableAccountForm,
+                               'change_password_form': ChangePasswordForm,
+                               'user_settings': user_settings
+                               })
+        else:
+            contact_me = ""
+
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['who_can_contact_me'] = contact_me
+
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/privacy-settings-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Privacy Settings Updated')
+                return HttpResponseRedirect(reverse('hobo_user:settings'))
+            else:
+                privacy_setting_errors = response['errors']
+        return render(request, 'user_pages/settings.html',
+                      {'privacy_setting_errors': privacy_setting_errors,
+                       'disable_account_form': DisableAccountForm,
+                       'change_password_form': ChangePasswordForm
+                      })
+
+
+class EnableAccountAPI(APIView):
+    serializer_class = EnableAccountSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if data_dict['account_status'] == 'enabled':
+                user = self.request.user
+                try:
+                    user_settings = CustomUserSettings.objects.get(user=user)
+                    user_settings.account_status = CustomUserSettings.ENABLED
+                    try:
+                        disabled_account = DisabledAccount.objects.get(user=user)
+                        disabled_account.delete()
+                        user_settings.save()
+                        response = {'message': "Account Enabled",
+                                    'status': status.HTTP_200_OK
+                                    }
+                    except DisabledAccount.DoesNotExist:
+                        response = {'message': "Disabled Account not found",
+                                    'status': status.HTTP_400_BAD_REQUEST
+                                    }
+                except CustomUserSettings.DoesNotExist:
+                    response = {'message': "Custom User Settings not found",
+                                'status': status.HTTP_400_BAD_REQUEST
+                                }
+            else:
+                response = {'message': "Failed!!",
+                            'status': status.HTTP_400_BAD_REQUEST
+                            }
+        else:
+            response = {'message': "Invalid Serializer",
+                        'errors': serializer.errors,
+                        'status': status.HTTP_400_BAD_REQUEST
+                        }
+        return Response(response)
+
+
+class EnableAccountView(TemplateView):
+    template_name = 'user_pages/enable-account.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        message =""
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/enable-account-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Account Enabled')
+                return HttpResponseRedirect(reverse('hobo_user:user_home'))
+            else:
+                message = response['message']
+        return render(request, 'user_pages/enable-account.html',
+                      {'message': message})
