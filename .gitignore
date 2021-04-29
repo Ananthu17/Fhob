@@ -19,4 +19,4 @@ film_hobo/hobo_user/migrations/
 film_hobo/initial_user/migrations/
 
 #ignore static files
-film_hobo/film_hobo/static/
+film_hobo/static/

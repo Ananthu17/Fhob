@@ -2,9 +2,10 @@
 {% block content %}
 {% load crispy_forms_tags %}
 
-  {% csrf_token %}
+
   <div class="mt-4 landing-form-font">
     <form method="post" class="col-lg-6 offset-lg-3">
+        {% csrf_token %}
         <div class="form-group row">
             <label for="" class="col-sm-3 col-form-label">{{ form.first_name.label_tag }}</label>
             <div class="col-sm-9">

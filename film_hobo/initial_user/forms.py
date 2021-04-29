@@ -12,7 +12,7 @@ class MyMultipleModelChoiceField(ModelMultipleChoiceField):
         return obj
 
 
-class InitialUserForm(forms.Form):
+class InitialUserForm(forms.ModelForm):
     first_name = forms.CharField(max_length=100,
                                  help_text='')
     middle_name = forms.CharField(max_length=100, required=False,
