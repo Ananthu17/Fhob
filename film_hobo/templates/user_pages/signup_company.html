@@ -9,73 +9,138 @@
     {% endfor %}
     <p>
       <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label><br>
-      <input type="text" name="{{ form.company_name.name }}" maxlength="150" id="{{ form.company_name.id_for_label }}">
+      <input type="text" name="{{ form.company_name.name }}"
+      maxlength="150" id="{{ form.company_name.id_for_label }}"
+      {% if form.company_name.value != None %}value="{{ form.company_name.value|stringformat:'s' }}"{% endif %}>
       {{ form.company_name.errors }}
-      {% if error in form.company_name.errors %}
-        <p style="color: red">{{ error }}</p>
+      {% if form.errors.company_name %}
+        <p style="color: red">{{ form.errors.company_name }}</p>
       {% endif %}
     </p>
     <p>
       <label for="{{ form.company_address.id_for_label }}">{{ form.company_address.label }}</label><br>
-      <textarea name="{{ form.company_address.name }}" cols="40" rows="10" required="" id="{{ form.company_address.id_for_label }}"></textarea>
+      <textarea name="{{ form.company_address.name }}" cols="40" rows="10"
+      required="" id="{{ form.company_address.id_for_label }}"
+      {% if form.company_address.value != None %}value="{{ form.company_address.value|stringformat:'s' }}"{% endif %}>
+      </textarea>
+      {% if form.errors.company_address %}
+        <p style="color: red">{{ form.errors.company_address }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.company_website.id_for_label }}">{{ form.company_website.label }}</label><br>
-      <input type="text" name="{{ form.company_website.name }}" maxlength="150" id="{{ form.company_website.id_for_label }}">
+      <input type="text" name="{{ form.company_website.name }}"
+      maxlength="150" id="{{ form.company_website.id_for_label }}"
+      {% if form.company_website.value != None %}value="{{ form.company_website.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.company_website %}
+        <p style="color: red">{{ form.errors.company_website }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.company_phone.id_for_label }}">{{ form.company_phone.label }}</label><br>
-      <input type="text" name="{{ form.company_phone.name }}" maxlength="150" id="{{ form.company_phone.id_for_label }}">
+      <input type="text" name="{{ form.company_phone.name }}" maxlength="150"
+      id="{{ form.company_phone.id_for_label }}"
+      {% if form.company_phone.value != None %}value="{{ form.company_phone.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.company_phone %}
+        <p style="color: red">{{ form.errors.company_phone }}</p>
+      {% endif %}
     </p>
     <h3>Your Information</h3>
     <p>
       <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label><br>
-      <input type="text" name="{{ form.first_name.name }}" maxlength="150" id="{{ form.first_name.id_for_label }}">
+      <input type="text" name="{{ form.first_name.name }}" maxlength="150"
+      id="{{ form.first_name.id_for_label }}"
+      {% if form.first_name.value != None %}value="{{ form.first_name.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.first_name %}
+        <p style="color: red">{{ form.errors.first_name }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.middle_name.id_for_label }}">{{ form.middle_name.label }}</label><br>
-      <input type="text" name="{{ form.middle_name.name }}" maxlength="150" id="{{ form.middle_name.id_for_label }}">
+      <input type="text" name="{{ form.middle_name.name }}" maxlength="150"
+      id="{{ form.middle_name.id_for_label }}"
+      {% if form.middle_name.value != None %}value="{{ form.middle_name.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.middle_name %}
+        <p style="color: red">{{ form.errors.middle_name }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label><br>
-      <input type="text" name="{{ form.last_name.name }}" maxlength="150" id="{{ form.last_name.id_for_label }}">
+      <input type="text" name="{{ form.last_name.name }}" maxlength="150"
+      id="{{ form.last_name.id_for_label }}"
+      {% if form.last_name.value != None %}value="{{ form.last_name.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.last_name %}
+        <p style="color: red">{{ form.errors.last_name }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.user_title.id_for_label }}">{{ form.user_title.label }}</label><br>
-      <input type="text" name="{{ form.user_title.name }}" maxlength="150" id="{{ form.user_title.id_for_label }}">
+      <input type="text" name="{{ form.user_title.name }}" maxlength="150"
+      id="{{ form.user_title.id_for_label }}"
+      {% if form.user_title.value != None %}value="{{ form.user_title.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.user_title %}
+        <p style="color: red">{{ form.errors.user_title }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label><br>
-      <input type="text" name="{{ form.email.name }}" maxlength="150" id="{{ form.email.id_for_label }}">
+      <input type="text" name="{{ form.email.name }}" maxlength="150"
+      id="{{ form.email.id_for_label }}"
+      {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.email %}
+        <p style="color: red">{{ form.errors.email }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label><br>
-      <input type="text" name="{{ form.phone_number.name }}" maxlength="150" id="{{ form.phone_number.id_for_label }}">
+      <input type="text" name="{{ form.phone_number.name }}" maxlength="150"
+      id="{{ form.phone_number.id_for_label }}"
+      {% if form.phone_number.value != None %}value="{{ form.phone_number.value|stringformat:'s' }}"{% endif %}>
+      {% if form.errors.phone_number %}
+        <p style="color: red">{{ form.errors.phone_number }}</p>
+      {% endif %}
     </p>
     <p>
     <label for="{{ form.country.id_for_label }}">{{ form.country.label }}</label><br>
-    <select id="{{ form.country.id_for_label }}" name="{{ form.country.name }}" class="selectpicker" data-title="Select Country" data-style="btn-default btn-block" data-menu-style="dropdown-blue">
+    <select id="{{ form.country.id_for_label }}" name="{{ form.country.name }}"
+    class="selectpicker" data-title="Select Country" data-style="btn-default btn-block"
+    data-menu-style="dropdown-blue">
       <option value="{{ country.id }}">-Select-</option>
       {% for country in countries %}
           <option value="{{ country.id }}">{{ country }}</option>
       {% endfor %}
       </select>
+      {% if form.errors.country %}
+        <p style="color: red">{{ form.errors.country }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }}</label><br>
       {{ form.date_of_birth }}
+      {% if form.errors.date_of_birth %}
+        <p style="color: red">{{ form.errors.date_of_birth }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.user_address.id_for_label }}">{{ form.user_address.label }}</label><br>
       <textarea name="{{ form.user_address.name }}" cols="40" rows="10" required="" id="{{ form.user_address.id_for_label }}"></textarea>
+      {% if form.errors.user_address %}
+        <p style="color: red">{{ form.errors.user_address }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label><br>
-      <input type="text" name="{{ form.password1.name }}" maxlength="150" id="{{ form.password1.id_for_label }}">
+      <input type="password" name="{{ form.password1.name }}" maxlength="150" id="{{ form.password1.id_for_label }}">
+      {% if form.errors.password1 %}
+        <p style="color: red">{{ form.errors.password1 }}</p>
+      {% endif %}
     </p>
     <p>
       <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label><br>
-      <input type="text" name="{{ form.password2.name }}" maxlength="150" id="{{ form.password2.id_for_label }}">
+      <input type="password" name="{{ form.password2.name }}" maxlength="150" id="{{ form.password2.id_for_label }}">
+      {% if form.errors.password2 %}
+        <p style="color: red">{{ form.errors.password2 }}</p>
+      {% endif %}
     </p>
     <button type="submit">Sign up</button>
   </form>

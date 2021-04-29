@@ -50,9 +50,13 @@ class InitialUserDetailSavePage(APIView):
              data=json.dumps(json_dict),
              headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
-                message = "Thank you for your help and consideration! " \
-                 "We will be in contact when the site is up and ready. " \
-                 "Sincerely, Film Hobo team."
+                message = "You are in!" \
+                 "Thank you for your interest and for supporting our brainchild. We can't wait for you to" \
+                 "see the final product. We are working diligently to get this site to 136% this coming summer!" \
+                 "However, do not sit back and relax… Finesse those scripts, reels, projects and talent of" \
+                 "yours to dive right into the mix and ride that wave into the future." \
+                 "Sincerely," \
+                 "The Film Hobo Team"
                 messages.success(request, message)
             else:
                 error_messages = ast.literal_eval(user_response.text)
