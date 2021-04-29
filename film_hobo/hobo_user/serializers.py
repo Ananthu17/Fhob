@@ -642,3 +642,26 @@ class EnableAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserSettings
         fields = ['account_status',]
+
+
+class TrackingAccountSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['who_can_track_me',]
+
+
+class NotificationAccountSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['someone_tracks_me', 'change_in_my_or_project_rating',
+                  'review_for_my_work_or_project', 'new_project',
+                  'friend_request', 'match_for_my_Interest']
+
+
+class BlockMembersSerializer(serializers.Serializer):
+    user_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

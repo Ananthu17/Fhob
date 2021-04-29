@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'initial_user',
     'hobo_user',
     'bootstrap_datepicker_plus',
+    'django_select2',
 ]
 
 SITE_ID = 1

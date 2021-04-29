@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django_select2.forms import Select2Widget
 
 from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
@@ -150,3 +151,26 @@ class DisableAccountForm(forms.ModelForm):
             'reason': forms.RadioSelect(),
         }
 
+
+class BlockMemberForm(forms.ModelForm):
+    blocked_members = forms.ModelChoiceField(
+                label="Blocked Members",
+                widget=Select2Widget(),
+                queryset=CustomUser.objects.all(),
+    )
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ('blocked_members',)
+
+    def __init__(self, *args, **kwargs):
+        super(BlockMemberForm, self).__init__(*args, **kwargs)
+        self.fields['blocked_members'].widget.attrs['id'] = 'blocked_members'
+
+
+class NotificationAccountSettingsForm(forms.ModelForm):
+    class Meta:
+        model = CustomUserSettings
+        fields = ('someone_tracks_me', 'change_in_my_or_project_rating',
+                  'review_for_my_work_or_project', 'new_project',
+                  'friend_request', 'match_for_my_Interest')

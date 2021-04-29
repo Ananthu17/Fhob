@@ -16,9 +16,12 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    SettingsView, GeneralSettingsUpdateAPI, \
                    CustomUserLogout, ExtendedRegisterCompanyView, \
                    ChangePasswordAPI, DisableAccountAPI, ChangePasswordView, \
-                   DisableAccountView, PrivacySettingsAPI, PrivacySettingsView, \
-                   EnableAccountView, EnableAccountAPI
-
+                   DisableAccountView, PrivacySettingsAPI, EnableAccountAPI, \
+                   EnableAccountView, PrivacySettingsView, \
+                   TrackingAccountSettingsAPI, TrackingAccountSettingsView, \
+                   BlockMembersAPI, BlockMembersView, UnBlockMembersAPI, \
+                   NotificationAccountSettingsAPI, \
+                   NotificationAccountSettingsView
 
 
 app_name = "hobo_user"
@@ -61,6 +64,15 @@ urlpatterns = [
          name='privacy-settings-api'),
     path('enable-account-api/', EnableAccountAPI.as_view(),
          name='enable-account-api'),
+    path('tracking-account-api/', TrackingAccountSettingsAPI.as_view(),
+         name='tracking-account-api'),
+    path('block-members-api/', BlockMembersAPI.as_view(),
+         name='block-members-api'),
+    path('unblock-members-api/', UnBlockMembersAPI.as_view(),
+         name='unblock-members-api'),
+    path('notification-account-settings-api/',
+         NotificationAccountSettingsAPI.as_view(),
+         name='notification-account-settings-api'),
 
     # web-view endpoints
     path('user_home/', HomePage.as_view(), name='user_home'),
@@ -95,5 +107,11 @@ urlpatterns = [
          name='privacy-settings'),
     path('enable-account/', EnableAccountView.as_view(),
          name='enable-account'),
+    path('tracking-account/', TrackingAccountSettingsView.as_view(),
+         name='tracking-account'),
+    path('block-members/', BlockMembersView.as_view(),
+         name='block-members'),
+    path('notification-account-settings/', NotificationAccountSettingsView.as_view(),
+         name='notification-account-settings'),
 
 ]

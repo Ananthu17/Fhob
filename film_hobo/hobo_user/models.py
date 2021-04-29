@@ -519,6 +519,7 @@ class DisabledAccount(models.Model):
 
     def __str__(self):
         return str(self.user)
+
     class Meta:
         verbose_name = 'Disabled Account'
         verbose_name_plural = 'Disabled Accounts'
@@ -527,6 +528,7 @@ class DisabledAccount(models.Model):
 class CustomUserSettings(models.Model):
     ENABLED = 'enabled'
     DISABLED = 'disabled'
+
     MEMBERS_WITH_RATING_1_STAR = 'members_with_rating_1_star'
     MEMBERS_WITH_RATING_2_STAR = 'members_with_rating_2_star'
     MEMBERS_WITH_RATING_3_STAR = 'members_with_rating_3_star'
@@ -534,14 +536,14 @@ class CustomUserSettings(models.Model):
     MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
     PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
     NO_ONE = 'no_one'
+    ALL_MEMBERS = 'all_members'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
 
     ACCOUNT_STATUS_CHOICES = [
         (ENABLED, 'Enabled'),
         (DISABLED, 'Disabled'),
     ]
 
-    ALL_MEMBERS = 'all_members'
-    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
     PROFILE_VISIBILITY_CHOICES = [
         (ALL_MEMBERS, 'All Members'),
         (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
@@ -554,6 +556,17 @@ class CustomUserSettings(models.Model):
     ]
 
     CONTACT_CHOICES = [
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (NO_ONE, 'No One'),
+    ]
+
+    TRACKING_CHOICES = [
+        (ALL_MEMBERS, 'All Members'),
         (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
         (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
         (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
@@ -578,6 +591,38 @@ class CustomUserSettings(models.Model):
                                           choices=CONTACT_CHOICES,
                                           max_length=150,
                                           default=MEMBERS_WITH_RATING_1_STAR)
+    who_can_track_me = models.CharField(_("Who can track me"),
+                                        choices=TRACKING_CHOICES,
+                                        max_length=150,
+                                        default=ALL_MEMBERS)
+    blocked_members = models.ManyToManyField('hobo_user.CustomUser',
+                                             blank=True,
+                                             related_name="blocked_users",
+                                             verbose_name=_("Blocked Members"))
+    someone_tracks_me = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone tracks me")
+        )
+    change_in_my_or_project_rating = models.BooleanField(
+        default=True,
+        verbose_name=_("If there was a change in my or my project’s rating")
+        )
+    review_for_my_work_or_project = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone posted a review for my work or my project")
+        )
+    new_project = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone I track has started a new project or got attached to a project")
+        )
+    friend_request = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone sends me a friend request")
+        )
+    match_for_my_Interest = models.BooleanField(
+        default=True,
+        verbose_name=_("If I’ve got a match for my Interest")
+        )
 
     class Meta:
         verbose_name = 'Custom User Settings'
