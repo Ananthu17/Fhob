@@ -26,7 +26,7 @@ SECRET_KEY = 'qyi$gs%)7&cw$(y8e6at3g1%h#sk+jm7ak54dz!st3k!srca^^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', '5s3u3jnor6.execute-api.us-east-1.amazonaws.com', '*']
 
 # Application definition
 
@@ -55,7 +55,12 @@ INSTALLED_APPS = [
     'hobo_user',
     'bootstrap_datepicker_plus',
     'django_select2',
+    'crispy_forms',
+    'django_s3_storage',
+
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 SITE_ID = 1
 
@@ -93,6 +98,20 @@ WSGI_APPLICATION = 'film_hobo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# # aws rds credentials
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.environ.get("SQL_ENGINE",
+#                                  "django.db.backends.postgresql_psycopg2"),
+#         'NAME': os.environ.get("SQL_DATABASE", "film_hobo_db"),
+#         'USER': os.environ.get("SQL_USER", "film_hobo_user"),
+#         'PASSWORD': os.environ.get("SQL_PASSWORD", "filmhobofilm1"),
+#         'HOST': os.environ.get("SQL_HOST", "film-hobo-db.cluster-czkvodnjhfkk.us-east-1.rds.amazonaws.com"),
+#         'PORT': os.environ.get("SQL_PORT", "5432"),
+#     }
+# }
+
+# local database credentials
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get("SQL_ENGINE",
@@ -185,3 +204,20 @@ EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
 
 OLD_PASSWORD_FIELD_ENABLED = True
+# AWS_DEFAULT_ACL = None
+
+# YOUR_S3_BUCKET = "film-hobo-static"
+
+# STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+# AWS_S3_BUCKET_NAME_STATIC = YOUR_S3_BUCKET
+
+# # These next two lines will serve the static files directly
+# # from the s3 bucket
+# AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % YOUR_S3_BUCKET
+# STATIC_URL = "https://%s/" % AWS_S3_CUSTOM_DOMAIN
+
+# # OR...if you create a fancy custom domain for your static files use:
+# # AWS_S3_PUBLIC_URL_STATIC = "https://static.zappaguide.com/"
+
+# AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
+

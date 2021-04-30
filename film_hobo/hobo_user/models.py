@@ -151,7 +151,10 @@ class CustomUser(AbstractUser):
     )
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
-    company_address = models.TextField(_("Address"), null=True, blank=True)
+    # company_address = models.TextField(_("Address"), null=True, blank=True)
+    company_address = models.CharField(_("Company Address"),
+                                       max_length=250,
+                                       null=True, blank=True)
     company_website = models.URLField(_("Company Website"),
                                       null=True,
                                       blank=True)
@@ -197,7 +200,10 @@ class CustomUser(AbstractUser):
                                     unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
-    address = models.TextField(_("Address"), null=True)
+    # address = models.TextField(_("Address"), null=True)
+    address = models.CharField(_("Address"),
+                               max_length=250,
+                               null=True)
     country = models.ForeignKey("hobo_user.Country",
                                 on_delete=models.SET_NULL,
                                 related_name='user_country',

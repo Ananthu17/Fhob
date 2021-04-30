@@ -28,6 +28,7 @@ class InitialIntrestedUsers(models.Model):
     designation = models.ManyToManyField(Designation,
                                          verbose_name=_('Designations'),
                                          blank=True,
+                                         related_name="user_designation"
                                          )
 
     class Meta:

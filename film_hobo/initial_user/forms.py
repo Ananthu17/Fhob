@@ -1,5 +1,8 @@
 from django import forms
 from django.forms import ModelMultipleChoiceField
+
+from phonenumber_field.formfields import PhoneNumberField
+
 from .models import Designation, InitialIntrestedUsers
 
 
@@ -9,7 +12,7 @@ class MyMultipleModelChoiceField(ModelMultipleChoiceField):
         return obj
 
 
-class InitialUserForm(forms.Form):
+class InitialUserForm(forms.ModelForm):
     first_name = forms.CharField(max_length=100,
                                  help_text='')
     middle_name = forms.CharField(max_length=100, required=False,
@@ -18,7 +21,7 @@ class InitialUserForm(forms.Form):
                                 help_text='')
     email = forms.EmailField(max_length=254,
                              help_text='')
-    phone = forms.CharField(max_length=50)
+    phone = PhoneNumberField()
     designation_id = forms.ModelMultipleChoiceField(
         label="Are you",
         queryset=Designation.objects.all(),

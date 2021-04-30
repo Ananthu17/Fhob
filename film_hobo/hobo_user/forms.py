@@ -5,9 +5,11 @@ from django_select2.forms import Select2Widget
 from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
-
 from .models import CustomUser, GuildMembership, DisabledAccount, \
     CustomUserSettings
+
+from .models import CustomUser, GuildMembership, Country
+
 
 
 class SignUpForm(UserCreationForm):
@@ -27,6 +29,19 @@ class SignUpForm(UserCreationForm):
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'i_agree')
 
+    def __init__(self, *args, **kwargs):
+        super(SignUpForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['first_name'].widget.attrs['placeholder'] = 'First'
+        self.fields['middle_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['middle_name'].widget.attrs['placeholder'] = 'Middle'
+        self.fields['last_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Last'
+        self.fields['email'].widget.attrs['class'] = 'inp-line'
+        self.fields['email'].widget.attrs['placeholder'] = 'Email'
+        self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
+
 
 class LoginForm(AuthenticationForm):
 
@@ -43,24 +58,42 @@ class SignUpIndieForm(UserCreationForm):
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
                   'address', 'i_agree', 'date_of_birth', 'country')
-
-        def __init__(self, *args, **kwargs):
-            super(SignUpIndieForm, self).__init__(*args, **kwargs)
-            self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
-            self.fields['i_agree'].required = True
-            self.fields['first_name'].required = True
-            self.fields['last_name'].required = True
-            self.fields['email'].required = True
-            self.fields['password1'].required = True
-            self.fields['password2'].required = True
-            self.fields['phone_number'].required = True
-            self.fields['address'].required = True
-            self.fields['date_of_birth'].required = True
-            self.fields['country'].required = True
-
         widgets = {
-                    'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
-                }
+            'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SignUpIndieForm, self).__init__(*args, **kwargs)
+        self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+        self.fields['i_agree'].required = True
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        self.fields['email'].required = True
+        self.fields['password1'].required = True
+        self.fields['password2'].required = True
+        self.fields['phone_number'].required = True
+        self.fields['address'].required = True
+        self.fields['date_of_birth'].required = True
+        self.fields['country'].required = True
+        self.fields['first_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['first_name'].widget.attrs['placeholder'] = 'First'
+        self.fields['middle_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['middle_name'].widget.attrs['placeholder'] = 'Middle'
+        self.fields['last_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Last'
+        self.fields['email'].widget.attrs['class'] = 'inp-line'
+        self.fields['email'].widget.attrs['placeholder'] = 'Email'
+        self.fields['phone_number'].widget.attrs['class'] = 'inp-line'
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
+        self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
+        self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['address'].widget.attrs['class'] = 'inp-line'
+        self.fields['address'].widget.attrs['placeholder'] = 'Address'
+
+
 
 
 class SignUpProForm(UserCreationForm):
@@ -82,23 +115,42 @@ class SignUpProForm(UserCreationForm):
                   'address', 'i_agree', 'date_of_birth', 'country',
                   'guild_membership_id')
 
-        def __init__(self, *args, **kwargs):
-            super(SignUpProForm, self).__init__(*args, **kwargs)
-            self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
-            self.fields['i_agree'].required = True
-            self.fields['first_name'].required = True
-            self.fields['last_name'].required = True
-            self.fields['email'].required = True
-            self.fields['password1'].required = True
-            self.fields['password2'].required = True
-            self.fields['phone_number'].required = True
-            self.fields['address'].required = True
-            self.fields['date_of_birth'].required = True
-            self.fields['country'].required = True
-
         widgets = {
-                    'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
-                }
+            'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(SignUpProForm, self).__init__(*args, **kwargs)
+        self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+        self.fields['i_agree'].required = True
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        self.fields['email'].required = True
+        self.fields['password1'].required = True
+        self.fields['password2'].required = True
+        self.fields['phone_number'].required = True
+        self.fields['address'].required = True
+        self.fields['date_of_birth'].required = True
+        self.fields['country'].required = True
+        self.fields['first_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['first_name'].widget.attrs['placeholder'] = 'First'
+        self.fields['middle_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['middle_name'].widget.attrs['placeholder'] = 'Middle'
+        self.fields['last_name'].widget.attrs['class'] = 'inp-line'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Last'
+        self.fields['email'].widget.attrs['class'] = 'inp-line'
+        self.fields['email'].widget.attrs['placeholder'] = 'Email'
+        self.fields['phone_number'].widget.attrs['class'] = 'inp-line'
+        self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
+        self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
+        self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['address'].widget.attrs['class'] = 'inp-line'
+        self.fields['address'].widget.attrs['placeholder'] = 'Address'
+        self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
+        self.fields['guild_membership_id'].widget.attrs['class'] = 'custom_check_box '
+
 
 
 class SignUpFormCompany(forms.Form):
@@ -130,9 +182,15 @@ class SignUpFormCompany(forms.Form):
      )
     user_address = forms.CharField(label="Address", help_text="",
                                    widget=forms.Textarea())
-    country = forms.ChoiceField(label="Country")
+    country = forms.ModelChoiceField(
+        label="Country", queryset=Country.objects.all())
     password1 = forms.CharField(label="Password", max_length=150)
     password2 = forms.CharField(label="Repeat Password", max_length=150)
+
+    def __init__(self, *args, **kwargs):
+        super(SignUpFormCompany, self).__init__(*args, **kwargs)
+        self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
+        self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
 
 
 class ChangePasswordForm(forms.Form):

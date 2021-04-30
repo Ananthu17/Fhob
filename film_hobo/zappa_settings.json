@@ -1,0 +1,13 @@
+{
+    "film_hobo_prod": {
+        "aws_region": "us-east-1",
+        "django_settings": "film_hobo.settings",
+        "profile_name": "default",
+        "project_name": "film-hobo",
+        "runtime": "python3.8",
+        "s3_bucket": "zappa-ahsg5jbla",
+        "certificate_arn": "arn:aws:acm:us-east-1:138740134274:certificate/7aeafed1-1e4f-48bb-bd93-9553ad566e00",
+        "domain": "www.filmhobo.com"
+    }
+
+}

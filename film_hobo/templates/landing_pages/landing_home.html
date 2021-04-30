@@ -1,9 +1,11 @@
 {% extends "landing_pages/landing_base.html" %}
 {% block content %}
+{% load crispy_forms_tags %}
 
-  {% csrf_token %}
+
   <div class="mt-4 landing-form-font">
     <form method="post" class="col-lg-6 offset-lg-3">
+        {% csrf_token %}
         <div class="form-group row">
             <label for="" class="col-sm-3 col-form-label">{{ form.first_name.label_tag }}</label>
             <div class="col-sm-9">
@@ -13,7 +15,10 @@
                 id="{{ form.first_name.id_for_label }}"
                 {% if form.first_name.value != None %}value="{{ form.first_name.value|stringformat:'s' }}"{% endif %}
                 maxlength="{{ form.first_name.field.max_length }}"
-                {% if form.first_name.field.required %}required{% endif %}>
+                {% if form.first_name.field.required %}required{% endif %}><br>
+                {% if form.errors.last_name %}
+                  <p style="color: red">{{ form.errors.first_name }}</p>
+                {% endif %}
             </div>
           </div>
           <div class="form-group row">
@@ -25,7 +30,10 @@
                 id="{{ form.last_name.id_for_label }}"
                 {% if form.last_name.value != None %}value="{{ form.last_name.value|stringformat:'s' }}"{% endif %}
                 maxlength="{{ form.last_name.field.max_length }}"
-                {% if form.last_name.field.required %}required{% endif %}>
+                {% if form.last_name.field.required %}required{% endif %}><br>
+                {% if form.errors.last_name %}
+                  <p style="color: red">{{ form.errors.last_name }}</p>
+                {% endif %}
             </div>
           </div>
           <div class="form-group row">
@@ -37,7 +45,10 @@
                 id="{{ form.email.id_for_label }}"
                 {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %}
                 maxlength="{{ form.email.field.max_length }}"
-                {% if form.email.field.required %}required{% endif %}>
+                {% if form.email.field.required %}required{% endif %}><br>
+                {% if form.errors.email %}
+                  <p style="color: red">{{ form.errors.email }}</p>
+                {% endif %}
             </div>
           </div>
           <div class="form-group row">
@@ -50,6 +61,9 @@
                 {% if form.phone.value != None %}value="{{ form.phone.value|stringformat:'s' }}"{% endif %}
                 maxlength="{{ form.phone.field.max_length }}"
                 {% if form.phone.field.required %}required{% endif %}>
+                {% if form.errors.phone %}
+                  <p style="color: red">{{ form.errors.phone }}</p>
+                {% endif %}
             </div>
           </div>
           <div class="form-group row">
@@ -63,6 +77,9 @@
                       </label>
                   </div>
                 {% endfor %}
+                {% if form.errors.designation_id %}
+                  <p style="color: red">{{ form.errors.designation_id }}</p>
+                {% endif %}
             </div>
           </div>
           <div class="text-center mb-4">

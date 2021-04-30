@@ -1,9 +1,7 @@
-import ast
-import json
-import requests
-
 from django.contrib import messages
+from django.utils.html import format_html
 from django.shortcuts import render
+from django.views import View
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -25,7 +23,7 @@ class InitialUserDetailSaveAPI(APIView):
         return Response([{"status": message}], status=status.HTTP_201_CREATED)
 
 
-class InitialUserDetailSavePage(APIView):
+class InitialUserDetailSavePage(View):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'landing_pages/landing_home.html'
 
@@ -37,26 +35,26 @@ class InitialUserDetailSavePage(APIView):
     def post(self, request):
         form = InitialUserForm(request.POST)
         if form.is_valid():
-            json_response = json.dumps(request.POST)
-            json_dict = ast.literal_eval(json_response)
-            designation_id_response = form.cleaned_data['designation_id']
-            destination_ids = []
-            for designation_id in designation_id_response:
-                destination_ids.append(str(designation_id.id))
-            json_dict["designation_id"] = destination_ids
-
-            user_response = requests.post(
-             'http://127.0.0.1:8000/initial_user/landing_home_api/',
-             data=json.dumps(json_dict),
-             headers={'Content-type': 'application/json'})
-            if user_response.status_code == 201:
-                message = "Thank you for your help and consideration! " \
-                 "We will be in contact when the site is up and ready. " \
-                 "Sincerely, Film Hobo team."
-                messages.success(request, message)
-            else:
-                error_messages = ast.literal_eval(user_response.text)
-                _, message = error_messages.popitem()
-                messages.error(request, message[0])
-        return render(request, 'landing_pages/landing_home.html',
-                      {'form': form})
+            form.save()
+            message = format_html("You are in! <br> <br> Thank you for your " +
+                                  "interest and for supporting our " +
+                                  "brainchild. We can't wait for you to" +
+                                  " see the final product. We are working " +
+                                  "diligently to get this site to 136% " +
+                                  "this coming summer! <br> <br>" +
+                                  "However, do not sit back and relax… " +
+                                  "Finesse those scripts, reels, projects " +
+                                  " and talent of yours to dive right " +
+                                  "into the mix and ride that wave into " +
+                                  " the future. <br> <br>" +
+                                  "For live updates, please follow us at " +
+                                  "<a href='https://www.facebook.com/filmhobo'>" +
+                                  "https://www.facebook.com/filmhobo</a>" +
+                                  "<br> <br> Sincerely,<br>" +
+                                  "The Film Hobo Team")
+            messages.success(request, message)
+            return render(request, 'landing_pages/landing_home.html',
+                          {'form': form})
+        else:
+            return render(request, 'landing_pages/landing_home.html',
+                          {'form': form})
