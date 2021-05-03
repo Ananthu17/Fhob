@@ -36,7 +36,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     DisableAccountForm, BlockMemberForm, NotificationAccountSettingsForm
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
-                    PromoCode, Country, DisabledAccount, CustomUserSettings
+                    PromoCode, Country, DisabledAccount, CustomUserSettings, \
+                    CompanyPaymentDetails
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -45,7 +46,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterCompanySerializer, DisableAccountSerializer, \
     PrivacySettingsSerializer, EnableAccountSerializer, \
     TrackingAccountSettingsSerializer, BlockMembersSerializer, \
-    NotificationAccountSettingsSerializer
+    NotificationAccountSettingsSerializer, CompanyPaymentSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -379,47 +380,45 @@ class CustomUserSignupCompany(APIView):
 
     def get(self, request):
         form = SignUpFormCompany()
-        countries = Country.objects.all()
         return render(request, 'user_pages/signup_company.html',
-                      {'form': form, 'countries': countries})
+                      {'form': form})
 
     def post(self, request):
         form = SignUpFormCompany(request.POST)
-        countries = Country.objects.all()
         must_validate_email = getattr(
             settings, "AUTH_EMAIL_VERIFICATION", True)
         if form.is_valid():
-            obj = CustomUser()
-            obj.username = form.cleaned_data['email']
-            # company details
-            obj.company_name = form.cleaned_data['company_name']
-            obj.company_address = form.cleaned_data['company_address']
-            obj.company_website = form.cleaned_data['company_website']
-            obj.company_phone = form.cleaned_data['company_phone']
-            # personal details
-            obj.first_name = form.cleaned_data['first_name']
-            obj.middle_name = form.cleaned_data['middle_name']
-            obj.last_name = form.cleaned_data['last_name']
-            obj.user_title = form.cleaned_data['user_title']
-            obj.email = form.cleaned_data['email']
-            obj.phone_number = form.cleaned_data['phone_number']
-            obj.date_of_birth = form.cleaned_data['date_of_birth']
-            obj.user_address = form.cleaned_data['user_address']
-            obj.country = form.cleaned_data['country']
-            obj.user_title = form.cleaned_data['password1']
-            obj.save()
-            if must_validate_email:
+            # json_response = json.dumps(request.POST)
+            # json_dict = ast.literal_eval(json_response)
+            customuser_username = request.POST['email']
+            if not request.POST._mutable:
+                request.POST._mutable = True
+            request.POST['username'] = customuser_username
+            user_response = requests.post(
+                'http://127.0.0.1:8000/hobo_user/registration_company/',
+                data=json.dumps(request.POST),
+                headers={'Content-type': 'application/json'})
+            if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
-                signup_code = SignupCode.objects.create_signup_code(
-                        new_user, ipaddr)
-                signup_code.send_signup_email()
-            return render(request, 'user_pages/user_home.html',
-                          {'form': form, 'countries': countries})
+                if must_validate_email:
+                    ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+                    signup_code = SignupCode.objects.create_signup_code(
+                            new_user, ipaddr)
+                    signup_code.send_signup_email()
+
+                return render(request,
+                              'user_pages/user_email_verification.html',
+                              {'user': new_user})
+            else:
+                return HttpResponse('Could not save data')
         else:
-            return render(request, 'user_pages/signup_company.html',
-                          {'form': form, 'countries': countries})
+            print(form.errors)
+        return render(request, 'user_pages/signup_company.html',
+                      {'form': form})
+
+    class Meta:
+        model = get_user_model()
 
 
 class SendEmailVerificationView(APIView):
@@ -547,6 +546,16 @@ class ProPaymentDetailsAPI(APIView):
         return Response(serializer.data)
 
 
+class CompanyPaymentDetailsAPI(APIView):
+    serializer_class = CompanyPaymentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        payment_details = CompanyPaymentDetails.get_solo()
+        serializer = CompanyPaymentSerializer(payment_details)
+        return Response(serializer.data)
+
+
 class SelectPaymentPlanIndieView(TemplateView):
     template_name = 'user_pages/payment_plan_indie.html'
 
@@ -621,6 +630,44 @@ class SelectPaymentPlanProView(TemplateView):
         return HttpResponseRedirect("/hobo_user/payment_pro?email="+email)
 
 
+class SelectPaymentPlanCompanyView(TemplateView):
+    template_name = 'user_pages/payment_plan_company.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
+        print(user_response)
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['monthly_amount'] = payment_details['monthly_amount']
+        context['annual_amount'] = payment_details['annual_amount']
+        return context
+
+    def post(self, request, *args, **kwargs):
+        email = self.request.POST.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        email = response['email']
+        return HttpResponseRedirect("/hobo_user/payment_company?email="+email)
+
+
 class PaymentIndieView(TemplateView):
     template_name = 'user_pages/payment.html'
 
@@ -653,6 +700,27 @@ class PaymentProView(TemplateView):
         token = 'Token '+key
         user_response = requests.get(
                 'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                headers={'Content-type': 'application/json',
+                         'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        payment_details = ast.literal_eval(dict_str)
+        context['payment_details'] = payment_details
+        context['payment_plan'] = user.payment_plan
+        return context
+
+
+class PaymentCompanyView(TemplateView):
+    template_name = 'user_pages/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        email = self.request.GET.get('email')
+        user = CustomUser.objects.get(email=email)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.get(
+                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content

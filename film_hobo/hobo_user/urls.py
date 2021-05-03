@@ -20,8 +20,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    EnableAccountView, PrivacySettingsView, \
                    TrackingAccountSettingsAPI, TrackingAccountSettingsView, \
                    BlockMembersAPI, BlockMembersView, UnBlockMembersAPI, \
-                   NotificationAccountSettingsAPI, \
-                   NotificationAccountSettingsView
+                   NotificationAccountSettingsAPI, PaymentCompanyView, \
+                   NotificationAccountSettingsView, \
+                   SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI
 
 
 app_name = "hobo_user"
@@ -48,10 +49,10 @@ urlpatterns = [
          name='login'),
     path('logout/', ExtendedLogoutView.as_view(),
          name='logout'),
-    path('indie_payment_details_api/', IndiePaymentDetailsAPI.as_view(),
-         name='indie_payment_details_api'),
     path('pro_payment_details_api/', ProPaymentDetailsAPI.as_view(),
          name='pro_payment_details_api'),
+    path('company_payment_details_api/', CompanyPaymentDetailsAPI.as_view(),
+         name='company_payment_details_api'),
     path('check-promocode-api/', CheckPromoCodeAPI.as_view(),
          name='check-promocode-api'),
     path('general-settings-update-api/', GeneralSettingsUpdateAPI.as_view(),
@@ -93,10 +94,14 @@ urlpatterns = [
          name='payment_plan_indie'),
     path('payment_plan_pro/', SelectPaymentPlanProView.as_view(),
          name='payment_plan_pro'),
+    path('payment_plan_company/', SelectPaymentPlanCompanyView.as_view(),
+         name='payment_plan_company'),
     path('payment_pro/', PaymentProView.as_view(),
          name='payment_pro'),
     path('payment_indie/', PaymentIndieView.as_view(),
          name='payment_indie'),
+    path('payment_company/', PaymentCompanyView.as_view(),
+         name='payment_company'),
     path('settings/', SettingsView.as_view(),
          name='settings'),
     path('settings-change-password/', ChangePasswordView.as_view(),

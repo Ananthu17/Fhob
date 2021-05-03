@@ -19,7 +19,7 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, ProPaymentDetails, PromoCode, \
-    DisabledAccount, CustomUserSettings
+    DisabledAccount, CustomUserSettings, CompanyPaymentDetails
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -478,7 +478,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     # company details
     company_name = serializers.CharField()
     company_address = serializers.CharField()
-    company_website = serializers.URLField()
+    company_website = serializers.URLField(allow_blank=True)
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
@@ -580,6 +580,13 @@ class ProPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProPaymentDetails
+        fields = ['free_days', 'annual_amount', 'monthly_amount',
+                  'estimated_tax']
+
+class CompanyPaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CompanyPaymentDetails
         fields = ['free_days', 'annual_amount', 'monthly_amount',
                   'estimated_tax']
 

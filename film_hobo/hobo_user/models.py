@@ -157,7 +157,7 @@ class CustomUser(AbstractUser):
                                        null=True, blank=True)
     company_website = models.URLField(_("Company Website"),
                                       null=True,
-                                      blank=True)
+                                      blank=True,)
     company_phone = PhoneNumberField(_("Phone Number"), null=True,
                                      unique=True)
     title = models.CharField(_('Title'),
