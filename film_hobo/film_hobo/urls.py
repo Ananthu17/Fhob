@@ -19,8 +19,11 @@ from django.urls import path, include
 from hobo_user.views import ExtendedSignupVerify
 
 from rest_framework_simplejwt import views as jwt_views
+from initial_user.views import InitialUserDetailSavePage
 
 urlpatterns = [
+    path('', InitialUserDetailSavePage.as_view(),
+         name='landing_home'),
     path('admin/', admin.site.urls),
     path('initial_user/', include('initial_user.urls')),
     path('hobo_user/', include('hobo_user.urls')),

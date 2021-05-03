@@ -1,4 +1,5 @@
 {% extends "landing_pages/landing_base.html" %}
+{% load static %}
 {% block content %}
 {% load crispy_forms_tags %}
 
@@ -86,6 +87,12 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+    <div class="float-right">
+      <ul class="list-inline">
+          <li class="list-inline-item"><a href="https://www.facebook.com/filmhobo"><img src="{% static 'initial_user/img/facebook.png' %}" class="social-icon img-fluid"></a></li>
+          <li class="list-inline-item"><a href="https://www.instagram.com/filmhobo/"><img src="{% static 'initial_user/img/instagram.png' %}" class="social-icon img-fluid"></a></li>
+      </ul>
+    </div>
 </div>
 
 {% endblock %}
