@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="wrapper flex-grow-1"></div>
 <div class="container">
     <div class="row">
         {% if content.status == 200 and content.user_membership == 'IND' %}
@@ -33,6 +33,7 @@
           {{ obj.membership }}
         {% endfor %}
     </div>
+</div>
 </div>
 
 {% endblock %}
