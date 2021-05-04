@@ -140,7 +140,8 @@
     border-radius: 58%;
     position: relative;
     top: 32px;
-}
+    background-color: #fff;
+ }
 .landing-des{
     font-family: "Caliban Std";
     color:#0b67bc;
@@ -156,6 +157,7 @@
     padding: 35px 49px;
     text-align: justify;
     font-size: 18px;
+    word-break: break-all;
 }
 .landing-form-font{
     font-weight: 600;
@@ -193,5 +195,8 @@ label:focus,
     outline:0px !important;
     -webkit-appearance:none;
     box-shadow: none !important;
+}
+.landing-des-orng{
+    color: #e88b22;
 }
 /*landing page end*/
