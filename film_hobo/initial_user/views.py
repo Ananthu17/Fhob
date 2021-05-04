@@ -48,7 +48,9 @@ class InitialUserDetailSavePage(View):
                                   "into the mix and ride that wave into " +
                                   " the future. <br> <br>" +
                                   "For live updates, please follow us at " +
-                                  "<a href='https://www.facebook.com/filmhobo'>" +
+                                  "<a alt='filmhobo_facebook' " +
+                                  "target='_blank' rel='noopener' " +
+                                  "href='https://www.facebook.com/filmhobo'>" +
                                   "https://www.facebook.com/filmhobo</a>" +
                                   "<br> <br> Sincerely,<br>" +
                                   "The Film Hobo Team")

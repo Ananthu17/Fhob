@@ -1,7 +1,6 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Designation(models.Model):
@@ -23,8 +22,11 @@ class InitialIntrestedUsers(models.Model):
                                    max_length=150, blank=True)
     last_name = models.CharField(_('Last Name'), max_length=150)
     email = models.EmailField(_('Email Address'), unique=True)
-    phone = PhoneNumberField(_('Contact Phone Number'), unique=True,
-                             blank=True)
+    phone = models.CharField(_('Contact Phone Number'),
+                             max_length=20, unique=True,
+                             validators=[
+                             RegexValidator(r'^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$')
+                             ])
     designation = models.ManyToManyField(Designation,
                                          verbose_name=_('Designations'),
                                          blank=True,
