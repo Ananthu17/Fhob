@@ -22,7 +22,7 @@ class InitialUserForm(forms.ModelForm):
     email = forms.EmailField(max_length=254,
                              help_text='')
     phone = PhoneNumberField()
-    designation_id = forms.ModelMultipleChoiceField(
+    designation = forms.ModelMultipleChoiceField(
         label="Are you",
         queryset=Designation.objects.all(),
         widget=forms.CheckboxSelectMultiple)
@@ -30,4 +30,4 @@ class InitialUserForm(forms.ModelForm):
     class Meta:
         model = InitialIntrestedUsers
         fields = ('first_name', 'middle_name', 'last_name', 'email',
-                  'phone', 'designation_id')
+                  'phone', 'designation')
