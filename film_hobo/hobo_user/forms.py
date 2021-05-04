@@ -297,3 +297,13 @@ class NotificationAccountSettingsForm(forms.ModelForm):
         fields = ('someone_tracks_me', 'change_in_my_or_project_rating',
                   'review_for_my_work_or_project', 'new_project',
                   'friend_request', 'match_for_my_Interest')
+
+
+class ForgotPasswordEmailForm(forms.Form):
+    email = forms.EmailField(label="Email", max_length=254,
+                             help_text='Enter your email address.')
+
+
+class ResetPasswordForm(forms.Form):
+    new_password1 = forms.CharField(widget=forms.PasswordInput())
+    new_password2 = forms.CharField(widget=forms.PasswordInput())

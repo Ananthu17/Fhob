@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 
-from hobo_user.views import ExtendedSignupVerify
+from hobo_user.views import ExtendedSignupVerify, PasswordResetConfirmView
 
 from rest_framework_simplejwt import views as jwt_views
 
@@ -33,4 +34,7 @@ urlpatterns = [
     path('api/accounts/', include('authemail.urls')),
     path('signup/verify/', ExtendedSignupVerify.as_view(),
          name='authemail-signup-verify'),
+    path('password-reset-confirm/<str:uidb64>/<str:token>',
+         PasswordResetConfirmView.as_view(),
+         name='password_reset_confirm'),
 ]

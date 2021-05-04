@@ -21,8 +21,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TrackingAccountSettingsAPI, TrackingAccountSettingsView, \
                    BlockMembersAPI, BlockMembersView, UnBlockMembersAPI, \
                    NotificationAccountSettingsAPI, PaymentCompanyView, \
-                   NotificationAccountSettingsView, \
-                   SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI
+                   NotificationAccountSettingsView, ForgotPasswordView, \
+                   SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
+                   ForgotPasswordAPI, PasswordResetConfirmView, \
+                   PasswordResetView
 
 
 app_name = "hobo_user"
@@ -74,6 +76,9 @@ urlpatterns = [
     path('notification-account-settings-api/',
          NotificationAccountSettingsAPI.as_view(),
          name='notification-account-settings-api'),
+    path('forgot-password-api/', ForgotPasswordAPI.as_view(),
+         name='forgot-password-api'),
+
 
     # web-view endpoints
     path('user_home/', HomePage.as_view(), name='user_home'),
@@ -118,5 +123,9 @@ urlpatterns = [
          name='block-members'),
     path('notification-account-settings/', NotificationAccountSettingsView.as_view(),
          name='notification-account-settings'),
+    path('forgot-password/', ForgotPasswordView.as_view(),
+         name='forgot-password'),
+    path('password-reset/', PasswordResetView.as_view(),
+         name='password-reset'),
 
 ]

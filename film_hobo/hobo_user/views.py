@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -28,13 +28,17 @@ from rest_framework.authtoken.models import Token
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
+from rest_auth.views import PasswordResetView as AuthPasswordResetView
+from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
 
 
 from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
-    DisableAccountForm, BlockMemberForm, NotificationAccountSettingsForm
+    DisableAccountForm, BlockMemberForm, NotificationAccountSettingsForm, \
+    ForgotPasswordEmailForm, ResetPasswordForm
+
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails
@@ -1555,3 +1559,99 @@ class NotificationAccountSettingsView(LoginRequiredMixin, TemplateView):
                        'block_member_form': BlockMemberForm,
                        'notification_form': NotificationAccountSettingsForm
                        })
+
+
+class ForgotPasswordAPI(AuthPasswordResetView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        # Create a serializer with request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # Return the success message with OK HTTP status
+        return Response(
+            {"detail": "Password reset e-mail has been sent."},
+            status=status.HTTP_200_OK
+        )
+
+
+class PasswordResetConfirmView(AuthPasswordResetConfirmView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        print("here-----------------")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"detail": "Password has been reset with the new password.",
+             "status": status.HTTP_200_OK}
+        )
+
+
+class ForgotPasswordView(TemplateView):
+    template_name = 'registration/password_reset.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = ForgotPasswordEmailForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                return HttpResponseRedirect(reverse('hobo_user:forgot-password'))
+        return render(request, 'registration/password_reset.html',
+                      {'response': response,
+                       'form': form,
+                      })
+
+
+class PasswordResetView(TemplateView):
+    template_name = 'registration/password_reset_from_key.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = ResetPasswordForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.form_class
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class
+        uid = request.POST.get('uid')
+        token = request.POST.get('token')
+        url = 'http://127.0.0.1:8000/password-reset-confirm/'+uid+"/"+token
+        user_response = requests.post(
+                            url,
+                            data=json.dumps(request.POST),
+                            headers={'Content-type': 'application/json'})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(
+                                self.request,
+                                'Password reset successfully.'
+                                )
+                return HttpResponseRedirect(reverse('hobo_user:user_login'))
+        return render(request, 'registration/password_reset_from_key.html',
+                      {'response': response,
+                       'form': form,
+                      })
