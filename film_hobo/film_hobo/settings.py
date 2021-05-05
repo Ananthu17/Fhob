@@ -64,15 +64,16 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
-    'bootstrap_datepicker_plus',
-    'crispy_forms',
-    'django_s3_storage',
-    'zappa_django_utils'
 
     # project apps
     'initial_user',
     'hobo_user',
-    'payment'
+    'payment',
+
+    'bootstrap_datepicker_plus',
+    'crispy_forms',
+    'django_s3_storage',
+    'zappa_django_utils'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
