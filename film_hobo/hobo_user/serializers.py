@@ -18,10 +18,10 @@ from rest_framework import exceptions
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
-    IndiePaymentDetails, ProPaymentDetails
+    IndiePaymentDetails, ProPaymentDetails, PromoCode, \
+    DisabledAccount, CustomUserSettings, CompanyPaymentDetails
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
-
 
 UserModel = get_user_model()
 
@@ -478,7 +478,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     # company details
     company_name = serializers.CharField()
     company_address = serializers.CharField()
-    company_website = serializers.URLField()
+    company_website = serializers.URLField(allow_blank=True)
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
@@ -582,3 +582,108 @@ class ProPaymentSerializer(serializers.ModelSerializer):
         model = ProPaymentDetails
         fields = ['free_days', 'annual_amount', 'monthly_amount',
                   'estimated_tax']
+
+
+class CompanyPaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CompanyPaymentDetails
+        fields = ['free_days', 'annual_amount', 'monthly_amount',
+                  'estimated_tax']
+
+
+class PromoCodeSerializer(serializers.ModelSerializer):
+    user_id = serializers.CharField(required=True)
+    class Meta:
+        model = PromoCode
+        fields = ['promo_code', 'created_time', 'valid_from', 'valid_to',
+                  'life_span', 'amount_type', 'user_type','user_id']
+
+
+class GeneralSettingsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True, required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    user_id = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+
+class DisableAccountSerializer(serializers.ModelSerializer):
+    reason = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = DisabledAccount
+        fields = ['reason',]
+
+
+class PrivacySettingsSerializer(serializers.ModelSerializer):
+    profile_visibility = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    who_can_contact_me = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['profile_visibility', 'who_can_contact_me']
+
+
+class EnableAccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['account_status',]
+
+
+class TrackingAccountSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['who_can_track_me',]
+
+
+class NotificationAccountSettingsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUserSettings
+        fields = ['someone_tracks_me', 'change_in_my_or_project_rating',
+                  'review_for_my_work_or_project', 'new_project',
+                  'friend_request', 'match_for_my_Interest']
+
+
+class BlockMembersSerializer(serializers.Serializer):
+    user_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+# class SettingsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CustomUserSettings
+#         fields = ['profile_visibility', 'who_can_contact_me',
+#                   'who_can_track_me', 'someone_tracks_me',
+#                   'change_in_my_or_project_rating',
+#                   'review_for_my_work_or_project',
+#                   'new_project', 'friend_request',
+#                   'match_for_my_Interest',
+#                   'user'
+#                  ]

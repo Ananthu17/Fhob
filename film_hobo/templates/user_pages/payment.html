@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper flex-grow-1">
+    <div class="container mt-3 mb-3">
+        <div class="signup-section signup-border">
+            <!-- Nav pills -->
+            <ul class="nav nav-pills nav-justified" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link " data-toggle="pill" href="#account">Account</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " data-toggle="pill" href="#paymentplan">Payment Plan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="pill" href="#payment">Payment</a>
+                </li>
+            </ul>
+            <hr class="m-0 signup-border-hr">
+            <div class="row mt-2">
+                <div class="col-4 d-flex justify-content-center">
+                    <a href="" class="btn btn-account">Indie</a>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <a href="" class="btn btn-account">Pro</a>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <a href="" class="btn btn-account">Company</a>
+                </div>
+            </div>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="payment" class="container tab-pane signup-form active">
+                    <div class="row">
+                        <div class="col-5">
+                            <input type ="hidden" name = "user" value="{{user.id}}" id="user_id"/>
+                            <div class="mt-2">First {{ payment_details.free_days }} days free</div>
+                            {% if payment_plan == 'monthly' %}
+                            <div class="mt-2">Amount: ${{ payment_details.monthly_amount }} (billed monthly)</div>
+                            {% elif payment_plan == 'annually' %}
+                            <div class="mt-2">Amount: ${{ payment_details.annual_amount }} (billed annually)</div>
+                            {% else %}
+                            <div class="mt-2">Choose Payment plan to Proceed</div>
+                            {% endif %}
+                            <div class="mt-2">Estimated Tax:$ {{ payment_details.estimated_tax }}</div>
+                            <div class="mt-2">Your credit card will be charged on
+                                ___/___/2021, 30 days from today</div>
+                            <div class="row mt-2">
+                                <div class="col-3">
+                                    <label class="form-title">Promo Code</label>
+                                </div>
+                                <div class="col-6 form-group mt-2">
+                                    <input type="text" value="" id="promocode" name="promocode" class="form-control form-control-input"/>
+                                    <input type="button" id="apply_promocode" value="Apply" class="promo_code_btn"/>
+                                    <p class="promo_code_status"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-7 paymnt-lft-bar">
+                            <form>
+                                <div class="row">
+                                    <div class="col-3 ">
+                                        <label class="form-title">Name on the card</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input class="inp-line" />
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-3">
+                                        <label class="form-title">Card Number</label>
+                                    </div>
+                                    <div class="col-6 form-group mt-2">
+                                        <input type="password" class="form-control form-control-input">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="form-title">Experation</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <input class="inp-line" />
+                                    </div><span class="dob-bar">/</span>
+                                    <div class="col-2">
+                                        <input class="inp-line" />
+                                    </div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-3">
+                                        <label class="form-title">CVV</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <input class="inp-line" />
+                                    </div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-3">
+                                        <label class="form-title">Billing Address</label>
+                                    </div>
+                                    <div class="col-5">
+                                        <input class="inp-line" placeholder="" />
+                                    </div>
+                                    <div class="col-4">
+                                        <input class="inp-line" placeholder="" />
+                                    </div>
+                                </div>
+                                <div class="mt-4">Total Amount: $15.00</div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
+                <ul class="list-inline m-0">
+                    <li class="list-inline-item fb">
+                        <a class="list-inline-item fb" >Back</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
+                    </li>
+                </ul>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('body').on('click' , '#apply_promocode', function(){
+        $('.promo_code_status').html("");
+        var promocode = $("#promocode").val();
+        var user_id = $("#user_id").val();
+        var data_dict = {};
+        if(user_id){
+            data_dict['user_id']=user_id
+        }
+        if(promocode){
+            data_dict['promo_code']=promocode
+        }
+        $.post('/hobo_user/check-promocode-api/',data_dict)
+        .done(function(data) {
+            if(data.results!='')
+                {
+                    $('.promo_code_status').html(data['message']);
+                }
+            });
+        });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

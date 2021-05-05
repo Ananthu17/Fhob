@@ -1,3 +1,9 @@
+
+import json
+import datetime
+from django.utils import timezone
+from datetime import date
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.db import models
@@ -146,10 +152,13 @@ class CustomUser(AbstractUser):
     )
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
-    company_address = models.TextField(_("Address"), null=True, blank=True)
+    # company_address = models.TextField(_("Address"), null=True, blank=True)
+    company_address = models.CharField(_("Company Address"),
+                                       max_length=250,
+                                       null=True, blank=True)
     company_website = models.URLField(_("Company Website"),
                                       null=True,
-                                      blank=True)
+                                      blank=True,)
     company_phone = PhoneNumberField(_("Phone Number"), null=True,
                                      unique=True)
     title = models.CharField(_('Title'),
@@ -192,7 +201,10 @@ class CustomUser(AbstractUser):
                                     unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
-    address = models.TextField(_("Address"), null=True)
+    # address = models.TextField(_("Address"), null=True)
+    address = models.CharField(_("Address"),
+                               max_length=250,
+                               null=True)
     country = models.ForeignKey("hobo_user.Country",
                                 on_delete=models.SET_NULL,
                                 related_name='user_country',
@@ -209,6 +221,7 @@ class CustomUser(AbstractUser):
                                     max_length=150,
                                     null=True,
                                     default=FREE)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -384,10 +397,36 @@ class ProjectReaction(models.Model):
 
 
 class PromoCode(models.Model):
+    FLAT_AMOUNT = 'flat_amount'
+    PERCENTAGE = 'percentage'
+    AMOUNT_TYPE = [
+        (FLAT_AMOUNT, 'Flat Amount'),
+        (PERCENTAGE, 'Percentage'),
+    ]
+    HOBO = 'HOB'
+    INDIE = 'IND'
+    PRO = 'PRO'
+    PRODUCTION_COMPANY = 'COM'
+    USER_TYPE_CHOICES = [
+        (HOBO, 'Hobo'),
+        (INDIE, 'Indie'),
+        (PRO, 'Pro'),
+        (PRODUCTION_COMPANY, 'Production Company')
+    ]
     promo_code = models.CharField(max_length=1000)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
-    life_span = models.IntegerField(_('Valid for days'), null=True)
+    valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
+    valid_to = models.DateTimeField(_('Valid To'),
+                                    null=True, blank=True)
+    life_span = models.IntegerField(_('Valid for days'), null=True, blank=True)
+    amount_type = models.CharField(_("Amount Type"),
+                                   choices=AMOUNT_TYPE,
+                                   max_length=150, default=FLAT_AMOUNT)
+    amount = models.IntegerField(_('Amount'))
+    user_type = models.CharField(_("User Type"),
+                                 choices=USER_TYPE_CHOICES,
+                                 max_length=150, default=HOBO)
 
 
 class Team(models.Model):
@@ -446,7 +485,7 @@ class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
@@ -457,7 +496,7 @@ class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Pro Members Payment Detail'
@@ -468,8 +507,146 @@ class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.IntegerField(_('Annual billing amount'))
     monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Valid for days'))
+    estimated_tax = models.IntegerField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Company Payment Detail'
         verbose_name_plural = 'Company Payment Details'
+
+
+class DisabledAccount(models.Model):
+    REASON1 = 'reason1'
+    REASON2 = 'reason2'
+    REASON3 = 'reason3'
+    REASON4 = 'reason4'
+    REASON5 = 'reason5'
+    REASON_CHOICES = [
+        (REASON1, "I don't get any values from the network"),
+        (REASON2, "I lost my interest"),
+        (REASON3, "I have a privacy concern"),
+        (REASON4, "It is too expensive for me"),
+        (REASON5, "Other")
+    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='disabled_user',
+                             verbose_name=_("User"),
+                             null=True)
+
+    reason = models.CharField(_("Reason"),
+                              choices=REASON_CHOICES,
+                              max_length=150, default=REASON1)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Disabled Account'
+        verbose_name_plural = 'Disabled Accounts'
+
+
+class CustomUserSettings(models.Model):
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
+
+    MEMBERS_WITH_RATING_1_STAR = 'members_with_rating_1_star'
+    MEMBERS_WITH_RATING_2_STAR = 'members_with_rating_2_star'
+    MEMBERS_WITH_RATING_3_STAR = 'members_with_rating_3_star'
+    MEMBERS_WITH_RATING_4_STAR = 'members_with_rating_4_star'
+    MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+    NO_ONE = 'no_one'
+    ALL_MEMBERS = 'all_members'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+
+    ACCOUNT_STATUS_CHOICES = [
+        (ENABLED, 'Enabled'),
+        (DISABLED, 'Disabled'),
+    ]
+
+    PROFILE_VISIBILITY_CHOICES = [
+        (ALL_MEMBERS, 'All Members'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (NO_ONE, 'No One'),
+    ]
+
+    CONTACT_CHOICES = [
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (NO_ONE, 'No One'),
+    ]
+
+    TRACKING_CHOICES = [
+        (ALL_MEMBERS, 'All Members'),
+        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only'),
+        (NO_ONE, 'No One'),
+    ]
+
+    account_status = models.CharField(_("Account Status"),
+                                      choices=ACCOUNT_STATUS_CHOICES,
+                                      max_length=150, default=ENABLED)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_settings',
+                             verbose_name=_("User"),
+                             null=True)
+    profile_visibility = models.CharField(_("Who can see my Profile"),
+                                          choices=PROFILE_VISIBILITY_CHOICES,
+                                          max_length=150, default=ALL_MEMBERS)
+    who_can_contact_me = models.CharField(_("Who can contact me"),
+                                          choices=CONTACT_CHOICES,
+                                          max_length=150,
+                                          default=MEMBERS_WITH_RATING_1_STAR)
+    who_can_track_me = models.CharField(_("Who can track me"),
+                                        choices=TRACKING_CHOICES,
+                                        max_length=150,
+                                        default=ALL_MEMBERS)
+    blocked_members = models.ManyToManyField('hobo_user.CustomUser',
+                                             blank=True,
+                                             related_name="blocked_users",
+                                             verbose_name=_("Blocked Members"))
+    someone_tracks_me = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone tracks me")
+        )
+    change_in_my_or_project_rating = models.BooleanField(
+        default=True,
+        verbose_name=_("If there was a change in my or my project’s rating")
+        )
+    review_for_my_work_or_project = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone posted a review for my work or my project")
+        )
+    new_project = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone I track has started a new project or got attached to a project")
+        )
+    friend_request = models.BooleanField(
+        default=True,
+        verbose_name=_("If someone sends me a friend request")
+        )
+    match_for_my_Interest = models.BooleanField(
+        default=True,
+        verbose_name=_("If I’ve got a match for my Interest")
+        )
+
+    class Meta:
+        verbose_name = 'Custom User Settings'
+        verbose_name_plural = 'Custom User Settings'
+
+    def __str__(self):
+        return str(self.user)

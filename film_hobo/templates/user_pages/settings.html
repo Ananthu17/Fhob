@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load token %}
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+{% block content %}
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-4">
+                    <b>GENERAL ACCOUNT SETTINGS</b>
+                    <form method="post" action="{% url 'hobo_user:settings' %}">
+                        {% csrf_token %}
+                    <p>First Name:
+                        <input type ="text" disabled id="first_name" name="first_name" value="{{user.first_name}}" />
+                        <input type = "button" value = "Edit" id="edit_first_name">
+                        {% if message.first_name %}
+                            {% for err in message.first_name %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </p>
+                    <p>Middle Name:
+                        <input type ="text" disabled id="middle_name" name="middle_name" value="{{user.middle_name}}" />
+                        <input type = "button" value = "Edit" id="edit_middle_name">
+                    </p>
+                    <p>Last Name:
+                        <input type ="text" disabled id="last_name" name="last_name" value="{{user.last_name}}" />
+                        <input type = "button" value = "Edit" id="edit_last_name">
+                        {% if message.last_name %}
+                            {% for err in message.last_name %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </p>
+                    <p>Email:
+                        <input type ="email" disabled id="email" name="email" value="{{user.email}}" />
+                        <input type = "button" value = "Edit" id="edit_email">
+                        {% if message.email %}
+                            {% for err in message.email %}
+                                 <p>{{ err}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </p>
+                    <p>Password:
+                        <input type ="text" disabled id="password" name="password" value="* * * * *" />
+                        <input type = "button" value = "Edit" id="edit_password">
+                    </p>
+                    <p><a href="">Disable My Account</a></p>
+                    <input type = "button" value = "Cancel" id="cancel">
+                    <input type = "submit" value = "Save" id="save_general">
+                    </form>
+                </div>
+
+            <div class="col-4">
+                <b>Change Password</b>
+                <form method="post" action="{% url 'hobo_user:settings-change-password' %}">
+                    {% csrf_token %}
+                    <p>{{change_password_form.old_password.label}}
+                     {{change_password_form.old_password}}
+                     {% if change_password_errors.old_password %}
+                     {% for err in change_password_errors.old_password %}
+                         <p>{{ err}}</p>
+                     {% endfor %}
+                 {% endif %}
+                    </p>
+                    <p>
+                    {{change_password_form.new_password1.label}}
+                    {{change_password_form.new_password1}}
+                    {% if change_password_errors.new_password1 %}
+                        {% for err in change_password_errors.new_password1 %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    </p>
+                    <P>
+                     {{change_password_form.new_password2.label}}
+                     {{change_password_form.new_password2}}
+                     {% if change_password_errors.new_password2 %}
+                        {% for err in change_password_errors.new_password2 %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                     {% endif %}
+                    </p>
+                     <input type = "submit" value = "Save" id="save_password">
+                     {% if change_password_messages %}
+                            <p>{{ change_password_messages}}</p>
+                     {% endif %}
+                </form>
+            </div>
+            <div class="col-4">
+                <b>Disable Account</b>
+                <form method="post" action="{% url 'hobo_user:settings-disable-account' %}">
+                    {% csrf_token %}
+                        <p>{{disable_account_form.reason}}</p>
+                        {% if disable_account_errors.errors %}
+                                <p>{{disable_account_errors.errors}}</p>
+                        {% endif %}
+                        <input type = "button" value = "Cancel" id="cancel">
+                        <input type = "submit" value = "Disable" id="disable_account">
+                </form>
+            </div>
+        </div>
+            <div class="row">
+               
+                <div class="col-md-12">
+                    <br><br>
+                    <b>PRIVACY SETTINGS</b>
+                    <form method="post" action="{% url 'hobo_user:privacy-settings' %}">
+                        {% csrf_token %}
+                            <b>Who can see my Profile</b></br>
+                                <input type="radio" id="all_members" name="profile_visibility" value="all_members"
+                                {% if user_settings.profile_visibility == 'all_members' %}checked{% endif %}>
+                                <label for="all_members">All Members</label><br>
+
+                                <input type="radio" id="members_with_rating" name="profile_visibility" value="members_with_rating"
+                                {% if user_settings.profile_visibility != 'no_one' and user_settings.profile_visibility != 'pros_and_companies_only' and user_settings.profile_visibility != 'all_members' %}checked
+                                {% endif %}>
+                                <label for="members_with_rating">Members with rating
+                                        <input type="radio" id="visibility_star1" name="visibility_rate" value="1"
+                                        {% if user_settings.profile_visibility == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                        <label for="visibility_star1" title="text">1 star</label>
+                                        <input type="radio" id="visibility_star2" name="visibility_rate" value="2"
+                                        {% if user_settings.profile_visibility == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                        <label for="visibility_star2" title="text">2 stars</label>
+                                        <input type="radio" id="visibility_star3" name="visibility_rate" value="3"
+                                        {% if user_settings.profile_visibility == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                        <label for="visibility_star3" title="text">3 stars</label>
+                                        <input type="radio" id="visibility_star4" name="visibility_rate" value="4"
+                                        {% if user_settings.profile_visibility == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                        <label for="visibility_star4" title="text">4 stars</label>
+                                        <input type="radio" id="visibility_star5" name="visibility_rate" value="5"
+                                        {% if user_settings.profile_visibility == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                        <label for="visibility_star5" title="text">5 stars</label>
+                                </label><br>
+
+                                <input type="radio" id="pros_and_companies_only" name="profile_visibility" value="pros_and_companies_only"
+                                {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
+                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+
+                                <input type="radio" id="no_one" name="profile_visibility" value="no_one"
+                                {% if user_settings.profile_visibility == 'no_one' %}checked{% endif %}/>
+                                <label for="no_one">No One</label><br>
+
+                                {% if privacy_setting_errors.profile_visibility %}
+                                    {% for err in privacy_setting_errors.profile_visibility %}
+                                        <p>{{ err}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <b>Who can contact me</b></br>
+                                <input type="radio" id="members_with_rating" name="who_can_contact_me" value="members_with_rating"
+                                {% if user_settings.who_can_contact_me != 'no_one' and user_settings.who_can_contact_me != 'pros_and_companies_only'%}checked{% endif %}>
+                                <label for="members_with_rating">Members with rating
+                                        <input type="radio" id="star1" name="rate" value="1"
+                                        {% if user_settings.who_can_contact_me == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                        <label for="star1" title="text">1 star</label>
+                                        <input type="radio" id="star2" name="rate" value="2"
+                                        {% if user_settings.who_can_contact_me == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                        <label for="star2" title="text">2 stars</label>
+                                        <input type="radio" id="star3" name="rate" value="3"
+                                        {% if user_settings.who_can_contact_me == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                        <label for="star3" title="text">3 stars</label>
+                                        <input type="radio" id="star4" name="rate" value="4"
+                                        {% if user_settings.who_can_contact_me == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                        <label for="star4" title="text">4 stars</label>
+                                        <input type="radio" id="star5" name="rate" value="5"
+                                        {% if user_settings.who_can_contact_me == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                        <label for="star5" title="text">5 stars</label>
+                                </label><br>
+
+                                <input type="radio" id="pros_and_companies_only" name="who_can_contact_me" value="pros_and_companies_only"
+                                {% if user_settings.who_can_contact_me == 'pros_and_companies_only' %}checked{% endif %}>
+                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+
+                                <input type="radio" id="no_one" name="who_can_contact_me" value="no_one"
+                                {% if user_settings.who_can_contact_me == 'no_one' %}checked{% endif %}>
+                                <label for="no_one">No One</label><br>
+
+                                {% if privacy_setting_errors.who_can_contact_me %}
+                                    {% for err in privacy_setting_errors.who_can_contact_me %}
+                                        <p>{{ err}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <input type = "button" value = "Cancel" id="cancel">
+                                <input type = "submit" value = "Save" id="save_privacy_settings">
+
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+              
+                <div class="col-md-12">  <br><br>
+                    <b>TRACKING</b>
+                    <form method="post" action="{% url 'hobo_user:tracking-account' %}">
+                        {% csrf_token %}
+                            <b>Tracking Account Settings</b></br>
+                                <input type="radio" id="all_members" name="who_can_track_me" value="all_members"
+                                {% if user_settings.who_can_track_me == 'all_members' %}checked{% endif %}>
+                                <label for="all_members">All Members</label><br>
+
+                                <input type="radio" id="members_with_rating" name="who_can_track_me" value="members_with_rating"
+                                {% if user_settings.who_can_track_me != 'no_one' and user_settings.who_can_track_me != 'pros_and_companies_only' and user_settings.who_can_track_me != 'all_members' %}
+                                    checked
+                                {% endif %}>
+                                <label for="members_with_rating">Members with rating
+                                        <input type="radio" id="tracking_star1" name="tracking_rate" value="1"
+                                        {% if user_settings.who_can_track_me == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                        <label for="tracking_star1" title="text">1 star</label>
+                                        <input type="radio" id="tracking_star2" name="tracking_rate" value="2"
+                                        {% if user_settings.who_can_track_me == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                        <label for="tracking_star2" title="text">2 stars</label>
+                                        <input type="radio" id="tracking_star3" name="tracking_rate" value="3"
+                                        {% if user_settings.who_can_track_me == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                        <label for="tracking_star3" title="text">3 stars</label>
+                                        <input type="radio" id="tracking_star4" name="tracking_rate" value="4"
+                                        {% if user_settings.who_can_track_me == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                        <label for="tracking_star4" title="text">4 stars</label>
+                                        <input type="radio" id="tracking_star5" name="tracking_rate" value="5"
+                                        {% if user_settings.who_can_track_me == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                        <label for="tracking_star5" title="text">5 stars</label>
+                                </label><br>
+
+                                <input type="radio" id="pros_and_companies_only" name="who_can_track_me" value="pros_and_companies_only"
+                                {% if user_settings.who_can_track_me == 'pros_and_companies_only' %}checked{% endif %}/>
+                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+
+                                <input type="radio" id="no_one" name="who_can_track_me" value="no_one"
+                                {% if user_settings.who_can_track_me == 'no_one' %}checked{% endif %}/>
+                                <label for="no_one">No One</label><br>
+
+                                {% if tracking_setting_errors.who_can_track_me %}
+                                    {% for err in tracking_setting_errors.who_can_track_me %}
+                                        <p>{{ err}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                                <input type = "button" value = "Cancel" id="cancel">
+                                <input type = "submit" value = "Save" id="save_tracking_settings">
+
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-12">
+                <br><br>
+                <b>Blocking Account Settings</b>
+                <form method="post" action="{% url 'hobo_user:block-members' %}">
+                    {% csrf_token %}
+                    <p>Once you block someone, that person can no longer see things you post on your timeline, track you, invite you to events
+                        or groups, start a conversation with you, or add you as a friend.</p>
+                    <b>Block Members</b>
+                    {{block_member_form.blocked_members}}
+                    <input type = "submit" value = "Block" id="save_blocked_users">
+                    <p>{{block_user_errors}}</p>
+                </form>
+                <p>Blocked Users</p><br>
+                {% get_my_token request as token %}
+                {% if user_settings.blocked_members %}
+                        <form>
+                        <input type = "hidden" value="{{token}}" name="token" id="token"/>
+                        {% for obj in user_settings.blocked_members.all %}
+                        <p>
+                            {% if obj.first_name %}{{obj.first_name}}{% endif %}
+                            {% if obj.middle_name %}{{obj.middle_name}}{% endif %}
+                            {% if obj.last_name %}{{obj.last_name}}{% endif %}
+                            <input type = "button" value = "Unblock" class="unblock" id="unblock_{{obj.id}}">
+                            <p class="unblock_message"></p>
+                        </p>
+                        {% endfor %}
+                        </form>
+                {% endif %}
+            </div>
+            </div>
+            <div class="row">
+            <div class="col-12">
+                <br><br>
+                <b>Notification Account Settings</b>
+                <form method="post" action="{% url 'hobo_user:notification-account-settings' %}">
+                    {% csrf_token %}
+                    <p>{{notification_form.someone_tracks_me}}
+                    {{notification_form.someone_tracks_me.label}}</p>
+                    {% if notification_errors.someone_tracks_me %}
+                        {% for err in notification_errors.someone_tracks_me %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <p>{{notification_form.change_in_my_or_project_rating}}
+                    {{notification_form.change_in_my_or_project_rating.label}}</p>
+                    {% if notification_errors.change_in_my_or_project_rating %}
+                        {% for err in notification_errors.change_in_my_or_project_rating %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <p>{{notification_form.review_for_my_work_or_project}}
+                    {{notification_form.review_for_my_work_or_project.label}}</p>
+                    {% if notification_errors.new_project %}
+                        {% for err in notification_errors.new_project %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <p>{{notification_form.new_project}}
+                    {{notification_form.new_project.label}}</p>
+                    {% if notification_errors.new_project %}
+                        {% for err in notification_errors.new_project %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <p>{{notification_form.friend_request}}
+                    {{notification_form.friend_request.label}}</p>
+                    {% if notification_errors.friend_request %}
+                        {% for err in notification_errors.friend_request %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <p>{{notification_form.match_for_my_Interest}}
+                    {{notification_form.match_for_my_Interest.label}}</p>
+                    {% if notification_errors.match_for_my_Interest %}
+                        {% for err in notification_errors.match_for_my_Interest %}
+                            <p>{{ err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <input type = "button" value = "Cancel" id="cancel">
+                    <input type = "submit" value = "Save" id="save_notification_settings">
+                </form>
+            </div>
+            </div>
+        </div>
+
+
+        {% endblock %}
+        {% block extrajs %}
+        {{ form.media.js }}
+        <script>
+            $("#blocked_members").select2();
+            $('body').on('click' , '#edit_first_name', function(){
+                 $('#first_name').removeAttr("disabled");
+            });
+            $('body').on('click' , '#edit_middle_name', function(){
+                 $('#middle_name').removeAttr("disabled");
+            });
+            $('body').on('click' , '#edit_last_name', function(){
+                 $('#last_name').removeAttr("disabled");
+            });
+            $('body').on('click' , '#edit_email', function(){
+                 $('#email').removeAttr("disabled");
+            });
+            $('body').on('click' , '#edit_password', function(){
+
+            });
+            $('body').on('click' , '.unblock', function(){
+                var id = $(this).attr("id");
+                var token = $("#token").val();
+                var lst = id.split("_");
+                var obj_id = lst[1];
+                var data_dict = {}
+                data_dict['user_id'] = obj_id;
+                $.ajax
+                ({
+                    type: "POST",
+                    url: "/hobo_user/unblock-members-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: data_dict,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (){
+                        location.reload();
+                    }
+                });
+
+            });
+    </script>
+        {% endblock %}
+

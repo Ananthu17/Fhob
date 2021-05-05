@@ -1,0 +1,108 @@
+.message-div
+{
+  position:fixed;
+  top: 4em;
+  left: 31%;
+  z-index:999999;
+  width: 34em;
+}
+.message-box
+{
+  padding:1em 3em;
+}
+.msg-close
+{
+  position:absolute;
+  top:0.1em;
+  right:0.5em;
+}
+.errorlist li
+{
+  list-style-type:none;
+  font-family:Myraid Pro;
+  font-size:14px;
+  color:Red;
+}
+.submit_btn
+  {
+    border: none;
+    background-color: #e6e6e6;
+    color: #2265b9;
+    font-family: "Myraid Pro";
+    font-weight: 600;
+    font-size: 14px;
+  }
+.promo_code_btn
+  {
+    border: 2px solid transparent;
+    background-color:transparent;
+    color: #2265b9;
+    font-family: "Myraid Pro";
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: none;
+  }
+  .promo_code_btn:active ,.promo_code_btn:hover {
+    border: 2px solid transparent;
+    background-color:transparent;
+    outline: none;
+    box-shadow: none;
+ }
+ .promo_code_btn:focus {
+    box-shadow: none;
+    outline: none;
+    border: 2px solid transparent;
+  }
+  .promo_code_btn:visited {
+    box-shadow: none;
+    outline: none;
+    border: 2px solid transparent;
+  }
+  .dob_calendar .input-group.date .input-group-addon {
+    visibility: hidden;
+    display:none;
+}
+.btn-pd-0
+  {
+    padding:0;
+  }
+
+  .custom_check_box {
+    height: 15px;
+    width: 15px;
+      background-color: white;
+      border-radius: 50%;
+      vertical-align: middle;
+      border:1px solid #f32121;
+      -webkit-appearance: none;
+      outline: none;
+      cursor: pointer;
+      margin-right:6px;
+      margin-bottom:5px;
+  }
+
+  .custom_check_box:checked {
+      background-color: #f32121;
+    }
+
+  .guild_membership label
+    {
+      margin-bottom:0;
+    }
+.all-p
+    {
+      font-family:Myraid Pro;
+      font-size:14px; 
+    }
+  .inp-border-none {
+    border:none;
+    padding: 5px 10px;
+    outline: none;
+    width: 100%;
+    font-size: 13px;
+    color: #000;
+   }
+.change-pswd-sbmt-btn
+   {
+     padding:1em 0;
+   }
