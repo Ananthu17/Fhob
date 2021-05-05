@@ -17,6 +17,7 @@ full_requirements.txt
 #ignore migration folders
 film_hobo/hobo_user/migrations/
 film_hobo/initial_user/migrations/
+film_hobo/payment/migrations/
 
 # ignore static files
 # film_hobo/static/
