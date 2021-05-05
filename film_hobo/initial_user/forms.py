@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelMultipleChoiceField
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Designation, InitialIntrestedUsers
 
@@ -21,6 +22,8 @@ class InitialUserForm(forms.ModelForm):
                              help_text='')
     phone = forms.CharField(max_length=20,
                             help_text='')
+    phone.error_messages['invalid'] = _(
+        'Please enter a valid US contact number')
     designation = forms.ModelMultipleChoiceField(
         label="Are you",
         queryset=Designation.objects.all(),
