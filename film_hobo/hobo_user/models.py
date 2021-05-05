@@ -1,5 +1,6 @@
 
 import json
+import datetime
 from django.utils import timezone
 from datetime import date
 
@@ -402,10 +403,20 @@ class PromoCode(models.Model):
         (FLAT_AMOUNT, 'Flat Amount'),
         (PERCENTAGE, 'Percentage'),
     ]
+    HOBO = 'HOB'
+    INDIE = 'IND'
+    PRO = 'PRO'
+    PRODUCTION_COMPANY = 'COM'
+    USER_TYPE_CHOICES = [
+        (HOBO, 'Hobo'),
+        (INDIE, 'Indie'),
+        (PRO, 'Pro'),
+        (PRODUCTION_COMPANY, 'Production Company')
+    ]
     promo_code = models.CharField(max_length=1000)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
-    valid_from = models.DateTimeField(_('Valid From'), null=True)
+    valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
     valid_to = models.DateTimeField(_('Valid To'),
                                     null=True, blank=True)
     life_span = models.IntegerField(_('Valid for days'), null=True, blank=True)
@@ -413,6 +424,9 @@ class PromoCode(models.Model):
                                    choices=AMOUNT_TYPE,
                                    max_length=150, default=FLAT_AMOUNT)
     amount = models.IntegerField(_('Amount'))
+    user_type = models.CharField(_("User Type"),
+                                 choices=USER_TYPE_CHOICES,
+                                 max_length=150, default=HOBO)
 
 
 class Team(models.Model):

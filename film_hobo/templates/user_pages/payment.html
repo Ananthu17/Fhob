@@ -38,6 +38,7 @@
                 <div id="payment" class="container tab-pane signup-form active">
                     <div class="row">
                         <div class="col-5">
+                            <input type ="hidden" name = "user" value="{{user.id}}" id="user_id"/>
                             <div class="mt-2">First {{ payment_details.free_days }} days free</div>
                             {% if payment_plan == 'monthly' %}
                             <div class="mt-2">Amount: ${{ payment_details.monthly_amount }} (billed monthly)</div>
@@ -56,7 +57,7 @@
                                 <div class="col-6 form-group mt-2">
                                     <input type="text" value="" id="promocode" name="promocode" class="form-control form-control-input"/>
                                     <input type="button" id="apply_promocode" value="Apply" class="promo_code_btn"/>
-                                    <span class="promo_code_status"></span>
+                                    <p class="promo_code_status"></p>
                                 </div>
                             </div>
                         </div>
@@ -136,7 +137,11 @@
     $('body').on('click' , '#apply_promocode', function(){
         $('.promo_code_status').html("");
         var promocode = $("#promocode").val();
+        var user_id = $("#user_id").val();
         var data_dict = {};
+        if(user_id){
+            data_dict['user_id']=user_id
+        }
         if(promocode){
             data_dict['promo_code']=promocode
         }

@@ -1,16 +1,15 @@
 {% extends 'base.html' %}
 {% load token %}
 
-
-
-        {% block extracss %}
-        {{ form.media.css }}
-        {% endblock %}
-        {% block content %}
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+{% block content %}
         <div class="container">
             <div class="row">
-                <h3>GENERAL ACCOUNT SETTINGS</h3>
-                <div class="col-md-4">
+                
+                <div class="col-4">
+                    <b>GENERAL ACCOUNT SETTINGS</b>
                     <form method="post" action="{% url 'hobo_user:settings' %}">
                         {% csrf_token %}
                     <p>First Name:
@@ -54,8 +53,8 @@
                     </form>
                 </div>
 
-            <div class="col-md-4">
-                <h4>Change Password</h4>
+            <div class="col-4">
+                <b>Change Password</b>
                 <form method="post" action="{% url 'hobo_user:settings-change-password' %}">
                     {% csrf_token %}
                     <p>{{change_password_form.old_password.label}}
@@ -90,8 +89,8 @@
                      {% endif %}
                 </form>
             </div>
-            <div class="col-md-4">
-                <h4>Disable Account</h4>
+            <div class="col-4">
+                <b>Disable Account</b>
                 <form method="post" action="{% url 'hobo_user:settings-disable-account' %}">
                     {% csrf_token %}
                         <p>{{disable_account_form.reason}}</p>
@@ -104,8 +103,10 @@
             </div>
         </div>
             <div class="row">
-                <h3>PRIVACY SETTINGS</h3>
+               
                 <div class="col-md-12">
+                    <br><br>
+                    <b>PRIVACY SETTINGS</b>
                     <form method="post" action="{% url 'hobo_user:privacy-settings' %}">
                         {% csrf_token %}
                             <b>Who can see my Profile</b></br>
@@ -188,8 +189,9 @@
                 </div>
             </div>
             <div class="row">
-                <h3>TRACKING</h3>
-                <div class="col-md-12">
+              
+                <div class="col-md-12">  <br><br>
+                    <b>TRACKING</b>
                     <form method="post" action="{% url 'hobo_user:tracking-account' %}">
                         {% csrf_token %}
                             <b>Tracking Account Settings</b></br>
@@ -239,17 +241,19 @@
                 </div>
             </div>
             <div class="row">
-                <h3>Blocking Account Settings</h3>
+            <div class="col-12">
+                <br><br>
+                <b>Blocking Account Settings</b>
                 <form method="post" action="{% url 'hobo_user:block-members' %}">
                     {% csrf_token %}
                     <p>Once you block someone, that person can no longer see things you post on your timeline, track you, invite you to events
                         or groups, start a conversation with you, or add you as a friend.</p>
                     <b>Block Members</b>
                     {{block_member_form.blocked_members}}
-                    <input type = "submit" value = "Save" id="save_blocked_users">
+                    <input type = "submit" value = "Block" id="save_blocked_users">
                     <p>{{block_user_errors}}</p>
                 </form>
-                <h4>Blocked Users</h4>
+                <p>Blocked Users</p><br>
                 {% get_my_token request as token %}
                 {% if user_settings.blocked_members %}
                         <form>
@@ -266,8 +270,11 @@
                         </form>
                 {% endif %}
             </div>
+            </div>
             <div class="row">
-                <h3>Notification Account Settings</h3>
+            <div class="col-12">
+                <br><br>
+                <b>Notification Account Settings</b>
                 <form method="post" action="{% url 'hobo_user:notification-account-settings' %}">
                     {% csrf_token %}
                     <p>{{notification_form.someone_tracks_me}}
@@ -315,6 +322,7 @@
                     <input type = "button" value = "Cancel" id="cancel">
                     <input type = "submit" value = "Save" id="save_notification_settings">
                 </form>
+            </div>
             </div>
         </div>
 
@@ -364,3 +372,4 @@
             });
     </script>
         {% endblock %}
+

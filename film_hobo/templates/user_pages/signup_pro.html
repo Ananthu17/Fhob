@@ -58,16 +58,43 @@
                               <label class="form-title">Your Name:</label>
                           </div>
                           <div class="col-3">
-                              {{form.first_name}}
-                              {{form.first_name.errors}}
+                            <input
+                            name="{{ form.first_name.name }}"
+                            class="inp-line"
+                            id="{{ form.first_name.id_for_label }}"
+                            {% if form.first_name.value != None %}value="{{ form.first_name.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.first_name.field.max_length }}"
+                            {% if form.first_name.field.required %}required{% endif %}
+                            placeholder="First" autocomplete="off">
+                            {% if form.errors.first_name %}
+                              <p style="color: red">{{form.errors.first_name}}</p>
+                            {% endif %}
                           </div>
                           <div class="col-3 ">
-                            {{form.middle_name}}
-                            {{form.middle_name.errors}}
+                            <input
+                            name="{{ form.middle_name.name }}"
+                            class="inp-line"
+                            id="{{ form.middle_name.id_for_label }}"
+                            {% if form.middle_name.value != None %}value="{{ form.middle_name.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.middle_name.field.max_length }}"
+                            {% if form.middle_name.field.required %}required{% endif %}
+                            placeholder="Middle" autocomplete="off">
+                            {% if form.errors.middle_name %}
+                              <p style="color: red">{{form.errors.middle_name}}</p>
+                            {% endif %}
                           </div>
                           <div class="col-3 ">
-                            {{form.last_name}}
-                            {{form.last_name.errors}}
+                            <input
+                            name="{{ form.last_name.name }}"
+                            class="inp-line"
+                            id="{{ form.last_name.id_for_label }}"
+                            {% if form.last_name.value != None %}value="{{ form.last_name.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.last_name.field.max_length }}"
+                            {% if form.last_name.field.required %}required{% endif %}
+                            placeholder="Last" autocomplete="off">
+                            {% if form.errors.last_name %}
+                              <p style="color: red">{{form.errors.last_name}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -75,8 +102,17 @@
                               <label class="form-title">Email:</label>
                           </div>
                           <div class="col-6">
-                            {{form.email}}
-                            {{form.email.errors}}
+                            <input
+                            name="{{ form.email.name }}"
+                            class="inp-line"
+                            id="{{ form.email.id_for_label }}"
+                            {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.email.field.max_length }}"
+                            {% if form.email.field.required %}required{% endif %}
+                            placeholder="Email" autocomplete="off">
+                            {% if form.errors.email %}
+                              <p style="color: red">{{form.errors.email}}</p>
+                            {% endif %}
                           </div>
                           <div class="col-3">
                               <span class="form-title">(your login username)</span>
@@ -87,8 +123,17 @@
                             <label class="form-title">Phone:</label>
                           </div>
                           <div class="col-6">
-                            {{form.phone_number}}
-                            {{form.phone_number.errors}}
+                            <input
+                            name="{{ form.phone_number.name }}"
+                            class="inp-line"
+                            id="{{ form.phone_number.id_for_label }}"
+                            {% if form.phone_number.value != None %}value="{{ form.phone_number.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.phone_number.field.max_length }}"
+                            {% if form.phone_number.field.required %}required{% endif %}
+                            placeholder="Phone" autocomplete="off">
+                            {% if form.errors.phone_number %}
+                              <p style="color: red">{{form.errors.phone_number}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -96,8 +141,17 @@
                               <label class="form-title">Date of Birth:</label>
                           </div>
                           <div class="col-6 dob_calendar">
-                            {{form.date_of_birth}}
-                            {{form.date_of_birth.errors}}
+                            <input
+                            name="{{ form.date_of_birth.name }}"
+                            class="inp-line"
+                            id="{{ form.date_of_birth.id_for_label }}"
+                            {% if form.date_of_birth.value != None %}value="{{ form.date_of_birth.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.date_of_birth.field.max_length }}"
+                            {% if form.date_of_birth.field.required %}required{% endif %}
+                            placeholder="Date of Birth" autocomplete="off">
+                            {% if form.errors.date_of_birth %}
+                              <p style="color: red">{{form.errors.date_of_birth}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -105,8 +159,17 @@
                               <label class="form-title">Address:</label>
                           </div>
                           <div class="col-9">
-                            {{form.address}}
-                            {{form.address.errors}}
+                            <input
+                            name="{{ form.address.name }}"
+                            class="inp-line"
+                            id="{{ form.address.id_for_label }}"
+                            {% if form.address.value != None %}value="{{ form.address.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.address.field.max_length }}"
+                            {% if form.address.field.required %}required{% endif %}
+                            placeholder="Address" autocomplete="off">
+                            {% if form.errors.address %}
+                              <p style="color: red">{{form.errors.address}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-3">
@@ -114,8 +177,17 @@
                               <label class="form-title">Country</label>
                           </div>
                           <div class="col-4 form-group">
-                            {{form.country}}
-                            {{form.country.errors}}
+                            <select class="form-control form-control-input" name="{{ form.country.name }}"
+                            id="{{ form.country.id_for_label }}"
+                            placeholder="Country"
+                            required>
+                            {% for item in form.country %}
+                                <option>{{item}}</option>
+                            {% endfor %}
+                            </select>
+                            {% if form.errors.country %}
+                              <p style="color: red">{{form.errors.country}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -123,8 +195,17 @@
                               <label class="form-title">Password</label>
                           </div>
                           <div class="col-4 form-group">
-                            {{ form.password1 }}
-                            {{ form.password1.errors }}
+                            <input type="password"
+                            name="{{ form.password1.name }}"
+                            class="form-control form-control-input"
+                            id="{{ form.password1.id_for_label }}"
+                            {% if form.password1.value != None %}value="{{ form.password1.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.password1.field.max_length }}"
+                            {% if form.password1.field.required %}required{% endif %}
+                            autocomplete="off">
+                            {% if form.errors.password1 %}
+                              <p style="color: red">{{form.errors.password1}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -132,8 +213,17 @@
                               <label class="form-title">Repeat Password</label>
                           </div>
                           <div class="col-4 form-group">
-                            {{ form.password2 }}
-                            {{ form.password2.errors }}
+                            <input type="password"
+                            name="{{ form.password2.name }}"
+                            class="form-control form-control-input"
+                            id="{{ form.password2.id_for_label }}"
+                            {% if form.password2.value != None %}value="{{ form.password2.value|stringformat:'s' }}"{% endif %}
+                            maxlength="{{ form.password2.field.max_length }}"
+                            {% if form.password2.field.required %}required{% endif %}
+                            autocomplete="off">
+                            {% if form.errors.password2 %}
+                              <p style="color: red">{{form.errors.password2}}</p>
+                            {% endif %}
                           </div>
                       </div>
                       <div class="row mt-2">
@@ -148,8 +238,13 @@
                       </div>
                       <div class="row mt-1 mb-2 mr-3 float-right ">
                           <label class="containerradio">I Agree
-                            {{form.i_agree}}
-                            {{form.i_agree.errors}}
+                            <input type="radio"  name="{{ form.i_agree.name }}"
+                            id="{{ form.i_agree.id_for_label }}"
+                            {% if form.i_agree.field.required %}required{% endif %}>
+                            <span class="checkmarkagree"></span>
+                            {% if form.errors.i_agree %}
+                              <p style="color: red">{{form.errors.i_agree}}</p>
+                            {% endif %}
                               <span class="checkmarkagree"></span>
                             </label>
                       </div>

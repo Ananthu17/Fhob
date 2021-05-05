@@ -583,6 +583,7 @@ class ProPaymentSerializer(serializers.ModelSerializer):
         fields = ['free_days', 'annual_amount', 'monthly_amount',
                   'estimated_tax']
 
+
 class CompanyPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -592,10 +593,11 @@ class CompanyPaymentSerializer(serializers.ModelSerializer):
 
 
 class PromoCodeSerializer(serializers.ModelSerializer):
-
+    user_id = serializers.CharField(required=True)
     class Meta:
         model = PromoCode
-        fields = ['promo_code', 'created_time', 'valid_from', 'life_span']
+        fields = ['promo_code', 'created_time', 'valid_from', 'valid_to',
+                  'life_span', 'amount_type', 'user_type','user_id']
 
 
 class GeneralSettingsSerializer(serializers.Serializer):
@@ -672,3 +674,16 @@ class BlockMembersSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+# class SettingsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = CustomUserSettings
+#         fields = ['profile_visibility', 'who_can_contact_me',
+#                   'who_can_track_me', 'someone_tracks_me',
+#                   'change_in_my_or_project_rating',
+#                   'review_for_my_work_or_project',
+#                   'new_project', 'friend_request',
+#                   'match_for_my_Interest',
+#                   'user'
+#                  ]

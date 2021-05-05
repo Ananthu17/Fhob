@@ -688,6 +688,7 @@ class PaymentIndieView(TemplateView):
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
+        context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
         return context
@@ -709,6 +710,7 @@ class PaymentProView(TemplateView):
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
+        context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
         return context
@@ -730,6 +732,7 @@ class PaymentCompanyView(TemplateView):
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
+        context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
         return context
@@ -743,6 +746,7 @@ class CheckPromoCodeAPI(APIView):
         serializer = PromoCodeSerializer(data=request.data)
         if serializer.is_valid():
             data_dict = serializer.data
+            user_id = data_dict['user_id']
             promocode = data_dict['promo_code']
             try:
                 promocode = PromoCode.objects.get(promo_code=promocode)
@@ -751,8 +755,23 @@ class CheckPromoCodeAPI(APIView):
                         days=life_span)
                 today = timezone.now()
                 if today <= validity:
-                    response = {'message': 'Promo Code Applied', 'status':
-                                status.HTTP_200_OK}
+                    user = CustomUser.objects.get(id=user_id)
+                    user_type = user.membership
+                    if user_type == promocode.user_type:
+                        response = {'message': 'Promo Code Applied', 'status':
+                                    status.HTTP_200_OK}
+                    else:
+                        if user_type == 'IND':
+                            membership = "Indie"
+                        if user_type == 'PRO':
+                            membership = "Pro"
+                        if user_type == 'HOB':
+                            membership = "Hobo"
+                        if user_type == 'COM':
+                            membership = "Production Company"
+                        msg = 'This Promo Code is not available for '+membership+' users.'
+                        response = {'message': msg, 'status':
+                                    status.HTTP_200_OK}
                 else:
                     response = {'message': 'Promo Code Expired', 'status':
                                 status.HTTP_200_OK}
@@ -1607,6 +1626,7 @@ class ForgotPasswordView(TemplateView):
                             'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
+        print(user_response)
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
@@ -1655,3 +1675,38 @@ class PasswordResetView(TemplateView):
                       {'response': response,
                        'form': form,
                       })
+
+
+# class SettingsAPI(APIView):
+#     serializer_class = NotificationAccountSettingsSerializer
+#     permission_classes = (IsAuthenticated,)
+
+#     def post(self, request):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             data_dict = serializer.data
+#             user = self.request.user
+#             user_settings = CustomUserSettings.objects.get(user=user)
+#             if 'someone_tracks_me' in data_dict:
+#                 user_settings.someone_tracks_me = data_dict['someone_tracks_me']
+#             if 'change_in_my_or_project_rating' in data_dict:
+#                 user_settings.change_in_my_or_project_rating = data_dict[
+#                                         'change_in_my_or_project_rating']
+#             if 'review_for_my_work_or_project' in data_dict:
+#                 user_settings.review_for_my_work_or_project = data_dict[
+#                                         'review_for_my_work_or_project']
+#             if 'new_project' in data_dict:
+#                 user_settings.new_project = data_dict['new_project']
+#             if 'friend_request' in data_dict:
+#                 user_settings.friend_request = data_dict['friend_request']
+#             if 'match_for_my_Interest' in data_dict:
+#                 user_settings.match_for_my_Interest = data_dict[
+#                                         'match_for_my_Interest']
+#             user_settings.save()
+#             response = {'message': "Notification Account Settings Updated",
+#                         'status': status.HTTP_200_OK}
+#         else:
+#             response = {'errors': serializer.errors, 'status':
+#                         status.HTTP_400_BAD_REQUEST}
+
+#         return Response(response)

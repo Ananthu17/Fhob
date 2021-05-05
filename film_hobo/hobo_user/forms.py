@@ -31,6 +31,11 @@ class SignUpForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        self.fields['email'].required = True
+        self.fields['password1'].required = True
+        self.fields['password2'].required = True
         self.fields['first_name'].widget.attrs['class'] = 'inp-line'
         self.fields['first_name'].widget.attrs['placeholder'] = 'First'
         self.fields['middle_name'].widget.attrs['class'] = 'inp-line'
@@ -258,10 +263,20 @@ class SignUpFormCompany(UserCreationForm):
 #         self.fields['user_address'].widget.attrs['placeholder'] = 'Address'
 
 
+
 class ChangePasswordForm(forms.Form):
     old_password = forms.CharField(widget=forms.PasswordInput())
     new_password1 = forms.CharField(widget=forms.PasswordInput())
     new_password2 = forms.CharField(widget=forms.PasswordInput())
+
+    def __init__(self, *args, **kwargs):
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        self.fields['old_password'].widget.attrs['class'] = 'inp-line'
+        self.fields['old_password'].widget.attrs['placeholder'] = 'Old Password'
+        self.fields['new_password1'].widget.attrs['class'] = 'inp-line'
+        self.fields['new_password1'].widget.attrs['placeholder'] = 'New Password'
+        self.fields['new_password2'].widget.attrs['class'] = 'inp-line'
+        self.fields['new_password2'].widget.attrs['placeholder'] = 'Confirm New Password'
 
 
 class DisableAccountForm(forms.ModelForm):
@@ -274,6 +289,10 @@ class DisableAccountForm(forms.ModelForm):
             'reason': forms.RadioSelect(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(DisableAccountForm, self).__init__(*args, **kwargs)
+        # self.fields['reason'].widget.attrs['class'] = 'form-check-input'
+        self.fields['reason'].widget.attrs['class'] = 'radio-btn-settings'
 
 class BlockMemberForm(forms.ModelForm):
     blocked_members = forms.ModelChoiceField(

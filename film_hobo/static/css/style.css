@@ -94,3 +94,15 @@
       font-family:Myraid Pro;
       font-size:14px; 
     }
+  .inp-border-none {
+    border:none;
+    padding: 5px 10px;
+    outline: none;
+    width: 100%;
+    font-size: 13px;
+    color: #000;
+   }
+.change-pswd-sbmt-btn
+   {
+     padding:1em 0;
+   }
