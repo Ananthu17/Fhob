@@ -26,6 +26,7 @@ urlpatterns = [
          name='landing_home'),
     path('admin/', admin.site.urls),
     path('initial_user/', include('initial_user.urls')),
+    path('payment/', include('payment.urls')),
     path('hobo_user/', include('hobo_user.urls')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(),
          name='token_obtain_pair'),

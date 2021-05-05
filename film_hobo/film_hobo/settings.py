@@ -29,7 +29,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-# for development
+# # for development
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1',
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3rd party packages
     'rest_auth',
     'rest_framework',
     'django.contrib.sites',
@@ -60,17 +61,18 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework.authtoken',
     'import_export',
-
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
-
-    'initial_user',
-    'hobo_user',
     'bootstrap_datepicker_plus',
     'crispy_forms',
     'django_s3_storage',
     'zappa_django_utils'
+
+    # project apps
+    'initial_user',
+    'hobo_user',
+    'payment'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
