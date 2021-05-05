@@ -145,7 +145,7 @@
 .landing-des{
     font-family: "Caliban Std";
     color:#0b67bc;
-    text-align: justify;
+    text-align:left;
     font-size: 29px;
     line-height: 34px;
 }
@@ -153,14 +153,16 @@
     background-color: #3fa9f5;
     color: #fff;
     font-family: Arial, Helvetica, sans-serif;
-    border-radius: 7px;
+    border-radius: 20px;
     padding: 35px 49px;
     text-align: left;
     font-size: 18px;
 }
 .landing-form-font{
     font-weight: 600;
+    padding-top: 25px;
 }
+
 .landing-page-footer{
     height: 100px;
     background-color: #3fa9f5;
