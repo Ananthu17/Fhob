@@ -481,11 +481,23 @@ class GuildMembership(models.Model):
         return str(self.membership)
 
 
+class HoboPaymentsDetails(SingletonModel):
+    free_days = models.CharField(_('First free days'), max_length=250,
+                                 null=True, blank=True)
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
+
+    class Meta:
+        verbose_name = 'Hobo Members Payment Detail'
+        verbose_name_plural = 'Hobo Members Payment Details'
+
+
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
@@ -494,9 +506,9 @@ class IndiePaymentDetails(SingletonModel):
 
 class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Pro Members Payment Detail'
@@ -505,9 +517,9 @@ class ProPaymentDetails(SingletonModel):
 
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Company Payment Detail'
