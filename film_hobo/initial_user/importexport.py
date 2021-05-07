@@ -1,6 +1,8 @@
+import re
+
 from import_export import resources
 
-from .models import InitialIntrestedUsers
+from .models import InitialIntrestedUsers, Designation
 
 
 class InitialIntrestedUsersResource(resources.ModelResource):

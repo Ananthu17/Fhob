@@ -1,3 +1,6 @@
+from django.shortcuts import render
+from django.views.generic.base import View
+
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -162,3 +165,10 @@ class UpdateMembershipFeeAPI(APIView):
                  "message": "no entry in CompanyPaymentDetails model to edit"
                  }, status=status.HTTP_204_NO_CONTENT)
         return Response(final_result, status=status.HTTP_200_OK)
+
+
+class PaymentAdmin(View):
+
+    def get(self, request, *args, **kwargs):
+        context = {'message': 'Hello Django!'}
+        return render(request, 'payment/payment_admin.html', context=context)
