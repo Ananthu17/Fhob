@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ImportExportModelAdmin, ImportExportActionModelAdmin
 
 from .models import Designation, InitialIntrestedUsers
 from .importexport import InitialIntrestedUsersResource
@@ -8,7 +8,7 @@ from .importexport import InitialIntrestedUsersResource
 admin.site.register(Designation)
 
 
-class InitialIntrestedUsersAdmin(ImportExportActionModelAdmin):
+class InitialIntrestedUsersAdmin(ImportExportModelAdmin, ImportExportActionModelAdmin):
     resource_class = InitialIntrestedUsersResource
 
 
