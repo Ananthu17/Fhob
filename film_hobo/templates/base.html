@@ -184,6 +184,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
+<!-- Axios -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+    document.getElementById("login-submit").addEventListener("click", function() {
+        var email = $('#id_username').val();
+        var password = $('#id_password').val();
+        origin_url = window.location.origin
+        post_url = origin_url + '/hobo_user/login/'
+        axios.post(post_url,  {"email": email.toString(),"password": password.toString()})
+        .then(response => {
+            var res = response.data.token
+
+            localStorage.setItem('token', response.data.token);
+        });
+    });
+    </script>
 </html>
 
 {% block extrajs %}
