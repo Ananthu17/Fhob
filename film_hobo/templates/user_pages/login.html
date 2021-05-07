@@ -1,10 +1,13 @@
+{% extends 'base.html' %}
 {% load rest_framework %}
 
-<html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    </head>
-    <body>
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
         <h1>Login</h1>
         <form method="post" action="{% url 'hobo_user:user_login' %}">
             {% csrf_token %}
@@ -17,7 +20,26 @@
                 Password {{form.password}}
                 {{form.password.errors}}
             </p>
-            <button type="submit" class="btn btn-default">Sign in</button>
+            <button id="login-submit" type="submit" class="btn btn-default">Sign in</button>
         </form>
-    </body>
-</html>
+        <a href="{% url 'hobo_user:forgot-password' %}">Forgot Password</a>
+
+
+
+{% endblock %}
+<!-- Axios -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+    // $("#login-submit").click(function() {
+    //     var email = $('#id_username').val();
+    //     var password = $('#id_password').val();
+    //     origin_url = window.location.origin
+    //     post_url = origin_url + '/hobo_user/login/'
+    //     axios.post(post_url,  {"email": email.toString(),"password": password.toString()})
+    //     .then((response) => {
+    //         localStorage["token"]= response.data
+    //     });
+    // });
+    </script>
+{% block extrajs %}
+{% endblock %}

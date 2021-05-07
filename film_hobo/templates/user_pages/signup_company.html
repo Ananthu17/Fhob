@@ -1,147 +1,364 @@
-{% extends "user_pages/signup_base.html" %}
-{% load crispy_forms_tags %}
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
+
 {% block content %}
-  <h2>Sign up - Company</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% for error in field.errors %}
-    <p style="color: red">{{ error }}</p>
-    {% endfor %}
-    <p>
-      <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label><br>
-      <input type="text" name="{{ form.company_name.name }}"
-      maxlength="150" id="{{ form.company_name.id_for_label }}"
-      {% if form.company_name.value != None %}value="{{ form.company_name.value|stringformat:'s' }}"{% endif %}>
-      {{ form.company_name.errors }}
-      {% if form.errors.company_name %}
-        <p style="color: red">{{ form.errors.company_name }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.company_address.id_for_label }}">{{ form.company_address.label }}</label><br>
-      <textarea name="{{ form.company_address.name }}" cols="40" rows="10"
-      required="" id="{{ form.company_address.id_for_label }}"
-      {% if form.company_address.value != None %}value="{{ form.company_address.value|stringformat:'s' }}"{% endif %}>
-      </textarea>
-      {% if form.errors.company_address %}
-        <p style="color: red">{{ form.errors.company_address }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.company_website.id_for_label }}">{{ form.company_website.label }}</label><br>
-      <input type="text" name="{{ form.company_website.name }}"
-      maxlength="150" id="{{ form.company_website.id_for_label }}"
-      {% if form.company_website.value != None %}value="{{ form.company_website.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.company_website %}
-        <p style="color: red">{{ form.errors.company_website }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.company_phone.id_for_label }}">{{ form.company_phone.label }}</label><br>
-      <input type="text" name="{{ form.company_phone.name }}" maxlength="150"
-      id="{{ form.company_phone.id_for_label }}"
-      {% if form.company_phone.value != None %}value="{{ form.company_phone.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.company_phone %}
-        <p style="color: red">{{ form.errors.company_phone }}</p>
-      {% endif %}
-    </p>
-    <h3>Your Information</h3>
-    <p>
-      <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label><br>
-      <input type="text" name="{{ form.first_name.name }}" maxlength="150"
-      id="{{ form.first_name.id_for_label }}"
-      {% if form.first_name.value != None %}value="{{ form.first_name.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.first_name %}
-        <p style="color: red">{{ form.errors.first_name }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.middle_name.id_for_label }}">{{ form.middle_name.label }}</label><br>
-      <input type="text" name="{{ form.middle_name.name }}" maxlength="150"
-      id="{{ form.middle_name.id_for_label }}"
-      {% if form.middle_name.value != None %}value="{{ form.middle_name.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.middle_name %}
-        <p style="color: red">{{ form.errors.middle_name }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label><br>
-      <input type="text" name="{{ form.last_name.name }}" maxlength="150"
-      id="{{ form.last_name.id_for_label }}"
-      {% if form.last_name.value != None %}value="{{ form.last_name.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.last_name %}
-        <p style="color: red">{{ form.errors.last_name }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.user_title.id_for_label }}">{{ form.user_title.label }}</label><br>
-      <input type="text" name="{{ form.user_title.name }}" maxlength="150"
-      id="{{ form.user_title.id_for_label }}"
-      {% if form.user_title.value != None %}value="{{ form.user_title.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.user_title %}
-        <p style="color: red">{{ form.errors.user_title }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label><br>
-      <input type="text" name="{{ form.email.name }}" maxlength="150"
-      id="{{ form.email.id_for_label }}"
-      {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.email %}
-        <p style="color: red">{{ form.errors.email }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label><br>
-      <input type="text" name="{{ form.phone_number.name }}" maxlength="150"
-      id="{{ form.phone_number.id_for_label }}"
-      {% if form.phone_number.value != None %}value="{{ form.phone_number.value|stringformat:'s' }}"{% endif %}>
-      {% if form.errors.phone_number %}
-        <p style="color: red">{{ form.errors.phone_number }}</p>
-      {% endif %}
-    </p>
-    <p>
-    <label for="{{ form.country.id_for_label }}">{{ form.country.label }}</label><br>
-    <select id="{{ form.country.id_for_label }}" name="{{ form.country.name }}"
-    class="selectpicker" data-title="Select Country" data-style="btn-default btn-block"
-    data-menu-style="dropdown-blue">
-      <option value="{{ country.id }}">-Select-</option>
-      {% for country in countries %}
-          <option value="{{ country.id }}">{{ country }}</option>
-      {% endfor %}
-      </select>
-      {% if form.errors.country %}
-        <p style="color: red">{{ form.errors.country }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.date_of_birth.id_for_label }}">{{ form.date_of_birth.label }}</label><br>
-      {{ form.date_of_birth }}
-      {% if form.errors.date_of_birth %}
-        <p style="color: red">{{ form.errors.date_of_birth }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.user_address.id_for_label }}">{{ form.user_address.label }}</label><br>
-      <textarea name="{{ form.user_address.name }}" cols="40" rows="10" required="" id="{{ form.user_address.id_for_label }}"></textarea>
-      {% if form.errors.user_address %}
-        <p style="color: red">{{ form.errors.user_address }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label><br>
-      <input type="password" name="{{ form.password1.name }}" maxlength="150" id="{{ form.password1.id_for_label }}">
-      {% if form.errors.password1 %}
-        <p style="color: red">{{ form.errors.password1 }}</p>
-      {% endif %}
-    </p>
-    <p>
-      <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label><br>
-      <input type="password" name="{{ form.password2.name }}" maxlength="150" id="{{ form.password2.id_for_label }}">
-      {% if form.errors.password2 %}
-        <p style="color: red">{{ form.errors.password2 }}</p>
-      {% endif %}
-    </p>
-    <button type="submit">Sign up</button>
-  </form>
+<div class="wrapper flex-grow-1">
+  <div class="container mt-3 mb-3">
+      <div class="signup-section signup-border">
+          <!-- Nav pills -->
+          <ul class="nav nav-pills nav-justified" role="tablist">
+              <li class="nav-item">
+                  <a class="nav-link active" data-toggle="pill" href="#account">Account</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" data-toggle="pill" href="#paymentplan">Payment Plan</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" data-toggle="pill" href="#payment">Payment</a>
+              </li>
+          </ul>
+          <hr class="m-0 signup-border-hr">
+          <div class="row mt-2">
+              <div class="col-4 d-flex justify-content-center">
+                  <a href="" class="btn btn-account">Indie</a>
+              </div>
+              <div class="col-4 d-flex justify-content-center">
+                  <a href="" class="btn btn-account">Pro</a>
+              </div>
+              <div class="col-4 d-flex justify-content-center">
+                  <a href="" class="btn btn-account">Company</a>
+              </div>
+          </div>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div id="account" class="container tab-pane active">
+              <form method="post">
+                {% csrf_token %}
+                {% for error in field.errors %}
+                <p style="color: red">{{ error }}</p>
+                {% endfor %}
+              <div class="signup-form mt-2 mb-2 ">
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Company Name:</label>
+                      </div>
+                      <div class="col-6">
+                         <input
+                         name="{{ form.company_name.name }}"
+                         class="inp-line"
+                         id="{{ form.company_name.id_for_label }}"
+                         {% if form.company_name.value != None %}value="{{ form.company_name.value|stringformat:'s' }}"{% endif %}
+                         maxlength="{{ form.company_name.field.max_length }}"
+                         {% if form.company_name.field.required %}required{% endif %}
+                         placeholder="Company Name" autocomplete="off">
+                         {% if form.errors.company_name %}
+                           <p style="color: red">{{form.errors.company_name}}</p>
+                         {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Address:</label>
+                      </div>
+                      <div class="col-6">
+                        <input
+                         name="{{ form.company_address.name }}"
+                         class="inp-line"
+                         id="{{ form.company_address.id_for_label }}"
+                         {% if form.company_address.value != None %}value="{{ form.company_address.value|stringformat:'s' }}"{% endif %}
+                         maxlength="{{ form.company_address.field.max_length }}"
+                         {% if form.company_address.field.required %}required{% endif %}
+                         placeholder="Company Address" autocomplete="off">
+                         {% if form.errors.company_address %}
+                           <p style="color: red">{{form.errors.company_address}}</p>
+                         {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" >Website:</label>
+                      </div>
+                      <div class="col-6">
+                         <input
+                         name="{{ form.company_website.name }}"
+                         class="inp-line"
+                         id="{{ form.company_website.id_for_label }}"
+                         {% if form.company_website.value != None %}value="{{ form.company_website.value|stringformat:'s' }}"{% endif %}
+                         maxlength="{{ form.company_website.field.max_length }}"
+                         {% if form.company_website.field.required %}required{% endif %}
+                         placeholder="Company Website" autocomplete="off">
+                         {% if form.errors.company_website %}
+                           <p style="color: red">{{form.errors.company_website}}</p>
+                         {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" >Phone:</label>
+                      </div>
+                      <div class="col-6">
+                         <input
+                         name="{{ form.company_phone.name }}"
+                         class="inp-line"
+                         id="{{ form.company_phone.id_for_label }}"
+                         {% if form.company_phone.value != None %}value="{{ form.company_phone.value|stringformat:'s' }}"{% endif %}
+                         maxlength="{{ form.company_phone.field.max_length }}"
+                         {% if form.company_phone.field.required %}required{% endif %}
+                         placeholder="Phone" autocomplete="off">
+                         {% if form.errors.company_phone %}
+                           <p style="color: red">{{form.errors.company_phone}}</p>
+                         {% endif %}
+                      </div>
+                  </div>
+                  <div class="mt-3">
+                      <h5>Your Information:</h5>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2 ">
+                          <label class="form-title">Your Name:</label>
+                      </div>
+                      <div class="col-3">
+                        <input
+                        name="{{ form.first_name.name }}"
+                        class="inp-line"
+                        id="{{ form.first_name.id_for_label }}"
+                        {% if form.first_name.value != None %}value="{{ form.first_name.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.first_name.field.max_length }}"
+                        {% if form.first_name.field.required %}required{% endif %}
+                        placeholder="First" autocomplete="off">
+                        {% if form.errors.first_name %}
+                          <p style="color: red">{{form.errors.first_name}}</p>
+                        {% endif %}
+                      </div>
+                      <div class="col-3 ">
+                        <input
+                        name="{{ form.middle_name.name }}"
+                        class="inp-line"
+                        id="{{ form.middle_name.id_for_label }}"
+                        {% if form.middle_name.value != None %}value="{{ form.middle_name.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.middle_name.field.max_length }}"
+                        {% if form.middle_name.field.required %}required{% endif %}
+                        placeholder="Middle" autocomplete="off">
+                        {% if form.errors.middle_name %}
+                          <p style="color: red">{{form.errors.middle_name}}</p>
+                        {% endif %}
+                      </div>
+                      <div class="col-3 ">
+                        <input
+                        name="{{ form.last_name.name }}"
+                        class="inp-line"
+                        id="{{ form.last_name.id_for_label }}"
+                        {% if form.last_name.value != None %}value="{{ form.last_name.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.last_name.field.max_length }}"
+                        {% if form.last_name.field.required %}required{% endif %}
+                        placeholder="Last" autocomplete="off">
+                        {% if form.errors.last_name %}
+                          <p style="color: red">{{form.errors.last_name}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Your title:</label>
+                      </div>
+                      <div class="col-6">
+                        <input
+                        name="{{ form.title.name }}"
+                        class="inp-line"
+                        id="{{ form.title.id_for_label }}"
+                        {% if form.title.value != None %}value="{{ form.title.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.title.field.max_length }}"
+                        {% if form.title.field.required %}required{% endif %}
+                        placeholder="Title" autocomplete="off">
+                        {% if form.errors.title %}
+                          <p style="color: red">{{form.errors.title}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Email:</label>
+                      </div>
+                      <div class="col-6">
+                        <input
+                        name="{{ form.email.name }}"
+                        class="inp-line"
+                        id="{{ form.email.id_for_label }}"
+                        {% if form.email.value != None %}value="{{ form.email.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.email.field.max_length }}"
+                        {% if form.email.field.required %}required{% endif %}
+                        placeholder="Email" autocomplete="off">
+                        {% if form.errors.email %}
+                          <p style="color: red">{{form.errors.email}}</p>
+                        {% endif %}
+                      </div>
+                      <div class="col-3">
+                          <span class="form-title">(your login username)</span>
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" >Phone:</label>
+                      </div>
+                      <div class="col-6">
+                        <input
+                        name="{{ form.phone_number.name }}"
+                        class="inp-line"
+                        id="{{ form.phone_number.id_for_label }}"
+                        {% if form.phone_number.value != None %}value="{{ form.phone_number.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.phone_number.field.max_length }}"
+                        {% if form.phone_number.field.required %}required{% endif %}
+                        placeholder="Phone" autocomplete="off">
+                        {% if form.errors.phone_number %}
+                          <p style="color: red">{{form.errors.phone_number}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
+                      </div>
+                      <div class="col-6 dob_calendar">
+                        <input
+                        name="{{ form.date_of_birth.name }}"
+                        class="inp-line"
+                        id="{{ form.date_of_birth.id_for_label }}"
+                        {% if form.date_of_birth.value != None %}value="{{ form.date_of_birth.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.date_of_birth.field.max_length }}"
+                        {% if form.date_of_birth.field.required %}required{% endif %}
+                        placeholder="Date of Birth" autocomplete="off">
+                        {% if form.errors.date_of_birth %}
+                          <p style="color: red">{{form.errors.date_of_birth}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Address:</label>
+                      </div>
+                      <div class="col-9">
+                        <input
+                        name="{{ form.address.name }}"
+                        class="inp-line"
+                        id="{{ form.address.id_for_label }}"
+                        {% if form.address.value != None %}value="{{ form.address.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.address.field.max_length }}"
+                        {% if form.address.field.required %}required{% endif %}
+                        placeholder="Address" autocomplete="off">
+                        {% if form.errors.address %}
+                          <p style="color: red">{{form.errors.address}}</p>
+                        {% endif %}
+                        </div>
+                  </div>
+                  <div class="row mt-3">
+                      <div class="col-2">
+                          <label class="form-title">Country</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <select class="form-control form-control-input" name="{{ form.country.name }}"
+                        id="{{ form.country.id_for_label }}"
+                        placeholder="Country"
+                        required>
+                        {% for item in form.country %}
+                            <option>{{item}}</option>
+                        {% endfor %}
+                        </select>
+                        {% if form.errors.country %}
+                          <p style="color: red">{{form.errors.country}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" >Password</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <input type="password"
+                        name="{{ form.password1.name }}"
+                        class="form-control form-control-input"
+                        id="{{ form.password1.id_for_label }}"
+                        {% if form.password1.value != None %}value="{{ form.password1.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.password1.field.max_length }}"
+                        {% if form.password1.field.required %}required{% endif %}
+                        autocomplete="off">
+                        {% if form.errors.password1 %}
+                          <p style="color: red">{{form.errors.password1}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title" >Repeat Password</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <input type="password"
+                        name="{{ form.password2.name }}"
+                        class="form-control form-control-input"
+                        id="{{ form.password2.id_for_label }}"
+                        {% if form.password2.value != None %}value="{{ form.password2.value|stringformat:'s' }}"{% endif %}
+                        maxlength="{{ form.password2.field.max_length }}"
+                        {% if form.password2.field.required %}required{% endif %}
+                        autocomplete="off">
+                        {% if form.errors.password2 %}
+                          <p style="color: red">{{form.errors.password2}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-12 tos">
+                          By creating this account, you agree to the<span class="tos-t"> TERMS OF
+                              SERVICE</span> of Film Hobo
+                          Corporation and acknowledge that your credit card will be charged for the
+                          selected subscription amount plus any applicable taxes, at the time of purchase
+                          or at the end of any promotional discount period. Your subscription will renew
+                          automatically unless you adjust your subscription settings at any time before
+                          the next billing date. </div>
+                  </div>
+                  <div class="row mt-1 mb-2 mr-3 float-right ">
+                      <label class="containerradio">I Agree
+                        <input type="radio"  name="{{ form.i_agree.name }}"
+                        id="{{ form.i_agree.id_for_label }}"
+                        {% if form.i_agree.field.required %}required{% endif %}>
+                        <span class="checkmarkagree"></span>
+                        {% if form.errors.i_agree %}
+                          <p style="color: red">{{form.errors.i_agree}}</p>
+                        {% endif %}
+                        <span class="checkmarkagree"></span>
+                      </label>
+                  </div>
+
+              </div>
+          </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
+              <ul class="list-inline m-0">
+                  <li class="list-inline-item fb">Back</li>
+                  <li class="list-inline-item">
+                    <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
+                  </li>
+              </ul>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{{ form.media.js }}
+<script>
+  $(document).ready(function() {
+    $(function () {
+              $('#date_of_birth').datetimepicker({
+                format: 'YYYY-MM-DD'
+                });
+             });
+});
+
+</script>
 {% endblock %}

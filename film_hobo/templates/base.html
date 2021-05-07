@@ -1,0 +1,190 @@
+{% load rest_framework %}
+{% load static %}
+{% block extracss %}
+{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        <div class="container">
+            <header class="fh-header">
+                <div class="row no-wrap justify-content-between align-items-center">
+                    <div class="col-md-3 col-xs-6">
+                        <a href="#home">
+                            <div><img src="{% static 'images/Film Hobo Logo.jpg' %}" class="img-fluid" style="height: 120px;"></div>
+                        </a>
+                    </div>
+                    <div class="col-md-5 col-xs-6 text-center">
+                        <div class="head-tp mt-20">Stardom starts with one scene</div>
+                        <div class="head-btm mt-1">Create your project, find a team, get noticed... </div>
+                        <div class="search-container">
+                            <input type="text" placeholder="Search" class="search-placeholder">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">
+                        <ul class="list-inline mb-0 mt-20">
+                            <li class="list-inline-item"><i class="fa fa-envelope header-fnt-clr header-icon-pos"
+                                    aria-hidden="true"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-bell header-fnt-clr header-icon-pos"
+                                    aria-hidden="true"></i>
+                            </li>
+                            <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
+                                    class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
+
+                        </ul>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <!-- Links -->
+                <ul class="navbar-nav justify-content-between w-100">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">SCREEN ROOM</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
+                    </li>
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            PROJECTS
+                        </a>
+                        <div class="dropdown-menu FH-dropdown-font">
+                            <a class="dropdown-item" href="#">Start a Project</a>
+                            <a class="dropdown-item" href="#">Scenes</a>
+                            <a class="dropdown-item" href="#">Shorts</a>
+                            <a class="dropdown-item" href="#">Pilots/Features</a>
+                        </div>
+                    </li>
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            SCENES
+                        </a>
+                        <div class="dropdown-menu FH-dropdown-font">
+                            <a class="dropdown-item" href="#">Projects</a>
+                            <a class="dropdown-item" href="#">Films</a>
+                        </div>
+                    </li>
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            SHORTS
+                        </a>
+                        <div class="dropdown-menu FH-dropdown-font">
+                            <a class="dropdown-item" href="#">Projects</a>
+                            <a class="dropdown-item" href="#">Films</a>
+                        </div>
+                    </li>
+                    <!-- Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            PILOTS/FEATURES
+                        </a>
+                        <div class="dropdown-menu FH-dropdown-font">
+                            <a class="dropdown-item" href="#">Projects</a>
+                            <a class="dropdown-item" href="#">Films</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">HOW TO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">LOGIN/SIGN UP</a>
+                    </li>
+                    <!-- Dropdown -->
+                    <!--<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            KONSTANTIN
+                        </a>
+                        <div class="dropdown-menu FH-dropdown-font">
+                            <a class="dropdown-item" href="#">Settings & Privacy</a>
+                            <a class="dropdown-item" href="#">Edit Profile</a>
+                            <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Support</a>
+                                <a class="dropdown-item" href="#">Report a Problem</a>
+                            </div>
+                            <a class="dropdown-item" href="#">Membership</a>
+                            <a class="dropdown-item" href="#">My Projects</a>
+                            <a class="dropdown-item" href="#">Logout</a>
+                        </div>
+                    </li>-->
+                </ul>
+            </div>
+        </nav>
+        <!--message-block-->
+        {% if messages %}
+        <div class="row">
+        <div class="col-12 col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
+        <div class="message-div">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message-box  alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    <a href="" class="close msg-close" data-dismiss="alert">&times;</a>
+                    <span  class="">{{ message|safe }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        </div>
+        </div>
+        {% endif %}
+        <!--end-msg-block-->
+{% block content %}
+{% endblock %}
+    <footer class="fh-footer">
+        <div class="container">
+            <div class="row no-wrap">
+                <div class="col-sm-4 align-self-end">
+                    <div class="mb-2">Film Hobo Inc. 2021</div>
+                </div>
+                <div class="col-sm-4 mt-4 mb-2">
+                    <ul class="list-unstyled fw">
+                        <li>About</li>
+                        <li>Membership</li>
+                        <li>FAQ</li>
+                        <li>Contact</li>
+                    </ul>
+                </div>
+                <div class="col-sm-4 mt-4 mb-2">
+                    <ul class="list-unstyled fw">
+                        <li>Terms of Service</li>
+                        <li>Privacy Policy</li>
+                        <li>Refund Policy</li>
+                        <li>Intellectual Property Rights</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</body>
+</html>
+
+{% block extrajs %}
+{% endblock %}

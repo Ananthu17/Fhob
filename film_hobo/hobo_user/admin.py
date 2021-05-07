@@ -8,7 +8,8 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkillInline, PromoCode, Team, Actor, Writer, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
-                    CompanyPaymentDetails
+                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
+                    HoboPaymentsDetails
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource
@@ -87,9 +88,11 @@ admin.site.register(Producer)
 admin.site.register(Director)
 admin.site.register(Editor)
 admin.site.register(Makeup)
+admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
+admin.site.register(DisabledAccount)
 
 
 @admin.register(EthnicAppearance)
@@ -110,3 +113,23 @@ class CountryAdmin(ImportExportModelAdmin):
 @admin.register(GuildMembership)
 class GuildMembershipAdmin(ImportExportModelAdmin):
     resource_class = GuildMembershipResource
+
+
+class CustomUserSettingsAdmin(admin.ModelAdmin):
+    model = CustomUserSettings
+    fieldsets = (
+        ('General', {'fields': ('user', 'profile_visibility',
+                                'who_can_track_me', 'who_can_contact_me',
+                                'account_status')}),
+        ('Blocked Members', {'fields': ('blocked_members',)}),
+        ('Notification', {'fields': ('someone_tracks_me',
+                                     'change_in_my_or_project_rating',
+                                     'review_for_my_work_or_project',
+                                     'new_project',
+                                     'friend_request',
+                                     'match_for_my_Interest',
+                                     )}),
+    )
+
+
+admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)

@@ -1,16 +1,25 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    </head>
-    <body>
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
         <h3>Home Page</h3>
         {% if user.is_authenticated %}
             <p>Welcome, {{ user.email }}. Thanks for logging in.</p>
             <p>{{ user.get_full_name }}</p>
-            <a href="{% url 'hobo_user:user_logout' %}" >Logout</a>
+            <a href="{% url 'hobo_user:user_logout' %}" >Logout</a><br>
+            <a href="{% url 'hobo_user:settings' %}">Settings</a>
         {% else %}
             <p>Welcome, new user. Please log in.</p>
         {% endif %}
         </form>
-    </body>
-</html>
+
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

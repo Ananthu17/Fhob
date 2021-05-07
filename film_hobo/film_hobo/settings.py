@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'payment',
 
     'bootstrap_datepicker_plus',
+    'django_select2',
     'crispy_forms',
     'django_s3_storage',
     'zappa_django_utils'
@@ -220,6 +221,8 @@ EMAIL_HOST_PASSWORD = os.environ.get(
     'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
 EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
+
+OLD_PASSWORD_FIELD_ENABLED = True
 
 # # production settings
 
