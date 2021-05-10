@@ -13,18 +13,18 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
-                   SettingsView, GeneralSettingsUpdateAPI, \
+                   SettingsView, \
                    CustomUserLogout, ExtendedRegisterCompanyView, \
-                   ChangePasswordAPI, DisableAccountAPI, ChangePasswordView, \
-                   DisableAccountView, PrivacySettingsAPI, EnableAccountAPI, \
-                   EnableAccountView, PrivacySettingsView, \
-                   TrackingAccountSettingsAPI, TrackingAccountSettingsView, \
-                   BlockMembersAPI, BlockMembersView, UnBlockMembersAPI, \
-                   NotificationAccountSettingsAPI, PaymentCompanyView, \
-                   NotificationAccountSettingsView, ForgotPasswordView, \
+                   ChangePasswordAPI, DisableAccountAPI, \
+                   EnableAccountAPI, \
+                   EnableAccountView, \
+                   BlockMembersAPI, UnBlockMembersAPI, \
+                   PaymentCompanyView, \
+                   ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
-                   ForgotPasswordAPI, PasswordResetConfirmView, \
-                   PasswordResetView
+                   ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
+                   PasswordResetView, GetUnblockedMembersAPI, \
+                   GetUnblockedMembersAjaxView
 
 
 app_name = "hobo_user"
@@ -57,27 +57,23 @@ urlpatterns = [
          name='company_payment_details_api'),
     path('check-promocode-api/', CheckPromoCodeAPI.as_view(),
          name='check-promocode-api'),
-    path('general-settings-update-api/', GeneralSettingsUpdateAPI.as_view(),
-         name='general-settings-update-api'),
     path('change-password-api/', ChangePasswordAPI.as_view(),
          name='change-password-api'),
     path('disable-account-api/', DisableAccountAPI.as_view(),
          name='disabled-account-api'),
-    path('privacy-settings-api/', PrivacySettingsAPI.as_view(),
-         name='privacy-settings-api'),
     path('enable-account-api/', EnableAccountAPI.as_view(),
          name='enable-account-api'),
-    path('tracking-account-api/', TrackingAccountSettingsAPI.as_view(),
-         name='tracking-account-api'),
     path('block-members-api/', BlockMembersAPI.as_view(),
          name='block-members-api'),
     path('unblock-members-api/', UnBlockMembersAPI.as_view(),
          name='unblock-members-api'),
-    path('notification-account-settings-api/',
-         NotificationAccountSettingsAPI.as_view(),
-         name='notification-account-settings-api'),
     path('forgot-password-api/', ForgotPasswordAPI.as_view(),
          name='forgot-password-api'),
+    path('update-settings-api/', SettingsAPI.as_view(),
+         name='update-settings-api'),
+    path('get-all-unblocked-members-api/',
+         GetUnblockedMembersAPI.as_view(),
+         name='get-all-unblocked-members-api'),
 
 
     # web-view endpoints
@@ -109,23 +105,13 @@ urlpatterns = [
          name='payment_company'),
     path('settings/', SettingsView.as_view(),
          name='settings'),
-    path('settings-change-password/', ChangePasswordView.as_view(),
-         name='settings-change-password'),
-    path('settings-disable-account/', DisableAccountView.as_view(),
-         name='settings-disable-account'),
-    path('privacy-settings/', PrivacySettingsView.as_view(),
-         name='privacy-settings'),
     path('enable-account/', EnableAccountView.as_view(),
          name='enable-account'),
-    path('tracking-account/', TrackingAccountSettingsView.as_view(),
-         name='tracking-account'),
-    path('block-members/', BlockMembersView.as_view(),
-         name='block-members'),
-    path('notification-account-settings/', NotificationAccountSettingsView.as_view(),
-         name='notification-account-settings'),
     path('forgot-password/', ForgotPasswordView.as_view(),
          name='forgot-password'),
     path('password-reset/', PasswordResetView.as_view(),
          name='password-reset'),
+    path('get-unblocked-members/', GetUnblockedMembersAjaxView.as_view(),
+         name='get-unblocked-members'),
 
 ]

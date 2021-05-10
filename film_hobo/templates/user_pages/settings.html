@@ -1,375 +1,630 @@
+
 {% extends 'base.html' %}
+{% load static %}
 {% load token %}
 
 {% block extracss %}
 {{ form.media.css }}
 {% endblock %}
+
 {% block content %}
-        <div class="container">
-            <div class="row">
-                
-                <div class="col-4">
-                    <b>GENERAL ACCOUNT SETTINGS</b>
-                    <form method="post" action="{% url 'hobo_user:settings' %}">
-                        {% csrf_token %}
-                    <p>First Name:
-                        <input type ="text" disabled id="first_name" name="first_name" value="{{user.first_name}}" />
-                        <input type = "button" value = "Edit" id="edit_first_name">
-                        {% if message.first_name %}
-                            {% for err in message.first_name %}
-                                 <p>{{ err}}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </p>
-                    <p>Middle Name:
-                        <input type ="text" disabled id="middle_name" name="middle_name" value="{{user.middle_name}}" />
-                        <input type = "button" value = "Edit" id="edit_middle_name">
-                    </p>
-                    <p>Last Name:
-                        <input type ="text" disabled id="last_name" name="last_name" value="{{user.last_name}}" />
-                        <input type = "button" value = "Edit" id="edit_last_name">
-                        {% if message.last_name %}
-                            {% for err in message.last_name %}
-                                 <p>{{ err}}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </p>
-                    <p>Email:
-                        <input type ="email" disabled id="email" name="email" value="{{user.email}}" />
-                        <input type = "button" value = "Edit" id="edit_email">
-                        {% if message.email %}
-                            {% for err in message.email %}
-                                 <p>{{ err}}</p>
-                            {% endfor %}
-                        {% endif %}
-                    </p>
-                    <p>Password:
-                        <input type ="text" disabled id="password" name="password" value="* * * * *" />
-                        <input type = "button" value = "Edit" id="edit_password">
-                    </p>
-                    <p><a href="">Disable My Account</a></p>
-                    <input type = "button" value = "Cancel" id="cancel">
-                    <input type = "submit" value = "Save" id="save_general">
-                    </form>
-                </div>
 
-            <div class="col-4">
-                <b>Change Password</b>
-                <form method="post" action="{% url 'hobo_user:settings-change-password' %}">
-                    {% csrf_token %}
-                    <p>{{change_password_form.old_password.label}}
-                     {{change_password_form.old_password}}
-                     {% if change_password_errors.old_password %}
-                     {% for err in change_password_errors.old_password %}
-                         <p>{{ err}}</p>
-                     {% endfor %}
-                 {% endif %}
-                    </p>
-                    <p>
-                    {{change_password_form.new_password1.label}}
-                    {{change_password_form.new_password1}}
-                    {% if change_password_errors.new_password1 %}
-                        {% for err in change_password_errors.new_password1 %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    </p>
-                    <P>
-                     {{change_password_form.new_password2.label}}
-                     {{change_password_form.new_password2}}
-                     {% if change_password_errors.new_password2 %}
-                        {% for err in change_password_errors.new_password2 %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                     {% endif %}
-                    </p>
-                     <input type = "submit" value = "Save" id="save_password">
-                     {% if change_password_messages %}
-                            <p>{{ change_password_messages}}</p>
-                     {% endif %}
-                </form>
+{% get_my_token request as token %}
+<input type = "hidden" value="{{token}}" name="token" id="token"/>
+<div class="wrapper flex-grow-1 ">
+    <div class="container mt-4 settings-font">
+        <form method="post" action="{% url 'hobo_user:settings' %}">
+            {% csrf_token %}
+        <div class="row">
+            <div class="col-4 bor-right pr-0">
+                <ul class="nav list-unstyled" role="tablist" style="display: block;">
+                    <li class="bor-bottom settings-head-font top-h-xs-screen">SETTINGS</li>
+                    <li class="mt-3">
+                        <a class="active fh-link-blck" data-toggle="pill" href="#general">General</a>
+                    </li>
+                    <li class="mt-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#privacy">Privacy</a>
+                    </li>
+                    <li class="mt-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#tracking">Tracking</a>
+                    </li>
+                    <li class="mt-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#blocking" id="block-user-tab">Blocking</a>
+                    </li>
+                    <li class="mt-3 mb-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#notification">Notification</a>
+                    </li>
+                    <li class="mt-3 mb-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#billing">Billing</a>
+                    </li>
+                </ul>
             </div>
-            <div class="col-4">
-                <b>Disable Account</b>
-                <form method="post" action="{% url 'hobo_user:settings-disable-account' %}">
-                    {% csrf_token %}
-                        <p>{{disable_account_form.reason}}</p>
-                        {% if disable_account_errors.errors %}
-                                <p>{{disable_account_errors.errors}}</p>
-                        {% endif %}
-                        <input type = "button" value = "Cancel" id="cancel">
-                        <input type = "submit" value = "Disable" id="disable_account">
-                </form>
-            </div>
-        </div>
-            <div class="row">
-               
-                <div class="col-md-12">
-                    <br><br>
-                    <b>PRIVACY SETTINGS</b>
-                    <form method="post" action="{% url 'hobo_user:privacy-settings' %}">
-                        {% csrf_token %}
-                            <b>Who can see my Profile</b></br>
-                                <input type="radio" id="all_members" name="profile_visibility" value="all_members"
-                                {% if user_settings.profile_visibility == 'all_members' %}checked{% endif %}>
-                                <label for="all_members">All Members</label><br>
+            <div class="col-8 pl-0">
+                <div class="tab-content">
+                    <div id="general" class="container tab-pane m-0 p-0 active">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">General Account Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-2">First Name:</div>
+                            <div class="col-8">
+                                <input
+                                name="first_name"
+                                class="inp-border-none"
+                                id="first_name"
+                                value="{{ user.first_name }}"
+                                maxlength=150
+                                autocomplete="off"
+                                disabled>
+                            </div>
+                            <div class="col-2">
+                                <a class="settings-font" type = "button" id="edit_first_name">
+                                    <img src="{% static 'images/edit.png' %}" class="edit-icon"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row mt-1 ml-2">
+                            <div class="col-2">Middle Name:</div>
+                            <div class="col-8">
+                                <input
+                                name="middle_name"
+                                class="inp-border-none"
+                                id="middle_name"
+                                value="{{ user.middle_name }}"
+                                maxlength=150
+                                autocomplete="off"
+                                disabled>
+                            </div>
+                            <div class="col-2">
+                                <a class="settings-font" type = "button" id="edit_middle_name">
+                                    <img src="{% static 'images/edit.png' %}" class="edit-icon"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row mt-1 ml-2">
+                            <div class="col-2">Last Name:</div>
+                            <div class="col-8">
+                                <input
+                                name="last_name"
+                                class="inp-border-none"
+                                id="last_name"
+                                value="{{ user.last_name }}"
+                                maxlength=150
+                                autocomplete="off"
+                                disabled>
+                                <br><span class="setting-sf">Member since 06.01.2021</span>
+                            </div>
+                            <div class="col-2">
+                                <a class="settings-font" type = "button" id="edit_last_name">
+                                    <img src="{% static 'images/edit.png' %}" class="edit-icon"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row mt-1 ml-2">
+                            <div class="col-2">Email:</div>
+                            <div class="col-8">
+                                <input
+                                name="email"
+                                class="inp-border-none"
+                                id="email"
+                                value="{{ user.email }}"
+                                maxlength=150
+                                autocomplete="off"
+                                disabled>
+                                <br><span class="setting-sf">Your email is not
+                                    publicly visible</span></div>
+                            <div class="col-2">
+                                <a class="settings-font" type = "button" id="edit_email">
+                                    <img src="{% static 'images/edit.png' %}" class="edit-icon"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row mt-1 ml-2">
+                            <div class="col-2 overflow-text">Password:</div>
+                            <div class="col-8">************</div>
+                            <div class="col-2">
+                                <a data-toggle="collapse" data-target="#password-tab" class="setings-fb"><img
+                                        src="{% static 'images/edit.png' %}" class="edit-icon"></a>
+                            </div>
+                        </div>
+                        <div id="password-tab" class="row ml-2 collapse">
+                            <div class="col-8 ml-4">
+                                <input class="inp-line pw" autocomplete="off" name="old_password" placeholder="Old Password" />
+                                <p class="old_password-error" style="margin-bottom:0; color:red;"></p>
+                                <input class="inp-line pw" autocomplete="off" name="new_password1" placeholder="New Password" />
+                                <p class="new_password1-error" style="margin-bottom:0; color:red;"></p>
+                                <input class="inp-line pw" autocomplete="off" name="new_password2" placeholder="Confirm New Password" />
+                                <p class="new_password2-error" style="margin-bottom:0; color:red;"></p>
+                                <div class="mt-2">
+                                        <a id="change-password" class="btn s-btn-disable">Save</a>
+                                        <a class="btn s-btn-disable"
+                                         data-toggle="collapse" data-target="#password-tab"
+                                        id="cancel">Cancel
+                                       </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2 ml-2">
+                            <div class="col-12">
+                                <a href="" data-toggle="collapse" data-target="#disable-tab"
+                                    class="settings-fb">Disable my account</a>
+                            </div>
+                        </div>
+                        <div id="disable-tab" class="row collapse ml-4 mt-1">
+                            <ul class="list-unstyled settings-checkbx-f w-100">
+                                {% for reason in disable_account_reasons %}
+                                <li>
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="radio" value="{{reason.0}}" name="reason" class="radio-settings form-check-input">
+                                            {{reason.1}}
+                                        </label>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                <p class="disable-error" style="margin-bottom:0; color:red;"></p>
+                            </ul><br />
+                            <ul class="list-inline ml-4">
+                                <li class="list-inline-item">
+                                    <a id="disable-my-account" class="btn s-btn-disable">Disable</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="btn s-btn-disable"
+                                        data-toggle="collapse" data-target="#disable-tab"
+                                        id="cancel">Cancel
+                                   </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="privacy" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Privacy Account Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-12">Who can see my Profile</div>
+                            <div class="row ml-4 ">
+                                <ul class="list-unstyled settings-checkbx-f ml-4 w-100">
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"  class="radio-settings form-check-input" name="profile_visibility"
+                                                value="all_members" {% if user_settings.profile_visibility == 'all_members' %}checked{% endif %}>
+                                               All Members
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="members_with_rating"
+                                                {% if user_settings.profile_visibility != 'no_one' and user_settings.profile_visibility != 'pros_and_companies_only' and user_settings.profile_visibility != 'all_members' %}checked
+                                                {% endif %}>
+                                                <span class="rate"> Members with Rating &nbsp;
 
-                                <input type="radio" id="members_with_rating" name="profile_visibility" value="members_with_rating"
-                                {% if user_settings.profile_visibility != 'no_one' and user_settings.profile_visibility != 'pros_and_companies_only' and user_settings.profile_visibility != 'all_members' %}checked
-                                {% endif %}>
-                                <label for="members_with_rating">Members with rating
-                                        <input type="radio" id="visibility_star1" name="visibility_rate" value="1"
-                                        {% if user_settings.profile_visibility == 'members_with_rating_1_star' %}checked{% endif %}/>
-                                        <label for="visibility_star1" title="text">1 star</label>
-                                        <input type="radio" id="visibility_star2" name="visibility_rate" value="2"
-                                        {% if user_settings.profile_visibility == 'members_with_rating_2_star' %}checked{% endif %}/>
-                                        <label for="visibility_star2" title="text">2 stars</label>
-                                        <input type="radio" id="visibility_star3" name="visibility_rate" value="3"
-                                        {% if user_settings.profile_visibility == 'members_with_rating_3_star' %}checked{% endif %}/>
-                                        <label for="visibility_star3" title="text">3 stars</label>
-                                        <input type="radio" id="visibility_star4" name="visibility_rate" value="4"
-                                        {% if user_settings.profile_visibility == 'members_with_rating_4_star' %}checked{% endif %}/>
-                                        <label for="visibility_star4" title="text">4 stars</label>
-                                        <input type="radio" id="visibility_star5" name="visibility_rate" value="5"
-                                        {% if user_settings.profile_visibility == 'members_with_rating_5_star' %}checked{% endif %}/>
-                                        <label for="visibility_star5" title="text">5 stars</label>
-                                </label><br>
+                                                        <input type="radio" id="visibility_star5" name="visibility_rate" value="5"
+                                                        {% if user_settings.profile_visibility == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                                        <label for="visibility_star5" class="form-check-label" title="text">5 stars</label>
 
-                                <input type="radio" id="pros_and_companies_only" name="profile_visibility" value="pros_and_companies_only"
-                                {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
-                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+                                                        <input type="radio" id="visibility_star4" name="visibility_rate" value="4"
+                                                        {% if user_settings.profile_visibility == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                                        <label for="visibility_star4" class="form-check-label" title="text">4 stars</label>
 
-                                <input type="radio" id="no_one" name="profile_visibility" value="no_one"
-                                {% if user_settings.profile_visibility == 'no_one' %}checked{% endif %}/>
-                                <label for="no_one">No One</label><br>
+                                                        <input type="radio" id="visibility_star3" name="visibility_rate" value="3"
+                                                        {% if user_settings.profile_visibility == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                                        <label for="visibility_star3" class="form-check-label" title="text">3 stars</label>
 
-                                {% if privacy_setting_errors.profile_visibility %}
-                                    {% for err in privacy_setting_errors.profile_visibility %}
-                                        <p>{{ err}}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <b>Who can contact me</b></br>
-                                <input type="radio" id="members_with_rating" name="who_can_contact_me" value="members_with_rating"
-                                {% if user_settings.who_can_contact_me != 'no_one' and user_settings.who_can_contact_me != 'pros_and_companies_only'%}checked{% endif %}>
-                                <label for="members_with_rating">Members with rating
-                                        <input type="radio" id="star1" name="rate" value="1"
-                                        {% if user_settings.who_can_contact_me == 'members_with_rating_1_star' %}checked{% endif %}/>
-                                        <label for="star1" title="text">1 star</label>
-                                        <input type="radio" id="star2" name="rate" value="2"
-                                        {% if user_settings.who_can_contact_me == 'members_with_rating_2_star' %}checked{% endif %}/>
-                                        <label for="star2" title="text">2 stars</label>
-                                        <input type="radio" id="star3" name="rate" value="3"
-                                        {% if user_settings.who_can_contact_me == 'members_with_rating_3_star' %}checked{% endif %}/>
-                                        <label for="star3" title="text">3 stars</label>
-                                        <input type="radio" id="star4" name="rate" value="4"
-                                        {% if user_settings.who_can_contact_me == 'members_with_rating_4_star' %}checked{% endif %}/>
-                                        <label for="star4" title="text">4 stars</label>
-                                        <input type="radio" id="star5" name="rate" value="5"
-                                        {% if user_settings.who_can_contact_me == 'members_with_rating_5_star' %}checked{% endif %}/>
-                                        <label for="star5" title="text">5 stars</label>
-                                </label><br>
+                                                        <input type="radio" id="visibility_star2" name="visibility_rate" value="2"
+                                                        {% if user_settings.profile_visibility == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                                        <label for="visibility_star2" class="form-check-label" title="text">2 stars</label>
 
-                                <input type="radio" id="pros_and_companies_only" name="who_can_contact_me" value="pros_and_companies_only"
-                                {% if user_settings.who_can_contact_me == 'pros_and_companies_only' %}checked{% endif %}>
-                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+                                                        <input type="radio" id="visibility_star1" name="visibility_rate" value="1"
+                                                        {% if user_settings.profile_visibility == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                                        <label for="visibility_star1" class="form-check-label"  title="text">1 star</label>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" name="profile_visibility" class="radio-settings form-check-input" 
+                                                value="pros_and_companies_only" {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
+                                                Pros and Companies only
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="no_one"
+                                                {% if user_settings.profile_visibility == 'no_one' %}checked{% endif %}/>
+                                                No one
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row mt-1 ml-2">
+                            <div class="col-12">Who can contact me</div>
+                            <div class="row ml-4 ">
+                                <ul class="list-unstyled settings-checkbx-f ml-4 w-100">
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                name="who_can_contact_me"
+                                                value="members_with_rating"
+                                                {% if user_settings.who_can_contact_me != 'no_one' and user_settings.who_can_contact_me != 'pros_and_companies_only'%}
+                                                checked
+                                                {% endif %}
+                                                class="form-check-input radio-settings">
+                                                <span class="rate"> Members with Rating &nbsp;
 
-                                <input type="radio" id="no_one" name="who_can_contact_me" value="no_one"
-                                {% if user_settings.who_can_contact_me == 'no_one' %}checked{% endif %}>
-                                <label for="no_one">No One</label><br>
+                                                    <input type="radio" id="contact_star5" name="contact_rate" value="5"
+                                                    {% if user_settings.who_can_contact_me == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                                    <label for="contact_star5" class="form-check-label" title="text">5 stars</label>
 
-                                {% if privacy_setting_errors.who_can_contact_me %}
-                                    {% for err in privacy_setting_errors.who_can_contact_me %}
-                                        <p>{{ err}}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <input type = "button" value = "Cancel" id="cancel">
-                                <input type = "submit" value = "Save" id="save_privacy_settings">
+                                                    <input type="radio" id="contact_star4" name="contact_rate" value="4"
+                                                    {% if user_settings.who_can_contact_me == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                                    <label for="contact_star4" class="form-check-label" title="text">4 stars</label>
 
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-              
-                <div class="col-md-12">  <br><br>
-                    <b>TRACKING</b>
-                    <form method="post" action="{% url 'hobo_user:tracking-account' %}">
-                        {% csrf_token %}
-                            <b>Tracking Account Settings</b></br>
-                                <input type="radio" id="all_members" name="who_can_track_me" value="all_members"
-                                {% if user_settings.who_can_track_me == 'all_members' %}checked{% endif %}>
-                                <label for="all_members">All Members</label><br>
+                                                    <input type="radio" id="contact_star3" name="contact_rate" value="3"
+                                                    {% if user_settings.who_can_contact_me == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                                    <label for="contact_star3" class="form-check-label" title="text">3 stars</label>
 
-                                <input type="radio" id="members_with_rating" name="who_can_track_me" value="members_with_rating"
-                                {% if user_settings.who_can_track_me != 'no_one' and user_settings.who_can_track_me != 'pros_and_companies_only' and user_settings.who_can_track_me != 'all_members' %}
-                                    checked
-                                {% endif %}>
-                                <label for="members_with_rating">Members with rating
-                                        <input type="radio" id="tracking_star1" name="tracking_rate" value="1"
-                                        {% if user_settings.who_can_track_me == 'members_with_rating_1_star' %}checked{% endif %}/>
-                                        <label for="tracking_star1" title="text">1 star</label>
-                                        <input type="radio" id="tracking_star2" name="tracking_rate" value="2"
-                                        {% if user_settings.who_can_track_me == 'members_with_rating_2_star' %}checked{% endif %}/>
-                                        <label for="tracking_star2" title="text">2 stars</label>
-                                        <input type="radio" id="tracking_star3" name="tracking_rate" value="3"
-                                        {% if user_settings.who_can_track_me == 'members_with_rating_3_star' %}checked{% endif %}/>
-                                        <label for="tracking_star3" title="text">3 stars</label>
-                                        <input type="radio" id="tracking_star4" name="tracking_rate" value="4"
-                                        {% if user_settings.who_can_track_me == 'members_with_rating_4_star' %}checked{% endif %}/>
-                                        <label for="tracking_star4" title="text">4 stars</label>
-                                        <input type="radio" id="tracking_star5" name="tracking_rate" value="5"
-                                        {% if user_settings.who_can_track_me == 'members_with_rating_5_star' %}checked{% endif %}/>
-                                        <label for="tracking_star5" title="text">5 stars</label>
-                                </label><br>
+                                                    <input type="radio" id="contact_star2" name="contact_rate" value="2"
+                                                    {% if user_settings.who_can_contact_me == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                                    <label for="contact_star2" class="form-check-label" title="text">2 stars</label>
 
-                                <input type="radio" id="pros_and_companies_only" name="who_can_track_me" value="pros_and_companies_only"
-                                {% if user_settings.who_can_track_me == 'pros_and_companies_only' %}checked{% endif %}/>
-                                <label for="pros_and_companies_only">Pros and Companies Only</label><br>
+                                                    <input type="radio" id="contact_star1" name="contact_rate" value="1"
+                                                    {% if user_settings.who_can_contact_me == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                                    <label for="contact_star1" class="form-check-label"  title="text">1 star</label>
 
-                                <input type="radio" id="no_one" name="who_can_track_me" value="no_one"
-                                {% if user_settings.who_can_track_me == 'no_one' %}checked{% endif %}/>
-                                <label for="no_one">No One</label><br>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                id="pros_and_companies_only"
+                                                name="who_can_contact_me"
+                                                value="pros_and_companies_only"
+                                                {% if user_settings.who_can_contact_me == 'pros_and_companies_only' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input">
+                                                Pros and Companies only
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                id="no_one"
+                                                name="who_can_contact_me"
+                                                value="no_one"
+                                                {% if user_settings.who_can_contact_me == 'no_one' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input">
+                                                No one
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tracking" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Tracking Account Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-12">Who can track me or my Projects</div>
+                            <div class="row ml-4 ">
+                                <ul class="list-unstyled settings-checkbx-f ml-4 w-100">
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                name="who_can_track_me" value="all_members"
+                                                {% if user_settings.who_can_track_me == 'all_members' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input">
+                                                All Members
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                name="who_can_track_me" value="members_with_rating"
+                                                {% if user_settings.who_can_track_me != 'no_one' and user_settings.who_can_track_me != 'pros_and_companies_only' and user_settings.who_can_track_me != 'all_members' %}
+                                                    checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input">
+                                                <span class="rate"> Members with Rating &nbsp;
+                                                    <input type="radio" id="tracking_star5" name="tracking_rate" value="5"
+                                                    {% if user_settings.who_can_track_me == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                                    <label for="tracking_star5" title="text">5 stars</label>
 
-                                {% if tracking_setting_errors.who_can_track_me %}
-                                    {% for err in tracking_setting_errors.who_can_track_me %}
-                                        <p>{{ err}}</p>
-                                    {% endfor %}
-                                {% endif %}
-                                <input type = "button" value = "Cancel" id="cancel">
-                                <input type = "submit" value = "Save" id="save_tracking_settings">
+                                                    <input type="radio" id="tracking_star4" name="tracking_rate" value="4"
+                                                    {% if user_settings.who_can_track_me == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                                    <label for="tracking_star4" title="text">4 stars</label>
 
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-            <div class="col-12">
-                <br><br>
-                <b>Blocking Account Settings</b>
-                <form method="post" action="{% url 'hobo_user:block-members' %}">
-                    {% csrf_token %}
-                    <p>Once you block someone, that person can no longer see things you post on your timeline, track you, invite you to events
-                        or groups, start a conversation with you, or add you as a friend.</p>
-                    <b>Block Members</b>
-                    {{block_member_form.blocked_members}}
-                    <input type = "submit" value = "Block" id="save_blocked_users">
-                    <p>{{block_user_errors}}</p>
-                </form>
-                <p>Blocked Users</p><br>
-                {% get_my_token request as token %}
-                {% if user_settings.blocked_members %}
-                        <form>
-                        <input type = "hidden" value="{{token}}" name="token" id="token"/>
-                        {% for obj in user_settings.blocked_members.all %}
-                        <p>
-                            {% if obj.first_name %}{{obj.first_name}}{% endif %}
-                            {% if obj.middle_name %}{{obj.middle_name}}{% endif %}
-                            {% if obj.last_name %}{{obj.last_name}}{% endif %}
-                            <input type = "button" value = "Unblock" class="unblock" id="unblock_{{obj.id}}">
-                            <p class="unblock_message"></p>
-                        </p>
-                        {% endfor %}
+                                                    <input type="radio" id="tracking_star3" name="tracking_rate" value="3"
+                                                    {% if user_settings.who_can_track_me == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                                    <label for="tracking_star3" title="text">3 stars</label>
+
+                                                    <input type="radio" id="tracking_star2" name="tracking_rate" value="2"
+                                                    {% if user_settings.who_can_track_me == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                                    <label for="tracking_star2" title="text">2 stars</label>
+
+                                                    <input type="radio" id="tracking_star1" name="tracking_rate" value="1"
+                                                    {% if user_settings.who_can_track_me == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                                    <label for="tracking_star1" title="text">1 star</label>
+
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" 
+                                                name="who_can_track_me" value="pros_and_companies_only"
+                                                {% if user_settings.who_can_track_me == 'pros_and_companies_only' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input" />
+                                                Pros and Companies only
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                name="who_can_track_me"
+                                                value="no_one"
+                                                {% if user_settings.who_can_track_me == 'no_one' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input">
+                                                No one
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="blocking" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Blocking Account Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-12 blocking-text">Once you block someone, that person can no longer see
+                                things you
+                                post on your timeline, track you, invite you to events
+                                or groups, start a conversation with you, or add you as a friend</div>
+                        </div>
+                        <div class="row ml-4 mt-4 ">
+                            <div class="col-4">
+                                <label class="">Block Members</label>
+                            </div>
+                            <div class="col-6 form-group p-0">
+                                <div class="dropdown-div">
+                                    {% include "user_pages/blocking_dropdown_menu.html" %}
+                                </div>
+                                <span class="blocking-text" id="empty-title">You haven't added anyone to your block list.</span>
+                            </div>
+                            <div class="col-2">
+                                <a  class="btn block-btn" id="block_user">Block</a>
+                            </div>
+                        </div>
+                        <div class="row ml-4 ">
+                            <div class="col-4">
+                            </div>
+                            <div class="col-6 form-group p-0">
+                                <p class="mb-1" id="blocked-list-title">Blocked Members</p>
+                                <select
+                                class="form-control form-control-input block-placeholder border-cls"
+                                id="all_blocked_members">
+                                <option value=""></option>
+                                </select>
+                            </div>
+                            <div class="col-2 mt-4">
+                                <a  class="btn unblock-btn unblock" >Unblock</a>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="notification" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Notification Account Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-12 noti-title">Send notifications to my email on file
+                            </div>
+                            <div class="row ml-noti mt-1">
+                                <ul class="list-unstyled noti-checkbx-f w-100">
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                If someone tracks me
+                                                <input type="checkbox"
+                                                name="someone_tracks_me"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.someone_tracks_me == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li class="mt-1">
+                                        <div class="form-check">
+                                            <label class="form-check-label w-100">
+                                                If there was a change in my or my project’s rating
+                                                <input type="checkbox"
+                                                name="change_in_my_or_project_rating"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.change_in_my_or_project_rating == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li class="mt-1">
+                                        <div class="form-check">
+                                            <label class="form-check-label w-100">
+                                                If someone posted a review for my work or my project
+                                                <input type="checkbox"
+                                                name="review_for_my_work_or_project"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.review_for_my_work_or_project == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li class="mt-1">
+                                        <div class="form-check">
+                                            <label class="form-check-label w-100">
+                                                If someone I track has started a new project or got attached to a
+                                                project
+                                                <input type="checkbox"
+                                                name="new_project"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.new_project == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li class="mt-1">
+                                        <div class="form-check">
+                                            <label class="form-check-label w-100">
+                                                If someone sends me a friend request
+                                                <input type="checkbox"
+                                                name="friend_request"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.friend_request == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                    <li class="mt-1">
+                                        <div class="form-check">
+                                            <label class="form-check-label w-100">
+                                                If I’ve got a match for my Interest
+                                                <input type="checkbox"
+                                                name="match_for_my_Interest"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.match_for_my_Interest == True %}checked{% endif %}>
+                                            </label>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="billing" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Billing Account Settings</div>
+                        {% comment %}
+                        <form class="billing-form">
+                        {% endcomment %}
+                            <div class="row ml-2 mt-3 ">
+                                <div class="col-3">
+                                    <label class="billing-label">Card on File:</label>
+                                </div>
+                                <div class="col-5 form-group p-0">
+                                    <input type="text" class="form-control form-control-input block-placeholder"
+                                        id="visa" placeholder="..........1234">
+                                    <span class="blocking-text">Expires 11/24</span>
+                                </div>
+                                <div class="col-1">
+                                    <a href="" class="billing-edit">Edit</a>
+                                </div>
+                                <div class="col-1">
+                                    <a href="" class="billing-edit">Remove</a>
+                                </div>
+                                <div class="col-2">
+                                    <a href="" class="billing-nw-card">Add New Card</a>
+                                </div>
+                            </div>
+                            <div class="row ml-2 mt-2 ">
+                                <div class="col-12">
+                                    <label class="billing-label">Description</label>
+                                </div>
+                                <div class="col-12">
+                                    Pro Membership
+                                </div>
+                                <div class="col-12 text-muted">
+                                    Annual: $100
+                                </div>
+                                <div class="col-12">
+                                    Monthly: $15.00
+                                </div>
+                                <div class="col-12">
+                                    Taxes: $0.00
+                                </div>
+                                <div class="col-12">
+                                    Total Amount: $15.00
+                                </div>
+                            </div>
+                            <div class="row ml-2 mt-1 ">
+                                <div class="col-3">
+                                    <label class="billing-label">Payment Option:</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="form-check-inline">
+                                        <label class="containerradio">Recurring
+                                            <input type="radio" name="radio">
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check-inline">
+                                        <label class="containerradio">One Time
+                                            <input type="radio" name="radio">
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row ml-2 mt-1 ">
+                                <div class="col-3">
+                                    <label class="billing-label">Change to Annual</label>
+                                </div>
+                                <div class="col-9">
+                                    <div class="form-check-inline">
+                                        <label class="containerradio">
+                                            <input type="radio" name="radio">&nbsp;
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        {% comment %}
                         </form>
-                {% endif %}
-            </div>
-            </div>
-            <div class="row">
-            <div class="col-12">
-                <br><br>
-                <b>Notification Account Settings</b>
-                <form method="post" action="{% url 'hobo_user:notification-account-settings' %}">
-                    {% csrf_token %}
-                    <p>{{notification_form.someone_tracks_me}}
-                    {{notification_form.someone_tracks_me.label}}</p>
-                    {% if notification_errors.someone_tracks_me %}
-                        {% for err in notification_errors.someone_tracks_me %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <p>{{notification_form.change_in_my_or_project_rating}}
-                    {{notification_form.change_in_my_or_project_rating.label}}</p>
-                    {% if notification_errors.change_in_my_or_project_rating %}
-                        {% for err in notification_errors.change_in_my_or_project_rating %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <p>{{notification_form.review_for_my_work_or_project}}
-                    {{notification_form.review_for_my_work_or_project.label}}</p>
-                    {% if notification_errors.new_project %}
-                        {% for err in notification_errors.new_project %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <p>{{notification_form.new_project}}
-                    {{notification_form.new_project.label}}</p>
-                    {% if notification_errors.new_project %}
-                        {% for err in notification_errors.new_project %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <p>{{notification_form.friend_request}}
-                    {{notification_form.friend_request.label}}</p>
-                    {% if notification_errors.friend_request %}
-                        {% for err in notification_errors.friend_request %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <p>{{notification_form.match_for_my_Interest}}
-                    {{notification_form.match_for_my_Interest.label}}</p>
-                    {% if notification_errors.match_for_my_Interest %}
-                        {% for err in notification_errors.match_for_my_Interest %}
-                            <p>{{ err}}</p>
-                        {% endfor %}
-                    {% endif %}
-                    <input type = "button" value = "Cancel" id="cancel">
-                    <input type = "submit" value = "Save" id="save_notification_settings">
-                </form>
-            </div>
+                        {% endcomment %}
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-4 bor-top bor-right"></div>
+            <div class="col-8 bor-top pt-1">
+                <ul class="list-inline ml-2">
+                    <li class="list-inline-item"><a href="" class="s-cancel">Cancel</a></li>
+                    <li class="list-inline-item">
+                        <input type="submit" class="btn btn-save" value="Save" />
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
 
+{% endblock %}
 
-        {% endblock %}
-        {% block extrajs %}
-        {{ form.media.js }}
-        <script>
-            $("#blocked_members").select2();
-            $('body').on('click' , '#edit_first_name', function(){
-                 $('#first_name').removeAttr("disabled");
-            });
-            $('body').on('click' , '#edit_middle_name', function(){
-                 $('#middle_name').removeAttr("disabled");
-            });
-            $('body').on('click' , '#edit_last_name', function(){
-                 $('#last_name').removeAttr("disabled");
-            });
-            $('body').on('click' , '#edit_email', function(){
-                 $('#email').removeAttr("disabled");
-            });
-            $('body').on('click' , '#edit_password', function(){
-
-            });
-            $('body').on('click' , '.unblock', function(){
-                var id = $(this).attr("id");
-                var token = $("#token").val();
-                var lst = id.split("_");
-                var obj_id = lst[1];
-                var data_dict = {}
-                data_dict['user_id'] = obj_id;
-                $.ajax
-                ({
-                    type: "POST",
-                    url: "/hobo_user/unblock-members-api/",
-                    dataType: 'json',
-                    async: false,
-                    data: data_dict,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader ("Authorization", token);
-                    },
-                    success: function (){
-                        location.reload();
-                    }
-                });
-
-            });
-    </script>
-        {% endblock %}
+{% block extrajs %}
+{{ form.media.js }}
+<script type="text/javascript" " src="{% static 'js/settings.js' %}"></script>
+{% endblock %}
 
