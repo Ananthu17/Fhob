@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container">
+        <div class = "row">
+        <div class = "col-12">
+                <b>Personal Details</b>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Gender</label>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-control" name="{{ form.gender.name }}"
+                                id="{{ form.gender.id_for_label }}"
+                                placeholder="Gender"
+                                required>
+                                {% for item in form.gender %}
+                                    {{item}}
+                                {% endfor %}
+                            </select>
+                            {% if form.errors.gender %}
+                            <p style="color: red">{{form.errors.gender}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Height</label>
+                        </div>
+                        <div class="col-6">
+                            <input class="" name="{{ form.feet.name }}" value="{% if user.feet %}{{ user.feet}}{% endif%}" />
+                            <input class="" name="{{ form.inch.name }}" value="{% if user.inch %}{{ user.inch}}{% endif%}" />
+                            {% if form.errors.feet %}
+                            <p style="color: red">{{form.errors.feet}}</p>
+                            {% endif %}
+                            {% if form.errors.inch %}
+                            <p style="color: red">{{form.errors.inch}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Weight</label>
+                        </div>
+                        <div class="col-6">
+                            <input class="form-control" name="{{ form.lbs.name }}" value="{% if user.lbs %}{{ user.lbs}}{% endif%}" />
+                            {% if form.errors.lbs %}
+                            <p style="color: red">{{form.errors.lbs}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Age-playing range</label>
+                        </div>
+                        <div class="col-6">
+                            <input class="" name="{{ form.start_age.name }}" value="{% if user.start_age %}{{ user.start_age}}{% endif%}" />
+                            <input class="" name="{{ form.stop_age.name }}" value="{% if user.stop_age %}{{ user.stop_age}}{% endif%}" />
+                            {% if form.errors.start_age %}
+                            <p style="color: red">{{form.errors.start_age}}</p>
+                            {% endif %}
+                            {% if form.errors.stop_age %}
+                            <p style="color: red">{{form.errors.stop_age}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Physique</label>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-control" name="{{ form.physique.name }}"
+                                id="{{ form.physique.id_for_label }}"
+                                placeholder="Physique"
+                                required>
+                                {% for item in form.physique %}
+                                    {{item}}
+                                {% endfor %}
+                            </select>
+                            {% if form.errors.physique %}
+                            <p style="color: red">{{form.errors.physique}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Hair Color</label>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-control" name="{{ form.hair_color.name }}"
+                            id="{{ form.hair_color.id_for_label }}"
+                            placeholder="Hair color"
+                            required>
+                            {% for item in form.hair_color %}
+                                {{item}}
+                            {% endfor %}
+                        </select>
+                            {% if form.errors.hair_color %}
+                            <p style="color: red">{{form.errors.hair_color}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Hair Length</label>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-control" name="{{ form.hair_length.name }}"
+                            id="{{ form.hair_length.id_for_label }}"
+                            placeholder="Hair Length"
+                            required>
+                            {% for item in form.hair_length %}
+                                {{item}}
+                            {% endfor %}
+                        </select>
+                            {% if form.errors.hair_length %}
+                            <p style="color: red">{{form.errors.hair_length}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Eyes</label>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-control" name="{{ form.eyes.name }}"
+                            id="{{ form.eyes.id_for_label }}"
+                            placeholder="Eyes"
+                            required>
+                            {% for item in form.eyes %}
+                                {{item}}
+                            {% endfor %}
+                        </select>
+                            {% if form.errors.eyes %}
+                            <p style="color: red">{{form.errors.eyes}}</p>
+                            {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <b>Ethnic Appearance</b>
+                        </div>
+                        <div class="col-6">
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <b>ATHLETIC SKILSS</b>
+                        </div>
+                        <div class="col-6">
+                            {% for item in all_athletic_skills %}
+                            <div class="">
+                                <input type="checkbox"  name="{{item}}" 
+                                class="form-check-input"
+                                {% if item.id in athletic_skills %} checked {% endif %}>
+                                {{item}}
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Save</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

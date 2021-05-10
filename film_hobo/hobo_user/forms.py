@@ -6,9 +6,9 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings
+    CustomUserSettings, AthleticSkill
 
-from .models import CustomUser, GuildMembership, Country
+from .models import GuildMembership, Country
 
 
 
@@ -97,8 +97,6 @@ class SignUpIndieForm(UserCreationForm):
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['address'].widget.attrs['class'] = 'inp-line'
         self.fields['address'].widget.attrs['placeholder'] = 'Address'
-
-
 
 
 class SignUpProForm(UserCreationForm):
@@ -279,45 +277,6 @@ class ChangePasswordForm(forms.Form):
         self.fields['new_password2'].widget.attrs['placeholder'] = 'Confirm New Password'
 
 
-class DisableAccountForm(forms.ModelForm):
-
-    class Meta:
-        model = DisabledAccount
-        fields = ('reason',)
-
-        widgets = {
-            'reason': forms.RadioSelect(),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(DisableAccountForm, self).__init__(*args, **kwargs)
-        # self.fields['reason'].widget.attrs['class'] = 'form-check-input'
-        self.fields['reason'].widget.attrs['class'] = 'radio-btn-settings'
-
-class BlockMemberForm(forms.ModelForm):
-    blocked_members = forms.ModelChoiceField(
-                label="Blocked Members",
-                widget=Select2Widget(),
-                queryset=CustomUser.objects.all(),
-    )
-
-    class Meta:
-        model = CustomUserSettings
-        fields = ('blocked_members',)
-
-    def __init__(self, *args, **kwargs):
-        super(BlockMemberForm, self).__init__(*args, **kwargs)
-        self.fields['blocked_members'].widget.attrs['id'] = 'blocked_members'
-
-
-class NotificationAccountSettingsForm(forms.ModelForm):
-    class Meta:
-        model = CustomUserSettings
-        fields = ('someone_tracks_me', 'change_in_my_or_project_rating',
-                  'review_for_my_work_or_project', 'new_project',
-                  'friend_request', 'match_for_my_Interest')
-
-
 class ForgotPasswordEmailForm(forms.Form):
     email = forms.EmailField(label="Email", max_length=254,
                              help_text='Enter your email address.')
@@ -327,24 +286,11 @@ class ResetPasswordForm(forms.Form):
     new_password1 = forms.CharField(widget=forms.PasswordInput())
     new_password2 = forms.CharField(widget=forms.PasswordInput())
 
-# class SettingsForm(forms.Form):
-    # first_name = forms.CharField(max_length=100, required=False,
-    #                              help_text='')
-    # middle_name = forms.CharField(max_length=100, required=False,
-    #                               help_text='')
-    # last_name = forms.CharField(max_length=100, required=False,
-    #                             help_text='')
-    # email = forms.EmailField(max_length=254, required=False)
-    # profile_visibility = forms.ModelChoiceField(
-    #                      label="", choices=
-    #                      CustomUserSettings.PROFILE_VISIBILITY_CHOICES)
-    # who_can_contact_me = serializers.ChoiceField(
-    #                      choices=CustomUserSettings.CONTACT_CHOICES)
-    # who_can_track_me = serializers.ChoiceField(
-    #                      choices=CustomUserSettings.TRACKING_CHOICES)
-    # someone_tracks_me = serializers.BooleanField(required=False)
-    # change_in_my_or_project_rating = serializers.BooleanField(required=False)
-    # review_for_my_work_or_project = serializers.BooleanField(required=False)
-    # new_project = serializers.BooleanField(required=False)
-    # friend_request = serializers.BooleanField(required=False)
-    # match_for_my_Interest = serializers.BooleanField(required=False)
+
+class PersonalDetailsForm(forms.ModelForm):
+
+    class Meta:
+        model = CustomUser
+        fields = ('gender', 'feet', 'inch', 'lbs', 'start_age',
+                  'stop_age', 'physique', 'hair_color', 'hair_length',
+                  'eyes')

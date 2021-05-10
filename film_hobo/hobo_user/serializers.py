@@ -14,12 +14,13 @@ except ImportError:
 from django.contrib.auth import get_user_model, authenticate
 from django.conf import settings
 from rest_framework import exceptions
-
+from rest_auth.serializers import PasswordResetSerializer
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, ProPaymentDetails, PromoCode, \
-    DisabledAccount, CustomUserSettings, CompanyPaymentDetails
+    DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
+    EthnicAppearance, AthleticSkill
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -132,6 +133,7 @@ class RegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
+
 
 
 class RegisterIndieSerializer(serializers.Serializer):
@@ -600,26 +602,6 @@ class PromoCodeSerializer(serializers.ModelSerializer):
                   'life_span', 'amount_type', 'user_type','user_id']
 
 
-class GeneralSettingsSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False)
-    first_name = serializers.CharField(
-        max_length=150,
-        required=False,
-    )
-    middle_name = serializers.CharField(
-        max_length=150,
-        allow_blank=True, required=False
-    )
-    last_name = serializers.CharField(
-        max_length=150,
-        required=False,
-    )
-    user_id = serializers.CharField(
-        max_length=150,
-        required=False,
-    )
-
-
 class DisableAccountSerializer(serializers.ModelSerializer):
     reason = serializers.CharField(
         max_length=150,
@@ -631,42 +613,11 @@ class DisableAccountSerializer(serializers.ModelSerializer):
         fields = ['reason',]
 
 
-class PrivacySettingsSerializer(serializers.ModelSerializer):
-    profile_visibility = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    who_can_contact_me = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-
-    class Meta:
-        model = CustomUserSettings
-        fields = ['profile_visibility', 'who_can_contact_me']
-
-
 class EnableAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUserSettings
         fields = ['account_status',]
-
-
-class TrackingAccountSettingsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CustomUserSettings
-        fields = ['who_can_track_me',]
-
-
-class NotificationAccountSettingsSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CustomUserSettings
-        fields = ['someone_tracks_me', 'change_in_my_or_project_rating',
-                  'review_for_my_work_or_project', 'new_project',
-                  'friend_request', 'match_for_my_Interest']
 
 
 class BlockMembersSerializer(serializers.Serializer):
@@ -712,3 +663,29 @@ class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'first_name', 'last_name']
+
+
+class PersonalDetailsSerializer(serializers.ModelSerializer):
+    # ethnic_appearance = serializers.PrimaryKeyRelatedField(
+    #                   queryset=AthleticSkill.objects.all(),
+    #                   write_only=True, many=True)
+    athletic_skills = serializers.ListField()
+
+    class Meta:
+        model = CustomUser
+        fields = ['gender', 'feet', 'inch', 'lbs', 'start_age',
+                  'stop_age', 'physique', 'hair_color', 'hair_length',
+                  'eyes', 'athletic_skills']
+
+
+class PasswordResetSerializer(PasswordResetSerializer):
+
+    def get_email_options(self):
+        print("here----my serializer")
+        # email_template_name = ""
+        # html_email_template_name = 'registration/password_reset_email.html'
+        return {
+                'subject_template_name': 'registration/password_reset_subject.txt',
+                'html_email_template_name': 'registration/'
+                                        'password_reset_email.html',
+        }
