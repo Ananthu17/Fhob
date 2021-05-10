@@ -170,5 +170,4 @@ class UpdateMembershipFeeAPI(APIView):
 class PaymentAdmin(View):
 
     def get(self, request, *args, **kwargs):
-        context = {'message': 'Hello Django!'}
-        return render(request, 'payment/payment_admin.html', context=context)
+        return render(request, 'payment/payment_admin.html')

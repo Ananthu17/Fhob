@@ -18,15 +18,66 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="{% static 'initial_user/css/main.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 </head>
 
 <body>
-    <h1>Hai</h1>
+    <h3>Admin Payment Set-up</h3><br>
+    <button id="membership_fee_edit" class="btn btn-primary">Edit</button>
+    <h3>Membership Annual Price</h3>
+    <table>
+        <tr>
+          <th>Membership</th>
+          <th>Price</th>
+        </tr>
+        <tr>
+          <td>Hobo</td>
+          <td id="annual_hobo" contenteditable='false'></td>
+        </tr>
+        <tr>
+          <td>Indie</td>
+          <td id="annual_indie" contenteditable='false'>$ </td>
+        </tr>
+        <tr>
+            <td>Pro</td>
+            <td id="annual_pro" contenteditable='false'>$ </td>
+        </tr>
+        <tr>
+            <td>Company</td>
+            <td id="annual_company" contenteditable='false'>$ </td>
+        </tr>
+      </table>
+      <br>
+      <h3>Membership Monthly Price</h3>
+      <table>
+        <tr>
+          <th>Membership</th>
+          <th>Price</th>
+        </tr>
+        <tr>
+          <td>Hobo</td>
+          <td id="monthly_hobo" contenteditable='false'></td>
+        </tr>
+        <tr>
+          <td>Indie</td>
+          <td id="monthly_indie" contenteditable='false'></td>
+        </tr>
+        <tr>
+            <td>Pro</td>
+            <td id="monthly_pro" contenteditable='false'></td>
+        </tr>
+        <tr>
+            <td>Company</td>
+            <td id="monthly_company" contenteditable='false'></td>
+        </tr>
+      </table>
+      <button id="membership_fee_save" class="btn btn-primary">Save</button>
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
+    /*
+    get membership fee details and render to html
+    */
     $( document ).ready(function() {
         origin_url = window.location.origin
         get_url = origin_url + '/payment/get_membership_fee_detail/'
@@ -36,11 +87,62 @@
         var authorization_str = token_str.concat(token_val);
         axios.get(get_url, {headers: {'Authorization': authorization_str}})
         .then((response) => {
-            console.log(response.data);
-            console.log(response.status);
-            console.log(response.statusText);
-            console.log(response.headers);
-            console.log(response.config);
+            document.getElementById("annual_hobo").innerHTML = "$ " + response.data.annual_hobo;
+            document.getElementById("annual_indie").innerHTML = "$ " + response.data.annual_indie;
+            document.getElementById("annual_pro").innerHTML = "$ " + response.data.annual_pro;
+            document.getElementById("annual_company").innerHTML = "$ " + response.data.annual_company;
+
+            document.getElementById("monthly_hobo").innerHTML = "$ " + response.data.monthly_hobo;
+            document.getElementById("monthly_indie").innerHTML = "$ " + response.data.monthly_indie;
+            document.getElementById("monthly_pro").innerHTML = "$ " + response.data.monthly_pro;
+            document.getElementById("monthly_company").innerHTML = "$ " + response.data.monthly_company;
+        });
+    });
+    /*
+    make the table column field editable
+    */
+    document.getElementById("membership_fee_edit").addEventListener("click", function() {
+        $("#annual_hobo").attr("contenteditable", "true");
+        $("#annual_hobo").attr("style", "background: #b5b3b3;");
+        $("#annual_indie").attr("contenteditable", "true");
+        $("#annual_indie").attr("style", "background: #b5b3b3;");
+        $("#annual_pro").attr("contenteditable", "true");
+        $("#annual_pro").attr("style", "background: #b5b3b3;");
+        $("#annual_company").attr("contenteditable", "true");
+        $("#annual_company").attr("style", "background: #b5b3b3;");
+        $("#monthly_hobo").attr("contenteditable", "true");
+        $("#monthly_hobo").attr("style", "background: #b5b3b3;");
+        $("#monthly_indie").attr("contenteditable", "true");
+        $("#monthly_indie").attr("style", "background: #b5b3b3;");
+        $("#monthly_pro").attr("contenteditable", "true");
+        $("#monthly_pro").attr("style", "background: #b5b3b3;");
+        $("#monthly_company").attr("contenteditable", "true");
+        $("#monthly_company").attr("style", "background: #b5b3b3;");
+    });
+    /*
+    post membership fee details and render to html
+    */
+    document.getElementById("membership_fee_save").addEventListener("click", function() {
+        put_url = origin_url + '/payment/update_membership_fee/'
+        extra_args = {
+            "monthly_hobo": $("#monthly_hobo").text().replace(/[A-Za-z$-]/g, ""),
+            "monthly_indie": $("#monthly_indie").text().replace(/[A-Za-z$-]/g, ""),
+            "monthly_pro": $("#monthly_pro").text().replace(/[A-Za-z$-]/g, ""),
+            "monthly_company": $("#monthly_company").text().replace(/[A-Za-z$-]/g, ""),
+            "annual_hobo": $("#annual_hobo").text().replace(/[A-Za-z$-]/g, ""),
+            "annual_indie": $("#annual_indie").text().replace(/[A-Za-z$-]/g, ""),
+            "annual_pro": $("#annual_pro").text().replace(/[A-Za-z$-]/g, ""),
+            "annual_company": $("#annual_company").text().replace(/[A-Za-z$-]/g, "")
+        }
+        var token = localStorage.getItem("token");
+        token_str = "Token "
+        token_val = String(token)
+        var authorization_str = token_str.concat(token_val);
+        axios.put(put_url, extra_args, {headers: {'Authorization': authorization_str}})
+        .then((response) => {
+            location.reload();
+        }, (error) => {
+            console.log(error);
         });
     });
     </script>
