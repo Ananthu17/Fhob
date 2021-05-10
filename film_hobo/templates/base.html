@@ -187,16 +187,22 @@
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
+    /*
+    code to store token info into local storage on login
+    */
     document.getElementById("login-submit").addEventListener("click", function() {
         var email = $('#id_username').val();
         var password = $('#id_password').val();
         origin_url = window.location.origin
         post_url = origin_url + '/hobo_user/login/'
-        axios.post(post_url,  {"email": email.toString(),"password": password.toString()})
-        .then(response => {
-            var res = response.data.token
-
-            localStorage.setItem('token', response.data.token);
+        extra_args = {"email": email.toString(), "password": password.toString()}
+        axios.post(post_url, extra_args)
+        .then((response) => {
+            console.log(response);
+            debugger
+            localStorage.setItem('access_token', response.data.key);
+        }, (error) => {
+            console.log(error);
         });
     });
     </script>
