@@ -676,14 +676,39 @@ class BlockMembersSerializer(serializers.Serializer):
     )
 
 
-# class SettingsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = CustomUserSettings
-#         fields = ['profile_visibility', 'who_can_contact_me',
-#                   'who_can_track_me', 'someone_tracks_me',
-#                   'change_in_my_or_project_rating',
-#                   'review_for_my_work_or_project',
-#                   'new_project', 'friend_request',
-#                   'match_for_my_Interest',
-#                   'user'
-#                  ]
+class SettingsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True, required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+    profile_visibility = serializers.ChoiceField(
+                         choices=CustomUserSettings.PROFILE_VISIBILITY_CHOICES,
+                         required=False,)
+    who_can_contact_me = serializers.ChoiceField(
+                         choices=CustomUserSettings.CONTACT_CHOICES,
+                         required=False,)
+    who_can_track_me = serializers.ChoiceField(
+                         choices=CustomUserSettings.TRACKING_CHOICES,
+                         required=False,)
+    someone_tracks_me = serializers.BooleanField(required=False)
+    change_in_my_or_project_rating = serializers.BooleanField(required=False)
+    review_for_my_work_or_project = serializers.BooleanField(required=False)
+    new_project = serializers.BooleanField(required=False)
+    friend_request = serializers.BooleanField(required=False)
+    match_for_my_Interest = serializers.BooleanField(required=False)
+
+
+class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'first_name', 'last_name']

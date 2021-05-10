@@ -9,6 +9,8 @@
 .message-box
 {
   padding:1em 3em;
+  font-size:12px;
+  font-family:Myraid Pro;
 }
 .msg-close
 {
@@ -96,7 +98,7 @@
     }
   .inp-border-none {
     border:none;
-    padding: 5px 10px;
+    /* padding: 5px 10px; */
     outline: none;
     width: 100%;
     font-size: 13px;
@@ -106,3 +108,58 @@
    {
      padding:1em 0;
    }
+.radio-settings
+   {
+     margin-top:0.1rem;
+   }
+.block-membr-dropdown
+  {
+    outline:none;
+  }
+.select2-container
+  {
+    border:1px solid #000!important;
+    border-radius:.25rem;
+    outline:none;
+  }
+.select2-container:focus
+  {
+    border:1px solid #000!important;
+    border-radius:.25rem;
+  }
+.select2-search--dropdown input[type="search"]:focus{
+   outline:none;
+}
+
+input.pw {
+  -webkit-text-security: disc;
+}
+.border-cls
+  {
+    border:1px solid #000;
+  }
+.border-cls:focus
+  {
+    border:1px solid #000;
+  }
+  .unblock-btn{
+    color: #f32121;
+    background-color: #EDEEF0;
+    font-weight: 600;
+    font-size: 13px;
+    height: 25px;
+    border-radius: 0rem;
+    padding: 3px 7px;
+    font-family: Courier Bold;
+  }
+  .unblock-btn:active,.unblock-btn:focus,.unblock-btn:hover{
+    color: #f32121;
+    background-color: #EDEEF0;
+    font-weight: 600;
+    font-size: 13px;
+    height: 25px;
+    border-radius: 0rem;
+    padding: 3px 7px;
+    font-family: Courier Bold;
+    box-shadow: none;
+  }

@@ -326,3 +326,25 @@ class ForgotPasswordEmailForm(forms.Form):
 class ResetPasswordForm(forms.Form):
     new_password1 = forms.CharField(widget=forms.PasswordInput())
     new_password2 = forms.CharField(widget=forms.PasswordInput())
+
+# class SettingsForm(forms.Form):
+    # first_name = forms.CharField(max_length=100, required=False,
+    #                              help_text='')
+    # middle_name = forms.CharField(max_length=100, required=False,
+    #                               help_text='')
+    # last_name = forms.CharField(max_length=100, required=False,
+    #                             help_text='')
+    # email = forms.EmailField(max_length=254, required=False)
+    # profile_visibility = forms.ModelChoiceField(
+    #                      label="", choices=
+    #                      CustomUserSettings.PROFILE_VISIBILITY_CHOICES)
+    # who_can_contact_me = serializers.ChoiceField(
+    #                      choices=CustomUserSettings.CONTACT_CHOICES)
+    # who_can_track_me = serializers.ChoiceField(
+    #                      choices=CustomUserSettings.TRACKING_CHOICES)
+    # someone_tracks_me = serializers.BooleanField(required=False)
+    # change_in_my_or_project_rating = serializers.BooleanField(required=False)
+    # review_for_my_work_or_project = serializers.BooleanField(required=False)
+    # new_project = serializers.BooleanField(required=False)
+    # friend_request = serializers.BooleanField(required=False)
+    # match_for_my_Interest = serializers.BooleanField(required=False)

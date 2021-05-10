@@ -2,9 +2,11 @@ import ast
 import json
 import requests
 import datetime
-from django.utils import timezone
+from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.template.loader import render_to_string
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
@@ -14,7 +16,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -50,7 +52,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterCompanySerializer, DisableAccountSerializer, \
     PrivacySettingsSerializer, EnableAccountSerializer, \
     TrackingAccountSettingsSerializer, BlockMembersSerializer, \
-    NotificationAccountSettingsSerializer, CompanyPaymentSerializer
+    NotificationAccountSettingsSerializer, CompanyPaymentSerializer, \
+    SettingsSerializer, BlockedMembersQuerysetSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -785,127 +788,12 @@ class CheckPromoCodeAPI(APIView):
         return Response(response)
 
 
-class GeneralSettingsUpdateAPI(APIView):
-    serializer_class = GeneralSettingsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = GeneralSettingsSerializer(data=request.data)
-        if serializer.is_valid():
-            data_dict = serializer.data
-            try:
-                id = data_dict['user_id']
-                user = CustomUser.objects.get(pk=id)
-                if 'first_name' in data_dict:
-                    user.first_name = data_dict['first_name']
-                if 'middle_name' in data_dict:
-                    user.middle_name = data_dict['middle_name']
-                if 'last_name' in data_dict:
-                    user.last_name = data_dict['last_name']
-                if 'email' in data_dict:
-                    email = data_dict['email']
-                    try:
-                        all_users = CustomUser.objects.exclude(pk=id)
-                        match = all_users.get(email=email)
-                        if match:
-                            response = {
-                             'email_validation_error':
-                             ['User with this email id already exists',],
-                             'status': status.HTTP_400_BAD_REQUEST
-                              }
-                    except CustomUser.DoesNotExist:
-                        user.email = data_dict['email']
-                        user.save()
-                        response = {'message': 'General Settings Updated',
-                                    'status': status.HTTP_200_OK}
-                else:
-                    user.save()
-                    response = {'message': 'General Settings Updated',
-                                'status': status.HTTP_200_OK}
-            except CustomUser.DoesNotExist:
-                response = {'errors': 'Invalid id', 'status':
-                            status.HTTP_400_BAD_REQUEST}
-        else:
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-
-        return Response(response)
-
-
-class SettingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        user_settings = CustomUserSettings.objects.get(user=user)
-
-        block_member_form = BlockMemberForm
-        already_blocked_users = user_settings.blocked_members.values_list(
-                                'id', flat=True)
-        already_blocked_users = list(already_blocked_users)
-        already_blocked_users.append(self.request.user.id)
-        modified_queryset = CustomUser.objects.exclude(
-                            id__in=already_blocked_users)
-        block_member_form.declared_fields[
-            'blocked_members'].queryset = modified_queryset
-
-        context['user_settings'] = user_settings
-        context['change_password_form'] = ChangePasswordForm
-        context['disable_account_form'] = DisableAccountForm
-        context['notification_form'] = NotificationAccountSettingsForm(
-                                        instance=user_settings)
-        context['block_member_form'] = block_member_form
-        context['user'] = user
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        json_response = json.dumps(request.POST)
-        json_dict = ast.literal_eval(json_response)
-        json_dict['user_id'] = user.id
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/general-settings-update-api/',
-                            data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        error_messages = dict()
-
-        if 'errors' in response:
-            if 'first_name' in response['errors']:
-                error_messages['first_name'] = response['errors']['first_name']
-            if 'last_name' in response['errors']:
-                error_messages['last_name'] = response['errors']['last_name']
-            if 'email' in response['errors']:
-                error_messages['email'] = response['errors']['email']
-            return render(request, 'user_pages/settings.html',
-                          {'message': error_messages, 'user': user,
-                           'change_password_form': ChangePasswordForm})
-        elif 'email_validation_error' in response:
-            error_messages['email'] = response['email_validation_error']
-            return render(request, 'user_pages/settings.html',
-                          {'message': error_messages, 'user': user,
-                           'change_password_form': ChangePasswordForm})
-        else:
-            messages.success(self.request, 'General Settings Updated')
-            return HttpResponseRedirect(reverse('hobo_user:settings'))
-
-        return HttpResponseRedirect(reverse('hobo_user:settings'))
-
-
 class ChangePasswordAPI(AuthPasswordChangeView):
     permission_classes = (IsAuthenticated,)
     # serializer_class = ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
+        print("here")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
@@ -920,49 +808,6 @@ class ChangePasswordAPI(AuthPasswordChangeView):
                         }
 
         return Response(response)
-
-
-class ChangePasswordView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-    form_class = ChangePasswordForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        change_password_form = self.form_class
-        context['change_password_form'] = change_password_form
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        message = ""
-        change_password_form = self.form_class
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/change-password-api/',
-                            data=json.dumps(request.POST),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'message' in response:
-            message = response['message']
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(self.request, 'Password Changed Successfully. Please login to continue')
-                return HttpResponseRedirect(reverse('hobo_user:user_login'))
-        return render(request, 'user_pages/settings.html',
-                      {'change_password_messages': message,
-                       'user': user,
-                       'change_password_form': change_password_form,
-                       'change_password_errors': response,
-                       'disable_account_form': DisableAccountForm,
-                       'block_member_form' : BlockMemberForm,
-                       'notification_form': NotificationAccountSettingsForm})
 
 
 class DisableAccountAPI(APIView):
@@ -999,169 +844,6 @@ class DisableAccountAPI(APIView):
                         status.HTTP_400_BAD_REQUEST}
 
         return Response(response)
-
-
-class DisableAccountView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-    form_class = DisableAccountForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        disable_account_form = self.form_class
-        context['disable_account_form'] = disable_account_form
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        disable_account_form = self.form_class
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/disable-account-api/',
-                            data=json.dumps(request.POST),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(self.request, 'Account Disabled')
-                return HttpResponseRedirect(reverse('hobo_user:enable-account'))
-        return render(request, 'user_pages/settings.html',
-                      {'disable_account_form': disable_account_form,
-                       'disable_account_errors': response})
-
-
-class PrivacySettingsAPI(APIView):
-    serializer_class = PrivacySettingsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            data_dict = serializer.data
-            user = self.request.user
-            user_settings = CustomUserSettings.objects.get(user=user)
-            user_settings.profile_visibility = data_dict['profile_visibility']
-            user_settings.who_can_contact_me = data_dict['who_can_contact_me']
-            user_settings.save()
-            response = {'message': "Privacy Settings Updated", 'status':
-                        status.HTTP_200_OK}
-        else:
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-
-        return Response(response)
-
-
-class PrivacySettingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        context['user_settings'] = user_settings
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = self.request.POST
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        privacy_setting_errors = ""
-
-        if 'profile_visibility' in data_dict:
-            profile_visibility = data_dict['profile_visibility']
-            if(profile_visibility == 'members_with_rating' and 'visibility_rate' in data_dict):
-                visibility_rate = data_dict['visibility_rate']
-                if visibility_rate == '1':
-                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
-                if visibility_rate == '2':
-                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
-                if visibility_rate == '3':
-                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
-                if visibility_rate == '4':
-                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
-                if visibility_rate == '5':
-                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
-            elif profile_visibility != 'members_with_rating':
-                visibility = data_dict['profile_visibility']
-            else:
-                error_message = {"profile_visibility": ["Please provide ratings",]}
-                return render(request, 'user_pages/settings.html',
-                              {'privacy_setting_errors': error_message,
-                               'disable_account_form': DisableAccountForm,
-                               'change_password_form': ChangePasswordForm,
-                               'user_settings': user_settings,
-                               'block_member_form': BlockMemberForm,
-                               'notification_form':
-                               NotificationAccountSettingsForm
-                               })
-        else:
-            visibility = ""
-
-        if 'who_can_contact_me' in data_dict:
-            contact_members = data_dict['who_can_contact_me']
-            if(contact_members == 'members_with_rating' and 'rate' in data_dict):
-                rate = data_dict['rate']
-                if rate == '1':
-                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
-                if rate == '2':
-                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
-                if rate == '3':
-                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
-                if rate == '4':
-                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
-                if rate == '5':
-                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
-            elif contact_members != 'members_with_rating':
-                contact_me = data_dict['who_can_contact_me']
-            else:
-                error_message = {"who_can_contact_me": ["Please provide ratings",]}
-                return render(request, 'user_pages/settings.html',
-                              {'privacy_setting_errors': error_message,
-                               'disable_account_form': DisableAccountForm,
-                               'change_password_form': ChangePasswordForm,
-                               'block_member_form': BlockMemberForm,
-                               'user_settings': user_settings
-                               })
-        else:
-            contact_me = ""
-
-        json_response = json.dumps(request.POST)
-        json_dict = ast.literal_eval(json_response)
-        json_dict['who_can_contact_me'] = contact_me
-        json_dict['profile_visibility'] = visibility
-
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/privacy-settings-api/',
-                            data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(self.request, 'Privacy Settings Updated')
-                return HttpResponseRedirect(reverse('hobo_user:settings'))
-            else:
-                privacy_setting_errors = response['errors']
-        return render(request, 'user_pages/settings.html',
-                      {'privacy_setting_errors': privacy_setting_errors,
-                       'disable_account_form': DisableAccountForm,
-                       'change_password_form': ChangePasswordForm,
-                       'block_member_form' : BlockMemberForm
-                      })
 
 
 class EnableAccountAPI(APIView):
@@ -1237,115 +919,18 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
                       {'message': message})
 
 
-class TrackingAccountSettingsAPI(APIView):
-    serializer_class = TrackingAccountSettingsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            data_dict = serializer.data
-            user = self.request.user
-            user_settings = CustomUserSettings.objects.get(user=user)
-            user_settings.who_can_track_me = data_dict['who_can_track_me']
-            user_settings.save()
-            response = {'message': "Tracking Account Settings Updated", 'status':
-                        status.HTTP_200_OK}
-        else:
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-
-        return Response(response)
-
-
-class TrackingAccountSettingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        context['user_settings'] = user_settings
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = self.request.POST
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        tracking_setting_errors = ""
-
-        if 'who_can_track_me' in data_dict:
-            who_can_track_me = data_dict['who_can_track_me']
-            if(who_can_track_me == 'members_with_rating' and 'tracking_rate' in data_dict):
-                tracking_rate = data_dict['tracking_rate']
-                if tracking_rate == '1':
-                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
-                if tracking_rate == '2':
-                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
-                if tracking_rate == '3':
-                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
-                if tracking_rate == '4':
-                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
-                if tracking_rate == '5':
-                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
-            elif who_can_track_me != 'members_with_rating':
-                tracking = data_dict['who_can_track_me']
-            else:
-                error_message = {"who_can_track_me": ["Please provide ratings",]}
-                return render(request, 'user_pages/settings.html',
-                              {'tracking_setting_errors': error_message,
-                               'disable_account_form': DisableAccountForm,
-                               'change_password_form': ChangePasswordForm,
-                               'user_settings': user_settings,
-                               'block_member_form' : BlockMemberForm,
-                               'notification_form': NotificationAccountSettingsForm
-                               })
-        else:
-            tracking = ""
-
-        json_response = json.dumps(request.POST)
-        json_dict = ast.literal_eval(json_response)
-        json_dict['who_can_track_me'] = tracking
-
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/tracking-account-api/',
-                            data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(self.request, 'Tracking Account Settings Updated')
-                return HttpResponseRedirect(reverse('hobo_user:settings'))
-            else:
-                tracking_setting_errors = response['errors']
-        return render(request, 'user_pages/settings.html',
-                      {'tracking_setting_errors': tracking_setting_errors,
-                       'disable_account_form': DisableAccountForm,
-                       'change_password_form': ChangePasswordForm,
-                       'block_member_form' : BlockMemberForm
-                      })
-
-
 class BlockMembersAPI(APIView):
     serializer_class = BlockMembersSerializer
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user = self.request.user
-        blocked_members = list()
+        blocked_members = dict()
         response = dict()
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members.append(obj.id)
+                blocked_members[obj.id]= obj.first_name + " "+ obj.last_name
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1379,60 +964,6 @@ class BlockMembersAPI(APIView):
                         status.HTTP_400_BAD_REQUEST}
 
         return Response(response)
-
-
-class BlockMembersView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-    form_class = BlockMemberForm()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        user_settings = CustomUserSettings.objects.get(user=user)
-        form = self.form_class()
-        context['block_member_form'] = form
-        context['user_settings'] = user_settings
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        block_user_errors = ""
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        block_user = self.request.POST.get('blocked_members')
-        block_user_obj = CustomUser.objects.get(id=block_user)
-        json_response = json.dumps(request.POST)
-        json_dict = ast.literal_eval(json_response)
-        json_dict['user_id'] = block_user
-
-        user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/block-members-api/',
-                            data=json.dumps(json_dict),
-                            headers={'Content-type': 'application/json',
-                                     'Authorization': token})
-
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(self.request, 'Blocked user %s %s' % (
-                    block_user_obj.first_name, block_user_obj.last_name))
-                return HttpResponseRedirect(reverse('hobo_user:settings'))
-            else:
-                block_user_errors = response['errors']
-        return render(request, 'user_pages/settings.html',
-                      {'block_user_errors': block_user_errors,
-                       'disable_account_form': DisableAccountForm,
-                       'change_password_form': ChangePasswordForm,
-                       'user_settings': user_settings,
-                       'block_member_form': BlockMemberForm,
-                       'notification_form': NotificationAccountSettingsForm
-                       })
 
 
 class UnBlockMembersAPI(APIView):
@@ -1469,115 +1000,6 @@ class UnBlockMembersAPI(APIView):
                         status.HTTP_400_BAD_REQUEST}
 
         return Response(response)
-
-
-class NotificationAccountSettingsAPI(APIView):
-    serializer_class = NotificationAccountSettingsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            data_dict = serializer.data
-            user = self.request.user
-            user_settings = CustomUserSettings.objects.get(user=user)
-            if 'someone_tracks_me' in data_dict:
-                user_settings.someone_tracks_me = data_dict['someone_tracks_me']
-            if 'change_in_my_or_project_rating' in data_dict:
-                user_settings.change_in_my_or_project_rating = data_dict[
-                                        'change_in_my_or_project_rating']
-            if 'review_for_my_work_or_project' in data_dict:
-                user_settings.review_for_my_work_or_project = data_dict[
-                                        'review_for_my_work_or_project']
-            if 'new_project' in data_dict:
-                user_settings.new_project = data_dict['new_project']
-            if 'friend_request' in data_dict:
-                user_settings.friend_request = data_dict['friend_request']
-            if 'match_for_my_Interest' in data_dict:
-                user_settings.match_for_my_Interest = data_dict[
-                                        'match_for_my_Interest']
-            user_settings.save()
-            response = {'message': "Notification Account Settings Updated",
-                        'status': status.HTTP_200_OK}
-        else:
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-
-        return Response(response)
-
-
-class NotificationAccountSettingsView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/settings.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-    form_class = NotificationAccountSettingsForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        user_settings = CustomUserSettings.objects.get(user=user)
-        context['notification_form'] = self.form_class(instance=user_settings)
-        context['user_settings'] = user_settings
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        user_settings = CustomUserSettings.objects.get(user=self.request.user)
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        someone_tracks_me = CHECKBOX_MAPPING.get(
-                            request.POST.get('someone_tracks_me', 'off'))
-        change_in_my_or_project_rating = CHECKBOX_MAPPING.get(
-                            request.POST.get(
-                                'change_in_my_or_project_rating',
-                                'off'))
-        review_for_my_work_or_project = CHECKBOX_MAPPING.get(
-                            request.POST.get(
-                                'review_for_my_work_or_project',
-                                'off'))
-        new_project = CHECKBOX_MAPPING.get(
-                            request.POST.get('new_project', 'off'))
-        friend_request = CHECKBOX_MAPPING.get(
-                            request.POST.get('friend_request', 'off'))
-        match_for_my_Interest = CHECKBOX_MAPPING.get(
-                            request.POST.get('match_for_my_Interest', 'off'))
-
-        json_response = json.dumps(request.POST)
-        json_dict = ast.literal_eval(json_response)
-        json_dict['someone_tracks_me'] = someone_tracks_me
-        json_dict['change_in_my_or_project_rating'] = change_in_my_or_project_rating
-        json_dict['review_for_my_work_or_project'] = review_for_my_work_or_project
-        json_dict['new_project'] = new_project
-        json_dict['friend_request'] = friend_request
-        json_dict['match_for_my_Interest'] = match_for_my_Interest
-
-        user_response = requests.post(
-            'http://127.0.0.1:8000/hobo_user/notification-account-settings-api/',
-            data=json.dumps(json_dict),
-            headers={'Content-type': 'application/json',
-                     'Authorization': token
-                     })
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] == 200:
-                messages.success(
-                    self.request,
-                    'Notification Account Settings Updated'
-                    )
-                return HttpResponseRedirect(reverse('hobo_user:settings'))
-            else:
-                notification_errors = response['errors']
-        return render(request, 'user_pages/settings.html',
-                      {'notification_errors': notification_errors,
-                       'disable_account_form': DisableAccountForm,
-                       'change_password_form': ChangePasswordForm,
-                       'user_settings': user_settings,
-                       'block_member_form': BlockMemberForm,
-                       'notification_form': NotificationAccountSettingsForm
-                       })
 
 
 class ForgotPasswordAPI(AuthPasswordResetView):
@@ -1677,36 +1099,300 @@ class PasswordResetView(TemplateView):
                       })
 
 
-# class SettingsAPI(APIView):
-#     serializer_class = NotificationAccountSettingsSerializer
-#     permission_classes = (IsAuthenticated,)
+class SettingsAPI(APIView):
+    serializer_class = SettingsSerializer
+    permission_classes = (IsAuthenticated,)
 
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         if serializer.is_valid():
-#             data_dict = serializer.data
-#             user = self.request.user
-#             user_settings = CustomUserSettings.objects.get(user=user)
-#             if 'someone_tracks_me' in data_dict:
-#                 user_settings.someone_tracks_me = data_dict['someone_tracks_me']
-#             if 'change_in_my_or_project_rating' in data_dict:
-#                 user_settings.change_in_my_or_project_rating = data_dict[
-#                                         'change_in_my_or_project_rating']
-#             if 'review_for_my_work_or_project' in data_dict:
-#                 user_settings.review_for_my_work_or_project = data_dict[
-#                                         'review_for_my_work_or_project']
-#             if 'new_project' in data_dict:
-#                 user_settings.new_project = data_dict['new_project']
-#             if 'friend_request' in data_dict:
-#                 user_settings.friend_request = data_dict['friend_request']
-#             if 'match_for_my_Interest' in data_dict:
-#                 user_settings.match_for_my_Interest = data_dict[
-#                                         'match_for_my_Interest']
-#             user_settings.save()
-#             response = {'message': "Notification Account Settings Updated",
-#                         'status': status.HTTP_200_OK}
-#         else:
-#             response = {'errors': serializer.errors, 'status':
-#                         status.HTTP_400_BAD_REQUEST}
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            user = self.request.user
+            user_settings = CustomUserSettings.objects.get(user=user)
+            if 'someone_tracks_me' in data_dict:
+                user_settings.someone_tracks_me = data_dict['someone_tracks_me']
+            if 'change_in_my_or_project_rating' in data_dict:
+                user_settings.change_in_my_or_project_rating = data_dict[
+                                        'change_in_my_or_project_rating']
+            if 'review_for_my_work_or_project' in data_dict:
+                user_settings.review_for_my_work_or_project = data_dict[
+                                        'review_for_my_work_or_project']
+            if 'new_project' in data_dict:
+                user_settings.new_project = data_dict['new_project']
+            if 'friend_request' in data_dict:
+                user_settings.friend_request = data_dict['friend_request']
+            if 'match_for_my_Interest' in data_dict:
+                user_settings.match_for_my_Interest = data_dict[
+                                        'match_for_my_Interest']
+            if 'who_can_track_me' in data_dict:
+                user_settings.who_can_track_me = data_dict['who_can_track_me']
+            if 'profile_visibility' in data_dict:
+                user_settings.profile_visibility = data_dict[
+                 'profile_visibility']
+            if 'who_can_contact_me' in data_dict:
+                user_settings.who_can_contact_me = data_dict[
+                 'who_can_contact_me']
+            if 'first_name' in data_dict:
+                user.first_name = data_dict['first_name']
+            if 'middle_name' in data_dict:
+                user.middle_name = data_dict['middle_name']
+            if 'last_name' in data_dict:
+                user.last_name = data_dict['last_name']
+            if 'email' in data_dict:
+                email = data_dict['email']
+                try:
+                    id = user.id
+                    all_users = CustomUser.objects.exclude(pk=id)
+                    match = all_users.get(email=email)
+                    if match:
+                        response = {
+                            'email_validation_error':
+                            ['User with this email id already exists',],
+                            'status': status.HTTP_400_BAD_REQUEST
+                            }
+                except CustomUser.DoesNotExist:
+                    user.email = data_dict['email']
+                    user.save()
+                    user_settings.save()
+                    response = {'message': "Settings Updated",
+                                'status': status.HTTP_200_OK}
+            else:
+                user.save()
+                user_settings.save()
+                response = {'message': "Settings Updated",
+                            'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
 
-#         return Response(response)
+        return Response(response)
+
+
+class SettingsView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/settings.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        user_settings = CustomUserSettings.objects.get(user=user)
+
+        already_blocked_users = user_settings.blocked_members.values_list(
+                                'id', flat=True)
+        already_blocked_users = list(already_blocked_users)
+        already_blocked_users.append(self.request.user.id)
+
+        # exclude super users
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        for id in super_users:
+            already_blocked_users.append(id)
+
+        modified_queryset = CustomUser.objects.exclude(
+                            id__in=already_blocked_users)
+
+        disable_account_reasons = DisabledAccount.REASON_CHOICES
+        context['user_settings'] = user_settings
+        context['change_password_form'] = ChangePasswordForm
+        context['disable_account_reasons'] = disable_account_reasons
+        context['block_member_list'] = modified_queryset
+        context['user'] = user
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        error_messages = dict()
+        data_dict = self.request.POST
+        user_settings = CustomUserSettings.objects.get(user=self.request.user)
+
+        someone_tracks_me = CHECKBOX_MAPPING.get(
+                            request.POST.get('someone_tracks_me', 'off'))
+        change_in_my_or_project_rating = CHECKBOX_MAPPING.get(
+                            request.POST.get(
+                                'change_in_my_or_project_rating',
+                                'off'))
+        review_for_my_work_or_project = CHECKBOX_MAPPING.get(
+                            request.POST.get(
+                                'review_for_my_work_or_project',
+                                'off'))
+        new_project = CHECKBOX_MAPPING.get(
+                            request.POST.get('new_project', 'off'))
+        friend_request = CHECKBOX_MAPPING.get(
+                            request.POST.get('friend_request', 'off'))
+        match_for_my_Interest = CHECKBOX_MAPPING.get(
+                            request.POST.get('match_for_my_Interest', 'off'))
+
+        if 'profile_visibility' in data_dict:
+            profile_visibility = data_dict['profile_visibility']
+            if(profile_visibility == 'members_with_rating' and
+               'visibility_rate' in data_dict):
+                visibility_rate = data_dict['visibility_rate']
+                if visibility_rate == '1':
+                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if visibility_rate == '2':
+                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if visibility_rate == '3':
+                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if visibility_rate == '4':
+                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if visibility_rate == '5':
+                    visibility = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif profile_visibility != 'members_with_rating':
+                visibility = data_dict['profile_visibility']
+            else:
+                messages.warning(
+                    self.request,
+                    'Cannot save!! Please provide ratings for who can see my Profile'
+                    )
+                return HttpResponseRedirect(reverse('hobo_user:settings'))
+        else:
+            visibility = ""
+
+        if 'who_can_contact_me' in data_dict:
+            contact_members = data_dict['who_can_contact_me']
+            if(contact_members == 'members_with_rating' and
+               'contact_rate' in data_dict):
+                contact_rate = data_dict['contact_rate']
+                if contact_rate == '1':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if contact_rate == '2':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if contact_rate == '3':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if contact_rate == '4':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if contact_rate == '5':
+                    contact_me = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif contact_members != 'members_with_rating':
+                contact_me = data_dict['who_can_contact_me']
+            else:
+                messages.warning(
+                    self.request,
+                    'Cannot save!! Please provide ratings for who can contact me'
+                    )
+                return HttpResponseRedirect(reverse('hobo_user:settings'))
+        else:
+            contact_me = ""
+
+        if 'who_can_track_me' in data_dict:
+            who_can_track_me = data_dict['who_can_track_me']
+            if(who_can_track_me == 'members_with_rating' and 'tracking_rate' in data_dict):
+                tracking_rate = data_dict['tracking_rate']
+                if tracking_rate == '1':
+                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if tracking_rate == '2':
+                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if tracking_rate == '3':
+                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if tracking_rate == '4':
+                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if tracking_rate == '5':
+                    tracking = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif who_can_track_me != 'members_with_rating':
+                tracking = data_dict['who_can_track_me']
+            else:
+                messages.warning(
+                    self.request,
+                    'Cannot save!! Please provide ratings for who can track me'
+                    )
+                return HttpResponseRedirect(reverse('hobo_user:settings'))
+        else:
+            tracking = ""
+
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['who_can_contact_me'] = contact_me
+        json_dict['profile_visibility'] = visibility
+        json_dict['who_can_track_me'] = tracking
+        json_dict['someone_tracks_me'] = someone_tracks_me
+        json_dict[
+            'change_in_my_or_project_rating'] = change_in_my_or_project_rating
+        json_dict[
+            'review_for_my_work_or_project'] = review_for_my_work_or_project
+        json_dict['new_project'] = new_project
+        json_dict['friend_request'] = friend_request
+        json_dict['match_for_my_Interest'] = match_for_my_Interest
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/update-settings-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+
+        if response['status'] == 200:
+            messages.success(self.request, 'General Settings Updated')
+            return HttpResponseRedirect(reverse('hobo_user:settings'))
+        else:
+            print(response['errors'])
+            error_messages = response['errors']
+            if 'first_name' in error_messages:
+                messages.warning(self.request, "First name cannot be empty")
+            if 'last_name' in error_messages:
+                messages.warning(self.request, "Last name cannot be empty")
+            if 'email' in error_messages:
+                messages.warning(self.request, "Enter valid email address, This field cannot be empty")
+            if 'email_validation_error' in response:
+                messages.warning(self.request, "Enter valid email id")
+        return HttpResponseRedirect(reverse('hobo_user:settings'))
+
+
+class GetUnblockedMembersAPI(APIView):
+    serializer_class = BlockedMembersQuerysetSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        response = {}
+        queryset = {}
+        user_settings = CustomUserSettings.objects.get(user=user)
+        already_blocked_users = user_settings.blocked_members.values_list(
+                                'id', flat=True)
+        already_blocked_users = list(already_blocked_users)
+        already_blocked_users.append(self.request.user.id)
+
+        # exclude super users
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        for id in super_users:
+            already_blocked_users.append(id)
+
+        modified_queryset = CustomUser.objects.exclude(
+                            id__in=already_blocked_users)
+        if modified_queryset:
+            for obj in modified_queryset:
+                queryset[obj.id] = obj.first_name + " "+ obj.last_name
+            response['queryset'] = queryset
+        return Response(response)
+
+
+class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/blocking_dropdown_menu.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        user_settings = CustomUserSettings.objects.get(user=user)
+
+        already_blocked_users = user_settings.blocked_members.values_list(
+                                'id', flat=True)
+        already_blocked_users = list(already_blocked_users)
+        already_blocked_users.append(self.request.user.id)
+
+        # exclude super users
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        for id in super_users:
+            already_blocked_users.append(id)
+        print(already_blocked_users)
+
+        modified_queryset = CustomUser.objects.exclude(
+                            id__in=already_blocked_users)
+        blocked_users_html = render_to_string(
+                                'user_pages/blocking_dropdown_menu.html',
+                                {'block_member_list': modified_queryset})
+        context['blocked_users_html'] = blocked_users_html
+        return self.render_json_response(context)
