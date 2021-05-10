@@ -52,6 +52,11 @@ class InitialUserDetailSavePage(View):
                                   "target='_blank' rel='noopener' " +
                                   "href='https://www.facebook.com/filmhobo'>" +
                                   "https://www.facebook.com/filmhobo</a>" +
+                                  " and " +
+                                  "<a alt='filmhobo_instagram' " +
+                                  "target='_blank' rel='noopener' " +
+                                  "href='https://www.instagram.com/filmhobo/'>" +
+                                  "https://www.instagram.com/filmhobo/</a>" +
                                   "<br> <br> Sincerely,<br>" +
                                   "The Film Hobo Team")
             messages.success(request, message)
