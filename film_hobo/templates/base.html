@@ -198,12 +198,18 @@
         extra_args = {"email": email.toString(), "password": password.toString()}
         axios.post(post_url, extra_args)
         .then((response) => {
-            console.log(response);
-            debugger
-            localStorage.setItem('access_token', response.data.key);
+            localStorage.setItem('token', response.data.key);
         }, (error) => {
             console.log(error);
         });
+    });
+    </script>
+    <script>
+    /*
+    code to clear token info from local storage on logout
+    */
+    document.getElementById("logout_link").addEventListener("click", function() {
+        localStorage.removeItem("token");
     });
     </script>
 </html>
