@@ -182,7 +182,7 @@
                             placeholder="Country"
                             required>
                             {% for item in form.country %}
-                                <option>{{item}}</option>
+                                {{item}}
                             {% endfor %}
                             </select>
                             {% if form.errors.country %}

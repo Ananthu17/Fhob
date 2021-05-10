@@ -13,19 +13,15 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
-                   SettingsView, \
-                   CustomUserLogout, ExtendedRegisterCompanyView, \
-                   ChangePasswordAPI, DisableAccountAPI, \
-                   EnableAccountAPI, \
-                   EnableAccountView, \
-                   BlockMembersAPI, UnBlockMembersAPI, \
-                   PaymentCompanyView, \
-                   ForgotPasswordView, \
+                   SettingsView, CustomUserLogout, ExtendedRegisterCompanyView, \
+                   ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
+                   EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
+                   PaymentCompanyView, ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
-                   PasswordResetView, GetUnblockedMembersAPI, \
-                   GetUnblockedMembersAjaxView
-
+                   PasswordResetTemplateView, GetUnblockedMembersAPI, \
+                   GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
+                   PersonalDetailsView
 
 app_name = "hobo_user"
 
@@ -74,6 +70,9 @@ urlpatterns = [
     path('get-all-unblocked-members-api/',
          GetUnblockedMembersAPI.as_view(),
          name='get-all-unblocked-members-api'),
+    path('personal-details-api/',
+         PersonalDetailsAPI.as_view(),
+         name='personal-details-api'),
 
 
     # web-view endpoints
@@ -109,9 +108,11 @@ urlpatterns = [
          name='enable-account'),
     path('forgot-password/', ForgotPasswordView.as_view(),
          name='forgot-password'),
-    path('password-reset/', PasswordResetView.as_view(),
+    path('password-reset/', PasswordResetTemplateView.as_view(),
          name='password-reset'),
     path('get-unblocked-members/', GetUnblockedMembersAjaxView.as_view(),
          name='get-unblocked-members'),
+    path('personal-details/', PersonalDetailsView.as_view(),
+         name='personal-details'),
 
 ]
