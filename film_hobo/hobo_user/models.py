@@ -221,7 +221,17 @@ class CustomUser(AbstractUser):
                                     max_length=150,
                                     null=True,
                                     default=FREE)
-
+    # athletic_skills = models.ManyToManyField('hobo_user.AthleticSkill',
+    #                                          blank=True,
+    #                                          related_name='user_athletic_skills',
+    #                                          verbose_name=_("Athletic Skills"
+    #                                                         )
+    #                                          )
+    # ethnic_appearance = models.ForeignKey("hobo_user.EthnicAppearance",
+    #                                       on_delete=models.SET_NULL,
+    #                                       related_name='user_ethnic_appearance',
+    #                                       verbose_name=_("Ethnic Appearance"),
+    #                                       null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

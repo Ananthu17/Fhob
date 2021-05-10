@@ -5,6 +5,8 @@ import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.template import loader
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
@@ -38,22 +40,22 @@ from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
-    DisableAccountForm, BlockMemberForm, NotificationAccountSettingsForm, \
-    ForgotPasswordEmailForm, ResetPasswordForm
+    ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm
 
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails
+                    CompanyPaymentDetails, EthnicAppearanceInline, \
+                    AthleticSkillInline, AthleticSkill
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
-    ProPaymentSerializer, PromoCodeSerializer, GeneralSettingsSerializer, \
+    ProPaymentSerializer, PromoCodeSerializer, \
     RegisterCompanySerializer, DisableAccountSerializer, \
-    PrivacySettingsSerializer, EnableAccountSerializer, \
-    TrackingAccountSettingsSerializer, BlockMembersSerializer, \
-    NotificationAccountSettingsSerializer, CompanyPaymentSerializer, \
-    SettingsSerializer, BlockedMembersQuerysetSerializer
+    EnableAccountSerializer, BlockMembersSerializer, \
+    CompanyPaymentSerializer, SettingsSerializer, \
+    BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
+    PasswordResetSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -1003,6 +1005,7 @@ class UnBlockMembersAPI(APIView):
 
 
 class ForgotPasswordAPI(AuthPasswordResetView):
+    serializer_class = PasswordResetSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
@@ -1010,6 +1013,7 @@ class ForgotPasswordAPI(AuthPasswordResetView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         # Return the success message with OK HTTP status
         return Response(
             {"detail": "Password reset e-mail has been sent."},
@@ -1021,7 +1025,6 @@ class PasswordResetConfirmView(AuthPasswordResetConfirmView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        print("here-----------------")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -1043,12 +1046,13 @@ class ForgotPasswordView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class
+        form = self.form_class(request.POST)
         user_response = requests.post(
                             'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         print(user_response)
+
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
@@ -1062,7 +1066,7 @@ class ForgotPasswordView(TemplateView):
                       })
 
 
-class PasswordResetView(TemplateView):
+class PasswordResetTemplateView(TemplateView):
     template_name = 'registration/password_reset_from_key.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
@@ -1077,6 +1081,7 @@ class PasswordResetView(TemplateView):
         form = self.form_class
         uid = request.POST.get('uid')
         token = request.POST.get('token')
+        email = request.POST.get('email')
         url = 'http://127.0.0.1:8000/password-reset-confirm/'+uid+"/"+token
         user_response = requests.post(
                             url,
@@ -1086,8 +1091,24 @@ class PasswordResetView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         response = dict(response)
+        print(response)
         if 'status' in response:
             if response['status'] == 200:
+                # confirmation mail
+                to_email =  []
+                to_email.append(email)
+                user = CustomUser.objects.get(email=email)
+                subject = "Password Change on FilmHobo"
+                message = 'text version of HTML message'
+                html_message = loader.render_to_string(
+                            'registration/change_password_confirmation_mail.html',
+                            {
+                                'name': user.first_name,
+                            }
+                        )
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL,
+                          to_email, fail_silently=True,
+                          html_message=html_message)
                 messages.success(
                                 self.request,
                                 'Password reset successfully.'
@@ -1396,3 +1417,124 @@ class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
                                 {'block_member_list': modified_queryset})
         context['blocked_users_html'] = blocked_users_html
         return self.render_json_response(context)
+
+
+class PersonalDetailsAPI(APIView):
+    serializer_class = PersonalDetailsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        personal_settings = {}
+        personal_settings['gender'] = user.gender
+        personal_settings['feet'] = user.feet
+        personal_settings['inch'] = user.inch
+        personal_settings['lbs'] = user.lbs
+        personal_settings['start_age'] = user.start_age
+        personal_settings['stop_age'] = user.stop_age
+        personal_settings['physique'] = user.physique
+        personal_settings['hair_color'] = user.hair_color
+        personal_settings['hair_length'] = user.hair_length
+        personal_settings['eyes'] = user.eyes
+        # ethnic_appearance_list = EthnicAppearanceInline.objects.filter(
+        #                          creator=user)
+        athletic_skill_list = AthleticSkillInline.objects.filter(
+                              creator=user).values_list('athletic_skill', flat=True)
+        print(athletic_skill_list)
+        # personal_settings['ethnic_appearance'] = 
+        personal_settings['athletic_skills'] = athletic_skill_list
+        response = {"personal_settings" : personal_settings}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        user = request.user
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'gender' in data_dict:
+                user.gender = data_dict['gender']
+            if 'feet' in data_dict:
+                user.feet = data_dict['feet']
+            if 'inch' in data_dict:
+                user.inch = data_dict['inch']
+            if 'lbs' in data_dict:
+                user.lbs = data_dict['lbs']
+            if 'start_age' in data_dict:
+                user.start_age = data_dict['start_age']
+            if 'stop_age' in data_dict:
+                user.stop_age = data_dict['stop_age']
+            if 'physique' in data_dict:
+                user.physique = data_dict['physique']
+            if 'hair_color' in data_dict:
+                user.hair_color = data_dict['hair_color']
+            if 'hair_length' in data_dict:
+                user.hair_length = data_dict['hair_length']
+            if 'eyes' in data_dict:
+                user.eyes = data_dict['eyes']
+            user.save()
+            if 'athletic_skills' in data_dict:
+                old_skills = AthleticSkillInline.objects.filter(creator=user)
+                if old_skills:
+                    for obj in old_skills:
+                        obj.delete()
+                for item in data_dict['athletic_skills']:
+                    skill = AthleticSkill.objects.get(id=item)
+                    athletic_skills_inline = AthleticSkillInline()
+                    athletic_skills_inline.athletic_skill = skill
+                    athletic_skills_inline.creator = user
+                    athletic_skills_inline.save()
+            response = {'message': "Personal Details Updated",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class PersonalDetailsView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/personal-details.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = PersonalDetailsForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        all_athletic_skills = AthleticSkill.objects.all()
+        athletic_skills = AthleticSkillInline.objects.filter(
+                          creator=user).values_list('athletic_skill__id', flat=True)
+        context['form'] = self.form_class(instance=user)
+        context['user'] = user
+        context['all_athletic_skills'] = all_athletic_skills
+        context['athletic_skills'] = athletic_skills
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        print(request.POST)
+        # json_response = json.dumps(request.POST)
+        # json_dict = ast.literal_eval(json_response)
+        # key = Token.objects.get(user=user).key
+        # token = 'Token '+key
+        # user_response = requests.post(
+        #                     'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+        #                     data=json.dumps(request.POST),
+        #                     headers={'Content-type': 'application/json',
+        #                              'Authorization': token})
+        # byte_str = user_response.content
+        # dict_str = byte_str.decode("UTF-8")
+        # response = ast.literal_eval(dict_str)
+        # response = dict(response)
+        # if 'status' in response:
+        #     if response['status'] == 200:
+        #         messages.success(self.request, 'Personal details updated')
+        #         return HttpResponseRedirect(
+        #             reverse('hobo_user:personal-details'))
+        #     else:
+        #         message = response['message']
+        # return render(
+        #     request, 'user_pages/personal-details.html',
+        #     {'message': message})
+        return HttpResponseRedirect(reverse('hobo_user:personal-details'))
