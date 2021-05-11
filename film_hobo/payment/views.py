@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
-    ProPaymentDetails, CompanyPaymentDetails
-
+    ProPaymentDetails, CompanyPaymentDetails, PromoCode
+from .serializers import DiscountsSerializer
 # Create your views here.
 
 
@@ -225,11 +225,33 @@ class PaymentAdmin(View):
         return render(request, 'payment/payment_admin.html')
 
 
-class GetDiscountDetailAPI(APIView):
+class AddDiscountDetailAPI(APIView):
+    """
+    API for superuser to add a discount with details
+    """
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request, format=None):
+        data = request.data
+        midnight = 'T00:00:00Z'
+        data['valid_from'] = data['valid_from'] + midnight
+        data['valid_to'] = data['valid_to'] + midnight
+        serializer = DiscountsSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "success",
+                             "message": "new promocode record added"})
+        else:
+            return Response(serializer.errors)
+
+
+class GetDiscountDetailListAPI(APIView):
     """
     API for superuser to get the discount details
     """
     permission_classes = (IsSuperUser,)
 
-    def put(self, request, format=None):
-        pass
+    def get(self, request, *args, **kwargs):
+        promocodes = PromoCode.objects.all()
+        serializer = DiscountsSerializer(promocodes, many=True)
+        return Response(serializer.data)
