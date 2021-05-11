@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views.generic.base import View
 
@@ -255,3 +256,50 @@ class GetDiscountDetailListAPI(APIView):
         promocodes = PromoCode.objects.all()
         serializer = DiscountsSerializer(promocodes, many=True)
         return Response(serializer.data)
+
+
+class EditDiscountDetailAPI(APIView):
+    """
+    API for superuser to edit a discount details
+    """
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            code = request.data['promo_code']
+            PromoCode.objects.get(promo_code=code)
+            midnight = 'T00:00:00Z'
+            data['valid_from'] = data['valid_from'] + midnight
+            data['valid_to'] = data['valid_to'] + midnight
+            serializer = DiscountsSerializer(data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"status": "success",
+                                "message": "promocode record updated successfully"})
+            else:
+                return Response(serializer.errors)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "promocode record not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class DeleteDiscountDetailAPI(APIView):
+    """
+    API for superuser to delete a discount with details
+    """
+    permission_classes = (IsSuperUser,)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            code = request.data['promo_code']
+            promocode = PromoCode.objects.get(promo_code=code)
+            promocode.delete()
+            return Response(
+                {"status": "promocode record deleted"},
+                status=status.HTTP_204_NO_CONTENT)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "promocode record not found"},
+                status=status.HTTP_404_NOT_FOUND)
