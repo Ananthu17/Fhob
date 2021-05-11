@@ -90,15 +90,28 @@ class UpdateMembershipFeeAPI(APIView):
             if data['monthly_hobo'] == "":
                 final_result['monthly_hobo'] = ""
             else:
-                HoboPaymentsDetails.objects.all().update(
-                    monthly_amount=float(data['monthly_hobo']))
-                final_result['monthly_hobo'] = HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
+                try:
+                    HoboPaymentsDetails.objects.all().update(
+                        monthly_amount=float(data['monthly_hobo']))
+                    final_result['monthly_hobo'] = HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "monthly_hobo": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
+
             if data['annual_hobo'] == "":
                 final_result['annual_hobo'] = ""
             else:
-                HoboPaymentsDetails.objects.all().update(
-                    annual_amount=float(data['annual_hobo']))
-                final_result['annual_hobo'] = HoboPaymentsDetails.objects.first().__dict__['annual_amount']
+                try:
+                    HoboPaymentsDetails.objects.all().update(
+                        annual_amount=float(data['annual_hobo']))
+                    final_result['annual_hobo'] = HoboPaymentsDetails.objects.first().__dict__['annual_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "annual_hobo": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError:
             return Response(
                 {"status": "failure",
@@ -110,15 +123,28 @@ class UpdateMembershipFeeAPI(APIView):
             if data['monthly_indie'] == "":
                 final_result['monthly_indie'] = ""
             else:
-                IndiePaymentDetails.objects.all().update(
-                    monthly_amount=float(data['monthly_indie']))
-                final_result['monthly_indie'] = IndiePaymentDetails.objects.first().__dict__['monthly_amount']
+                try:
+                    IndiePaymentDetails.objects.all().update(
+                        monthly_amount=float(data['monthly_indie']))
+                    final_result['monthly_indie'] = IndiePaymentDetails.objects.first().__dict__['monthly_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "monthly_indie": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
+
             if data['annual_indie'] == "":
                 final_result['annual_indie'] = ""
             else:
-                IndiePaymentDetails.objects.all().update(
-                    annual_amount=float(data['annual_indie']))
-                final_result['annual_indie'] = IndiePaymentDetails.objects.first().__dict__['annual_amount']
+                try:
+                    IndiePaymentDetails.objects.all().update(
+                        annual_amount=float(data['annual_indie']))
+                    final_result['annual_indie'] = IndiePaymentDetails.objects.first().__dict__['annual_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "annual_indie": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError:
             return Response(
                 {"status": "failure",
@@ -130,15 +156,27 @@ class UpdateMembershipFeeAPI(APIView):
             if data['monthly_pro'] == "":
                 final_result['monthly_pro'] = ""
             else:
-                ProPaymentDetails.objects.all().update(
-                    monthly_amount=float(data['monthly_pro']))
-                final_result['monthly_pro'] = ProPaymentDetails.objects.first().__dict__['monthly_amount']
+                try:
+                    ProPaymentDetails.objects.all().update(
+                        monthly_amount=float(data['monthly_pro']))
+                    final_result['monthly_pro'] = ProPaymentDetails.objects.first().__dict__['monthly_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "monthly_pro": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
             if data['annual_pro'] == "":
                 final_result['annual_pro'] = ""
             else:
-                ProPaymentDetails.objects.all().update(
-                    annual_amount=float(data['annual_pro']))
-                final_result['annual_pro'] = ProPaymentDetails.objects.first().__dict__['annual_amount']
+                try:
+                    ProPaymentDetails.objects.all().update(
+                        annual_amount=float(data['annual_pro']))
+                    final_result['annual_pro'] = ProPaymentDetails.objects.first().__dict__['annual_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "annual_pro": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError:
             return Response(
                 {"status": "failure",
@@ -150,15 +188,27 @@ class UpdateMembershipFeeAPI(APIView):
             if data['monthly_company'] == "":
                 final_result['monthly_company'] = ""
             else:
-                CompanyPaymentDetails.objects.all().update(
-                    monthly_amount=float(data['monthly_company']))
-                final_result['monthly_company'] = CompanyPaymentDetails.objects.first().__dict__['monthly_amount']
+                try:
+                    CompanyPaymentDetails.objects.all().update(
+                        monthly_amount=float(data['monthly_company']))
+                    final_result['monthly_company'] = CompanyPaymentDetails.objects.first().__dict__['monthly_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "monthly_company": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
             if data['annual_company'] == "":
                 final_result['annual_company'] = ""
             else:
-                CompanyPaymentDetails.objects.all().update(
-                    annual_amount=float(data['annual_company']))
-                final_result['annual_company'] = CompanyPaymentDetails.objects.first().__dict__['annual_amount']
+                try:
+                    CompanyPaymentDetails.objects.all().update(
+                        annual_amount=float(data['annual_company']))
+                    final_result['annual_company'] = CompanyPaymentDetails.objects.first().__dict__['annual_amount']
+                except ValueError:
+                    return Response(
+                        {"status": "failure",
+                         "annual_company": "please enter a valid number"
+                         }, status=status.HTTP_400_BAD_REQUEST)
         except AttributeError:
             return Response(
                 {"status": "failure",
@@ -168,6 +218,18 @@ class UpdateMembershipFeeAPI(APIView):
 
 
 class PaymentAdmin(View):
-
+    """
+    Web URL View to load the admin payment page
+    """
     def get(self, request, *args, **kwargs):
         return render(request, 'payment/payment_admin.html')
+
+
+class GetDiscountDetailAPI(APIView):
+    """
+    API for superuser to get the discount details
+    """
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, format=None):
+        pass
