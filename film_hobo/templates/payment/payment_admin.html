@@ -71,6 +71,38 @@
         </tr>
       </table>
       <button id="membership_fee_save" class="btn btn-primary">Save</button>
+      <br>
+      <h3>Add Discount</h3>
+      <br>
+      <table>
+        <tr>
+        </tr>
+        <tr>
+          <td>Discount Name</td>
+          <td id="discount_name"  contenteditable='false'>
+            <input id="id_first_name" maxlength="100" placeholder="write it here">
+          </td>
+        </tr>
+        <tr>
+          <td>Amount</td>
+          <td id="discount_amount" contenteditable='false'>
+            <span id="doller-percentage-toggle">$</span>
+            <input id="id_first_name" maxlength="100" placeholder="">
+            <input type="radio" id="percentage" name="amount" value="%">
+            <label for="percentage">%</label>
+            <input type="radio" id="doller" name="amount" value="$" checked>
+            <label for="doller">$</label>
+          </td>
+        </tr>
+        <tr>
+            <td>Timeframe</td>
+            <td id="discount_timeframe" contenteditable='false'>
+              <input id="valid_from" type="date">to<input id="valid_to" type="date">
+            </td>
+        </tr>
+      </table>
+      <button id="discout_add" class="btn btn-primary">Add</button>
+      <br><br><br>
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -144,6 +176,15 @@
         }, (error) => {
             console.log(error);
         });
+    });
+    /*
+    toggle the text in amount
+    */
+    $(document).ready(function () {
+      $('#discount_amount').on('click', function () {
+          var value = $("[name=amount]:checked").val();
+          $('#doller-percentage-toggle').html(value);
+      })
     });
     </script>
 </html>
