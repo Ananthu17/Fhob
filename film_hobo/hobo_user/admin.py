@@ -4,8 +4,8 @@ from django.contrib.auth.admin import UserAdmin
 from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
-                    EthnicAppearanceInline, AthleticSkill, \
-                    AthleticSkillInline, PromoCode, Team, Actor, Writer, \
+                    AthleticSkill, EthnicAppearanceInline, \
+                    PromoCode, Team, Actor, Writer, AthleticSkillInline, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings
@@ -14,9 +14,9 @@ from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource
 
 
-class EthnicAppearanceInlineInline(admin.StackedInline):
-    model = EthnicAppearanceInline
-    insert_after = 'eyes'
+# class EthnicAppearanceInlineInline(admin.StackedInline):
+#     model = EthnicAppearanceInline
+#     insert_after = 'eyes'
 
 
 class AthleticSkillInlineInline(admin.StackedInline):
@@ -43,11 +43,11 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('Weight', {'fields': ('lbs',)}),
         ('Age-Playing Range', {'fields': ('start_age', 'stop_age')}),
         ('Build', {'fields': ('physique', 'hair_color', 'hair_length',
-                              'eyes',)})
+                              'ethnic_appearance', 'eyes')})
     )
     # adding personal details inline
     inlines = [
-        EthnicAppearanceInlineInline, AthleticSkillInlineInline
+        AthleticSkillInlineInline
     ]
     change_form_template = 'admin/custom/change_form.html'
 

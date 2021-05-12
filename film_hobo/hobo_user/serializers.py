@@ -666,16 +666,22 @@ class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
 
 
 class PersonalDetailsSerializer(serializers.ModelSerializer):
-    # ethnic_appearance = serializers.PrimaryKeyRelatedField(
-    #                   queryset=AthleticSkill.objects.all(),
-    #                   write_only=True, many=True)
     athletic_skills = serializers.ListField()
+    lbs = serializers.IntegerField(allow_null=True)
+    start_age = serializers.IntegerField(allow_null=True)
+    stop_age = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ['gender', 'feet', 'inch', 'lbs', 'start_age',
                   'stop_age', 'physique', 'hair_color', 'hair_length',
-                  'eyes', 'athletic_skills']
+                  'eyes', 'athletic_skills', 'ethnic_appearance']
+
+    def get_validation_exclusions(self,instance=None):
+        print("----------------------------------------")
+        exclusions = super(PersonalDetailsSerializer,
+                           self).get_validation_exclusions(instance)
+        return exclusions + ['lbs', 'start_age', 'stop_age']
 
 
 class PasswordResetSerializer(PasswordResetSerializer):

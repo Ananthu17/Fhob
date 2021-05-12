@@ -204,6 +204,7 @@ EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
 
 OLD_PASSWORD_FIELD_ENABLED = True
+SITE_URL = os.environ.get('SITE_URL', '')
 # AWS_DEFAULT_ACL = None
 
 # YOUR_S3_BUCKET = "film-hobo-static"

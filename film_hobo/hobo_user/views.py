@@ -1,5 +1,6 @@
 import ast
 import json
+from django.db.models.deletion import SET_NULL
 import requests
 import datetime
 from braces.views import JSONResponseMixin
@@ -26,6 +27,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
@@ -44,8 +46,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
 
 from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails, EthnicAppearanceInline, \
-                    AthleticSkillInline, AthleticSkill
+                    CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
+                    EthnicAppearance
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -1436,12 +1438,11 @@ class PersonalDetailsAPI(APIView):
         personal_settings['hair_color'] = user.hair_color
         personal_settings['hair_length'] = user.hair_length
         personal_settings['eyes'] = user.eyes
-        # ethnic_appearance_list = EthnicAppearanceInline.objects.filter(
-        #                          creator=user)
+        personal_settings['eyes'] = user.eyes
+        personal_settings['ethnic_appearance'] = user.ethnic_appearance.ethnic_appearance
+
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
-        print(athletic_skill_list)
-        # personal_settings['ethnic_appearance'] = 
         personal_settings['athletic_skills'] = athletic_skill_list
         response = {"personal_settings" : personal_settings}
         return Response(response)
@@ -1471,6 +1472,10 @@ class PersonalDetailsAPI(APIView):
                 user.hair_length = data_dict['hair_length']
             if 'eyes' in data_dict:
                 user.eyes = data_dict['eyes']
+            if 'ethnic_appearance' in data_dict:
+                ethnic_appearance_id = data_dict['ethnic_appearance']
+                obj = EthnicAppearance.objects.get(id=ethnic_appearance_id)
+                user.ethnic_appearance = obj
             user.save()
             if 'athletic_skills' in data_dict:
                 old_skills = AthleticSkillInline.objects.filter(creator=user)
@@ -1503,38 +1508,66 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         all_athletic_skills = AthleticSkill.objects.all()
+        all_ethnic_appearances = EthnicAppearance.objects.all()
         athletic_skills = AthleticSkillInline.objects.filter(
                           creator=user).values_list('athletic_skill__id', flat=True)
         context['form'] = self.form_class(instance=user)
         context['user'] = user
-        context['all_athletic_skills'] = all_athletic_skills
+        context['all_ethnic_appearances'] = all_ethnic_appearances
+        context['all_athletic_skills_set1'] = all_athletic_skills[:15]
+        context['all_athletic_skills_set2'] = all_athletic_skills[15:]
         context['athletic_skills'] = athletic_skills
         return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        print(request.POST)
-        # json_response = json.dumps(request.POST)
-        # json_dict = ast.literal_eval(json_response)
-        # key = Token.objects.get(user=user).key
-        # token = 'Token '+key
-        # user_response = requests.post(
-        #                     'http://127.0.0.1:8000/hobo_user/personal-details-api/',
-        #                     data=json.dumps(request.POST),
-        #                     headers={'Content-type': 'application/json',
-        #                              'Authorization': token})
-        # byte_str = user_response.content
-        # dict_str = byte_str.decode("UTF-8")
-        # response = ast.literal_eval(dict_str)
-        # response = dict(response)
-        # if 'status' in response:
-        #     if response['status'] == 200:
-        #         messages.success(self.request, 'Personal details updated')
-        #         return HttpResponseRedirect(
-        #             reverse('hobo_user:personal-details'))
-        #     else:
-        #         message = response['message']
-        # return render(
-        #     request, 'user_pages/personal-details.html',
-        #     {'message': message})
+
+        athletic_skills = request.POST.getlist('checks[]')
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['athletic_skills'] = athletic_skills
+        lbs = request.POST.get('lbs')
+        start_age = request.POST.get('start_age')
+        stop_age = request.POST.get('stop_age')
+        lbs = request.POST.get('lbs')
+        if lbs == '':
+            json_dict['lbs'] = None
+        if start_age == '':
+            json_dict['start_age'] = None
+        if stop_age == '':
+            json_dict['stop_age'] = None
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        message = ""
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Personal details updated')
+                return HttpResponseRedirect(
+                    reverse('hobo_user:personal-details'))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    all_athletic_skills = AthleticSkill.objects.all()
+                    all_ethnic_appearances = EthnicAppearance.objects.all()
+                    athletic_skills = AthleticSkillInline.objects.filter(
+                          creator=user).values_list('athletic_skill__id', flat=True)
+                    messages.warning(self.request, "Failed to update personal details.")
+                    return render(request, 'user_pages/personal-details.html',
+                                  {'errors': errors,
+                                   'form': PersonalDetailsForm,
+                                   'all_ethnic_appearances': all_ethnic_appearances,
+                                   'all_athletic_skills_set1': all_athletic_skills[:15],
+                                   'all_athletic_skills_set2': all_athletic_skills[15:],
+                                   'athletic_skills': athletic_skills,
+                                   'user': user
+                                  })
         return HttpResponseRedirect(reverse('hobo_user:personal-details'))

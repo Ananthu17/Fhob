@@ -293,4 +293,8 @@ class PersonalDetailsForm(forms.ModelForm):
         model = CustomUser
         fields = ('gender', 'feet', 'inch', 'lbs', 'start_age',
                   'stop_age', 'physique', 'hair_color', 'hair_length',
-                  'eyes')
+                  'eyes', 'ethnic_appearance')
+
+    def __init__(self, *args, **kwargs):
+        super(PersonalDetailsForm, self).__init__(*args, **kwargs)
+        # self.fields[field].required = True
