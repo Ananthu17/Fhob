@@ -18,7 +18,7 @@ urlpatterns = [
          name='get_discount_detail_list'),
     path('edit_discount_detail/', EditDiscountDetailAPI.as_view(),
          name='edit_discount_detail'),
-    path('delete_discount_detail/', DeleteDiscountDetailAPI.as_view(),
+    path('delete_discount_detail/<int:pk>/', DeleteDiscountDetailAPI.as_view(),
          name='delete_discount_detail'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),

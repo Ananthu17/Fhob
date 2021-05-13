@@ -76,18 +76,30 @@
       <br>
       <table>
         <tr>
+          <td>User Type</td>
+          <td id="discount_usertype" contenteditable='false'>
+            <select id="usertype" name="usertype">
+              <option value="select">-Select-</option>
+              <option value="hobo">Hobo</option>
+              <option value="indie">Indie</option>
+              <option value="pro">Pro</option>
+              <option value="company">Production Company</option>
+            </select>
+          </td>
+      </tr>
+        <tr>
         </tr>
         <tr>
           <td>Discount Name</td>
           <td id="discount_name"  contenteditable='false'>
-            <input id="id_first_name" maxlength="100" placeholder="write it here">
+            <input id="discount_name_input" maxlength="100" placeholder="write it here">
           </td>
         </tr>
         <tr>
           <td>Amount</td>
           <td id="discount_amount" contenteditable='false'>
             <span id="doller-percentage-toggle">$</span>
-            <input id="id_first_name" maxlength="100" placeholder="">
+            <input id="discount_amount_input" maxlength="100" placeholder="">
             <input type="radio" id="percentage" name="amount" value="%">
             <label for="percentage">%</label>
             <input type="radio" id="doller" name="amount" value="$" checked>
@@ -101,8 +113,11 @@
             </td>
         </tr>
       </table>
-      <button id="discout_add" class="btn btn-primary">Add</button>
+      <button id="discount_add" class="btn btn-primary">Add</button>
       <br><br><br>
+      <h3>Discount List</h3>
+      <table id="discount_table">
+      </table>
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -110,6 +125,21 @@
     /*
     get membership fee details and render to html
     */
+    var token = localStorage.getItem("token");
+    token_str = "Token "
+    token_val = String(token)
+    var authorization_str = token_str.concat(token_val);
+    origin_url = window.location.origin
+
+    /*
+    delete discount record funtion
+    */
+    function deleteDiscountFunction(obj_id) {
+      origin_url = window.location.origin
+      delete_url = origin_url + '/payment/delete_discount_detail/' + obj_id + '/'
+      axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
+    }
+
     $( document ).ready(function() {
         origin_url = window.location.origin
         get_url = origin_url + '/payment/get_membership_fee_detail/'
@@ -128,6 +158,26 @@
             document.getElementById("monthly_indie").innerHTML = "$ " + response.data.monthly_indie;
             document.getElementById("monthly_pro").innerHTML = "$ " + response.data.monthly_pro;
             document.getElementById("monthly_company").innerHTML = "$ " + response.data.monthly_company;
+        });
+
+        get_lust_url = origin_url + '/payment/get_discount_detail_list/'
+
+        axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
+        .then((response) => {
+          discount_objs = response.data
+
+          let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th>Action</th> </tr></thead><tbody></tbody>';
+          let modify_link = '<a alt="modify_remove" href="">remove</a> <a alt="modify_edit" href="">edit</a>'
+            discount_objs.forEach(function(d){
+            obj_id = d.id
+            delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
+            table += '<tr><td>'+d.promo_code+'</td>';
+            table += '<td>'+d.amount+'</td>';
+            table += '<td>'+d.valid_from+' to '+d.valid_to+'</td></tr>';
+            table += '<td><a alt="modify_remove" value="'+d.id+'" href="" onclick="deleteDiscountFunction('+obj_id+')">remove</a> <a alt="modify_edit" href="">edit</a></td></tr>';
+          })
+          table += '</tbody>';
+          $('#discount_table').empty().html(table);
         });
     });
     /*
@@ -186,6 +236,62 @@
           $('#doller-percentage-toggle').html(value);
       })
     });
+    /*
+    get details of new discount and pass to add discount api
+    */
+    document.getElementById("discount_add").addEventListener("click", function() {
+    add_url = origin_url + '/payment/add_discount_detail/'
+    if ($("#doller-percentage-toggle").text() === "$"){
+      amount_type_val = "flat_amount"
+    }
+    else {
+      amount_type_val = "percentage"
+    }
+
+    var selected_option = document.getElementById("usertype");
+    selected_option_val = selected_option.value
+
+    if (selected_option_val === "hobo"){
+      var selected_option = "HOB"
+    }
+    else if (selected_option_val === "indie") {
+      var selected_option = "IND"
+    }
+    else if (selected_option_val === "pro") {
+      var selected_option = "PRO"
+    }
+    else if (selected_option_val === "company") {
+      var selected_option = "COM"
+    }
+    else {
+      var selected_option = ""
+    }
+
+    add_args = {
+        "promo_code": document.getElementById("discount_name_input").value,
+        "valid_from": document.getElementById("valid_from").value,
+        "valid_to": document.getElementById("valid_to").value,
+        "amount_type": amount_type_val,
+        "amount": document.getElementById("discount_amount_input").value,
+        "user_type": selected_option,
+    }
+    axios.post(add_url, add_args, {headers: {'Authorization': authorization_str}})
+    .then((response) => {
+      if (response.data.status === "success"){
+        $("#discount_name_input").val("");
+        $("#discount_amount_input").val("");
+        $("#valid_from").val("");
+        $("#valid_to").val("");
+        document.getElementById('usertype').value="select";
+      }
+    }, (error) => {
+        console.log(error);
+    });
+    });
+    /*
+    get details of all the discounts added
+    */
+
     </script>
 </html>
 </body>

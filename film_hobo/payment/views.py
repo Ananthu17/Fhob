@@ -293,8 +293,8 @@ class DeleteDiscountDetailAPI(APIView):
 
     def delete(self, request, *args, **kwargs):
         try:
-            code = request.data['promo_code']
-            promocode = PromoCode.objects.get(promo_code=code)
+            pk = self.kwargs['pk']
+            promocode = PromoCode.objects.get(pk=pk)
             promocode.delete()
             return Response(
                 {"status": "promocode record deleted"},
