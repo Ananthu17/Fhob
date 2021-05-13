@@ -1,7 +1,6 @@
 from django import forms
 from django.forms import ModelMultipleChoiceField
-
-from phonenumber_field.formfields import PhoneNumberField
+from django.utils.translation import ugettext_lazy as _
 
 from .models import Designation, InitialIntrestedUsers
 
@@ -21,8 +20,11 @@ class InitialUserForm(forms.ModelForm):
                                 help_text='')
     email = forms.EmailField(max_length=254,
                              help_text='')
-    phone = PhoneNumberField()
-    designation_id = forms.ModelMultipleChoiceField(
+    phone = forms.CharField(max_length=20,
+                            help_text='')
+    phone.error_messages['invalid'] = _(
+        'Please enter a valid US contact number')
+    designation = forms.ModelMultipleChoiceField(
         label="Are you",
         queryset=Designation.objects.all(),
         widget=forms.CheckboxSelectMultiple)
@@ -30,4 +32,4 @@ class InitialUserForm(forms.ModelForm):
     class Meta:
         model = InitialIntrestedUsers
         fields = ('first_name', 'middle_name', 'last_name', 'email',
-                  'phone', 'designation_id')
+                  'phone', 'designation')

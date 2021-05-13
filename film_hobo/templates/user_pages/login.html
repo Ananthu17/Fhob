@@ -20,13 +20,12 @@
                 Password {{form.password}}
                 {{form.password.errors}}
             </p>
-            <button type="submit" class="btn btn-default">Sign in</button>
+            <button id="login-submit" type="submit" class="btn btn-default">Sign in</button>
         </form>
         <a href="{% url 'hobo_user:forgot-password' %}">Forgot Password</a>
 
 
 
 {% endblock %}
-
 {% block extrajs %}
 {% endblock %}

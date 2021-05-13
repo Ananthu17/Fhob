@@ -1,5 +1,6 @@
 import ast
 import json
+from django.contrib.auth.models import User
 from django.db.models.deletion import SET_NULL
 import requests
 import datetime
@@ -42,12 +43,13 @@ from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
-    ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm
+    ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
+    EditProfileForm
 
-from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
+from .models import CustomUser, GuildMembership, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance
+                    EthnicAppearance, UserProfile
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -57,7 +59,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     EnableAccountSerializer, BlockMembersSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
-    PasswordResetSerializer
+    PasswordResetSerializer, UserProfileSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -143,6 +145,9 @@ class ExtendedRegisterView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -160,9 +165,14 @@ class ExtendedRegisterCompanyView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
+        user.is_company = True
+        user.save()
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -180,6 +190,9 @@ class ExtendedRegisterIndieView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -198,6 +211,9 @@ class ExtendedRegisterProView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -1571,3 +1587,153 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
                                    'user': user
                                   })
         return HttpResponseRedirect(reverse('hobo_user:personal-details'))
+
+
+class UserProfileAPI(APIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        profile = UserProfile.objects.get(user=user)
+        profile_data = {}
+        job_type_list = {}
+        guild_membership_dict = {}
+        job_types = profile.job_types.all()
+        guild_membership = user.guild_membership.all()
+
+        profile_data['first_name'] = user.first_name
+        profile_data['middle_name'] = user.middle_name
+        profile_data['last_name'] = user.last_name
+        profile_data['membership'] = user.membership
+        for item in job_types:
+            job_type_list[item.id] = item.title
+        for item in guild_membership:
+            guild_membership_dict[item.id] = item.membership
+        profile_data['guild_membership'] = guild_membership_dict
+        profile_data['job_types'] = job_type_list
+        profile_data['company'] = profile.company
+        profile_data['company_position'] = profile.company_position
+        profile_data['company_website'] = profile.company_website
+        profile_data['agent'] = profile.agent
+        profile_data['agent_phone'] = str(profile.agent_phone)
+        profile_data['agent_email'] = profile.agent_email
+        profile_data['manager'] = profile.manager
+        profile_data['manager_phone'] = str(profile.manager_phone)
+        profile_data['manager_email'] = profile.manager_email
+        profile_data['imdb'] = profile.imdb
+        profile_data['bio'] = profile.bio
+
+        response = {"profile_data": profile_data}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            if 'first_name' in data_dict:
+                user.first_name = data_dict['first_name']
+            if 'middle_name' in data_dict:
+                user.middle_name = data_dict['middle_name']
+            if 'last_name' in data_dict:
+                user.last_name = data_dict['last_name']
+            if 'guild_membership' in data_dict:
+                user.guild_membership.set(data_dict['guild_membership'])
+            user.save()
+            if 'company' in data_dict:
+                profile.company = data_dict['company']
+            if 'company_position' in data_dict:
+                profile.company_position = data_dict['company_position']
+            if 'company_website' in data_dict:
+                profile.company_website = data_dict['company_website']
+            if 'agent' in data_dict:
+                profile.agent = data_dict['agent']
+            if 'agent_phone' in data_dict:
+                profile.agent_phone = data_dict['agent_phone']
+            if 'agent_email' in data_dict:
+                profile.agent_email = data_dict['agent_email']
+            if 'manager' in data_dict:
+                profile.manager = data_dict['manager']
+            if 'manager_phone' in data_dict:
+                profile.manager_phone = data_dict['manager_phone']
+            if 'manager_email' in data_dict:
+                profile.manager_email = data_dict['manager_email']
+            if 'imdb' in data_dict:
+                profile.imdb = data_dict['imdb']
+            if 'bio' in data_dict:
+                profile.bio = data_dict['bio']
+            profile.save()
+            response = {'message': "Profile Updated",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-profile.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = EditProfileForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = UserProfile.objects.get(user=user)
+        context['guild_membership'] = GuildMembership.objects.all()
+        context['user'] = user
+        context['profile'] = profile
+        context['form'] = self.form_class(instance=profile)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        profile = UserProfile.objects.get(user=user)
+        guild_membership_all = GuildMembership.objects.all()
+        print(request.POST)
+        guild_membership = request.POST.getlist('guild_membership')
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['guild_membership'] = guild_membership
+        agent_phone = request.POST.get('agent_phone')
+        manager_phone = request.POST.get('manager_phone')
+        if agent_phone == '':
+            json_dict['agent_phone'] = None
+        if manager_phone == '':
+            json_dict['manager_phone'] = None
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/profile-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Profile updated successfully')
+                return HttpResponseRedirect(reverse('hobo_user:profile'))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    messages.warning(self.request, "Failed to update profile !!")
+                    return render(request, 'user_pages/edit-profile.html',
+                                  {'errors': errors,
+                                   'form': self.form_class(instance=profile),
+                                   'profile': profile,
+                                   'user': user,
+                                   'guild_membership': guild_membership_all
+                                   })
+        return HttpResponseRedirect(reverse('hobo_user:profile'))
+
+

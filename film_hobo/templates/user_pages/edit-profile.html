@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper flex-grow-1">
+    <div class="container">
+        <div class = "row">
+        <div class = "col-12">
+                <b>Edit Profile</b>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Name</label>
+                        </div>
+                        <div class="col-8">
+                            <input class=""
+                            name="{{ form.first_name.name }}"
+                            value="{% if user.first_name %}{{ user.first_name}}{% endif%}"
+                            required/>
+                            {% if errors.first_name %}
+                            {% for err in errors.first_name %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                            <input class=""
+                            name="{{ form.middle_name.name }}"
+                            value="{% if user.middle_name %}{{ user.middle_name}}{% endif%}"
+                            />
+                            {% if errors.middle_name %}
+                            {% for err in errors.middle_name %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                            <input class=""
+                            name="{{ form.last_name.name }}"
+                            value="{% if user.last_name %}{{ user.last_name}}{% endif%}"
+                            required/>
+                            {% if errors.last_name %}
+                            {% for err in errors.last_name %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Membership</label>
+                        </div>
+                        <div class="col-8">
+                            {{user.get_membership_display}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Job type</label>
+                        </div>
+                        <div class="col-8">
+                            {% if profile.job_types %}
+                                {% for job in profile.job_types.all %}
+                                    {{job}} {% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title">Guild Membership</label>
+                        </div>
+                        <div class="col-8">
+                            {% for item in guild_membership %}
+                            <div class="form-check-inline">
+                                <label class="containerradio">{{item}}
+                                    <input type="checkbox"  name="guild_membership"
+                                    value="{{item.id}}"
+                                    {% if item in user.guild_membership.all %}checked{% endif%}>
+                                    <span class="checkmarkagree"></span>
+                                  </label>
+                              </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">
+                                <a href="{% url 'hobo_user:personal-details' %}">Personal Details</a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Company</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.company.name }}"
+                            value="{% if profile.company %}{{ profile.company}}{% endif%}"
+                            />
+                            {% if errors.company %}
+                            {% for err in errors.company %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Position</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.company_position.name }}"
+                            value="{% if profile.company_position %}{{ profile.company_position}}{% endif%}"
+                            />
+                            {% if errors.company_position %}
+                            {% for err in errors.company_position %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Website</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.company_website.name }}"
+                            value="{% if profile.company_website %}{{ profile.company_website}}{% endif%}"
+                            />
+                            {% if errors.company_website %}
+                            {% for err in errors.company_website %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Agent</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.agent.name }}"
+                            value="{% if profile.agent %}{{ profile.agent}}{% endif%}"
+                            />
+                            {% if errors.agent %}
+                            {% for err in errors.agent %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Phone</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.agent_phone.name }}"
+                            value="{% if profile.agent_phone %}{{ profile.agent_phone}}{% endif%}"
+                            />
+                            {% if errors.agent_phone %}
+                            {% for err in errors.agent_phone %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Email</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.agent_email.name }}"
+                            value="{% if profile.agent_email %}{{ profile.agent_email}}{% endif%}"
+                            />
+                            {% if errors.agent_email %}
+                            {% for err in errors.agent_email %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Manager</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.manager.name }}"
+                            value="{% if profile.manager %}{{ profile.manager}}{% endif%}"
+                            />
+                            {% if errors.manager %}
+                            {% for err in errors.manager %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Phone</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.manager_phone.name }}"
+                            value="{% if profile.manager_phone %}{{ profile.manager_phone}}{% endif%}"
+                            />
+                            {% if errors.manager_phone %}
+                            {% for err in errors.manager_phone %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Email</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.manager_email.name }}"
+                            value="{% if profile.manager_email %}{{ profile.manager_email}}{% endif%}"
+                            />
+                            {% if errors.manager_email %}
+                            {% for err in errors.manager_email %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">IMDB</label>
+                        </div>
+                        <div class="col-4">
+                            <input class=""
+                            name="{{ form.imdb.name }}"
+                            value="{% if profile.imdb %}{{ profile.imdb}}{% endif%}"
+                            />
+                            {% if errors.imdb %}
+                            {% for err in errors.imdb %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="">Bio/Info</label>
+                        </div>
+                        <div class="col-6">
+                            <textarea
+                            name="{{ form.bio.name }}">
+                            {% if profile.bio %}{{ profile.bio}}{% endif%}
+                            </textarea>
+                            {% if errors.bio %}
+                            {% for err in errors.bio %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn mem-btn-save mt-3 mb-3">SAVE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

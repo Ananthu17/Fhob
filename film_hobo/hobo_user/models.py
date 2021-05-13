@@ -150,6 +150,12 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
     )
+    is_company = models.BooleanField(
+        _('Is Company'),
+        default=False,
+        help_text=_(
+            'This field will be True for company accounts'),
+    )
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
     # company_address = models.TextField(_("Address"), null=True, blank=True)
@@ -491,11 +497,23 @@ class GuildMembership(models.Model):
         return str(self.membership)
 
 
+class HoboPaymentsDetails(SingletonModel):
+    free_days = models.CharField(_('First free days'), max_length=250,
+                                 null=True, blank=True)
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
+
+    class Meta:
+        verbose_name = 'Hobo Members Payment Detail'
+        verbose_name_plural = 'Hobo Members Payment Details'
+
+
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
@@ -504,9 +522,9 @@ class IndiePaymentDetails(SingletonModel):
 
 class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Pro Members Payment Detail'
@@ -515,9 +533,9 @@ class ProPaymentDetails(SingletonModel):
 
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
-    annual_amount = models.IntegerField(_('Annual billing amount'))
-    monthly_amount = models.IntegerField(_('Monthly billing amount'))
-    estimated_tax = models.IntegerField(_('Estimated Tax'))
+    annual_amount = models.FloatField(_('Annual billing amount'))
+    monthly_amount = models.FloatField(_('Monthly billing amount'))
+    estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
         verbose_name = 'Company Payment Detail'
@@ -660,3 +678,103 @@ class CustomUserSettings(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class JobType(models.Model):
+    title = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'Job Type'
+        verbose_name_plural = 'Job Types'
+
+
+class UserProfile(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_profile',
+                             verbose_name=_("User"),
+                             null=True)
+    job_types = models.ManyToManyField('hobo_user.JobType',
+                                       blank=True,
+                                       related_name="user_job_types",
+                                       verbose_name=_("Job Types")
+                                       )
+    company = models.CharField(_('Company'),
+                               max_length=150,
+                               null=True,
+                               blank=True
+                               )
+    company_position = models.CharField(_('Company Position'),
+                                        max_length=150,
+                                        null=True,
+                                        blank=True
+                                        )
+    company_website = models.CharField(_('Company Website'),
+                                       max_length=150,
+                                       null=True,
+                                       blank=True
+                                       )
+    agent = models.CharField(_('Agent'),
+                             max_length=150,
+                             null=True,
+                             blank=True
+                             )
+    agent_phone = PhoneNumberField(_("Agent's phone number"),
+                                   null=True,
+                                   blank=True
+                                   )
+    agent_email = models.EmailField(_("Agent's email address"),
+                                    null=True,
+                                    blank=True)
+    manager = models.CharField(_('Manager'),
+                               max_length=150,
+                               null=True,
+                               blank=True
+                               )
+    manager_phone = PhoneNumberField(_("Manager's phone number"),
+                                     null=True,
+                                     blank=True
+                                     )
+    manager_email = models.EmailField(_("Manager's email address"),
+                                      null=True,
+                                      blank=True
+                                      )
+    imdb = models.CharField(_("IMDB"),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    bio = models.TextField(_("Bio/Info"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user.email)
+
+    class Meta:
+        verbose_name = 'User Profile'
+        verbose_name_plural = 'User Profiles'
+
+
+class CoWorker(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='coworker',
+                             verbose_name=_("Coworker"),
+                             null=True)
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company',
+                                verbose_name=_("Company"),
+                                null=True)
+    name = models.CharField(_('Name'),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.CASCADE,
+                                 related_name='coworker',
+                                 verbose_name=_("User"),
+                                 null=True)

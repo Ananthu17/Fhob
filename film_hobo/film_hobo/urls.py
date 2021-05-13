@@ -20,10 +20,14 @@ from django.conf.urls import url
 from hobo_user.views import ExtendedSignupVerify, PasswordResetConfirmView
 
 from rest_framework_simplejwt import views as jwt_views
+from initial_user.views import InitialUserDetailSavePage
 
 urlpatterns = [
+    path('', InitialUserDetailSavePage.as_view(),
+         name='landing_home'),
     path('admin/', admin.site.urls),
     path('initial_user/', include('initial_user.urls')),
+    path('payment/', include('payment.urls')),
     path('hobo_user/', include('hobo_user.urls')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(),
          name='token_obtain_pair'),

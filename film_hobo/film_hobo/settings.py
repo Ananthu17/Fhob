@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+import environ
 from pathlib import Path
+
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +25,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qyi$gs%)7&cw$(y8e6at3g1%h#sk+jm7ak54dz!st3k!srca^^'
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+# # for development
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '5s3u3jnor6.execute-api.us-east-1.amazonaws.com', '*']
+ALLOWED_HOSTS = ['127.0.0.1',
+                 '5s3u3jnor6.execute-api.us-east-1.amazonaws.com',
+                 '*']
+
+# for production
+# DEBUG = False
+
+# ALLOWED_HOSTS = ['www.filmhobo.com',
+#                  'filmhobo.com']
 
 # Application definition
 
@@ -38,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3rd party packages
     'rest_auth',
     'rest_framework',
     'django.contrib.sites',
@@ -46,18 +61,20 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework.authtoken',
     'import_export',
-
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
 
+    # project apps
     'initial_user',
     'hobo_user',
+    'payment',
+
     'bootstrap_datepicker_plus',
     'django_select2',
     'crispy_forms',
     'django_s3_storage',
-
+    'zappa_django_utils'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -65,7 +82,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SITE_ID = 1
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,26 +119,27 @@ WSGI_APPLICATION = 'film_hobo.wsgi.application'
 # # aws rds credentials
 # DATABASES = {
 #     'default': {
-#         'ENGINE': os.environ.get("SQL_ENGINE",
-#                                  "django.db.backends.postgresql_psycopg2"),
-#         'NAME': os.environ.get("SQL_DATABASE", "film_hobo_db"),
-#         'USER': os.environ.get("SQL_USER", "film_hobo_user"),
-#         'PASSWORD': os.environ.get("SQL_PASSWORD", "filmhobofilm1"),
-#         'HOST': os.environ.get("SQL_HOST", "film-hobo-db.cluster-czkvodnjhfkk.us-east-1.rds.amazonaws.com"),
-#         'PORT': os.environ.get("SQL_PORT", "5432"),
+#         'ENGINE': env("AWS_DATABASE_ENGINE"),
+#         'NAME': env("AWS_DATABASE_NAME"),
+#         'USER': env("AWS_DATABASE_USER"),
+#         'PASSWORD': env("AWS_DATABASE_PASSWORD"),
+#         'HOST': env("AWS_DATABASE_HOST"),
+#         'PORT': env("AWS_DATABASE_PORT"),
+#         'OPTIONS': {
+#             'connect_timeout': 5,
+#         }
 #     }
 # }
 
 # local database credentials
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get("SQL_ENGINE",
-                                 "django.db.backends.postgresql_psycopg2"),
-        'NAME': os.environ.get("SQL_DATABASE", "filmhobo_database"),
-        'USER': os.environ.get("SQL_USER", "filmhobo_admin"),
-        'PASSWORD': os.environ.get("SQL_PASSWORD", "techversant"),
-        'HOST': os.environ.get("SQL_HOST", "localhost"),
-        'PORT': os.environ.get("SQL_PORT", "5432"),
+        'ENGINE': env("DATABASE_ENGINE"),
+        'NAME': env("DATABASE_NAME"),
+        'USER': env("DATABASE_USER"),
+        'PASSWORD': env("DATABASE_PASSWORD"),
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
     }
 }
 
@@ -204,7 +223,12 @@ EMAIL_BCC = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
 
 OLD_PASSWORD_FIELD_ENABLED = True
+
 SITE_URL = os.environ.get('SITE_URL', '')
+
+
+# # production settings
+
 # AWS_DEFAULT_ACL = None
 
 # YOUR_S3_BUCKET = "film-hobo-static"
@@ -220,5 +244,4 @@ SITE_URL = os.environ.get('SITE_URL', '')
 # # OR...if you create a fancy custom domain for your static files use:
 # # AWS_S3_PUBLIC_URL_STATIC = "https://static.zappaguide.com/"
 
-# AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
-
+# # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"

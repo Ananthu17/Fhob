@@ -8,10 +8,11 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     PromoCode, Team, Actor, Writer, AthleticSkillInline, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
-                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings
+                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
+                    HoboPaymentsDetails, JobType, UserProfile, CoWorker
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource
+                    CountryResource, GuildMembershipResource, JobTypeResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -36,7 +37,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender', 'date_of_birth',
                               'phone_number', 'address', 'country')}),
-        ('Company Details', {'fields': ('company_name', 'title',
+        ('Company Details', {'fields': ('is_company', 'company_name', 'title',
                                         'company_address', 'company_website',
                                         'company_phone',)}),
         ('Height', {'fields': ('feet', 'inch')}),
@@ -87,10 +88,13 @@ admin.site.register(Producer)
 admin.site.register(Director)
 admin.site.register(Editor)
 admin.site.register(Makeup)
+admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
+admin.site.register(UserProfile)
+admin.site.register(CoWorker)
 
 
 @admin.register(EthnicAppearance)
@@ -111,6 +115,10 @@ class CountryAdmin(ImportExportModelAdmin):
 @admin.register(GuildMembership)
 class GuildMembershipAdmin(ImportExportModelAdmin):
     resource_class = GuildMembershipResource
+
+@admin.register(JobType)
+class JobTypeAdmin(ImportExportModelAdmin):
+    resource_class = JobTypeResource
 
 
 class CustomUserSettingsAdmin(admin.ModelAdmin):

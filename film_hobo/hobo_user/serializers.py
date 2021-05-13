@@ -20,7 +20,7 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill
+    EthnicAppearance, AthleticSkill, UserProfile
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -677,8 +677,7 @@ class PersonalDetailsSerializer(serializers.ModelSerializer):
                   'stop_age', 'physique', 'hair_color', 'hair_length',
                   'eyes', 'athletic_skills', 'ethnic_appearance']
 
-    def get_validation_exclusions(self,instance=None):
-        print("----------------------------------------")
+    def get_validation_exclusions(self, instance=None):
         exclusions = super(PersonalDetailsSerializer,
                            self).get_validation_exclusions(instance)
         return exclusions + ['lbs', 'start_age', 'stop_age']
@@ -687,11 +686,37 @@ class PersonalDetailsSerializer(serializers.ModelSerializer):
 class PasswordResetSerializer(PasswordResetSerializer):
 
     def get_email_options(self):
-        print("here----my serializer")
-        # email_template_name = ""
-        # html_email_template_name = 'registration/password_reset_email.html'
         return {
                 'subject_template_name': 'registration/password_reset_subject.txt',
                 'html_email_template_name': 'registration/'
                                         'password_reset_email.html',
         }
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    agent_phone = PhoneNumberField(allow_null=True)
+    manager_phone = PhoneNumberField(allow_null=True)
+    job_types = serializers.ListField(required=False)
+    membership = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True, required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    guild_membership = serializers.ListField(required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ['first_name', 'middle_name', 'last_name', 'job_types',
+                  'company', 'company_position', 'guild_membership',
+                  'company_website', 'agent', 'agent_phone', 'agent_email',
+                  'manager', 'manager_phone', 'manager_email', 'imdb', 'bio',
+                  'membership']
+

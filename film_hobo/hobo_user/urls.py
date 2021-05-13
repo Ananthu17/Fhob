@@ -21,7 +21,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
-                   PersonalDetailsView
+                   PersonalDetailsView, UserProfileAPI, UserProfileView
 
 app_name = "hobo_user"
 
@@ -73,6 +73,8 @@ urlpatterns = [
     path('personal-details-api/',
          PersonalDetailsAPI.as_view(),
          name='personal-details-api'),
+    path('profile-api/', UserProfileAPI.as_view(),
+         name='profile-api'),
 
 
     # web-view endpoints
@@ -114,5 +116,7 @@ urlpatterns = [
          name='get-unblocked-members'),
     path('personal-details/', PersonalDetailsView.as_view(),
          name='personal-details'),
+    path('profile/', UserProfileView.as_view(),
+         name='profile'),
 
 ]
