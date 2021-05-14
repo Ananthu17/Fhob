@@ -196,24 +196,40 @@
                   <div class="col-2">Add Discount:</div>
                   <div class="col-6  table-responsive">
                       <table class="table table-bordered admin-bill-tbl-bordered admin-bill-tbl">
-                          <tbody>
-                              <tr>
-                                  <th>Discount Name</th>
-                                  <td class="text-muted">write it here</td>
-                              </tr>
-                              <tr>
-                                  <th>Amount</th>
-                                  <td id="discount_amount">
-                                      <span id="doller-percentage-toggle">$ ___</span>
-                                      <button id="percentage" name="amount" value="%" class="btn btn-default-doller-per ml-1 toggle_dp">%</button>
-                                      <button id="doller" name="amount" value="$" class="btn btn-default-doller-per ml-1 toggle_dp dp_active_toggle">$</button>
-                                  </td>
-                              </tr>
-                              <tr>
-                                  <th>Timeframe</th>
-                                  <td class="text-muted">___/___/___ to ___/___/___</td>
-                              </tr>
-                          </tbody>
+                        <tbody>
+                            <tr>
+                                <th>User Type</th>
+                                <td class="text-muted">
+                                    <select class="form-control form-control-input" name="country" id="id_country" placeholder="Country" required="">
+                                        <option value="1" selected="">---------</option>
+                                        <option value="2" >Hobo</option>
+                                        <option value="3" >Indie</option>
+                                        <option value="4" >Pro</option>
+                                        <option value="5" >Company</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Discount Name</th>
+                                <td class="text-muted">
+                                    <input type="text" class="form-control admin-bill-form-cntrl-b" placeholder="write it here">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Amount</th>
+                                <td id="discount_amount"><span id="doller-percentage-toggle">$ </span><input type="text" class="form-control admin-bill-form-cntrl-b w-10" placeholder="">
+                                    <button id="percentage" name="amount" value="%" class="btn btn-default-doller-per ml-1 toggle_dp">%</button>
+                                    <button id="doller" name="amount" value="$" class="btn btn-default-doller-per ml-1 toggle_dp dp_active_toggle">$</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Timeframe</th>
+                                <td class="text-muted"><input type="date" class="form-control admin-bill-form-cntrl-b w-42" placeholder="___/___/___">
+                                     to
+                                     <input type="date" class="form-control admin-bill-form-cntrl-b w-42" placeholder="___/___/___">
+                                </td>
+                            </tr>
+                        </tbody>
                       </table>
                       <a href="#" class="btn admin-bill-link">Add</a>
                   </div>
@@ -253,14 +269,14 @@
               <div class="row mt-3">
                   <div class="col-2 ">Tax:</div>
                   <div class="col-10">
-                      ____ % Added to the Total price
+                    <span class="admin-bill-time">0</span> % Added to the Total price
                   </div>
               </div>
               <hr class="admin-bill-hr">
               <div class="row mt-3">
-                  <div class="col-2 ">Free Evaluation Time</div>
+                  <div class="col-2 " contenteditable="true">Free Evaluation Time</div>
                   <div class="col-10">
-                      <span class="admin-bill-time">30</span> Days
+                      <span class="admin-bill-time">0</span> Days
                   </div>
               </div>
               <hr class="admin-bill-hr">
@@ -367,6 +383,20 @@
         axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
     }
 
+    function editDiscountFunction(obj_id) {
+        editable_fields = 'edit' + obj_id
+
+        var editable_elements = document.getElementsByClassName(editable_fields);
+        for (var i = 0; i < editable_elements.length; i++) {
+            element_to_change = editable_elements
+            if (editable_elements.item(i).contentEditable == true) {
+                editable_elements.item(i).contentEditable = false;
+            } else {
+                editable_elements.item(i).contentEditable = true;
+            }
+        }
+    }
+
     $( document ).ready(function() {
         origin_url = window.location.origin
         get_url = origin_url + '/payment/get_membership_fee_detail/'
@@ -399,10 +429,10 @@
             discount_objs.forEach(function(d){
             obj_id = d.id
             delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
-            table += '<tr><td>'+d.promo_code+'</td>';
-            table += '<td>'+d.amount+'</td>';
-            table += '<td>'+d.valid_from+' to '+d.valid_to+'</td>';
-            table += '<td><a class="modify_remove_id" alt="modify_remove" value="'+d.id+'" href="" onclick="return deleteDiscountFunction('+obj_id+')">Remove</a></td><td> <a alt="modify_edit" href="">Edit</a></td></tr>';
+            table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
+            table += '<td contenteditable="false" class="edit'+d.id+'">'+d.amount+'</td>';
+            table += '<td contenteditable="false" class="edit'+d.id+'">'+d.valid_from+' to '+d.valid_to+'</td>';
+            table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')">Remove</a></td><td> <a alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
         })
           table += '</tbody>';
           $('#discount_table').empty().html(table);
@@ -423,7 +453,7 @@
 
         if ($("#annual_indie").attr("contenteditable") == "true") {
           $("#annual_indie").attr("contenteditable", "false");
-          $("#annual_indie").attr("style", "background: #f2f2f2;");
+          $("#annual_indie").attr("style", "background: #ffffff;");
         } else {
             $("#annual_indie").attr("contenteditable", "true");
             $("#annual_indie").attr("style", "background: #b8b8b8;");
@@ -439,7 +469,7 @@
 
         if ($("#annual_company").attr("contenteditable") == "true") {
           $("#annual_company").attr("contenteditable", "false");
-          $("#annual_company").attr("style", "background: #f2f2f2;");
+          $("#annual_company").attr("style", "background: #ffffff;");
         } else {
             $("#annual_company").attr("contenteditable", "true");
             $("#annual_company").attr("style", "background: #b8b8b8;");
@@ -455,7 +485,7 @@
 
         if ($("#monthly_indie").attr("contenteditable") == "true") {
           $("#monthly_indie").attr("contenteditable", "false");
-          $("#monthly_indie").attr("style", "background: #f2f2f2;");
+          $("#monthly_indie").attr("style", "background: #ffffff;");
         } else {
             $("#monthly_indie").attr("contenteditable", "true");
             $("#monthly_indie").attr("style", "background: #b8b8b8;");
@@ -471,7 +501,7 @@
 
         if ($("#monthly_company").attr("contenteditable") == "true") {
           $("#monthly_company").attr("contenteditable", "false");
-          $("#monthly_company").attr("style", "background: #f2f2f2;");
+          $("#monthly_company").attr("style", "background: #ffffff;");
         } else {
             $("#monthly_company").attr("contenteditable", "true");
             $("#monthly_company").attr("style", "background: #b8b8b8;");
@@ -515,7 +545,7 @@
       var current = document.getElementsByClassName("dp_active_toggle");
       current[0].className = current[0].className.replace(" dp_active_toggle", "");
       this.className += " dp_active_toggle";
-      var final_str = current[0].innerText + " ___"
+      var final_str = current[0].innerText
       $('#doller-percentage-toggle').html(final_str);
     });
     }
