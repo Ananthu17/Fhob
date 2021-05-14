@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
-
+{% load token %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
-
+{% get_my_token request as token %}
+<input type = "hidden" value="{{token}}" name="token" id="token"/>
 <div class="wrapper flex-grow-1">
     <div class="container">
         <div class = "row">
         <div class = "col-12">
                 <b>Edit Profile</b>
-                <form method="post">
+                <form method="post" action="{% url 'hobo_user:profile' %}">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-2">
@@ -269,6 +270,63 @@
                     </div>
                     <button type="submit" class="btn mem-btn-save mt-3 mb-3">SAVE</button>
                 </form>
+                {% if user.membership == 'COM' %}
+                <form method="post" action="{% url 'hobo_user:add-coworkers' %}">
+                        {% csrf_token %}
+                    <div class="sec-1">
+                        {% for coworker in coworkers %}
+                        <div class="row coworker">
+                            <div class="col-12">Name
+                                <input name="saved_name"
+                                value="{{coworker.name}}"/>
+                                Position
+                                <input name="saved_position"
+                                value = "{{coworker.position.title}}"/>
+                                <input type="checkbox"  name="remove" value="{{coworker.id}}">Remove
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <b>FilmHobo Members:</b><a class="btn repeat">Add Stuff</a>
+                        <div class="row coworker" >
+                            <div class="col-12">Name
+                                <select name="user" id="user1">
+                                    <option value="" selected disabled hidden>Type a name</option>
+                                    {% for usr in all_users %}
+                                    <option value="{{usr.id}}">
+                                    {{usr.first_name}} {{usr.last_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                Position
+                                <select name="position" id="position1">
+                                    <option value="" selected disabled hidden>Choose position</option>
+                                    {% for job in job_types %}
+                                    <option value="{{job.id}}">
+                                    {{job}}</option>
+                                    {% endfor %}
+                                </select>
+                                <!-- <input type="checkbox"  name="remove1">Remove -->
+                            </div>
+                        </div>
+                </div>
+                <b>Others:</b><a class="btn repeat-new">Add Stuff</a>
+                    <div class="sec-2">
+                    <div class="row coworker-new">
+                        <div class="col-12">Name
+                            <input name="name" id="name1" value=""/>
+                            Position
+                            <select name="designation" id="designation1">
+                                <option value="" selected disabled hidden>Choose position</option>
+                                {% for job in job_types %}
+                                <option value="{{job.id}}">
+                                {{job}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    </div>
+                    <button type="submit" class="btn mem-btn-save mt-3 mb-3">SAVE</button>
+                </form>
+                    {% endif %}
             </div>
         </div>
     </div>
@@ -276,6 +334,55 @@
 {% endblock %}
 
 {% block extrajs %}
+<script>
+
+    $(document).ready(function() {
+        $('#user1').select2();
+    });
+    $(document).ready(function() {
+        $('#position1').select2();
+    });
+    $(document).ready(function() {
+        $('#designation1').select2();
+    });
+
+// add coworker - filmhobo users
+var count=1;
+$('body').on('click' , '.repeat', function(){
+    count++
+    var user_id ="#user"+count
+    var position_id ="#position"+count
+    data_dict = {'count':count}
+    // get add coworker form
+    $.get('/hobo_user/add-coworker-form/', data_dict)
+    .done(function(data) {
+    if(data.results!='')
+        {
+            $('.sec-1').append(data['add_coworker_form_html']);
+            $(user_id).select2();
+            $(position_id).select2();
+        }
+    });
+});
+
+// add coworker - new users
+var new_count=1;
+$('body').on('click' , '.repeat-new', function(){
+    new_count++
+    var name_id ="#name"+new_count
+    var designation_id ="#designation"+new_count
+    data_dict = {'new_count':new_count}
+    // get add coworker form
+    $.get('/hobo_user/add-new-coworker-form/', data_dict)
+    .done(function(data) {
+    if(data.results!='')
+        {
+            $('.sec-2').append(data['add_new_coworker_form_html']);
+            $(designation_id).select2();
+        }
+    });
+});
+</script>
 {% endblock %}
 
 

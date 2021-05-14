@@ -1,5 +1,6 @@
 import ast
 import json
+from os import remove
 from django.contrib.auth.models import User
 from django.db.models.deletion import SET_NULL
 import requests
@@ -22,6 +23,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework import serializers
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -46,10 +48,10 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm
 
-from .models import CustomUser, GuildMembership, IndiePaymentDetails, ProPaymentDetails, \
+from .models import CoWorker, CustomUser, GuildMembership, IndiePaymentDetails, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserProfile
+                    EthnicAppearance, UserProfile, CoWorker, JobType
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -59,7 +61,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     EnableAccountSerializer, BlockMembersSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
-    PasswordResetSerializer, UserProfileSerializer
+    PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
+    RemoveCoWorkerSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -1691,13 +1694,19 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         context['profile'] = profile
         context['form'] = self.form_class(instance=profile)
+
+        all_users = CustomUser.objects.exclude(id=user.id)
+        context['all_users'] = all_users
+        context['job_types'] = JobType.objects.all()
+
+        coworkers = CoWorker.objects.filter(company=user)
+        context['coworkers'] = coworkers
         return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
         profile = UserProfile.objects.get(user=user)
         guild_membership_all = GuildMembership.objects.all()
-        print(request.POST)
         guild_membership = request.POST.getlist('guild_membership')
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
@@ -1736,4 +1745,201 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                                    })
         return HttpResponseRedirect(reverse('hobo_user:profile'))
 
+
+class AddCoworkerAPI(APIView):
+    serializer_class = CoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        company = request.user
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'user' not in data_dict and 'name' not in data_dict:
+                response = {'errors': "Either User id or Name is required", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            else:
+                coworker = CoWorker()
+                coworker.company = company
+                if 'position' in data_dict:
+                    position = JobType.objects.get(id=data_dict['position'])
+                    coworker.position = position
+                if 'user' in data_dict:
+                    user = CustomUser.objects.get(id=data_dict['user'])
+                    coworker.user = user
+                    coworker.name = user.first_name+" "+user.last_name
+                if 'name' in data_dict:
+                    coworker.name = data_dict['name']
+                coworker.save()
+                response = {'message': "Stuff Added",
+                            'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveCoworkerAPI(APIView):
+    serializer_class = RemoveCoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            remove_ids = data_dict['id']
+            for id in remove_ids:
+                obj = CoWorker.objects.get(id=id)
+                obj.delete()
+            response = {'message': "Stuff Removed",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddCoworkersView(LoginRequiredMixin, TemplateView):
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        json_dict = {}
+        remove_ids = request.POST.getlist('remove')
+        users = list(request.POST.getlist('user'))
+        position = list(request.POST.getlist('position'))
+        designation = list(request.POST.getlist('designation'))
+        user_count = len(users)
+        position_count = len(position)
+        designation_count = len(designation)
+
+        new_users = request.POST.get('name')
+        if new_users == "":
+            new_users_count = 0
+        else:
+            new_users = list(request.POST.getlist('name'))
+            new_users_count = len(new_users)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        if(
+           (user_count != position_count) or
+           (new_users_count != designation_count)
+           ):
+            messages.warning(
+                self.request,
+                "Failed to update Stuff. Provide name & position")
+            return HttpResponseRedirect(reverse('hobo_user:profile'))
+
+        if((user_count == position_count) and (user_count != 0)):
+            for i in range(user_count):
+                json_dict['user'] = users[i]
+                json_dict['position'] = position[i]
+                user_response = requests.post(
+                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
+                                    data=json.dumps(json_dict),
+                                    headers={'Content-type': 'application/json',
+                                            'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            # errors = response['errors']
+                            messages.warning(
+                                self.request, "Failed to update Stuff !!")
+                            return HttpResponseRedirect(
+                                reverse('hobo_user:profile'))
+        if((new_users_count == designation_count) and (new_users_count != 0)):
+            for i in range(new_users_count):
+                json_dict['name'] = new_users[i]
+                json_dict['position'] = designation[i]
+                user_response = requests.post(
+                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
+                                    data=json.dumps(json_dict),
+                                    headers={
+                                        'Content-type': 'application/json',
+                                        'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            # errors = response['errors']
+                            messages.warning(
+                                self.request, "Failed to update Stuff !!")
+                            return HttpResponseRedirect(
+                                reverse('hobo_user:profile'))
+        if remove_ids:
+            json_dict['id'] = remove_ids
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/remove-coworker-api/',
+                                data=json.dumps(json_dict),
+                                headers={
+                                    'Content-type': 'application/json',
+                                    'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        # errors = response['errors']
+                        messages.warning(
+                            self.request, "Failed to remove Stuff !!")
+                        return HttpResponseRedirect(
+                            reverse('hobo_user:profile'))
+        messages.success(self.request, 'Stuffs updated successfully')
+        return HttpResponseRedirect(reverse('hobo_user:profile'))
+
+
+class AddCoworkerFormAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-coworker-form1.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        count = self.request.GET.get('count')
+        all_users_dict = {}
+        job_types_dict = {}
+        all_users = CustomUser.objects.exclude(id=user.id)
+        job_types = JobType.objects.all()
+        for usr in all_users:
+            all_users_dict[usr.id] = usr.first_name+" "+usr.last_name
+        for job in job_types:
+            job_types_dict[job.id] = job.title
+        add_coworker_form_html = render_to_string(
+                                'user_pages/add-coworker-form1.html', {
+                                    'all_users': all_users_dict,
+                                    'job_types': job_types_dict,
+                                    'count': count
+                                    })
+        context['add_coworker_form_html'] = add_coworker_form_html
+        return self.render_json_response(context)
+
+
+class AddNewCoworkerFormAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-coworker-form2.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        count = self.request.GET.get('new_count')
+        job_types_dict = {}
+        job_types = JobType.objects.all()
+        for job in job_types:
+            job_types_dict[job.id] = job.title
+        add_new_coworker_form_html = render_to_string(
+                                'user_pages/add-coworker-form2.html', {
+                                    'job_types': job_types_dict,
+                                    'count': count
+                                    })
+        context['add_new_coworker_form_html'] = add_new_coworker_form_html
+        return self.render_json_response(context)
 

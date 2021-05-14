@@ -1,0 +1,12 @@
+<div class="row coworker-new">
+    <div class="col-12">Name
+        <input name="name" id="name{{count}}" />
+        Position
+        <select name="designation" id="designation{{count}}">
+            <option value="" selected disabled hidden>Choose position</option>
+            {% for key,value in job_types.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>

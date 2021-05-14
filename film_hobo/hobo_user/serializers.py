@@ -20,7 +20,7 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserProfile
+    EthnicAppearance, AthleticSkill, UserProfile, CoWorker
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -720,3 +720,25 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'manager', 'manager_phone', 'manager_email', 'imdb', 'bio',
                   'membership']
 
+
+class CoWorkerSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = CoWorker
+        fields = ['user', 'name', 'position']
+
+
+class RemoveCoWorkerSerializer(serializers.Serializer):
+    id = serializers.ListField(required=False)

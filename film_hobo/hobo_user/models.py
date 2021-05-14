@@ -761,7 +761,7 @@ class CoWorker(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
                              related_name='coworker',
-                             verbose_name=_("Coworker"),
+                             verbose_name=_("User"),
                              null=True)
     company = models.ForeignKey("hobo_user.CustomUser",
                                 on_delete=models.CASCADE,
@@ -776,5 +776,5 @@ class CoWorker(models.Model):
     position = models.ForeignKey("hobo_user.JobType",
                                  on_delete=models.CASCADE,
                                  related_name='coworker',
-                                 verbose_name=_("User"),
+                                 verbose_name=_("Position"),
                                  null=True)

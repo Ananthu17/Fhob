@@ -21,7 +21,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
-                   PersonalDetailsView, UserProfileAPI, UserProfileView
+                   PersonalDetailsView, UserProfileAPI, UserProfileView, \
+                   AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
+                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI
 
 app_name = "hobo_user"
 
@@ -75,6 +77,10 @@ urlpatterns = [
          name='personal-details-api'),
     path('profile-api/', UserProfileAPI.as_view(),
          name='profile-api'),
+    path('add-coworker-api/', AddCoworkerAPI.as_view(),
+         name='add-coworker-api'),
+    path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
+         name='remove-coworker-api'),
 
 
     # web-view endpoints
@@ -118,5 +124,11 @@ urlpatterns = [
          name='personal-details'),
     path('profile/', UserProfileView.as_view(),
          name='profile'),
+    path('add-coworkers/', AddCoworkersView.as_view(),
+         name='add-coworkers'),
+    path('add-coworker-form/', AddCoworkerFormAjaxView.as_view(),
+         name='add-coworker-form'),
+    path('add-new-coworker-form/', AddNewCoworkerFormAjaxView.as_view(),
+         name='add-new-coworker-form'),
 
 ]

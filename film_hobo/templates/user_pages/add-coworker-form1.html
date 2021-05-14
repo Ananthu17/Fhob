@@ -1,0 +1,17 @@
+<div class="row coworker">
+    <div class="col-12">Name
+        <select name="user" id="user{{count}}">
+            <option value="" selected disabled hidden>Type a name</option>
+            {% for key,value in all_users.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select>
+        Position
+        <select name="position" id="position{{count}}">
+            <option value="" selected disabled hidden>Choose position</option>
+            {% for key,value in job_types.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
