@@ -423,7 +423,7 @@ class PromoCode(models.Model):
         (PRO, 'Pro'),
         (PRODUCTION_COMPANY, 'Production Company')
     ]
-    promo_code = models.CharField(max_length=1000)
+    promo_code = models.CharField(max_length=1000, unique=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
