@@ -289,13 +289,13 @@
                   <div class="col-10">
                       <div class="form-check-inline">
                           <label class="containerradio">On
-                              <input type="radio" name="radio">
+                              <input id="on_click" type="radio" name="renew_radio">
                               <span class="checkmarkagree"></span>
                           </label>
                       </div>
                       <div class="form-check-inline">
                           <label class="containerradio">Off
-                              <input type="radio" name="radio">
+                              <input id="off_click" type="radio" name="renew_radio">
                               <span class="checkmarkagree"></span>
                           </label>
                       </div>
@@ -418,6 +418,7 @@
         axios.get(get_url, {headers: {'Authorization': authorization_str}})
         .then((response) => {
             $('#annual_hobo').val("$ " + response.data.annual_hobo);
+
             $('#annual_indie').val("$ " + response.data.annual_indie);
             $('#annual_pro').val("$ " + response.data.annual_pro);
             $('#annual_company').val("$ " + response.data.annual_company);
@@ -426,6 +427,20 @@
             $('#monthly_indie').val("$ " + response.data.monthly_indie);
             $('#monthly_pro').val("$ " + response.data.monthly_pro);
             $('#monthly_company').val("$ " + response.data.monthly_company);
+
+            $('#tax_value').text(response.data.tax);
+            $('#days_value').text(response.data.free_evaluation_time);
+            var $renew_option = $('input:radio[name=renew_radio]');
+            if (response.data.auto_renew === 'on'){
+                $renew_option.filter('[id=on_click]').attr('checked', true);
+            }
+            else if (response.data.auto_renew === 'off'){
+                $renew_option.filter('[id=off_click]').attr('checked', true);
+            }
+            else{
+                $renew_option.filter('[id=on_click]').attr('checked', false);
+                $renew_option.filter('[id=off_click]').attr('checked', false);
+            }
         });
 
         get_lust_url = origin_url + '/payment/get_discount_detail_list/'

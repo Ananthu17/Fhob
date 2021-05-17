@@ -245,8 +245,8 @@ class UpdateMembershipFeeAPI(APIView):
                 elif (float(data['tax']) < 0.0) or (float(data['tax']) > 100.0):
                     return Response(
                             {"status": "failure",
-                            "tax": "please enter a valid number between 0 and 100"
-                            }, status=status.HTTP_400_BAD_REQUEST)
+                             "tax": "please enter a valid number between 0 and 100"
+                             }, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     final_result['tax'] = float(data['tax'])
                     final_result['monthly_hobo'] = final_result['monthly_hobo'] + \
