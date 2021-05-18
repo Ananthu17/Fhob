@@ -32,3 +32,4 @@ class JobTypeResource(ModelResource):
 
     class Meta:
         model = JobType
+

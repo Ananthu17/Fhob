@@ -23,7 +23,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
-                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI
+                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
+                   MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
+                   AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
+                   FriendsAndFollowersView, TrackUserAPI
 
 app_name = "hobo_user"
 
@@ -79,8 +82,16 @@ urlpatterns = [
          name='profile-api'),
     path('add-coworker-api/', AddCoworkerAPI.as_view(),
          name='add-coworker-api'),
+    path('add-agent-manager-api/', AddAgentManagerAPI.as_view(),
+         name='add-agent-manager-api'),
     path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
          name='remove-coworker-api'),
+    path('rate-user-api/', RateUserSkillsAPI.as_view(),
+         name='rate-user-api'),
+    path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
+         name='remove-agent-api'),
+    path('track-user-api/', TrackUserAPI.as_view(),
+         name='track-user-api'),
 
 
     # web-view endpoints
@@ -122,13 +133,19 @@ urlpatterns = [
          name='get-unblocked-members'),
     path('personal-details/', PersonalDetailsView.as_view(),
          name='personal-details'),
-    path('profile/', UserProfileView.as_view(),
-         name='profile'),
+    path('edit-profile/', UserProfileView.as_view(),
+         name='edit-profile'),
     path('add-coworkers/', AddCoworkersView.as_view(),
          name='add-coworkers'),
     path('add-coworker-form/', AddCoworkerFormAjaxView.as_view(),
          name='add-coworker-form'),
     path('add-new-coworker-form/', AddNewCoworkerFormAjaxView.as_view(),
          name='add-new-coworker-form'),
+    path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
+         name='add-new-agent-form'),
+    path('profile/<int:id>/', MemberProfileView.as_view(),
+         name='profile'),
+    path('friends-and-followers/', FriendsAndFollowersView.as_view(),
+         name='friends-and-followers'),
 
 ]

@@ -9,10 +9,11 @@
 <input type = "hidden" value="{{token}}" name="token" id="token"/>
 <div class="wrapper flex-grow-1">
     <div class="container">
+        <b><a href="{% url 'hobo_user:profile' request.user.id %}">Back</a></b>
         <div class = "row">
         <div class = "col-12">
                 <b>Edit Profile</b>
-                <form method="post" action="{% url 'hobo_user:profile' %}">
+                <form method="post" action="{% url 'hobo_user:edit-profile' %}">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-2">
@@ -140,102 +141,35 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Agent</label>
+                    <b>Others:</b><a class="btn repeat-agent">Add Agent/Manager</a>
+                    <div class="sec-3">
+                        {% for agent in all_agents %}
+                        <div class="row">
+                            <div class="col-12">
+                                <input name="agent_type" value="{{agent.agent_type}}" placeholder="Name" disabled/>
+                                <input name="agent_name" value="{{agent.agent_name}}" placeholder="Name" disabled/>
+                                <input name="agent_job_type" value="{{agent.agent_job_type}}" placeholder="Job" disabled/>
+                                <input name="agent_phone" value="{{agent.agent_phone}}" placeholder="Phone" disabled/>
+                                <input name="agent_email" value="{{agent.agent_email}}" placeholder="Email" disabled/>
+                                <input type="checkbox"  name="remove-agent" value="{{agent.id}}">Remove
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.agent.name }}"
-                            value="{% if profile.agent %}{{ profile.agent}}{% endif%}"
-                            />
-                            {% if errors.agent %}
-                            {% for err in errors.agent %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Phone</label>
-                        </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.agent_phone.name }}"
-                            value="{% if profile.agent_phone %}{{ profile.agent_phone}}{% endif%}"
-                            />
-                            {% if errors.agent_phone %}
-                            {% for err in errors.agent_phone %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
+                        {% endfor %}
+                    <div class="row ">
+                        <div class="col-12">
+                            <select name="agent_type" id="agent_type1">
+                                <option value="" selected disabled hidden>Choose type</option>
+                                <option value="agent">Agent</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                            <input name="agent_name" id="agent_name1" value="" placeholder="Name"/>
+                            <input name="agent_job_type" id="agent_job_type1" value="" placeholder="Job"/>
+                            <input name="agent_phone" id="agent_phone1" value="" placeholder="Phone"/>
+                            <input name="agent_email" id="agent_email1" value="" placeholder="Email"/>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Email</label>
-                        </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.agent_email.name }}"
-                            value="{% if profile.agent_email %}{{ profile.agent_email}}{% endif%}"
-                            />
-                            {% if errors.agent_email %}
-                            {% for err in errors.agent_email %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Manager</label>
-                        </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.manager.name }}"
-                            value="{% if profile.manager %}{{ profile.manager}}{% endif%}"
-                            />
-                            {% if errors.manager %}
-                            {% for err in errors.manager %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Phone</label>
-                        </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.manager_phone.name }}"
-                            value="{% if profile.manager_phone %}{{ profile.manager_phone}}{% endif%}"
-                            />
-                            {% if errors.manager_phone %}
-                            {% for err in errors.manager_phone %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="">Email</label>
-                        </div>
-                        <div class="col-4">
-                            <input class=""
-                            name="{{ form.manager_email.name }}"
-                            value="{% if profile.manager_email %}{{ profile.manager_email}}{% endif%}"
-                            />
-                            {% if errors.manager_email %}
-                            {% for err in errors.manager_email %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
+                    </div><br>
+
                     <div class="row">
                         <div class="col-2">
                             <label class="">IMDB</label>
@@ -278,10 +212,10 @@
                         <div class="row coworker">
                             <div class="col-12">Name
                                 <input name="saved_name"
-                                value="{{coworker.name}}"/>
+                                value="{{coworker.name}}" disabled/>
                                 Position
                                 <input name="saved_position"
-                                value = "{{coworker.position.title}}"/>
+                                value = "{{coworker.position.title}}" disabled/>
                                 <input type="checkbox"  name="remove" value="{{coworker.id}}">Remove
                             </div>
                         </div>
@@ -379,6 +313,21 @@ $('body').on('click' , '.repeat-new', function(){
         {
             $('.sec-2').append(data['add_new_coworker_form_html']);
             $(designation_id).select2();
+        }
+    });
+});
+
+// add agent/manager
+var agent_count=1;
+$('body').on('click' , '.repeat-agent', function(){
+    agent_count++
+    data_dict = {'agent_count':agent_count}
+    // get add coworker form
+    $.get('/hobo_user/add-new-agent-form/', data_dict)
+    .done(function(data) {
+    if(data.results!='')
+        {
+            $('.sec-3').append(data['add_new_agent_form_html']);
         }
     });
 });

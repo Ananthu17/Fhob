@@ -20,7 +20,8 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserProfile, CoWorker
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
+    UserRating, UserAgentManager
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -694,8 +695,6 @@ class PasswordResetSerializer(PasswordResetSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    agent_phone = PhoneNumberField(allow_null=True)
-    manager_phone = PhoneNumberField(allow_null=True)
     job_types = serializers.ListField(required=False)
     membership = serializers.CharField(read_only=True)
     first_name = serializers.CharField(
@@ -716,8 +715,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['first_name', 'middle_name', 'last_name', 'job_types',
                   'company', 'company_position', 'guild_membership',
-                  'company_website', 'agent', 'agent_phone', 'agent_email',
-                  'manager', 'manager_phone', 'manager_email', 'imdb', 'bio',
+                  'company_website', 'imdb', 'bio',
                   'membership']
 
 
@@ -742,3 +740,59 @@ class CoWorkerSerializer(serializers.ModelSerializer):
 
 class RemoveCoWorkerSerializer(serializers.Serializer):
     id = serializers.ListField(required=False)
+
+
+class RemoveAgentManagerSerializer(serializers.Serializer):
+    id = serializers.ListField(required=False)
+
+
+class TrackUserSerializer(serializers.Serializer):
+    track_id =  serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class RateUserSkillsSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    job_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserRating
+        fields = ['user', 'job_type', 'rating']
+
+
+class AgentManagerSerializer(serializers.ModelSerializer):
+    agent_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_phone = PhoneNumberField(
+        required=True,
+    )
+    agent_job_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_email = serializers.EmailField(
+        required=False,
+    )
+
+    class Meta:
+        model = UserAgentManager
+        fields = ['agent_type', 'agent_name', 'agent_phone',
+                  'agent_email', 'agent_job_type']

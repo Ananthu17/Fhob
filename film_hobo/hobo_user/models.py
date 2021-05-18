@@ -1,5 +1,6 @@
 
 import json
+import math
 import datetime
 from django.utils import timezone
 from datetime import date
@@ -246,6 +247,22 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+    def get_full_name(self):
+        if self.middle_name:
+            name = self.first_name+" "+self.middle_name+" "+self.last_name
+        else:
+            name = self.first_name+" "+self.last_name
+        return name
+
+    def get_height_in_meters(self):
+        if self.feet:
+            feet = self.feet
+            inch = (self.inch)/12
+            print(inch)
+            in_feet = feet+inch
+            in_meter = round(float(in_feet/3.281), 2)
+        return in_meter
+
 
 class EthnicAppearance(models.Model):
     ethnic_appearance = models.CharField(_("Ethnic Appearance"),
@@ -296,6 +313,7 @@ class AthleticSkill(models.Model):
 class AthleticSkillInline(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
                                 verbose_name=_("Creator"),
+                                related_name="user_athletic_skills",
                                 on_delete=models.CASCADE)
     athletic_skill = models.ForeignKey("hobo_user.AthleticSkill",
                                        on_delete=models.CASCADE)
@@ -717,31 +735,6 @@ class UserProfile(models.Model):
                                        null=True,
                                        blank=True
                                        )
-    agent = models.CharField(_('Agent'),
-                             max_length=150,
-                             null=True,
-                             blank=True
-                             )
-    agent_phone = PhoneNumberField(_("Agent's phone number"),
-                                   null=True,
-                                   blank=True
-                                   )
-    agent_email = models.EmailField(_("Agent's email address"),
-                                    null=True,
-                                    blank=True)
-    manager = models.CharField(_('Manager'),
-                               max_length=150,
-                               null=True,
-                               blank=True
-                               )
-    manager_phone = PhoneNumberField(_("Manager's phone number"),
-                                     null=True,
-                                     blank=True
-                                     )
-    manager_email = models.EmailField(_("Manager's email address"),
-                                      null=True,
-                                      blank=True
-                                      )
     imdb = models.CharField(_("IMDB"),
                             max_length=150,
                             null=True,
@@ -750,6 +743,24 @@ class UserProfile(models.Model):
     bio = models.TextField(_("Bio/Info"), null=True, blank=True)
 
     def __str__(self):
+        return str(self.user.email)
+
+    def update_job_type(self, job_id):
+        job_types = self.job_types.all()
+        job_types = list(job_types)
+        job = JobType.objects.get(id=job_id)
+        if job not in job_types:
+            job_types.append(job)
+            self.job_types.set(job_types)
+        return str(self.user.email)
+
+    def remove_job_type(self, job_id):
+        job_types = self.job_types.all()
+        job_types = list(job_types)
+        job = JobType.objects.get(id=job_id)
+        if job in job_types:
+            job_types.remove(job)
+            self.job_types.set(job_types)
         return str(self.user.email)
 
     class Meta:
@@ -778,3 +789,140 @@ class CoWorker(models.Model):
                                  related_name='coworker',
                                  verbose_name=_("Position"),
                                  null=True)
+
+
+class UserRatingCombined(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_rating',
+                             verbose_name=_("User"),
+                             null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="user_job_type_rating_combined",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Rating Combined'
+        verbose_name_plural = 'User Rating Combined'
+
+
+class UserRating(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_rating_combined',
+                             verbose_name=_("User"),
+                             null=True)
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='rated_by_user',
+                                 verbose_name=_("Rated by"),
+                                 null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="user_job_type_rating",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Rating'
+        verbose_name_plural = 'User Rating'
+
+
+class UserTacking(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_tracking',
+                             verbose_name=_("User"),
+                             null=True)
+    tracked_by = models.ManyToManyField('hobo_user.CustomUser',
+                                        blank=True,
+                                        related_name="tracked_by",
+                                        verbose_name=_("Tracked by")
+                                        )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Tracking'
+        verbose_name_plural = 'User Tracking'
+
+
+class FriendRequest(models.Model):
+    ACCEPTED = 'accepted'
+    REQUEST_SEND = 'request_send'
+    STATUS_CHOICES = [
+        (ACCEPTED, 'Accepted'),
+        (REQUEST_SEND, 'Request Send'),
+    ]
+    status = models.CharField(_("Account Status"),
+                              choices=STATUS_CHOICES,
+                              max_length=150, default=REQUEST_SEND)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_friend_request',
+                             verbose_name=_("User"),
+                             null=True)
+    requested_by = models.ForeignKey("hobo_user.CustomUser",
+                                     on_delete=models.CASCADE,
+                                     related_name='requested_by',
+                                     verbose_name=_("Requested by"),
+                                     null=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Friend Request'
+        verbose_name_plural = 'Friend Requests'
+
+
+class UserAgentManager(models.Model):
+    AGENT = 'agent'
+    MANAGER = 'manager'
+    AGENT_TYPE_CHOICES = [
+        (AGENT, 'Agent'),
+        (MANAGER, 'Manager'),
+    ]
+    agent_type = models.CharField(_("Agent Type"),
+                                  choices=AGENT_TYPE_CHOICES,
+                                  max_length=150, default=AGENT)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_agent',
+                             verbose_name=_("User"),
+                             null=True)
+    agent_name = models.CharField(_('Name'),
+                                  max_length=150,
+                                  null=True,
+                                  blank=True
+                                  )
+    agent_phone = PhoneNumberField(_("Agent's phone number"),
+                                   null=True,
+                                   blank=True
+                                   )
+    agent_email = models.EmailField(_("Agent's email address"),
+                                    null=True,
+                                    blank=True)
+    agent_job_type = models.CharField(_('Agent Job Type'),
+                                      max_length=150,
+                                      null=True,
+                                      blank=True
+                                      )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Agent/Manager'
+        verbose_name_plural = 'User Agents/Managers'

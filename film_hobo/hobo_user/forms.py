@@ -316,8 +316,7 @@ class EditProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ('company', 'company_position',
-                  'company_website', 'agent', 'agent_phone', 'agent_email',
-                  'manager', 'manager_phone', 'manager_email', 'imdb', 'bio')
+                  'company_website', 'imdb', 'bio')
 
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)

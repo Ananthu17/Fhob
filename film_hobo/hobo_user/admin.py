@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
+from django.db import models
+from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
@@ -9,7 +10,9 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
-                    HoboPaymentsDetails, JobType, UserProfile, CoWorker
+                    HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
+                    FriendRequest, UserTacking, UserRatingCombined, UserRating, \
+                    UserAgentManager
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, JobTypeResource
@@ -95,6 +98,10 @@ admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
 admin.site.register(UserProfile)
 admin.site.register(CoWorker)
+admin.site.register(UserRating)
+admin.site.register(UserRatingCombined)
+admin.site.register(FriendRequest)
+admin.site.register(UserAgentManager)
 
 
 @admin.register(EthnicAppearance)
@@ -139,3 +146,10 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
+
+class UserTackingAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+admin.site.register(UserTacking, UserTackingAdmin)
