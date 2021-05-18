@@ -80,7 +80,7 @@ class GetMembershipFeeDetailsAPI(APIView):
             final_result['free_evaluation_time'] = payment_options_dict[
                 'free_evaluation_time']
             final_result['auto_renew'] = payment_options_dict[
-                'auto_renew']
+                'auto_renew'].lower().replace(" ", "")
         except AttributeError:
             final_result['tax'] = ""
             final_result['free_evaluation_time'] = ""

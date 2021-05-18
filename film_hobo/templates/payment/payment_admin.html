@@ -290,13 +290,13 @@
                       <div class="form-check-inline">
                           <label class="containerradio">On
                               <input id="on_click" type="radio" name="renew_radio">
-                              <span class="checkmarkagree"></span>
+                              <span id="on_click_span" class="checkmarkagree"></span>
                           </label>
                       </div>
                       <div class="form-check-inline">
                           <label class="containerradio">Off
                               <input id="off_click" type="radio" name="renew_radio">
-                              <span class="checkmarkagree"></span>
+                              <span id="off_click_span" class="checkmarkagree"></span>
                           </label>
                       </div>
                   </div>
@@ -431,15 +431,20 @@
             $('#tax_value').text(response.data.tax);
             $('#days_value').text(response.data.free_evaluation_time);
             var $renew_option = $('input:radio[name=renew_radio]');
+
             if (response.data.auto_renew === 'on'){
                 $renew_option.filter('[id=on_click]').attr('checked', true);
+                $renew_option.filter('[id=off_click]').attr('disabled', true);
             }
             else if (response.data.auto_renew === 'off'){
                 $renew_option.filter('[id=off_click]').attr('checked', true);
+                $renew_option.filter('[id=on_click]').attr('disabled', true);
             }
             else{
                 $renew_option.filter('[id=on_click]').attr('checked', false);
                 $renew_option.filter('[id=off_click]').attr('checked', false);
+                $renew_option.filter('[id=on_click]').attr('disabled', true);
+                $renew_option.filter('[id=off_click]').attr('disabled', true);
             }
         });
 
@@ -527,12 +532,18 @@
         } else {
             $("#days_value").attr("contenteditable", "true");
         }
+        var $renew_option = $('input:radio[name=renew_radio]');
+
+        $renew_option[0].disabled = false
+        $renew_option[1].disabled = false
+
     });
     /*
     post membership fee details and render to html
     */
     document.getElementById("membership_fee_save").addEventListener("click", function() {
         put_url = origin_url + '/payment/update_membership_fee/'
+        // selected_radio_btn = $('.containerradio .active').toggleClass('checkmarkagree');
         extra_args = {
             "monthly_hobo": $("#monthly_hobo").val().replace(/[A-Za-z$-]/g, ""),
             "monthly_indie": $("#monthly_indie").val().replace(/[A-Za-z$-]/g, ""),
@@ -541,7 +552,10 @@
             "annual_hobo": $("#annual_hobo").val().replace(/[A-Za-z$-]/g, ""),
             "annual_indie": $("#annual_indie").val().replace(/[A-Za-z$-]/g, ""),
             "annual_pro": $("#annual_pro").val().replace(/[A-Za-z$-]/g, ""),
-            "annual_company": $("#annual_company").val().replace(/[A-Za-z$-]/g, "")
+            "annual_company": $("#annual_company").val().replace(/[A-Za-z$-]/g, ""),
+            "tax": $('span[id="tax_value"]').text(),
+            "free_evaluation_time": $('span[id="days_value"]').text(),
+            "auto_renew": checked_value.toString()
         }
         var token = localStorage.getItem("token");
         token_str = "Token "
@@ -610,7 +624,7 @@
             "amount": document.getElementById("discount_amount_input").value,
             "user_type": selected_option,
         }
-        debugger
+
         axios.post(add_url, add_args, {headers: {'Authorization': authorization_str}})
         .then((response) => {
             console.log(response);

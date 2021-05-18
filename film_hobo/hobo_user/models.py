@@ -502,6 +502,12 @@ class HoboPaymentsDetails(SingletonModel):
         verbose_name = 'Hobo Members Payment Detail'
         verbose_name_plural = 'Hobo Members Payment Details'
 
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(HoboPaymentsDetails, self).save(*args, **kwargs)
+
 
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
@@ -512,6 +518,12 @@ class IndiePaymentDetails(SingletonModel):
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
         verbose_name_plural = 'Indie Members Payment Details'
+
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(IndiePaymentDetails, self).save(*args, **kwargs)
 
 
 class ProPaymentDetails(SingletonModel):
@@ -524,6 +536,12 @@ class ProPaymentDetails(SingletonModel):
         verbose_name = 'Pro Members Payment Detail'
         verbose_name_plural = 'Pro Members Payment Details'
 
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(ProPaymentDetails, self).save(*args, **kwargs)
+
 
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
@@ -534,6 +552,12 @@ class CompanyPaymentDetails(SingletonModel):
     class Meta:
         verbose_name = 'Company Payment Detail'
         verbose_name_plural = 'Company Payment Details'
+
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(CompanyPaymentDetails, self).save(*args, **kwargs)
 
 
 class DisabledAccount(models.Model):
