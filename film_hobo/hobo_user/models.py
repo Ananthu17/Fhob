@@ -413,11 +413,13 @@ class PromoCode(models.Model):
         (FLAT_AMOUNT, 'Flat Amount'),
         (PERCENTAGE, 'Percentage'),
     ]
+    ALL = 'ALL'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
     USER_TYPE_CHOICES = [
+        (ALL, 'All'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),

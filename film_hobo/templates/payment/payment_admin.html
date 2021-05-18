@@ -202,18 +202,6 @@
                       <table class="table table-bordered admin-bill-tbl-bordered admin-bill-tbl">
                         <tbody>
                             <tr>
-                                <th>User Type</th>
-                                <td id="discount_usertype" class="text-muted">
-                                    <select id="usertype" name="usertype" class="form-control form-control-input" name="usertype" id="id_usertype" placeholder="Usertype" required="">
-                                        <option value="select" selected="">-Select-</option>
-                                        <option value="hobo" >Hobo</option>
-                                        <option value="indie" >Indie</option>
-                                        <option value="pro" >Pro</option>
-                                        <option value="company" >Company</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
                                 <th>Discount Name</th>
                                 <td class="text-muted">
                                     <input id="discount_name_input" type="text" class="form-control admin-bill-form-cntrl-b" placeholder="write it here">
@@ -288,13 +276,13 @@
                   <div class="col-2 ">Auto-Renew</div>
                   <div class="col-10">
                       <div class="form-check-inline">
-                          <label class="containerradio">On
+                          <label id="on_value" class="containerradio">On
                               <input id="on_click" type="radio" name="renew_radio">
                               <span id="on_click_span" class="checkmarkagree"></span>
                           </label>
                       </div>
                       <div class="form-check-inline">
-                          <label class="containerradio">Off
+                          <label id="off_value" class="containerradio">Off
                               <input id="off_click" type="radio" name="renew_radio">
                               <span id="off_click_span" class="checkmarkagree"></span>
                           </label>
@@ -385,16 +373,41 @@
     }
 
     function editDiscountFunction(obj_id) {
-        editable_fields = 'edit' + obj_id
+        edit_field_element = '#modify_edit_' + obj_id
+        edit_state = $(edit_field_element).text()
+        if (edit_state === 'Edit'){
+            $(edit_field_element).html("Save");
 
-        var editable_elements = document.getElementsByClassName(editable_fields);
-        for (var i = 0; i < editable_elements.length; i++) {
-            element_to_change = editable_elements
-            if (editable_elements.item(i).contentEditable == true) {
-                editable_elements.item(i).contentEditable = false;
-            } else {
-                editable_elements.item(i).contentEditable = true;
+            editable_fields = 'edit' + obj_id
+            var editable_elements = document.getElementsByClassName(editable_fields);
+            for (var i = 0; i < editable_elements.length; i++) {
+                element_to_change = editable_elements
+                if (editable_elements.item(i).contentEditable == true) {
+                    editable_elements.item(i).contentEditable = false;
+                } else {
+                    editable_elements.item(i).contentEditable = true;
+                }
             }
+        }
+        else{
+            editable_fields = 'edit' + obj_id
+            var editable_elements = document.getElementsByClassName(editable_fields);
+            edit_discount_url = origin_url + '/payment/edit_discount_detail/'
+
+            for (var i = 0; i < editable_elements.length; i++) {
+                promo_code_val = editable_elements.item(0).textContent
+                amount_val = editable_elements.item(0).textContent
+
+            }
+            editable_fields = 'edit' + obj_id
+            edit_extra_args = {"promo_code": "",
+                               "valid_from": "",
+                               "valid_to": "",
+                               "amount_type": "",
+                               "amount": "",
+                               "user_type": ""
+                            }
+            axios.put(edit_discount_url, edit_extra_args, {headers: {'Authorization': authorization_str}})
         }
     }
 
@@ -455,14 +468,20 @@
           discount_objs = response.data
 
           let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
-          let modify_link = '<a alt="modify_remove" href="">remove</a> <a alt="modify_edit" href="">edit</a>'
+        //   let modify_link = '<a alt="modify_remove" href="">remove</a> <a alt="modify_edit" href="">edit</a>'
             discount_objs.forEach(function(d){
             obj_id = d.id
+            if (d.amount_type == "flat_amount"){
+                var amount_value = '$ ' + (d.amount).toString()
+            }
+            else{
+                var amount_value = (d.amount).toString() + ' %'
+            }
             delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
             table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
-            table += '<td contenteditable="false" class="edit'+d.id+'">'+d.amount+'</td>';
-            table += '<td contenteditable="false" class="edit'+d.id+'">'+d.valid_from+' to '+d.valid_to+'</td>';
-            table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')">Remove</a></td><td> <a alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
+            table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
+            table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42" value = "'+d.valid_from+'"/>to<input id="valid_from" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42" value = "'+d.valid_to+'"/> </td>';
+            table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
         })
           table += '</tbody>';
           $('#discount_table').empty().html(table);
@@ -528,22 +547,32 @@
         }
 
         if ($("#days_value").attr("contenteditable") == "true") {
-          $("#days_value").attr("contenteditable", "false");
+            $("#days_value").attr("contenteditable", "false");
+
         } else {
             $("#days_value").attr("contenteditable", "true");
+            $('#on_click').removeAttr("disabled");
+            $('#off_click').removeAttr("disabled");
         }
-        var $renew_option = $('input:radio[name=renew_radio]');
-
-        $renew_option[0].disabled = false
-        $renew_option[1].disabled = false
 
     });
     /*
     post membership fee details and render to html
     */
     document.getElementById("membership_fee_save").addEventListener("click", function() {
+        var renew_option = $('input:radio[name=renew_radio]');
+        var selected_option_name = "";
+        if (renew_option[0].checked == true){
+            var selected_option_name = "on";
+        }
+        else if (renew_option[1].checked == true){
+            var selected_option_name = "off";
+        }
+        else{
+
+        }
+
         put_url = origin_url + '/payment/update_membership_fee/'
-        // selected_radio_btn = $('.containerradio .active').toggleClass('checkmarkagree');
         extra_args = {
             "monthly_hobo": $("#monthly_hobo").val().replace(/[A-Za-z$-]/g, ""),
             "monthly_indie": $("#monthly_indie").val().replace(/[A-Za-z$-]/g, ""),
@@ -555,7 +584,7 @@
             "annual_company": $("#annual_company").val().replace(/[A-Za-z$-]/g, ""),
             "tax": $('span[id="tax_value"]').text(),
             "free_evaluation_time": $('span[id="days_value"]').text(),
-            "auto_renew": checked_value.toString()
+            "auto_renew": selected_option_name
         }
         var token = localStorage.getItem("token");
         token_str = "Token "
@@ -597,25 +626,6 @@
             amount_type_val = "percentage"
         }
 
-        var selected_option =  document.getElementById("usertype");
-        selected_option_val = selected_option.value
-
-        if (selected_option_val === "hobo"){
-        var selected_option = "HOB"
-        }
-        else if (selected_option_val === "indie") {
-        var selected_option = "IND"
-        }
-        else if (selected_option_val === "pro") {
-        var selected_option = "PRO"
-        }
-        else if (selected_option_val === "company") {
-        var selected_option = "COM"
-        }
-        else {
-        var selected_option = ""
-        }
-
         add_args = {
             "promo_code": document.getElementById("discount_name_input").value,
             "valid_from": document.getElementById("valid_from").value,
@@ -627,27 +637,10 @@
 
         axios.post(add_url, add_args, {headers: {'Authorization': authorization_str}})
         .then((response) => {
-            console.log(response);
-            console.log(response.data.amount);
+            location.reload();
         }, (error) => {
             console.log(error);
         });
-        // .then((response) => {
-        // if (response.data.status === "success"){
-        //     $("#discount_name_input").val("");
-        //     $("#discount_amount_input").val("");
-        //     $("#valid_from").val("");
-        //     $("#valid_to").val("");
-        //     document.getElementById('usertype').value="select";
-        //     location.reload();
-        // }
-        // else{
-        //     console.log(response.data)
-        //     console.log(response.data.status)
-        // }
-        // }, (error) => {
-        //     console.log(error);
-        // });
     });
     /*
     get details of all the discounts added

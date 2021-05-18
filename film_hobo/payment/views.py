@@ -297,6 +297,18 @@ class UpdateMembershipFeeAPI(APIView):
                      "auto_renew": "please enter a option on/off"
                      }, status=status.HTTP_400_BAD_REQUEST)
 
+            PaymentOptions.objects.all().update(
+                tax=float(final_result['tax']),
+                free_evaluation_time=final_result['free_evaluation_time'],
+                auto_renew=final_result['auto_renew'])
+
+            del final_result["auto_renew"]
+            for key, value in final_result.items():
+                if key == "free_evaluation_time":
+                    final_result["free_evaluation_time"] = int(value)
+                else:
+                    final_result[key] = round(value, 2)
+
             HoboPaymentsDetails.objects.all().update(
                 free_days=final_result['free_evaluation_time'],
                 monthly_amount=float(final_result['monthly_hobo']),
@@ -317,10 +329,7 @@ class UpdateMembershipFeeAPI(APIView):
                 monthly_amount=float(final_result['monthly_company']),
                 annual_amount=float(final_result['annual_company']),
                 estimated_tax=float(final_result['tax']))
-            PaymentOptions.objects.all().update(
-                tax=float(final_result['tax']),
-                free_evaluation_time=final_result['free_evaluation_time'],
-                auto_renew=final_result['auto_renew'])
+
         except ValueError:
             return Response(
                 {"status": "failure",
@@ -349,6 +358,7 @@ class AddDiscountDetailAPI(APIView):
         midnight = 'T00:00:00Z'
         data['valid_from'] = data['valid_from'] + midnight
         data['valid_to'] = data['valid_to'] + midnight
+        data['user_type'] = 'ALL'
         serializer = DiscountsSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
