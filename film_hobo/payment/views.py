@@ -365,6 +365,7 @@ class AddDiscountDetailAPI(APIView):
             return Response({"status": "success",
                              "message": "new promocode record added"})
         else:
+            print(serializer.errors)
             return Response(serializer.errors)
 
 
@@ -375,7 +376,7 @@ class GetDiscountDetailListAPI(APIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request, *args, **kwargs):
-        promocodes = PromoCode.objects.all()
+        promocodes = PromoCode.objects.all().order_by('-id')
         serializer = DiscountsSerializer(promocodes, many=True)
         return Response(serializer.data)
 

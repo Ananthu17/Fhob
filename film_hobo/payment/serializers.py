@@ -11,13 +11,15 @@ class DiscountsSerializer(serializers.ModelSerializer):
                   'life_span', 'amount_type', 'amount', 'user_type']
 
     def validate_amount(self, obj):
-        check_status = (self.__dict__['_kwargs']['data']['amount_type'] == 'percentage') and \
-         ((obj >= 0) and (obj <= 100))
-        if not check_status:
-            raise serializers.ValidationError("please enter a valid "
-                                              "percentage value between"
-                                              " 0 and 100")
-        return obj
+        if (self.__dict__['_kwargs']['data']['amount_type'] == 'percentage'):
+            if (obj >= 0) and (obj <= 100):
+                return obj
+            else:
+                raise serializers.ValidationError("please enter a valid "
+                                                  "percentage value between"
+                                                  " 0 and 100")
+        else:
+            return obj
 
     def to_representation(self, instance):
         promocode = dict()

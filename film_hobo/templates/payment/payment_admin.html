@@ -362,7 +362,6 @@
     token_val = String(token)
     var authorization_str = token_str.concat(token_val);
     origin_url = window.location.origin
-
     /*
     delete discount record funtion
     */
@@ -431,16 +430,13 @@
         axios.get(get_url, {headers: {'Authorization': authorization_str}})
         .then((response) => {
             $('#annual_hobo').val("$ " + response.data.annual_hobo);
-
             $('#annual_indie').val("$ " + response.data.annual_indie);
             $('#annual_pro').val("$ " + response.data.annual_pro);
             $('#annual_company').val("$ " + response.data.annual_company);
-
             $('#monthly_hobo').val("$ " + response.data.monthly_hobo);
             $('#monthly_indie').val("$ " + response.data.monthly_indie);
             $('#monthly_pro').val("$ " + response.data.monthly_pro);
             $('#monthly_company').val("$ " + response.data.monthly_company);
-
             $('#tax_value').text(response.data.tax);
             $('#days_value').text(response.data.free_evaluation_time);
             var $renew_option = $('input:radio[name=renew_radio]');
@@ -468,7 +464,6 @@
           discount_objs = response.data
 
           let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
-        //   let modify_link = '<a alt="modify_remove" href="">remove</a> <a alt="modify_edit" href="">edit</a>'
             discount_objs.forEach(function(d){
             obj_id = d.id
             if (d.amount_type == "flat_amount"){
@@ -491,7 +486,6 @@
     make the table column field editable
     */
     document.getElementById("membership_fee_edit").addEventListener("click", function() {
-
         if ($('#annual_hobo').is('[readonly]')) {
             $("#annual_hobo").prop("readonly", false);
         } else {
@@ -548,13 +542,11 @@
 
         if ($("#days_value").attr("contenteditable") == "true") {
             $("#days_value").attr("contenteditable", "false");
-
         } else {
             $("#days_value").attr("contenteditable", "true");
             $('#on_click').removeAttr("disabled");
             $('#off_click').removeAttr("disabled");
         }
-
     });
     /*
     post membership fee details and render to html
@@ -596,8 +588,6 @@
         }, (error) => {
             console.log(error);
         });
-
-
     });
     /*
     toggle the text in amount (Add active class to the current button (highlight it))
@@ -617,34 +607,35 @@
     get details of new discount and pass to add discount api
     */
     document.getElementById("discount_add").addEventListener("click", function() {
+
         add_url = origin_url + '/payment/add_discount_detail/'
 
-        if ($("#doller-percentage-toggle").text() === "$"){
-            amount_type_val = "flat_amount"
+        var amount_type_val = ""
+        if ($("#doller-percentage-toggle").text() == "$ "){
+            var amount_type_val = "flat_amount"
         }
         else {
-            amount_type_val = "percentage"
+            var amount_type_val = "percentage"
         }
-
-        add_args = {
+        debugger
+        var add_args = {
             "promo_code": document.getElementById("discount_name_input").value,
             "valid_from": document.getElementById("valid_from").value,
             "valid_to": document.getElementById("valid_to").value,
             "amount_type": amount_type_val,
             "amount": document.getElementById("discount_amount_input").value,
-            "user_type": selected_option,
         }
 
-        axios.post(add_url, add_args, {headers: {'Authorization': authorization_str}})
+        axios.post(add_url, add_args, {headers: { "Authorization": authorization_str}})
         .then((response) => {
-            location.reload();
+            if (response.status == 200){
+                location.reload();
+            }
         }, (error) => {
             console.log(error);
         });
+
     });
-    /*
-    get details of all the discounts added
-    */
     /*
     jqery ui
     */
