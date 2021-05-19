@@ -369,6 +369,13 @@
         origin_url = window.location.origin
         delete_url = origin_url + '/payment/delete_discount_detail/' + obj_id + '/'
         axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
+        .then((response) => {
+        if (response.status == 204){
+                location.reload();
+            }
+        }, (error) => {
+            console.log(error);
+        });
     }
 
     function editDiscountFunction(obj_id) {
@@ -473,7 +480,7 @@
                 $renew_option.filter('[id=off_click]').attr('disabled', true);
             }
         });
-
+        $('#datepicker').prop('readonly', true);
         get_lust_url = origin_url + '/payment/get_discount_detail_list/'
 
         axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
@@ -492,7 +499,7 @@
             delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
             table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
             table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
-            table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42" value = "'+d.valid_from+'"/>to<input id="valid_to" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42" value = "'+d.valid_to+'"/> </td>';
+            table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_from+'"/>to<input id="valid_to" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_to+'"/> </td>';
             table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
         })
           table += '</tbody>';
