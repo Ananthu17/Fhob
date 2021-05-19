@@ -390,14 +390,15 @@ class EditDiscountDetailAPI(APIView):
     def put(self, request, *args, **kwargs):
         try:
             data = request.data
-            code = request.data['promo_code']
-            PromoCode.objects.get(promo_code=code)
+            unique_id = request.data['id']
+            PromoCode.objects.get(id=unique_id)
             midnight = 'T00:00:00Z'
             data['valid_from'] = data['valid_from'] + midnight
             data['valid_to'] = data['valid_to'] + midnight
             serializer = DiscountsSerializer(data=request.data, partial=True)
             if serializer.is_valid():
-                serializer.save()
+                serializer.update(PromoCode.objects.get(id=unique_id),
+                                  request.data)
                 return Response({"status": "success",
                                 "message": "promocode record updated successfully"})
             else:
