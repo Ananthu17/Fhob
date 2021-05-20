@@ -391,11 +391,12 @@ class EditDiscountDetailAPI(APIView):
         try:
             data = request.data
             unique_id = request.data['id']
-            PromoCode.objects.get(id=unique_id)
+            promocode_instance = PromoCode.objects.get(id=unique_id)
             midnight = 'T00:00:00Z'
             data['valid_from'] = data['valid_from'] + midnight
             data['valid_to'] = data['valid_to'] + midnight
-            serializer = DiscountsSerializer(data=request.data, partial=True)
+            serializer = DiscountsSerializer(promocode_instance,
+                                             data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.update(PromoCode.objects.get(id=unique_id),
                                   request.data)
