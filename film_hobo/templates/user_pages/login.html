@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load rest_framework %}
-
-
-
+{% load static %}
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
-
+<div class="wrapper flex-grow-1">
         <h1>Login</h1>
         <form method="post" action="{% url 'hobo_user:user_login' %}">
             {% csrf_token %}
@@ -23,9 +21,9 @@
             <button id="login-submit" type="submit" class="btn btn-default">Sign in</button>
         </form>
         <a href="{% url 'hobo_user:forgot-password' %}">Forgot Password</a>
-
-
+</div>
 
 {% endblock %}
 {% block extrajs %}
+<script src="{% static 'js/base.js' %}"></script>
 {% endblock %}

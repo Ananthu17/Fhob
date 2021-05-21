@@ -106,27 +106,48 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">HOW TO</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">LOGIN/SIGN UP</a>
-                    </li>
                     <!-- Dropdown -->
-                    <!--<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            KONSTANTIN
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Settings & Privacy</a>
-                            <a class="dropdown-item" href="#">Edit Profile</a>
-                            <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                {% if user.is_superuser %}
+                                    Admin
+                                {% else %}
+                                    {{ user.get_full_name }}
+                                {% endif %}
+                            </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Support</a>
-                                <a class="dropdown-item" href="#">Report a Problem</a>
+                                {% if user.is_superuser %}
+                                    <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
+                                    <a class="dropdown-item" href="#">Settings & Privacy</a>
+                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                                    <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="#">Support</a>
+                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                    </div>
+                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="#">My Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
+                                {% else %}
+                                    <a class="dropdown-item" href="#">Settings & Privacy</a>
+                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                                    <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="#">Support</a>
+                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                    </div>
+                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="#">My Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
+                                {% endif %}
                             </div>
-                            <a class="dropdown-item" href="#">Membership</a>
-                            <a class="dropdown-item" href="#">My Projects</a>
-                            <a class="dropdown-item" href="#">Logout</a>
-                        </div>
-                    </li>-->
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -186,33 +207,7 @@
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script>
-    /*
-    code to store token info into local storage on login
-    */
-    document.getElementById("login-submit").addEventListener("click", function() {
-        var email = $('#id_username').val();
-        var password = $('#id_password').val();
-        origin_url = window.location.origin
-        post_url = origin_url + '/hobo_user/login/'
-        extra_args = {"email": email.toString(), "password": password.toString()}
-        axios.post(post_url, extra_args)
-        .then((response) => {
-            localStorage.setItem('token', response.data.key);
-        }, (error) => {
-            console.log(error);
-        });
-    });
-    </script>
-    <script>
-    /*
-    code to clear token info from local storage on logout
-    */
-    document.getElementById("logout_link").addEventListener("click", function() {
-        localStorage.removeItem("token");
-    });
-    </script>
-</html>
-
 {% block extrajs %}
 {% endblock %}
+</html>
+
