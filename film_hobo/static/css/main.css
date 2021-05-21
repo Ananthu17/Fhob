@@ -1,28 +1,28 @@
 /*fonts*/
 
 @font-face {
-    font-family: "Caliban Std"; 
-    src:url("../fonts/CalibanStd.otf") format("truetype"); 
+    font-family: "Caliban Std";
+    src:url("../fonts/CalibanStd.otf") format("truetype");
 }
 @font-face {
-    font-family: "Satisfy-Regular"; 
-    src:url("../fonts/Satisfy-Regular.ttf") format("truetype"); 
+    font-family: "Satisfy-Regular";
+    src:url("../fonts/Satisfy-Regular.ttf") format("truetype");
 }
 @font-face {
-    font-family: "Myraid Pro"; 
-    src:url("../fonts/Myriad\ Pro\ Regular.ttf") format("truetype"); 
+    font-family: "Myraid Pro";
+    src:url("../fonts/Myriad\ Pro\ Regular.ttf") format("truetype");
 }
 @font-face {
-    font-family: "Courier Bold"; 
-    src:url("../fonts/Courier-Bold.otf") format("truetype"); 
+    font-family: "Courier Bold";
+    src:url("../fonts/Courier-Bold.otf") format("truetype");
 }
 @font-face {
-   font-family: "Courier"; 
-   src:url("../fonts/COURIER.TTF") format("truetype"); 
+   font-family: "Courier";
+   src:url("../fonts/COURIER.TTF") format("truetype");
 }
 @font-face {
-    font-family: "Arial Rounded Bold"; 
-    src:url("../fonts/ARLRDBD.ttf") format("truetype"); 
+    font-family: "Arial Rounded Bold";
+    src:url("../fonts/ARLRDBD.ttf") format("truetype");
 }
 /*fonts-end*/
 /*header section*/
@@ -51,15 +51,15 @@
 }
 
 .search-placeholder:-moz-placeholder { /* Firefox 18- */
-   text-align: center;  
+   text-align: center;
 }
 
 .search-placeholder::-moz-placeholder {  /* Firefox 19+ */
-   text-align: center;  
+   text-align: center;
 }
 
-.search-placeholder:-ms-input-placeholder {  
-   text-align: center; 
+.search-placeholder:-ms-input-placeholder {
+   text-align: center;
 }
 
 .search-placeholder{
@@ -120,13 +120,13 @@
    outline: none;
 }
 .navbar-light .navbar-nav .nav-link.active{
-   color: #e88b22; 
+   color: #e88b22;
 }
 /*navbar section end*/
 /*footer*/
 .fh-footer{
    background-color: #8a8a89;
-   font-family: "Arial Rounded Bold"; 
+   font-family: "Arial Rounded Bold";
    font-size:10px;
 }
 .fw{
@@ -191,7 +191,7 @@
   text-align: center;
 }
 .index-des-con{
-   font-family: "Myraid Pro"; 
+   font-family: "Myraid Pro";
    text-align: justify;
    font-size:14px;
    padding: 20px 90px 20px 10px;
@@ -249,7 +249,7 @@
 .signup-section .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
   color: #2265b9;
   background-color: #e6e6e6;
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-weight: 600;
   font-size: 14px;
   padding: 6px 5px;
@@ -258,7 +258,7 @@
 .signup-section .nav-pills .nav-link {
   border-radius: 0rem !important;
   color: #2265b9;
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-weight: 600;
   font-size: 14px;
   padding: 6px 5px;
@@ -291,7 +291,7 @@
   padding: 0px;
 }
 .signup-form{
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-size: 13px;
 }
 .inp-line {
@@ -303,14 +303,14 @@
 }
 
 [placeholder]:focus::-webkit-input-placeholder {
-  transition: text-indent 0.5s 0.5s ease; 
+  transition: text-indent 0.5s 0.5s ease;
   text-indent: -200%;
   opacity: 1;
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-size: 12px;
 }
 .form-title{
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-size: 13px;
   margin-top: 15px;
   position: absolute;
@@ -331,7 +331,7 @@
 .signup-footer{
   color: #2265b9;
   background-color: #e6e6e6;
-  font-family: "Myraid Pro";  
+  font-family: "Myraid Pro";
   font-weight: 600;
   font-size: 14px;
   width: 100%;
