@@ -21,7 +21,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
-                   PersonalDetailsView
+                   PersonalDetailsView, HowTo
 
 app_name = "hobo_user"
 
@@ -76,6 +76,7 @@ urlpatterns = [
 
 
     # web-view endpoints
+    path('how_to/', HowTo.as_view(), name='how_to'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),

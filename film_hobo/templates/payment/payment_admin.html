@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<head>
-    <!-- Custom stylesheets -->
-    <link rel="stylesheet" href="{% static 'payment/css/payment_admin.css' %}">
-  </head>
       <div class="wrapper flex-grow-1">
           <div class="container admin-bill-sec pb-4">
               <div class="row mt-3">
@@ -214,5 +210,5 @@
     </div>
 {% endblock %}
 {% block extrajs %}
-<script src="{% static 'payment/js/payment.js' %}"></script>
+<script src="{% static 'js/payment.js' %}"></script>
 {% endblock %}
