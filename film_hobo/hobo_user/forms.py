@@ -8,7 +8,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from .models import CustomUser, GuildMembership, DisabledAccount, \
     CustomUserSettings, AthleticSkill, UserProfile, CoWorker
 
-from .models import GuildMembership, Country
+from .models import GuildMembership, Country, Photo
 
 
 
@@ -323,12 +323,3 @@ class EditProfileForm(forms.ModelForm):
         # self.fields['company'].required = False
 
 
-# class AddCoworkerForm(forms.ModelForm):
-#     class Meta:
-#         model = CoWorker
-#         fields = ('user', 'name', 'position')
-
-#     def __init__(self, *args, **kwargs):
-#         super(AddCoworkerForm, self).__init__(*args, **kwargs)
-#         self.fields['user'].required = False
-#         self.fields['name'].required = False

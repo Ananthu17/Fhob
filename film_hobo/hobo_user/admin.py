@@ -12,7 +12,7 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
-                    UserAgentManager
+                    UserAgentManager, Photo, UserNotification
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, JobTypeResource
@@ -33,14 +33,14 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
     list_filter = ('email', 'is_staff', 'is_active',)
     fieldsets = (
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
-                             'email', 'password')}),
+                             'email', 'password', 'date_of_joining')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Membership', {'fields': ('membership', 'guild_membership',
                                    'payment_plan')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
         ('Personal Details', {'fields': ('gender', 'date_of_birth',
                               'phone_number', 'address', 'country')}),
-        ('Company Details', {'fields': ('is_company', 'company_name', 'title',
+        ('Company Details', {'fields': ('company_name', 'title',
                                         'company_address', 'company_website',
                                         'company_phone',)}),
         ('Height', {'fields': ('feet', 'inch')}),
@@ -102,6 +102,8 @@ admin.site.register(UserRating)
 admin.site.register(UserRatingCombined)
 admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
+admin.site.register(Photo)
+admin.site.register(UserNotification)
 
 
 @admin.register(EthnicAppearance)

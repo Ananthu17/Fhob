@@ -1,17 +1,105 @@
 {% extends 'base.html' %}
-
-
+{% load static %}
+{% load profile_photo_tag %}
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
-
+<input type = "hidden" value="{{token}}" name="token" id="token"/>
+<div class="container">
+<div class="row">
+<div class="col-4">
         <h3>Social Networks</h3>
+        <b>Trackers ({{trackers_list.count}}) </b>
+        {% for obj in trackers_list %}
+        <div class="row">
+        <div class="col-2">
+                {% get_profile_photo obj as image %}
+                {% if image %}
+                <img src="{{ image }}" class="" style="width:100%;">
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="" style="width:100%;">
+                {% endif %}
+        </div>
+        <div class="col-10">
+                <p>{{obj.get_full_name }}</p>
+        </div>
+        </div>
+        {% endfor %}
+        <b>Tracking ({{tracking_list.count}})</b>
+        {% for obj in tracking_list %}
+        <div class="row">
+                <div class="col-2">
+                        {% get_profile_photo obj as image %}
+                        {% if image %}
+                        <img src="{{ image }}" class="" style="width:100%;">
+                        {% else %}
+                        <img src="{% static 'images/default_profile_pic.png' %}" class="" style="width:100%;">
+                        {% endif %}
+                </div>
+                <div class="col-10">
+                <p>{{ obj.user.get_full_name }}</p>
+                </div>
+        </div>
+        {% endfor %}
+</div>
+<div class="col-8">
+<div class="images-div">
+        <div class="row">
+        {% for photo in photos %}
+                <div class="col-3 ">
+                <img src="{{ photo.image.url }}" class="" style="width:100%;">
+                <input type="hidden" value="{{photo.id}}" name="image_id" id="image_id"/>
+                <p>
+                <a  id="1_{{photo.id}}" class="{% if photo.position != 1 %}pos{%else%}img-btn{% endif %}">1</a>
+                <a  id="2_{{photo.id}}" class="{% if photo.position != 2 %}pos{%else%}img-btn{% endif %}">2</a>
+                <a  id="3_{{photo.id}}" class="{% if photo.position != 3 %}pos{%else%}img-btn{% endif %}">3</a>
+                <a  id="4_{{photo.id}}" class="{% if photo.position != 4 %}pos{%else%}img-btn{% endif %}">4</a>
+                </p>
+                </div>
+        {% endfor %}
+</div>
+</div>
+        <div class="">
+                <p><b>Upload Image</b></p>
+                <form method="post" enctype="multipart/form-data"
+                action="{% url 'hobo_user:upload-image' %}">
+                        {% csrf_token %}
+                        <p>Position
+                                <input type="radio" value="1" name="position"/ required>1
+                                <input type="radio" value="2" name="position"/>2
+                                <input type="radio" value="3" name="position"/>3
+                                <input type="radio" value="4" name="position"/>4
+                        </p>
+                        <p>Upload Photo
+                        <input type="file" id="file" name="image" required>
+                        </p>
+                        <input type="submit" value="Save">
+                </form>
+        </div>
+        </div>
 
-
+</div>
+</div>
 {% endblock %}
 
 {% block extrajs %}
+<script>
+    $('body').on('click' , '.pos', function(){
+        var id = $(this).attr('id');
+        position=id.split("_")[0]
+        image_id=id.split("_")[1]
+        data_dict = {"id":image_id, "position":position}
+        console.log(data_dict)
+        $.get('/hobo_user/swap-image-position/', data_dict)
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            location.reload();
+                        }
+                });
+    });
+</script>
 {% endblock %}
 
 

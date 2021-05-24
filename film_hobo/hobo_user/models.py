@@ -151,12 +151,6 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
     )
-    is_company = models.BooleanField(
-        _('Is Company'),
-        default=False,
-        help_text=_(
-            'This field will be True for company accounts'),
-    )
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
     # company_address = models.TextField(_("Address"), null=True, blank=True)
@@ -208,6 +202,9 @@ class CustomUser(AbstractUser):
                                     unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
+    date_of_joining = models.DateField(_("Date of Joining"),
+                                       default=datetime.date.today,
+                                       null=True)
     # address = models.TextField(_("Address"), null=True)
     address = models.CharField(_("Address"),
                                max_length=250,
@@ -258,7 +255,6 @@ class CustomUser(AbstractUser):
         if self.feet:
             feet = self.feet
             inch = (self.inch)/12
-            print(inch)
             in_feet = feet+inch
             in_meter = round(float(in_feet/3.281), 2)
         return in_meter
@@ -926,3 +922,65 @@ class UserAgentManager(models.Model):
     class Meta:
         verbose_name = 'User Agent/Manager'
         verbose_name_plural = 'User Agents/Managers'
+
+
+class Photo(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_photo',
+                             verbose_name=_("User"),
+                             null=True)
+    position = models.IntegerField(_("Position"), null=True, blank=True)
+    image = models.ImageField(upload_to='gallery/',
+                              blank=True, null=True,
+                              help_text="Image size:370 X 248.")
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Photo'
+        verbose_name_plural = 'Photos'
+
+
+class UserNotification(models.Model):
+    TRACKING = 'tracking'
+    FRIEND_REQUEST = 'friend_request'
+    USER_RATING = 'user_rating'
+    NOTIFICATION_TYPE_CHOICES = [
+                                (TRACKING, 'Tracking'),
+                                (FRIEND_REQUEST, 'Friend Request'),
+                                (USER_RATING, 'User Rating'),
+                               ]
+    notification_type = models.CharField(_("Notification Type"),
+                                         choices=NOTIFICATION_TYPE_CHOICES,
+                                         max_length=150, default=TRACKING)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_notification',
+                             verbose_name=_("User"),
+                             null=True)
+    tracked_by = models.ForeignKey("hobo_user.CustomUser",
+                                   on_delete=models.CASCADE,
+                                   related_name='tacked_by_user',
+                                   verbose_name=_("User"),
+                                   null=True)
+    friend_request_from = models.ForeignKey("hobo_user.CustomUser",
+                                            on_delete=models.CASCADE,
+                                            related_name='friend_request_from',
+                                            verbose_name=_("User"),
+                                            null=True)
+    user_rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                      on_delete=models.CASCADE,
+                                      related_name='user_rated_by',
+                                      verbose_name=_("User"),
+                                      null=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Notification'
+        verbose_name_plural = 'User Notifications'

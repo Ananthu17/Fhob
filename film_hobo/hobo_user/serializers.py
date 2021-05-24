@@ -18,10 +18,10 @@ from rest_auth.serializers import PasswordResetSerializer
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
-    IndiePaymentDetails, ProPaymentDetails, PromoCode, \
+    IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
-    UserRating, UserAgentManager
+    UserRating, UserAgentManager, Photo
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -722,20 +722,24 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class CoWorkerSerializer(serializers.ModelSerializer):
     name = serializers.CharField(
         max_length=150,
-        required=False,
+        required=False, allow_blank=True
     )
     user = serializers.CharField(
         max_length=150,
-        required=False,
+        required=False, allow_blank=True
     )
     position = serializers.CharField(
         max_length=150,
         required=True,
     )
+    id = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
 
     class Meta:
         model = CoWorker
-        fields = ['user', 'name', 'position']
+        fields = ['id', 'user', 'name', 'position']
 
 
 class RemoveCoWorkerSerializer(serializers.Serializer):
@@ -789,10 +793,48 @@ class AgentManagerSerializer(serializers.ModelSerializer):
         required=True,
     )
     agent_email = serializers.EmailField(
+        required=False, allow_blank=True
+    )
+    id = serializers.CharField(
         required=False,
+        max_length=150
     )
 
     class Meta:
         model = UserAgentManager
-        fields = ['agent_type', 'agent_name', 'agent_phone',
+        fields = ['id', 'agent_type', 'agent_name', 'agent_phone',
                   'agent_email', 'agent_job_type']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name']
+
+
+class GetSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUserSettings
+        exclude = []
+
+
+class PhotoSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = Photo
+        exclude = ['id', 'position']
+
+
+class UploadPhotoSerializer(serializers.Serializer):
+    file = serializers.ImageField(required=True)
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

@@ -26,7 +26,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
                    MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
-                   FriendsAndFollowersView, TrackUserAPI
+                   FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
+                   GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
+                   UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
+                   UploadImageView, UploadImageAPI
 
 app_name = "hobo_user"
 
@@ -82,6 +85,8 @@ urlpatterns = [
          name='profile-api'),
     path('add-coworker-api/', AddCoworkerAPI.as_view(),
          name='add-coworker-api'),
+    path('edit-coworker-api/', EditCoworkerAPI.as_view(),
+         name='edit-coworker-api'),
     path('add-agent-manager-api/', AddAgentManagerAPI.as_view(),
          name='add-agent-manager-api'),
     path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
@@ -92,6 +97,18 @@ urlpatterns = [
          name='remove-agent-api'),
     path('track-user-api/', TrackUserAPI.as_view(),
          name='track-user-api'),
+    path('untrack-user-api/', UnTrackUserAPI.as_view(),
+         name='untrack-user-api'),
+    path('get-agent-manager-api/', GetAgentManagerAPI.as_view(),
+         name='get-agent-manager-api'),
+    path('get-user-settings-api/', GetSettingsAPI.as_view(),
+         name='get-user-settings-api'),
+    path('edit-agent-manager-api/', EditAgentManagerAPI.as_view(),
+         name='edit-agent-manager-api'),
+    path('change-photo-position-api/', ChangePhotoPositionAPI.as_view(),
+         name='change-photo-position-api'),
+    path('upload-image-api/', UploadImageAPI.as_view(),
+         name='upload-image-api'),
 
 
     # web-view endpoints
@@ -147,5 +164,9 @@ urlpatterns = [
          name='profile'),
     path('friends-and-followers/', FriendsAndFollowersView.as_view(),
          name='friends-and-followers'),
+    path('swap-image-position/', SwapImageAjaxView.as_view(),
+         name='swap-image-position'),
+    path('upload-image/', UploadImageView.as_view(),
+         name='upload-image'),
 
 ]

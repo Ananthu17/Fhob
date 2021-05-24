@@ -8,6 +8,7 @@ import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.core.files import File
 from django.db.models import Q
 from django.template import loader
 from django.core.mail import send_mail
@@ -40,7 +41,8 @@ from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
-
+from rest_framework.exceptions import ParseError
+from rest_framework.parsers import FileUploadParser
 
 from authemail.views import SignupVerify
 
@@ -50,11 +52,11 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     EditProfileForm
 
 from .models import CoWorker, CustomUser, GuildMembership, \
-                    IndiePaymentDetails, ProPaymentDetails, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
-                    UserRating, UserRatingCombined, UserTacking
+                    UserRating, UserRatingCombined, UserTacking, Photo
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -66,7 +68,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
-    RemoveAgentManagerSerializer, TrackUserSerializer
+    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -172,8 +175,6 @@ class ExtendedRegisterCompanyView(RegisterView):
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        user.is_company = True
-        user.save()
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
@@ -820,7 +821,6 @@ class ChangePasswordAPI(AuthPasswordChangeView):
     # serializer_class = ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
-        print("here")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
@@ -1076,7 +1076,7 @@ class ForgotPasswordView(TemplateView):
                             'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
-        print(user_response)
+        # print(user_response)
 
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
@@ -1116,7 +1116,6 @@ class PasswordResetTemplateView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         response = dict(response)
-        print(response)
         if 'status' in response:
             if response['status'] == 200:
                 # confirmation mail
@@ -1433,7 +1432,6 @@ class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
         super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
         for id in super_users:
             already_blocked_users.append(id)
-        print(already_blocked_users)
 
         modified_queryset = CustomUser.objects.exclude(
                             id__in=already_blocked_users)
@@ -1624,7 +1622,7 @@ class UserProfileAPI(APIView):
         profile_data['company_website'] = profile.company_website
         profile_data['imdb'] = profile.imdb
         profile_data['bio'] = profile.bio
-        if user.is_company == True:
+        if user.membership == CustomUser.PRODUCTION_COMPANY:
             coworkers = CoWorker.objects.filter(company=user)
             coworkers_dict = {}
             for obj in coworkers:
@@ -1640,7 +1638,6 @@ class UserProfileAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
             if 'first_name' in data_dict:
                 user.first_name = data_dict['first_name']
             if 'middle_name' in data_dict:
@@ -1686,6 +1683,11 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['guild_membership'] = GuildMembership.objects.all()
         context['user'] = user
         context['profile'] = profile
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list)
+        context['photos'] = photos[:3]
+        context['all_photos'] = all_photos[:4]
         context['form'] = self.form_class(instance=profile)
 
         # exclude super user and current user
@@ -1701,10 +1703,19 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
         coworkers = CoWorker.objects.filter(company=user)
         context['coworkers'] = coworkers
+
+        track_obj = UserTacking.objects.get(user=user)
+        trackers_list = track_obj.tracked_by.all()
+        tracking_list = UserTacking.objects.filter(
+                        tracked_by=user)
+        context['trackers_list'] = trackers_list
+        context['tracking_list'] = tracking_list
         return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
         profile = UserProfile.objects.get(user=user)
         guild_membership_all = GuildMembership.objects.all()
         all_agents = UserAgentManager.objects.filter(user=self.request.user)
@@ -1722,6 +1733,52 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         agent_manager_list = list(request.POST.getlist('agent_type'))
         agent_job_list = request.POST.get('agent_job_type')
         agent_manager_count = len(agent_manager_list)
+
+        # edit agent/manager
+        edit_agent_dict = {}
+        edit_agent_id_list = request.POST.getlist('edit_agent_id')
+        edit_agent_name_list = request.POST.getlist('edit_agent_name')
+        edit_agent_phone_list = request.POST.getlist('edit_agent_phone')
+        edit_agent_email_list = request.POST.getlist('edit_agent_email')
+        edit_agent_manager_list = request.POST.getlist('edit_agent_type')
+        edit_agent_job_list = request.POST.getlist('edit_agent_job_type')
+        edit_count = len(edit_agent_manager_list)
+
+        for i in range(edit_count):
+            edit_agent_dict['id'] = edit_agent_id_list[i]
+            edit_agent_dict['agent_name'] = edit_agent_name_list[i]
+            edit_agent_dict['agent_type'] = edit_agent_manager_list[i]
+            edit_agent_dict['agent_job_type'] = edit_agent_job_list[i]
+            edit_agent_dict['agent_phone'] = edit_agent_phone_list[i]
+            if edit_agent_email_list[i] != "":
+                edit_agent_dict['agent_email'] = edit_agent_email_list[i]
+            else:
+                edit_agent_dict['agent_email'] = ""
+            # call edit-agent api
+            user_response = requests.post(
+                    'http://127.0.0.1:8000/hobo_user/edit-agent-manager-api/',
+                    data=json.dumps(edit_agent_dict),
+                    headers={'Content-type': 'application/json',
+                            'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        errors = response['errors']
+                        if 'agent_phone' in errors and 'agent_email' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager.Enter valid phone number and email address.")
+                        elif 'agent_phone' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager. Enter valid phone number.")
+                        elif 'agent_email' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager. Enter valid email address.")
+                        return HttpResponseRedirect(
+                                reverse('hobo_user:edit-profile'))
 
         if agent_name_list == "":
             agent_count = 0
@@ -1747,9 +1804,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             agent_email_list = list(request.POST.getlist('agent_email'))
             agent_email_count = len(agent_email_list)
 
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-
         if((agent_count != 0) and
            (agent_count != agent_manager_count) or
            (agent_count != agent_phone_count) or
@@ -1774,7 +1828,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                     if agent_email_list[i] != "":
                         agent_dict['agent_email'] = agent_email_list[i]
                     else:
-                        agent_dict['agent_email'] = None
+                        agent_dict['agent_email'] = ""
 
                 # save agents/manager
                 user_response = requests.post(
@@ -1873,7 +1927,7 @@ class AddCoworkerAPI(APIView):
                 if 'user' in data_dict:
                     user = CustomUser.objects.get(id=data_dict['user'])
                     coworker.user = user
-                    coworker.name = user.first_name+" "+user.last_name
+                    coworker.name = user.get_full_name()
                     profile = UserProfile.objects.get(user=user)
                     profile.update_job_type(position.id)
                     profile.save()
@@ -1882,6 +1936,48 @@ class AddCoworkerAPI(APIView):
                 coworker.save()
                 response = {'message': "Stuff Added",
                             'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditCoworkerAPI(APIView):
+    serializer_class = CoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                coworker = CoWorker.objects.get(id=id)
+                if coworker.company == request.user:
+                    if 'position' in data_dict:
+                        position = JobType.objects.get(id=data_dict['position'])
+                        coworker.position = position
+                    if 'user' in data_dict and data_dict['user']!="":
+                        user_id = data_dict['user']
+                        user = CustomUser.objects.get(id=user_id)
+                        coworker.user = user
+                        coworker.name = user.get_full_name()
+                        profile = UserProfile.objects.get(user=user)
+                        profile.update_job_type(position.id)
+                        profile.save()
+                    if 'name' in data_dict and data_dict['name'] != "":
+                        coworker.name = data_dict['name']
+                    coworker.save()
+                    response = {'message': "Stuffs Updated",
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': "Invalid Token", 'status':
+                                status.HTTP_400_BAD_REQUEST}
+            except CoWorker.DoesNotExist:
+                response = {'errors': "Object Not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -1918,6 +2014,77 @@ class AddAgentManagerAPI(APIView):
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditAgentManagerAPI(APIView):
+    serializer_class = AgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                obj = UserAgentManager.objects.get(id=id)
+                if request.user == obj.user:
+                    if 'agent_type' in data_dict:
+                        obj.agent_type = data_dict['agent_type']
+                    if 'agent_name' in data_dict:
+                        obj.agent_name = data_dict['agent_name']
+                    if 'agent_phone' in data_dict:
+                        obj.agent_phone = data_dict['agent_phone']
+                    if 'agent_email' in data_dict:
+                        obj.agent_email = data_dict['agent_email']
+                    if 'agent_job_type' in data_dict:
+                        obj.agent_job_type = data_dict['agent_job_type']
+
+                    obj.save()
+                    response = {'message': "Agent-Manager Updated",
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': "Invalid Token",
+                                'status': status.HTTP_400_BAD_REQUEST}
+            except UserAgentManager.DoesNotExist:
+                response = {'errors': "Object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetAgentManagerAPI(APIView):
+    serializer_class = AgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        agent_dict = {}
+        agents = UserAgentManager.objects.filter(user=self.request.user)
+        for agent in agents:
+            agent_dict[agent.id ]= self.serializer_class(agent).data
+        response = {'Agents and managers': agent_dict}
+        return Response(response)
+
+
+class GetSettingsAPI(APIView):
+    serializer_class = GetSettingsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        settings_dict = {}
+        response = {}
+        try:
+            user_settings = CustomUserSettings.objects.get(user=user)
+            settings_dict = self.serializer_class(user_settings).data
+            response = {'User Settings': settings_dict}
+        except CustomUserSettings.DoesNotExist:
+            response = {'message': "Custom User Settings not found",
+                        'status': status.HTTP_400_BAD_REQUEST}
         return Response(response)
 
 
@@ -1990,10 +2157,19 @@ class AddCoworkersView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         user = self.request.user
         json_dict = {}
+        edit_dict = {}
         remove_ids = request.POST.getlist('remove')
+
         users = list(request.POST.getlist('user'))
         position = list(request.POST.getlist('position'))
         designation = list(request.POST.getlist('designation'))
+
+        saved_id = list(request.POST.getlist('saved_id'))
+        saved_user = list(request.POST.getlist('saved_user'))
+        saved_name = list(request.POST.getlist('saved_name'))
+        saved_position = list(request.POST.getlist('saved_position'))
+
+        edit_count = len(saved_position)
         user_count = len(users)
         position_count = len(position)
         designation_count = len(designation)
@@ -2036,6 +2212,7 @@ class AddCoworkersView(LoginRequiredMixin, TemplateView):
                                 self.request, "Failed to update Stuff !!")
                             return HttpResponseRedirect(
                                 reverse('hobo_user:edit-profile'))
+        json_dict = {}
         if((new_users_count == designation_count) and (new_users_count != 0)):
             for i in range(new_users_count):
                 json_dict['name'] = new_users[i]
@@ -2058,6 +2235,30 @@ class AddCoworkersView(LoginRequiredMixin, TemplateView):
                                 self.request, "Failed to update Stuff !!")
                             return HttpResponseRedirect(
                                 reverse('hobo_user:edit-profile'))
+
+        for i in range(edit_count):
+            edit_dict['id'] = saved_id[i]
+            edit_dict['name'] = saved_name[i]
+            edit_dict['position'] = saved_position[i]
+            edit_dict['user'] = saved_user[i]
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/edit-coworker-api/',
+                                data=json.dumps(edit_dict),
+                                headers={
+                                    'Content-type': 'application/json',
+                                    'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        messages.warning(
+                            self.request, "Failed to update Stuff !!")
+                        return HttpResponseRedirect(
+                            reverse('hobo_user:edit-profile'))
+        json_dict = {}
         if remove_ids:
             json_dict['id'] = remove_ids
             user_response = requests.post(
@@ -2232,14 +2433,22 @@ class TrackUserAPI(APIView):
     def get(self, request):
         user = self.request.user
         try:
+            trackers_dict = {}
+            tracking_dict = {}
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
-            trackers_list_ids = trackers_list.values_list('id', flat=True)
+            # trackers_list_ids = trackers_list.values_list('id', flat=True)
             tracking_list = UserTacking.objects.filter(
                             tracked_by=user)
-            tracking_list_ids = tracking_list.values_list('tracked_by__id', flat=True)
-            response = {'Trackers': trackers_list_ids,
-                        'Tracking': tracking_list_ids,
+            tracking_list_ids = tracking_list.values_list(
+                                'user__id', flat=True)
+            for user in trackers_list:
+                trackers_dict[user.id] = UserSerializer(user).data
+            tracking_users = CustomUser.objects.filter(id__in=tracking_list_ids)
+            for user in tracking_users:
+                tracking_dict[user.id] = UserSerializer(user).data
+            response = {'Trackers': trackers_dict,
+                        'Tracking': tracking_dict,
                         'status': status.HTTP_200_OK}
         except UserTacking.DoesNotExist:
             response = {'errors': "Trackers list is empty", 'status':
@@ -2293,7 +2502,9 @@ class TrackUserAPI(APIView):
                     trackers_list = track_obj.tracked_by.all()
                     if track_by_user in trackers_list:
                         response = {'message': "You are already tracking this user",
-                                    'status': status.HTTP_400_BAD_REQUEST}
+                                    'status': status.HTTP_400_BAD_REQUEST,
+                                    'track_status': 'tracking'
+                                    }
                         return Response(response)
                     track_obj.tracked_by.add(track_by_user.id)
                 except UserTacking.DoesNotExist:
@@ -2303,10 +2514,43 @@ class TrackUserAPI(APIView):
                     track_obj.tracked_by.add(track_by_user.id)
                 msg = "Started Tracking " + track_user.get_full_name()
                 response = {'message': msg,
-                            'status': status.HTTP_200_OK}
+                            'status': status.HTTP_200_OK,
+                            'track_status':'tracking'}
             else:
                 response = {'message': "You cannot track this user",
-                            'status': status.HTTP_200_OK}
+                            'status': status.HTTP_200_OK,
+                            'track_status':'not_tracking'}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class UnTrackUserAPI(APIView):
+    serializer_class = TrackUserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            track_id = data_dict['track_id']
+            track_user = CustomUser.objects.get(id=track_id)
+            track_by_user = self.request.user
+
+            try:
+                track_obj = UserTacking.objects.get(user=track_user)
+                track_obj.tracked_by.remove(track_by_user.id)
+            except UserTacking.DoesNotExist:
+                response = {'errors': "invalid id", 'status':
+                             status.HTTP_400_BAD_REQUEST}
+            msg = "Stopped Tracking " + track_user.get_full_name()
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status':'not_tracking'}
+
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2322,5 +2566,132 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        track_obj = UserTacking.objects.get(user=user)
+        trackers_list = track_obj.tracked_by.all()
+        tracking_list = UserTacking.objects.filter(
+                        tracked_by=user)
+        photos = Photo.objects.filter(user=user).order_by('position')
+
+        context['trackers_list'] = trackers_list
+        context['tracking_list'] = tracking_list
+        context['photos'] = photos
         context['user'] = user
         return context
+
+
+class ChangePhotoPositionAPI(APIView):
+    serializer_class = PhotoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            position = data_dict['position']
+            try:
+                swap_obj1 = Photo.objects.get(id=id)
+                try:
+                    swap_obj2 = Photo.objects.get(Q(position=position) & Q(user=user))
+                    pos_1 = swap_obj1.position
+                    pos_2 = swap_obj2.position
+                    swap_obj1.position, swap_obj2.position  = swap_obj2.position, swap_obj1.position
+                    swap_obj1.save()
+                    swap_obj2.save()
+                except Photo.DoesNotExist:
+                    swap_obj1.position = position
+                    swap_obj1.save()
+            except Photo.DoesNotExist:
+                response = {'errors': "invalid id provided", 'status':
+                             status.HTTP_400_BAD_REQUEST}
+            response = {'message': "Position Swapped",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class SwapImageAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/swap-images.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        photos_dict = dict()
+        user = self.request.user
+        id = self.request.GET.get('id')
+        position = self.request.GET.get('position')
+        try:
+            swap_obj1 = Photo.objects.get(id=id)
+            try:
+                swap_obj2 = Photo.objects.get(Q(position=position) & Q(user=user))
+                pos_1 = swap_obj1.position
+                pos_2 = swap_obj2.position
+                swap_obj1.position, swap_obj2.position  = swap_obj2.position, swap_obj1.position
+                swap_obj1.save()
+                swap_obj2.save()
+            except Photo.DoesNotExist:
+                swap_obj1.position = position
+                swap_obj1.save()
+
+        except Photo.DoesNotExist:
+            pass
+        return self.render_json_response(context)
+
+
+class UploadImageView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/friends-and-followers.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        position = self.request.POST.get('position')
+        file = self.request.FILES['image']
+
+        photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
+        if photo_obj:
+            photo_obj.image = file
+            photo_obj.save()
+        else:
+            photo_obj = Photo()
+            photo_obj.image = file
+            photo_obj.position = position
+            photo_obj.user = user
+            photo_obj.save()
+        return HttpResponseRedirect(reverse("hobo_user:friends-and-followers"))
+
+
+class UploadImageAPI(APIView):
+    serializer_class = UploadPhotoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            user = self.request.user
+            position = data_dict['position']
+            file =  request.data['file']
+            photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
+            if photo_obj:
+                photo_obj.image = file
+                photo_obj.save()
+            else:
+                photo_obj = Photo()
+                photo_obj.image = file
+                photo_obj.position = position
+                photo_obj.user = user
+                photo_obj.save()
+            response = {'message': "Image Uploaded",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
