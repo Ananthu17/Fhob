@@ -244,12 +244,10 @@ class CustomUserSignupHobo(APIView):
         model = get_user_model()
 
 
-class HowTo(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'user_pages/how_to.html'
+class HowTo(View):
 
-    def get(self, request):
-        return Response({})
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_pages/how_to.html')
 
 
 class HomePage(APIView):

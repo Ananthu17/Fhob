@@ -22,11 +22,11 @@
 
         {% elif content.status == 200 and content.user_membership == 'HOB' %}
             <p>Email address verified.</p>
-            <a href = "{% url 'hobo_user:login' %}">Login</a>
+            <a href = "{% url 'hobo_user:user_login' %}">Login</a>
 
         {% else %}
             <p>Invalid Link.</p>
-            <a href = "{% url 'hobo_user:login' %}">Login</a>
+            <a href = "{% url 'hobo_user:user_login' %}">Login</a>
         {% endif %}
 
         {% for obj in queryset %}
