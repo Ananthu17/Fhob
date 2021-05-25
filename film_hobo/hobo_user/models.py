@@ -952,28 +952,28 @@ class UserNotification(models.Model):
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
                                ]
-    notification_type = models.CharField(_("Notification Type"),
-                                         choices=NOTIFICATION_TYPE_CHOICES,
-                                         max_length=150, default=TRACKING)
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
                              related_name='user_notification',
                              verbose_name=_("User"),
                              null=True)
+    notification_type = models.CharField(_("Notification Type"),
+                                         choices=NOTIFICATION_TYPE_CHOICES,
+                                         max_length=150, default=TRACKING)
     tracked_by = models.ForeignKey("hobo_user.CustomUser",
                                    on_delete=models.CASCADE,
                                    related_name='tacked_by_user',
-                                   verbose_name=_("User"),
+                                   verbose_name=_("Tracked by"),
                                    null=True)
     friend_request_from = models.ForeignKey("hobo_user.CustomUser",
                                             on_delete=models.CASCADE,
                                             related_name='friend_request_from',
-                                            verbose_name=_("User"),
+                                            verbose_name=_("Friend request from"),
                                             null=True)
     user_rated_by = models.ForeignKey("hobo_user.CustomUser",
                                       on_delete=models.CASCADE,
                                       related_name='user_rated_by',
-                                      verbose_name=_("User"),
+                                      verbose_name=_("User rated by"),
                                       null=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)

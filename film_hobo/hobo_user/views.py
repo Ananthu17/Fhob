@@ -55,8 +55,9 @@ from .models import CoWorker, CustomUser, GuildMembership, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
-                    UserRating, UserRatingCombined, UserTacking, Photo
+                    EthnicAppearance, UserAgentManager, UserNotification, \
+                    UserProfile, CoWorker, JobType, UserRating, \
+                    UserRatingCombined, UserTacking, Photo
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -70,6 +71,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
+
+from notifications.consumers import Consumer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -2507,10 +2510,24 @@ class TrackUserAPI(APIView):
                                     }
                         return Response(response)
                     track_obj.tracked_by.add(track_by_user.id)
+                    # notification = UserNotification()
+                    # notification.user = track_user
+                    # notification.notification_type = UserNotification.TRACKING
+                    # notification.tracked_by = track_by_user
+                    # notification.save()
+                    # consumer_obj = Consumer()
+                    # print(consumer_obj.__dict__)
+
                 except UserTacking.DoesNotExist:
                     track_obj = UserTacking()
                     track_obj.user = track_user
                     track_obj.save()
+                    # notification = UserNotification()
+                    # notification.user = track_user
+                    # notification.notification_type = UserNotification.TRACKING
+                    # notification.tracked_by = track_by_user
+                    # notification.save()
+
                     track_obj.tracked_by.add(track_by_user.id)
                 msg = "Started Tracking " + track_user.get_full_name()
                 response = {'message': msg,

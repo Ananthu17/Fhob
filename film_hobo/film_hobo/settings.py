@@ -69,12 +69,14 @@ INSTALLED_APPS = [
     'initial_user',
     'hobo_user',
     'payment',
+    'notifications',
 
     'bootstrap_datepicker_plus',
     'django_select2',
     'crispy_forms',
     'django_s3_storage',
-    'zappa_django_utils'
+    'zappa_django_utils',
+    'channels',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -110,7 +112,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'film_hobo.wsgi.application'
+# WSGI_APPLICATION = 'film_hobo.wsgi.application'
+# Channels
+ASGI_APPLICATION = "film_hobo.asgi.application"
 
 
 # Database
@@ -246,4 +250,15 @@ SITE_URL = os.environ.get('SITE_URL', '')
 # # AWS_S3_PUBLIC_URL_STATIC = "https://static.zappaguide.com/"
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # },
+        # 'ROUTING': 'notification_channels.routing.channel_routing',
+    }
+}
 

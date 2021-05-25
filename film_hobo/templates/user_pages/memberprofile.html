@@ -29,7 +29,7 @@
             {% if profile.user.id != request.user.id and can_track == True %}
                     <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
                     <span class="track-btn">
-                        <button class="btn" style="color:rgb(7, 128, 184);font-weight: bold;" id="track">Track</button>
+                        <button class="btn" style="color:rgb(7, 128, 184);font-weight: bold;" id="track" class="track">Track</button>
                     </span>
             {% endif %}
         {% endif %}
@@ -106,7 +106,7 @@
         var track_id = $("#track_id").val();
         var data_dict = {}
         data_dict['track_id'] = track_id;
-        console.log(track_id)
+        // console.log(track_id)
         $.ajax
         ({
             type: "POST",
@@ -118,6 +118,10 @@
                 xhr.setRequestHeader ("Authorization", token);
             },
             success: function (response){
+                // gameSocket.send(JSON.stringify({
+                //     "event": "TRACK",
+                //     "message": "Started tracking"
+                // }));
                 $('.track-btn').html(" ")
                 $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='un_track'>Tracking</button>");
             }
@@ -130,7 +134,7 @@
         var track_id = $("#track_id").val();
         var data_dict = {}
         data_dict['track_id'] = track_id;
-        console.log(track_id)
+        // console.log(track_id)
         $.ajax
         ({
             type: "POST",
@@ -143,7 +147,7 @@
             },
             success: function (response){
                 $('.track-btn').html(" ")
-                $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='track'>Track</button>");
+                $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='track' class='track'>Track</button>");
             }
         });
     });

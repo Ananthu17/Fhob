@@ -1,5 +1,6 @@
 {% load rest_framework %}
 {% load static %}
+{% load static %}
 {% block extracss %}
 {% endblock %}
 <!DOCTYPE html>
@@ -209,6 +210,7 @@
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="{% static 'js/notification.js' %}"></script>
     <script>
     /*
     code to store token info into local storage on login
