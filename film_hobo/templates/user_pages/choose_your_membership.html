@@ -1,25 +1,29 @@
+{% extends 'base.html' %}
 {% load rest_framework %}
 
-<html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_indie' %}">Indie</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_pro' %}">Pro</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_company' %}">Company</a></h3>
-                </div>
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <h3><a href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></h3>
+            </div>
+            <div class="col-sm-3">
+                <h3><a href = "{% url 'hobo_user:signup_indie' %}">Indie</a></h3>
+            </div>
+            <div class="col-sm-3">
+                <h3><a href = "{% url 'hobo_user:signup_pro' %}">Pro</a></h3>
+            </div>
+            <div class="col-sm-3">
+                <h3><a href = "{% url 'hobo_user:signup_company' %}">Company</a></h3>
             </div>
         </div>
-    </body>
-</html>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}

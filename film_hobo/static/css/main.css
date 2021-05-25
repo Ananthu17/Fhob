@@ -1030,3 +1030,52 @@ input#visa:focus {
   font-weight: 600;
 }
 /*member setup page end*/
+/*login page*/
+.btn-login{
+  color: #2265b9;
+   background-color: #e6e6e6;
+   font-family: "Myraid Pro";
+   font-weight: 600;
+   font-size: 14px;
+   padding: 4px 35px;
+   height: 30px;
+}
+.btn-login:hover, .btn-login:focus, .btn-login:active{
+  color: #2265b9;
+   background-color: #e6e6e6;
+   font-family: "Myraid Pro";
+   font-weight: 600;
+   font-size: 14px;
+   padding: 4px 35px;
+   height: 30px;
+   outline: none;
+   box-shadow: none;
+}
+.login-link{
+  color: #2265b9;
+   font-family: "Myraid Pro";
+   font-weight: 600;
+   font-size: 14px;
+}
+.login-link:active, .login-link:focus, .login-link:hover{
+  color: #2265b9;
+   font-family: "Myraid Pro";
+   font-weight: 600;
+   font-size: 14px;
+   text-decoration: none;
+}
+/* login page end*/
+/*password-reset page*/
+.pr-content{
+  font-size: 16px;
+  color: #2265b9;
+}
+/*password-reset page end*/
+/*simple content page*/
+.content-page-logo{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 110px;
+}
+/*simple content page end*/
