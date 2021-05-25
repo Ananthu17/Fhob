@@ -702,6 +702,11 @@ class PaymentIndieView(TemplateView):
         context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
+        free_evaluation_time = payment_details['free_days']
+        date_today = datetime.date.today()
+        date_interval = datetime.timedelta(days=int(free_evaluation_time))
+        bill_date = date_today + date_interval
+        context['bill_date'] = bill_date
         return context
 
 

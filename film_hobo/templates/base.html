@@ -130,7 +130,7 @@
                                     <a class="dropdown-item" href="#">My Projects</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% else %}
-                                    <a class="dropdown-item" href="#">Settings & Privacy</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
                                     <a class="dropdown-item" href="#">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">

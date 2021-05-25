@@ -5,18 +5,16 @@
 {% endblock %}
 
 {% block content %}
-
+<div class="wrapper flex-grow-1">
         <h3>Home Page</h3>
         {% if user.is_authenticated %}
-            <p>Welcome, {{ user.email }}. Thanks for logging in.</p>
-            <p>{{ user.get_full_name }}</p>
-            <a id="logout_link" href="{% url 'hobo_user:user_logout' %}" >Logout</a><br>
-            <a href="{% url 'hobo_user:settings' %}">Settings</a>
+            <p>Welcome, {{ user.get_full_name }}.</p>
+            <p>Thanks for logging in.</p>
         {% else %}
             <p>Welcome, new user. Please log in.</p>
         {% endif %}
         </form>
-
+</div>
 {% endblock %}
 
 {% block extrajs %}
