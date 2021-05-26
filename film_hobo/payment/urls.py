@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
-     EditDiscountDetailAPI, DeleteDiscountDetailAPI
+     EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI
 
 app_name = "payment"
 
@@ -20,6 +20,8 @@ urlpatterns = [
          name='edit_discount_detail'),
     path('delete_discount_detail/<int:pk>/', DeleteDiscountDetailAPI.as_view(),
          name='delete_discount_detail'),
+    path('calculate_discount/', CalculateDiscountAPI.as_view(),
+         name='calculate_discount'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
          name='payment_admin')

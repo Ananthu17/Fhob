@@ -1,11 +1,14 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
+from django.utils import timezone
 from django.views.generic.base import View
 
 from rest_framework import status
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from datetimerange import DateTimeRange
 
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode
@@ -427,4 +430,37 @@ class DeleteDiscountDetailAPI(APIView):
         except ObjectDoesNotExist:
             return Response(
                 {"status": "promocode record not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class CalculateDiscountAPI(APIView):
+    """
+    API for calculateing the discount
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        try:
+            data = request.data
+            promocode_obj = PromoCode.objects.get(promo_code=data['promocode'])
+            current_date_time = timezone.now()
+            time_range = DateTimeRange(
+                promocode_obj.valid_from, promocode_obj.valid_to)
+            if current_date_time in time_range:
+                if promocode_obj.amount_type == 'flat_amount':
+                    final_amount = float(data['amount']) - \
+                        float(promocode_obj.amount)
+                else:
+                    final_amount = float(data['amount']) - \
+                        (float(data['amount']) * (float(promocode_obj.amount) / 100.0))
+                return Response({"status": "success",
+                                 "final_amount": round(final_amount, 2)},
+                                status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"status": "promocode expired"},
+                    status=status.HTTP_404_NOT_FOUND)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "promocode does not exist"},
                 status=status.HTTP_404_NOT_FOUND)

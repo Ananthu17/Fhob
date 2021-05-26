@@ -64,7 +64,13 @@
                         <div class="col-7 paymnt-lft-bar">
                             <form>
                                 <div class="mt-4">Amount: $
+                                    {% if payment_plan == 'monthly' %}
                                     <span id="full_amount">{{ payment_details.monthly_amount }}</span>
+                                    {% elif payment_plan == 'annually' %}
+                                    <span id="full_amount">{{ payment_details.annual_amount }}</span>
+                                    {% else %}
+                                    <span id="full_amount">0.00</span>
+                                    {% endif %}
                                 </div>
                                 <div class="mt-4">Promotions: $
                                     <span id="promotion_amount">0.00</span>
