@@ -118,10 +118,10 @@
                 xhr.setRequestHeader ("Authorization", token);
             },
             success: function (response){
-                // gameSocket.send(JSON.stringify({
-                //     "event": "TRACK",
-                //     "message": "Started tracking"
-                // }));
+                gameSocket.send(JSON.stringify({
+                    "event": "TRACK",
+                    "message": "Started tracking"
+                }));
                 $('.track-btn').html(" ")
                 $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='un_track'>Tracking</button>");
             }
