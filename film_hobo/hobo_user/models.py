@@ -138,7 +138,7 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(_('Last Name'),
                                  max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
-    bio = models.TextField(_("Bio"), null=True, blank=True)
+    # bio = models.TextField(_("Bio"), null=True, blank=True)
     imdb_url = models.URLField(_("IMDB URL"),
                                null=True,
                                blank=True)
