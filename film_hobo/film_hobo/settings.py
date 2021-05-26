@@ -209,15 +209,6 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
-
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
-# Email settings
-AUTH_EMAIL_VERIFICATION = True
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
 EMAIL_FROM = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_FROM', 'avin@techversantinfo.com')
 EMAIL_HOST_USER = os.environ.get(
@@ -261,4 +252,3 @@ CHANNEL_LAYERS = {
         # 'ROUTING': 'notification_channels.routing.channel_routing',
     }
 }
-
