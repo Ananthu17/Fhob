@@ -1,5 +1,4 @@
 
-import json
 import datetime
 from django.utils import timezone
 from datetime import date
@@ -140,7 +139,7 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(_('Last Name'),
                                  max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
-    bio = models.TextField(_("Bio"), null=True, blank=True)
+    # bio = models.TextField(_("Bio"), null=True, blank=True)
     imdb_url = models.URLField(_("IMDB URL"),
                                null=True,
                                blank=True)
@@ -204,6 +203,9 @@ class CustomUser(AbstractUser):
                                     unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
+    date_of_joining = models.DateField(_("Date of Joining"),
+                                       default=datetime.date.today,
+                                       null=True)
     # address = models.TextField(_("Address"), null=True)
     address = models.CharField(_("Address"),
                                max_length=250,
@@ -230,11 +232,11 @@ class CustomUser(AbstractUser):
     #                                          verbose_name=_("Athletic Skills"
     #                                                         )
     #                                          )
-    # ethnic_appearance = models.ForeignKey("hobo_user.EthnicAppearance",
-    #                                       on_delete=models.SET_NULL,
-    #                                       related_name='user_ethnic_appearance',
-    #                                       verbose_name=_("Ethnic Appearance"),
-    #                                       null=True)
+    ethnic_appearance = models.ForeignKey('hobo_user.EthnicAppearance',
+                                          on_delete=models.SET_NULL,
+                                          related_name='user_ethnic_appearance',
+                                          verbose_name=_("Ethnic Appearance"),
+                                          null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -242,6 +244,23 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    def get_full_name(self):
+        if self.is_superuser:
+            name = "Admin"
+        elif self.middle_name:
+            name = self.first_name+" "+self.middle_name+" "+self.last_name
+        else:
+            name = self.first_name+" "+self.last_name
+        return name
+
+    def get_height_in_meters(self):
+        if self.feet:
+            feet = self.feet
+            inch = (self.inch)/12
+            in_feet = feet+inch
+            in_meter = round(float(in_feet/3.281), 2)
+        return in_meter
 
 
 class EthnicAppearance(models.Model):
@@ -293,6 +312,7 @@ class AthleticSkill(models.Model):
 class AthleticSkillInline(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
                                 verbose_name=_("Creator"),
+                                related_name="user_athletic_skills",
                                 on_delete=models.CASCADE)
     athletic_skill = models.ForeignKey("hobo_user.AthleticSkill",
                                        on_delete=models.CASCADE)
@@ -701,3 +721,295 @@ class CustomUserSettings(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class JobType(models.Model):
+    title = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'Job Type'
+        verbose_name_plural = 'Job Types'
+
+
+class UserProfile(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_profile',
+                             verbose_name=_("User"),
+                             null=True)
+    job_types = models.ManyToManyField('hobo_user.JobType',
+                                       blank=True,
+                                       related_name="user_job_types",
+                                       verbose_name=_("Job Types")
+                                       )
+    company = models.CharField(_('Company'),
+                               max_length=150,
+                               null=True,
+                               blank=True
+                               )
+    company_position = models.CharField(_('Company Position'),
+                                        max_length=150,
+                                        null=True,
+                                        blank=True
+                                        )
+    company_website = models.CharField(_('Company Website'),
+                                       max_length=150,
+                                       null=True,
+                                       blank=True
+                                       )
+    imdb = models.CharField(_("IMDB"),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    bio = models.TextField(_("Bio/Info"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user.email)
+
+    def update_job_type(self, job_id):
+        job_types = self.job_types.all()
+        job_types = list(job_types)
+        job = JobType.objects.get(id=job_id)
+        if job not in job_types:
+            job_types.append(job)
+            self.job_types.set(job_types)
+        return str(self.user.email)
+
+    def remove_job_type(self, job_id):
+        job_types = self.job_types.all()
+        job_types = list(job_types)
+        job = JobType.objects.get(id=job_id)
+        if job in job_types:
+            job_types.remove(job)
+            self.job_types.set(job_types)
+        return str(self.user.email)
+
+    class Meta:
+        verbose_name = 'User Profile'
+        verbose_name_plural = 'User Profiles'
+
+
+class CoWorker(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='coworker',
+                             verbose_name=_("User"),
+                             null=True)
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company',
+                                verbose_name=_("Company"),
+                                null=True)
+    name = models.CharField(_('Name'),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.CASCADE,
+                                 related_name='coworker',
+                                 verbose_name=_("Position"),
+                                 null=True)
+
+
+class UserRatingCombined(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_rating',
+                             verbose_name=_("User"),
+                             null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="user_job_type_rating_combined",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Rating Combined'
+        verbose_name_plural = 'User Rating Combined'
+
+
+class UserRating(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_rating_combined',
+                             verbose_name=_("User"),
+                             null=True)
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='rated_by_user',
+                                 verbose_name=_("Rated by"),
+                                 null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="user_job_type_rating",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Rating'
+        verbose_name_plural = 'User Rating'
+
+
+class UserTacking(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_tracking',
+                             verbose_name=_("User"),
+                             null=True)
+    tracked_by = models.ManyToManyField('hobo_user.CustomUser',
+                                        blank=True,
+                                        related_name="tracked_by",
+                                        verbose_name=_("Tracked by")
+                                        )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Tracking'
+        verbose_name_plural = 'User Tracking'
+
+
+class FriendRequest(models.Model):
+    ACCEPTED = 'accepted'
+    REQUEST_SEND = 'request_send'
+    STATUS_CHOICES = [
+        (ACCEPTED, 'Accepted'),
+        (REQUEST_SEND, 'Request Send'),
+    ]
+    status = models.CharField(_("Account Status"),
+                              choices=STATUS_CHOICES,
+                              max_length=150, default=REQUEST_SEND)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_friend_request',
+                             verbose_name=_("User"),
+                             null=True)
+    requested_by = models.ForeignKey("hobo_user.CustomUser",
+                                     on_delete=models.CASCADE,
+                                     related_name='requested_by',
+                                     verbose_name=_("Requested by"),
+                                     null=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Friend Request'
+        verbose_name_plural = 'Friend Requests'
+
+
+class UserAgentManager(models.Model):
+    AGENT = 'agent'
+    MANAGER = 'manager'
+    AGENT_TYPE_CHOICES = [
+        (AGENT, 'Agent'),
+        (MANAGER, 'Manager'),
+    ]
+    agent_type = models.CharField(_("Agent Type"),
+                                  choices=AGENT_TYPE_CHOICES,
+                                  max_length=150, default=AGENT)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_agent',
+                             verbose_name=_("User"),
+                             null=True)
+    agent_name = models.CharField(_('Name'),
+                                  max_length=150,
+                                  null=True,
+                                  blank=True
+                                  )
+    agent_phone = PhoneNumberField(_("Agent's phone number"),
+                                   null=True,
+                                   blank=True
+                                   )
+    agent_email = models.EmailField(_("Agent's email address"),
+                                    null=True,
+                                    blank=True)
+    agent_job_type = models.CharField(_('Agent Job Type'),
+                                      max_length=150,
+                                      null=True,
+                                      blank=True
+                                      )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Agent/Manager'
+        verbose_name_plural = 'User Agents/Managers'
+
+
+class Photo(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_photo',
+                             verbose_name=_("User"),
+                             null=True)
+    position = models.IntegerField(_("Position"), null=True, blank=True)
+    image = models.ImageField(upload_to='gallery/',
+                              blank=True, null=True,
+                              help_text="Image size:370 X 248.")
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Photo'
+        verbose_name_plural = 'Photos'
+
+
+class UserNotification(models.Model):
+    TRACKING = 'tracking'
+    FRIEND_REQUEST = 'friend_request'
+    USER_RATING = 'user_rating'
+    NOTIFICATION_TYPE_CHOICES = [
+                                (TRACKING, 'Tracking'),
+                                (FRIEND_REQUEST, 'Friend Request'),
+                                (USER_RATING, 'User Rating'),
+                               ]
+    notification_type = models.CharField(_("Notification Type"),
+                                         choices=NOTIFICATION_TYPE_CHOICES,
+                                         max_length=150, default=TRACKING)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_notification',
+                             verbose_name=_("User"),
+                             null=True)
+    tracked_by = models.ForeignKey("hobo_user.CustomUser",
+                                   on_delete=models.CASCADE,
+                                   related_name='tacked_by_user',
+                                   verbose_name=_("User"),
+                                   null=True)
+    friend_request_from = models.ForeignKey("hobo_user.CustomUser",
+                                            on_delete=models.CASCADE,
+                                            related_name='friend_request_from',
+                                            verbose_name=_("User"),
+                                            null=True)
+    user_rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                      on_delete=models.CASCADE,
+                                      related_name='user_rated_by',
+                                      verbose_name=_("User"),
+                                      null=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Notification'
+        verbose_name_plural = 'User Notifications'

@@ -6,9 +6,9 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings, AthleticSkill
+    CustomUserSettings, AthleticSkill, UserProfile, CoWorker
 
-from .models import GuildMembership, Country
+from .models import GuildMembership, Country, Photo
 
 
 
@@ -293,4 +293,33 @@ class PersonalDetailsForm(forms.ModelForm):
         model = CustomUser
         fields = ('gender', 'feet', 'inch', 'lbs', 'start_age',
                   'stop_age', 'physique', 'hair_color', 'hair_length',
-                  'eyes')
+                  'eyes', 'ethnic_appearance')
+
+    def __init__(self, *args, **kwargs):
+        super(PersonalDetailsForm, self).__init__(*args, **kwargs)
+        # self.fields[field].required = True
+
+
+class EditProfileForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=100, required=True,
+                                 help_text='')
+    middle_name = forms.CharField(max_length=100, required=False,
+                                  help_text='')
+    last_name = forms.CharField(max_length=100, required=True,
+                                help_text='')
+    guild_membership = forms.ModelMultipleChoiceField(
+        label="Guild Membership",
+        queryset=GuildMembership.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ('company', 'company_position',
+                  'company_website', 'imdb', 'bio')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+

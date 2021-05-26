@@ -1,10 +1,15 @@
 import ast
 import json
+from os import remove
+from django.contrib.auth.models import User
+from django.db.models.deletion import SET_NULL
 import requests
 import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.core.files import File
+from django.db.models import Q
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -20,12 +25,14 @@ from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework import serializers
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
@@ -34,18 +41,22 @@ from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
-
+from rest_framework.exceptions import ParseError
+from rest_framework.parsers import FileUploadParser
 
 from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
-    ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm
+    ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
+    EditProfileForm
 
-from .models import CustomUser, IndiePaymentDetails, ProPaymentDetails, \
+from .models import CoWorker, CustomUser, GuildMembership, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails, EthnicAppearanceInline, \
-                    AthleticSkillInline, AthleticSkill
+                    CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
+                    EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
+                    UserRating, UserRatingCombined, UserTacking, Photo
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -55,7 +66,10 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     EnableAccountSerializer, BlockMembersSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
-    PasswordResetSerializer
+    PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
+    RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
+    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -141,6 +155,9 @@ class ExtendedRegisterView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -161,6 +178,9 @@ class ExtendedRegisterCompanyView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -178,6 +198,9 @@ class ExtendedRegisterIndieView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -196,6 +219,9 @@ class ExtendedRegisterProView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
+        profile = UserProfile()
+        profile.user = user
+        profile.save()
 
         return Response(self.get_response_data(user),
                         status=status.HTTP_201_CREATED,
@@ -804,7 +830,6 @@ class ChangePasswordAPI(AuthPasswordChangeView):
     # serializer_class = ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
-        print("here")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if serializer.is_valid():
@@ -1060,7 +1085,7 @@ class ForgotPasswordView(TemplateView):
                             'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
-        print(user_response)
+        # print(user_response)
 
         byte_str = user_response.content
         dict_str = byte_str.decode("UTF-8")
@@ -1100,7 +1125,6 @@ class PasswordResetTemplateView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         response = dict(response)
-        print(response)
         if 'status' in response:
             if response['status'] == 200:
                 # confirmation mail
@@ -1417,7 +1441,6 @@ class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
         super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
         for id in super_users:
             already_blocked_users.append(id)
-        print(already_blocked_users)
 
         modified_queryset = CustomUser.objects.exclude(
                             id__in=already_blocked_users)
@@ -1445,12 +1468,11 @@ class PersonalDetailsAPI(APIView):
         personal_settings['hair_color'] = user.hair_color
         personal_settings['hair_length'] = user.hair_length
         personal_settings['eyes'] = user.eyes
-        # ethnic_appearance_list = EthnicAppearanceInline.objects.filter(
-        #                          creator=user)
+        personal_settings['eyes'] = user.eyes
+        personal_settings['ethnic_appearance'] = user.ethnic_appearance.ethnic_appearance
+
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
-        print(athletic_skill_list)
-        # personal_settings['ethnic_appearance'] = 
         personal_settings['athletic_skills'] = athletic_skill_list
         response = {"personal_settings" : personal_settings}
         return Response(response)
@@ -1480,6 +1502,10 @@ class PersonalDetailsAPI(APIView):
                 user.hair_length = data_dict['hair_length']
             if 'eyes' in data_dict:
                 user.eyes = data_dict['eyes']
+            if 'ethnic_appearance' in data_dict:
+                ethnic_appearance_id = data_dict['ethnic_appearance']
+                obj = EthnicAppearance.objects.get(id=ethnic_appearance_id)
+                user.ethnic_appearance = obj
             user.save()
             if 'athletic_skills' in data_dict:
                 old_skills = AthleticSkillInline.objects.filter(creator=user)
@@ -1512,38 +1538,1169 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         all_athletic_skills = AthleticSkill.objects.all()
+        all_ethnic_appearances = EthnicAppearance.objects.all()
         athletic_skills = AthleticSkillInline.objects.filter(
                           creator=user).values_list('athletic_skill__id', flat=True)
         context['form'] = self.form_class(instance=user)
         context['user'] = user
-        context['all_athletic_skills'] = all_athletic_skills
+        context['all_ethnic_appearances'] = all_ethnic_appearances
+        context['all_athletic_skills_set1'] = all_athletic_skills[:15]
+        context['all_athletic_skills_set2'] = all_athletic_skills[15:]
         context['athletic_skills'] = athletic_skills
         return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        print(request.POST)
-        # json_response = json.dumps(request.POST)
-        # json_dict = ast.literal_eval(json_response)
-        # key = Token.objects.get(user=user).key
-        # token = 'Token '+key
-        # user_response = requests.post(
-        #                     'http://127.0.0.1:8000/hobo_user/personal-details-api/',
-        #                     data=json.dumps(request.POST),
-        #                     headers={'Content-type': 'application/json',
-        #                              'Authorization': token})
-        # byte_str = user_response.content
-        # dict_str = byte_str.decode("UTF-8")
-        # response = ast.literal_eval(dict_str)
-        # response = dict(response)
-        # if 'status' in response:
-        #     if response['status'] == 200:
-        #         messages.success(self.request, 'Personal details updated')
-        #         return HttpResponseRedirect(
-        #             reverse('hobo_user:personal-details'))
-        #     else:
-        #         message = response['message']
-        # return render(
-        #     request, 'user_pages/personal-details.html',
-        #     {'message': message})
-        return HttpResponseRedirect(reverse('hobo_user:personal-details'))
+
+        athletic_skills = request.POST.getlist('checks[]')
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['athletic_skills'] = athletic_skills
+        lbs = request.POST.get('lbs')
+        start_age = request.POST.get('start_age')
+        stop_age = request.POST.get('stop_age')
+        lbs = request.POST.get('lbs')
+        if lbs == '':
+            json_dict['lbs'] = None
+        if start_age == '':
+            json_dict['start_age'] = None
+        if stop_age == '':
+            json_dict['stop_age'] = None
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        message = ""
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Personal details updated')
+                return HttpResponseRedirect(
+                    reverse('hobo_user:edit-profile'))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    all_athletic_skills = AthleticSkill.objects.all()
+                    all_ethnic_appearances = EthnicAppearance.objects.all()
+                    athletic_skills = AthleticSkillInline.objects.filter(
+                          creator=user).values_list('athletic_skill__id', flat=True)
+                    messages.warning(self.request, "Failed to update personal details.")
+                    return render(request, 'user_pages/personal-details.html',
+                                  {'errors': errors,
+                                   'form': PersonalDetailsForm,
+                                   'all_ethnic_appearances': all_ethnic_appearances,
+                                   'all_athletic_skills_set1': all_athletic_skills[:15],
+                                   'all_athletic_skills_set2': all_athletic_skills[15:],
+                                   'athletic_skills': athletic_skills,
+                                   'user': user
+                                  })
+        return HttpResponseRedirect(reverse('hobo_user:edi-profile'))
+
+
+class UserProfileAPI(APIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        profile = UserProfile.objects.get(user=user)
+        profile_data = {}
+        job_type_list = {}
+        guild_membership_dict = {}
+        job_types = profile.job_types.all()
+        guild_membership = user.guild_membership.all()
+
+        profile_data['first_name'] = user.first_name
+        profile_data['middle_name'] = user.middle_name
+        profile_data['last_name'] = user.last_name
+        profile_data['membership'] = user.membership
+        for item in job_types:
+            job_type_list[item.id] = item.title
+        for item in guild_membership:
+            guild_membership_dict[item.id] = item.membership
+        profile_data['guild_membership'] = guild_membership_dict
+        profile_data['job_types'] = job_type_list
+        profile_data['company'] = profile.company
+        profile_data['company_position'] = profile.company_position
+        profile_data['company_website'] = profile.company_website
+        profile_data['imdb'] = profile.imdb
+        profile_data['bio'] = profile.bio
+        if user.membership == CustomUser.PRODUCTION_COMPANY:
+            coworkers = CoWorker.objects.filter(company=user)
+            coworkers_dict = {}
+            for obj in coworkers:
+                coworkers_dict[obj.id] = obj.position.title
+        profile_data['coworkers'] = coworkers_dict
+        response = {"profile_data": profile_data}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'first_name' in data_dict:
+                user.first_name = data_dict['first_name']
+            if 'middle_name' in data_dict:
+                user.middle_name = data_dict['middle_name']
+            if 'last_name' in data_dict:
+                user.last_name = data_dict['last_name']
+            if 'guild_membership' in data_dict:
+                user.guild_membership.set(data_dict['guild_membership'])
+            user.save()
+            if 'company' in data_dict:
+                profile.company = data_dict['company']
+            if 'company_position' in data_dict:
+                profile.company_position = data_dict['company_position']
+            if 'company_website' in data_dict:
+                profile.company_website = data_dict['company_website']
+            if 'imdb' in data_dict:
+                profile.imdb = data_dict['imdb']
+            if 'bio' in data_dict:
+                profile.bio = data_dict['bio']
+            profile.save()
+            response = {'message': "Profile Updated",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-profile.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = EditProfileForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = UserProfile.objects.get(user=user)
+        all_agents = UserAgentManager.objects.filter(user=self.request.user)
+        context['all_agents'] = all_agents
+        context['guild_membership'] = GuildMembership.objects.all()
+        context['user'] = user
+        context['profile'] = profile
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list)
+        context['photos'] = photos[:3]
+        context['all_photos'] = all_photos[:4]
+        context['form'] = self.form_class(instance=profile)
+
+        # exclude super user and current user
+        user_ids = []
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        for id in super_users:
+            user_ids.append(id)
+        user_ids.append(user.id)
+        all_users = CustomUser.objects.exclude(id__in=user_ids)
+
+        context['all_users'] = all_users
+        context['job_types'] = JobType.objects.all()
+
+        coworkers = CoWorker.objects.filter(company=user)
+        context['coworkers'] = coworkers
+
+        track_obj = UserTacking.objects.get(user=user)
+        trackers_list = track_obj.tracked_by.all()
+        tracking_list = UserTacking.objects.filter(
+                        tracked_by=user)
+        context['trackers_list'] = trackers_list
+        context['tracking_list'] = tracking_list
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        profile = UserProfile.objects.get(user=user)
+        guild_membership_all = GuildMembership.objects.all()
+        all_agents = UserAgentManager.objects.filter(user=self.request.user)
+        guild_membership = request.POST.getlist('guild_membership')
+        remove_agents = request.POST.getlist('remove-agent')
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        json_dict['guild_membership'] = guild_membership
+
+        agent_dict = {}
+        remove_dict = {}
+        agent_name_list = request.POST.get('agent_name')
+        agent_phone_list = request.POST.get('agent_phone')
+        agent_email_list = request.POST.get('agent_email')
+        agent_manager_list = list(request.POST.getlist('agent_type'))
+        agent_job_list = request.POST.get('agent_job_type')
+        agent_manager_count = len(agent_manager_list)
+
+        # edit agent/manager
+        edit_agent_dict = {}
+        edit_agent_id_list = request.POST.getlist('edit_agent_id')
+        edit_agent_name_list = request.POST.getlist('edit_agent_name')
+        edit_agent_phone_list = request.POST.getlist('edit_agent_phone')
+        edit_agent_email_list = request.POST.getlist('edit_agent_email')
+        edit_agent_manager_list = request.POST.getlist('edit_agent_type')
+        edit_agent_job_list = request.POST.getlist('edit_agent_job_type')
+        edit_count = len(edit_agent_manager_list)
+
+        for i in range(edit_count):
+            edit_agent_dict['id'] = edit_agent_id_list[i]
+            edit_agent_dict['agent_name'] = edit_agent_name_list[i]
+            edit_agent_dict['agent_type'] = edit_agent_manager_list[i]
+            edit_agent_dict['agent_job_type'] = edit_agent_job_list[i]
+            edit_agent_dict['agent_phone'] = edit_agent_phone_list[i]
+            if edit_agent_email_list[i] != "":
+                edit_agent_dict['agent_email'] = edit_agent_email_list[i]
+            else:
+                edit_agent_dict['agent_email'] = ""
+            # call edit-agent api
+            user_response = requests.post(
+                    'http://127.0.0.1:8000/hobo_user/edit-agent-manager-api/',
+                    data=json.dumps(edit_agent_dict),
+                    headers={'Content-type': 'application/json',
+                            'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        errors = response['errors']
+                        if 'agent_phone' in errors and 'agent_email' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager.Enter valid phone number and email address.")
+                        elif 'agent_phone' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager. Enter valid phone number.")
+                        elif 'agent_email' in errors:
+                            messages.warning(self.request,
+                            "Failed to update Agent/Manager. Enter valid email address.")
+                        return HttpResponseRedirect(
+                                reverse('hobo_user:edit-profile'))
+
+        if agent_name_list == "":
+            agent_count = 0
+        else:
+            agent_name_list = list(request.POST.getlist('agent_name'))
+            agent_count = len(agent_name_list)
+
+        if agent_job_list == "":
+            agent_job_count = 0
+        else:
+            agent_job_list = list(request.POST.getlist('agent_job_type'))
+            agent_job_count = len(agent_job_list)
+
+        if agent_phone_list == "":
+            agent_phone_count = 0
+        else:
+            agent_phone_list = list(request.POST.getlist('agent_phone'))
+            agent_phone_count = len(agent_phone_list)
+
+        if agent_email_list == "":
+            agent_email_count = 0
+        else:
+            agent_email_list = list(request.POST.getlist('agent_email'))
+            agent_email_count = len(agent_email_list)
+
+        if((agent_count != 0) and
+           (agent_count != agent_manager_count) or
+           (agent_count != agent_phone_count) or
+           (agent_count != agent_job_count)
+           ):
+            messages.warning(
+                self.request,
+                "Failed to update Agent/Manager. Provide agent name, job & phone number.")
+            return HttpResponseRedirect(reverse('hobo_user:edit-profile'))
+
+        if((agent_count == agent_manager_count) and
+           (agent_count == agent_phone_count) and
+           (agent_count == agent_job_count) and
+           (agent_count != 0)
+           ):
+            for i in range(agent_count):
+                agent_dict['agent_name'] = agent_name_list[i]
+                agent_dict['agent_type'] = agent_manager_list[i]
+                agent_dict['agent_job_type'] = agent_job_list[i]
+                agent_dict['agent_phone'] = agent_phone_list[i]
+                if agent_email_count != 0:
+                    if agent_email_list[i] != "":
+                        agent_dict['agent_email'] = agent_email_list[i]
+                    else:
+                        agent_dict['agent_email'] = ""
+
+                # save agents/manager
+                user_response = requests.post(
+                                    'http://127.0.0.1:8000/hobo_user/add-agent-manager-api/',
+                                    data=json.dumps(agent_dict),
+                                    headers={'Content-type': 'application/json',
+                                            'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            errors = response['errors']
+                            if 'agent_phone' in errors and 'agent_email' in errors:
+                                messages.warning(self.request,
+                                "Failed to update Agent/Manager.Enter valid phone number and email address.")
+                            elif 'agent_phone' in errors:
+                                messages.warning(self.request,
+                                "Failed to update Agent/Manager. Enter valid phone number.")
+                            elif 'agent_email' in errors:
+                                messages.warning(self.request,
+                                "Failed to update Agent/Manager. Enter valid email address.")
+                            return HttpResponseRedirect(
+                                    reverse('hobo_user:edit-profile'))
+        if remove_agents:
+            remove_dict['id'] = remove_agents
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/remove-agent-api/',
+                                data=json.dumps(remove_dict),
+                                headers={
+                                    'Content-type': 'application/json',
+                                    'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        # errors = response['errors']
+                        messages.warning(
+                            self.request, "Failed to remove Stuff !!")
+                        return HttpResponseRedirect(
+                            reverse('hobo_user:edit-profile'))
+
+        # Update Profile
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/profile-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Profile updated successfully')
+                return HttpResponseRedirect("/hobo_user/profile/%s/" % (user.id))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    messages.warning(self.request, "Failed to update profile !!")
+                    return render(request, 'user_pages/edit-profile.html',
+                                  {'errors': errors,
+                                   'form': self.form_class(instance=profile),
+                                   'profile': profile,
+                                   'user': user,
+                                   'guild_membership': guild_membership_all,
+                                   'all_agents': all_agents
+                                   })
+        return HttpResponseRedirect("/hobo_user/profile/%s/" % (user.id))
+
+
+class AddCoworkerAPI(APIView):
+    serializer_class = CoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        company = request.user
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'user' not in data_dict and 'name' not in data_dict:
+                response = {'errors': "Either User id or Name is required", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            else:
+                coworker = CoWorker()
+                coworker.company = company
+                if 'position' in data_dict:
+                    position = JobType.objects.get(id=data_dict['position'])
+                    coworker.position = position
+                if 'user' in data_dict:
+                    user = CustomUser.objects.get(id=data_dict['user'])
+                    coworker.user = user
+                    coworker.name = user.get_full_name()
+                    profile = UserProfile.objects.get(user=user)
+                    profile.update_job_type(position.id)
+                    profile.save()
+                if 'name' in data_dict:
+                    coworker.name = data_dict['name']
+                coworker.save()
+                response = {'message': "Stuff Added",
+                            'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditCoworkerAPI(APIView):
+    serializer_class = CoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                coworker = CoWorker.objects.get(id=id)
+                if coworker.company == request.user:
+                    if 'position' in data_dict:
+                        position = JobType.objects.get(id=data_dict['position'])
+                        coworker.position = position
+                    if 'user' in data_dict and data_dict['user']!="":
+                        user_id = data_dict['user']
+                        user = CustomUser.objects.get(id=user_id)
+                        coworker.user = user
+                        coworker.name = user.get_full_name()
+                        profile = UserProfile.objects.get(user=user)
+                        profile.update_job_type(position.id)
+                        profile.save()
+                    if 'name' in data_dict and data_dict['name'] != "":
+                        coworker.name = data_dict['name']
+                    coworker.save()
+                    response = {'message': "Stuffs Updated",
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': "Invalid Token", 'status':
+                                status.HTTP_400_BAD_REQUEST}
+            except CoWorker.DoesNotExist:
+                response = {'errors': "Object Not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddAgentManagerAPI(APIView):
+    serializer_class = AgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            obj = UserAgentManager()
+            obj.user = self.request.user
+            if 'agent_type' in data_dict:
+                obj.agent_type = data_dict['agent_type']
+            if 'agent_name' in data_dict:
+                obj.agent_name = data_dict['agent_name']
+            if 'agent_phone' in data_dict:
+                obj.agent_phone = data_dict['agent_phone']
+            if 'agent_email' in data_dict:
+                obj.agent_email = data_dict['agent_email']
+            if 'agent_job_type' in data_dict:
+                obj.agent_job_type = data_dict['agent_job_type']
+
+            obj.save()
+            response = {'message': "Agent-Manager Added",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditAgentManagerAPI(APIView):
+    serializer_class = AgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                obj = UserAgentManager.objects.get(id=id)
+                if request.user == obj.user:
+                    if 'agent_type' in data_dict:
+                        obj.agent_type = data_dict['agent_type']
+                    if 'agent_name' in data_dict:
+                        obj.agent_name = data_dict['agent_name']
+                    if 'agent_phone' in data_dict:
+                        obj.agent_phone = data_dict['agent_phone']
+                    if 'agent_email' in data_dict:
+                        obj.agent_email = data_dict['agent_email']
+                    if 'agent_job_type' in data_dict:
+                        obj.agent_job_type = data_dict['agent_job_type']
+
+                    obj.save()
+                    response = {'message': "Agent-Manager Updated",
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': "Invalid Token",
+                                'status': status.HTTP_400_BAD_REQUEST}
+            except UserAgentManager.DoesNotExist:
+                response = {'errors': "Object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetAgentManagerAPI(APIView):
+    serializer_class = AgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        agent_dict = {}
+        agents = UserAgentManager.objects.filter(user=self.request.user)
+        for agent in agents:
+            agent_dict[agent.id ]= self.serializer_class(agent).data
+        response = {'Agents and managers': agent_dict}
+        return Response(response)
+
+
+class GetSettingsAPI(APIView):
+    serializer_class = GetSettingsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        settings_dict = {}
+        response = {}
+        try:
+            user_settings = CustomUserSettings.objects.get(user=user)
+            settings_dict = self.serializer_class(user_settings).data
+            response = {'User Settings': settings_dict}
+        except CustomUserSettings.DoesNotExist:
+            response = {'message': "Custom User Settings not found",
+                        'status': status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveCoworkerAPI(APIView):
+    serializer_class = RemoveCoWorkerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            remove_ids = data_dict['id']
+            for id in remove_ids:
+                try:
+                    obj = CoWorker.objects.get(id=id)
+
+                    # Remove job type from this profile if this user doesnot
+                    # participate in any other projects in this job type
+
+                    # if obj.user:
+                    #     profile = UserProfile.objects.get(user=obj.user)
+                    #     profile.remove_job_type(obj.position.id)
+                    #     profile.save()
+
+                    obj.delete()
+                    response = {'message': "Stuff Removed",
+                                'status': status.HTTP_200_OK}
+                except CoWorker.DoesNotExist:
+                    response = {'message': "Invalid Id",
+                                'status': status.HTTP_400_BAD_REQUEST}
+                    return Response(response)
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveAgentManagerAPI(APIView):
+    serializer_class = RemoveAgentManagerSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            remove_ids = data_dict['id']
+            for id in remove_ids:
+                try:
+                    obj = UserAgentManager.objects.get(id=id)
+                    obj.delete()
+                    response = {'message': "Agent-Manager Removed",
+                                'status': status.HTTP_200_OK}
+                except UserAgentManager.DoesNotExist:
+                    response = {'message': "Invalid Id",
+                                'status': status.HTTP_400_BAD_REQUEST}
+                    return Response(response)
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddCoworkersView(LoginRequiredMixin, TemplateView):
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        json_dict = {}
+        edit_dict = {}
+        remove_ids = request.POST.getlist('remove')
+
+        users = list(request.POST.getlist('user'))
+        position = list(request.POST.getlist('position'))
+        designation = list(request.POST.getlist('designation'))
+
+        saved_id = list(request.POST.getlist('saved_id'))
+        saved_user = list(request.POST.getlist('saved_user'))
+        saved_name = list(request.POST.getlist('saved_name'))
+        saved_position = list(request.POST.getlist('saved_position'))
+
+        edit_count = len(saved_position)
+        user_count = len(users)
+        position_count = len(position)
+        designation_count = len(designation)
+
+        new_users = request.POST.get('name')
+        if new_users == "":
+            new_users_count = 0
+        else:
+            new_users = list(request.POST.getlist('name'))
+            new_users_count = len(new_users)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        if(
+           (user_count != position_count) or
+           (new_users_count != designation_count)
+           ):
+            messages.warning(
+                self.request,
+                "Failed to update Stuff. Provide name & position")
+            return HttpResponseRedirect(reverse('hobo_user:edit-profile'))
+
+        if((user_count == position_count) and (user_count != 0)):
+            for i in range(user_count):
+                json_dict['user'] = users[i]
+                json_dict['position'] = position[i]
+                user_response = requests.post(
+                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
+                                    data=json.dumps(json_dict),
+                                    headers={'Content-type': 'application/json',
+                                            'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            # errors = response['errors']
+                            messages.warning(
+                                self.request, "Failed to update Stuff !!")
+                            return HttpResponseRedirect(
+                                reverse('hobo_user:edit-profile'))
+        json_dict = {}
+        if((new_users_count == designation_count) and (new_users_count != 0)):
+            for i in range(new_users_count):
+                json_dict['name'] = new_users[i]
+                json_dict['position'] = designation[i]
+                user_response = requests.post(
+                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
+                                    data=json.dumps(json_dict),
+                                    headers={
+                                        'Content-type': 'application/json',
+                                        'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            # errors = response['errors']
+                            messages.warning(
+                                self.request, "Failed to update Stuff !!")
+                            return HttpResponseRedirect(
+                                reverse('hobo_user:edit-profile'))
+
+        for i in range(edit_count):
+            edit_dict['id'] = saved_id[i]
+            edit_dict['name'] = saved_name[i]
+            edit_dict['position'] = saved_position[i]
+            edit_dict['user'] = saved_user[i]
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/edit-coworker-api/',
+                                data=json.dumps(edit_dict),
+                                headers={
+                                    'Content-type': 'application/json',
+                                    'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        messages.warning(
+                            self.request, "Failed to update Stuff !!")
+                        return HttpResponseRedirect(
+                            reverse('hobo_user:edit-profile'))
+        json_dict = {}
+        if remove_ids:
+            json_dict['id'] = remove_ids
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/remove-coworker-api/',
+                                data=json.dumps(json_dict),
+                                headers={
+                                    'Content-type': 'application/json',
+                                    'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        # errors = response['errors']
+                        messages.warning(
+                            self.request, "Failed to remove Stuff !!")
+                        return HttpResponseRedirect(
+                            reverse('hobo_user:edit-profile'))
+        messages.success(self.request, 'Stuffs updated successfully')
+        return HttpResponseRedirect("/hobo_user/profile/%s/" % (user.id))
+
+
+class AddCoworkerFormAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-coworker-form1.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        count = self.request.GET.get('count')
+        all_users_dict = {}
+        job_types_dict = {}
+
+        # exclude super user and current user
+        user_ids = []
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        for id in super_users:
+            user_ids.append(id)
+        user_ids.append(user.id)
+        all_users = CustomUser.objects.exclude(id__in=user_ids)
+
+        job_types = JobType.objects.all()
+        for usr in all_users:
+            all_users_dict[usr.id] = usr.first_name+" "+usr.last_name
+        for job in job_types:
+            job_types_dict[job.id] = job.title
+        add_coworker_form_html = render_to_string(
+                                'user_pages/add-coworker-form1.html', {
+                                    'all_users': all_users_dict,
+                                    'job_types': job_types_dict,
+                                    'count': count
+                                    })
+        context['add_coworker_form_html'] = add_coworker_form_html
+        return self.render_json_response(context)
+
+
+class AddNewCoworkerFormAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-coworker-form2.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        count = self.request.GET.get('new_count')
+        job_types_dict = {}
+        job_types = JobType.objects.all()
+        for job in job_types:
+            job_types_dict[job.id] = job.title
+        add_new_coworker_form_html = render_to_string(
+                                'user_pages/add-coworker-form2.html', {
+                                    'job_types': job_types_dict,
+                                    'count': count
+                                    })
+        context['add_new_coworker_form_html'] = add_new_coworker_form_html
+        return self.render_json_response(context)
+
+
+class AddNewAgentFormAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-agent-form.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        count = self.request.GET.get('agent_count')
+        job_types_dict = {}
+        job_types = JobType.objects.all()
+        for job in job_types:
+            job_types_dict[job.id] = job.title
+        add_new_agent_form_html = render_to_string(
+                                'user_pages/add-agent-form.html', {
+                                    'job_types': job_types_dict,
+                                    'count': count
+                                    })
+        context['add_new_agent_form_html'] = add_new_agent_form_html
+        return self.render_json_response(context)
+
+
+class MemberProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/memberprofile.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+        try:
+            profile = UserProfile.objects.get(user=user)
+            all_agents = UserAgentManager.objects.filter(user=user)
+            context['all_agents'] = all_agents
+            context['profile'] = profile
+        except UserProfile.DoesNotExist:
+            message = "No Data Available"
+            context['message'] = message
+        return context
+
+
+class RateUserSkillsAPI(APIView):
+    serializer_class = RateUserSkillsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            user = CustomUser.objects.get(id=data_dict['user'])
+            job_type = JobType.objects.get(id=data_dict['job_type'])
+            try:
+                user_rating = UserRating.objects.get(
+                               Q(user=data_dict['user']) &
+                               Q(rated_by=request.user) &
+                               Q(job_type=data_dict['job_type'])
+                               )
+            except UserRating.DoesNotExist:
+                user_rating = UserRating()
+                user_rating.user = user
+                user_rating.rated_by = self.request.user
+                user_rating.job_type = job_type
+            user_rating.rating = data_dict['rating']
+            user_rating.save()
+            # try:
+            #     user_rating_combined = UserRatingCombined.objects.filter(
+            #                             Q(user=data_dict['user']) &
+            #                             Q(job_type=data_dict['job_type'])
+            #                             )
+            #     count = UserRating.objects.filter(
+            #             Q(user=user) &
+            #             Q(job_type=job_type)
+            #             ).count()
+            #     rating = user_rating_combined.rating
+            #     total_rating = user_rating_combined.total_rating
+            #     # new_rating = 
+            # except UserRating.DoesNotExist:
+            #     user_rating_combined = UserRatingCombined()
+            #     user = CustomUser.objects.get(id=data_dict['user'])
+            #     job_type = JobType.objects.get(id=data_dict['job_type'])
+            #     user_rating_combined.user = user
+            #     user_rating_combined.job_type = job_type
+            #     user_rating_combined.rating = data_dict['rating']
+
+            response = {'message': "User skill rated sucessfully",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TrackUserAPI(APIView):
+    serializer_class = TrackUserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        try:
+            trackers_dict = {}
+            tracking_dict = {}
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            # trackers_list_ids = trackers_list.values_list('id', flat=True)
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            tracking_list_ids = tracking_list.values_list(
+                                'user__id', flat=True)
+            for user in trackers_list:
+                trackers_dict[user.id] = UserSerializer(user).data
+            tracking_users = CustomUser.objects.filter(id__in=tracking_list_ids)
+            for user in tracking_users:
+                tracking_dict[user.id] = UserSerializer(user).data
+            response = {'Trackers': trackers_dict,
+                        'Tracking': tracking_dict,
+                        'status': status.HTTP_200_OK}
+        except UserTacking.DoesNotExist:
+            response = {'errors': "Trackers list is empty", 'status':
+                        status.HTTP_200_OK}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            track_id = data_dict['track_id']
+            track_user = CustomUser.objects.get(id=track_id)
+            track_by_user = self.request.user
+
+            can_track = False
+            track_user_settings = CustomUserSettings.objects.get(user=track_user)
+            permission = track_user_settings.who_can_track_me
+
+            track_by_user_rating = UserRatingCombined.objects.filter(
+                                   user=track_by_user)
+            one_star_count = track_by_user_rating.filter(rating__gte=1).count()
+            two_star_count = track_by_user_rating.filter(rating__gte=2).count()
+            three_star_count = track_by_user_rating.filter(
+                               rating__gte=3).count()
+            four_star_count = track_by_user_rating.filter(
+                              rating__gte=4).count()
+            five_star_count = track_by_user_rating.filter(
+                              rating__gte=5).count()
+
+            if permission == 'no_one':
+                can_track = False
+            if permission == 'all_members':
+                can_track = True
+            if permission == 'pros_and_companies_only' and track_by_user.membership == 'COM':
+                can_track = True
+            if permission == 'members_with_rating_1_star' and one_star_count >= 1:
+                can_track = True
+            if permission == 'members_with_rating_2_star' and two_star_count >= 1:
+                can_track = True
+            if permission == 'members_with_rating_3_star' and three_star_count >= 1:
+                can_track = True
+            if permission == 'members_with_rating_4_star' and four_star_count >= 1:
+                can_track = True
+            if permission == 'members_with_rating_5_star' and five_star_count >= 1:
+                can_track = True
+
+            if can_track == True:
+                try:
+                    track_obj = UserTacking.objects.get(user=track_user)
+                    trackers_list = track_obj.tracked_by.all()
+                    if track_by_user in trackers_list:
+                        response = {'message': "You are already tracking this user",
+                                    'status': status.HTTP_400_BAD_REQUEST,
+                                    'track_status': 'tracking'
+                                    }
+                        return Response(response)
+                    track_obj.tracked_by.add(track_by_user.id)
+                except UserTacking.DoesNotExist:
+                    track_obj = UserTacking()
+                    track_obj.user = track_user
+                    track_obj.save()
+                    track_obj.tracked_by.add(track_by_user.id)
+                msg = "Started Tracking " + track_user.get_full_name()
+                response = {'message': msg,
+                            'status': status.HTTP_200_OK,
+                            'track_status':'tracking'}
+            else:
+                response = {'message': "You cannot track this user",
+                            'status': status.HTTP_200_OK,
+                            'track_status':'not_tracking'}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class UnTrackUserAPI(APIView):
+    serializer_class = TrackUserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            track_id = data_dict['track_id']
+            track_user = CustomUser.objects.get(id=track_id)
+            track_by_user = self.request.user
+
+            try:
+                track_obj = UserTacking.objects.get(user=track_user)
+                track_obj.tracked_by.remove(track_by_user.id)
+            except UserTacking.DoesNotExist:
+                response = {'errors': "invalid id", 'status':
+                             status.HTTP_400_BAD_REQUEST}
+            msg = "Stopped Tracking " + track_user.get_full_name()
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status':'not_tracking'}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/friends-and-followers.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        track_obj = UserTacking.objects.get(user=user)
+        trackers_list = track_obj.tracked_by.all()
+        tracking_list = UserTacking.objects.filter(
+                        tracked_by=user)
+        photos = Photo.objects.filter(user=user).order_by('position')
+
+        context['trackers_list'] = trackers_list
+        context['tracking_list'] = tracking_list
+        context['photos'] = photos
+        context['user'] = user
+        return context
+
+
+class ChangePhotoPositionAPI(APIView):
+    serializer_class = PhotoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            position = data_dict['position']
+            try:
+                swap_obj1 = Photo.objects.get(id=id)
+                try:
+                    swap_obj2 = Photo.objects.get(Q(position=position) & Q(user=user))
+                    pos_1 = swap_obj1.position
+                    pos_2 = swap_obj2.position
+                    swap_obj1.position, swap_obj2.position  = swap_obj2.position, swap_obj1.position
+                    swap_obj1.save()
+                    swap_obj2.save()
+                except Photo.DoesNotExist:
+                    swap_obj1.position = position
+                    swap_obj1.save()
+            except Photo.DoesNotExist:
+                response = {'errors': "invalid id provided", 'status':
+                             status.HTTP_400_BAD_REQUEST}
+            response = {'message': "Position Swapped",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class SwapImageAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/swap-images.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        photos_dict = dict()
+        user = self.request.user
+        id = self.request.GET.get('id')
+        position = self.request.GET.get('position')
+        try:
+            swap_obj1 = Photo.objects.get(id=id)
+            try:
+                swap_obj2 = Photo.objects.get(Q(position=position) & Q(user=user))
+                pos_1 = swap_obj1.position
+                pos_2 = swap_obj2.position
+                swap_obj1.position, swap_obj2.position  = swap_obj2.position, swap_obj1.position
+                swap_obj1.save()
+                swap_obj2.save()
+            except Photo.DoesNotExist:
+                swap_obj1.position = position
+                swap_obj1.save()
+
+        except Photo.DoesNotExist:
+            pass
+        return self.render_json_response(context)
+
+
+class UploadImageView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/friends-and-followers.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        position = self.request.POST.get('position')
+        file = self.request.FILES['image']
+
+        photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
+        if photo_obj:
+            photo_obj.image = file
+            photo_obj.save()
+        else:
+            photo_obj = Photo()
+            photo_obj.image = file
+            photo_obj.position = position
+            photo_obj.user = user
+            photo_obj.save()
+        return HttpResponseRedirect(reverse("hobo_user:friends-and-followers"))
+
+
+class UploadImageAPI(APIView):
+    serializer_class = UploadPhotoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            user = self.request.user
+            position = data_dict['position']
+            file =  request.data['file']
+            photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
+            if photo_obj:
+                photo_obj.image = file
+                photo_obj.save()
+            else:
+                photo_obj = Photo()
+                photo_obj.image = file
+                photo_obj.position = position
+                photo_obj.user = user
+                photo_obj.save()
+            response = {'message': "Image Uploaded",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

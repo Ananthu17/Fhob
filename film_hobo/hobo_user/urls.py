@@ -2,7 +2,6 @@ from django.urls import path
 
 from rest_auth.views import LoginView
 
-
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
                    ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
@@ -21,7 +20,16 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
-                   PersonalDetailsView, HowTo
+                   PersonalDetailsView, HowTo, \
+                   PersonalDetailsView, UserProfileAPI, UserProfileView, \
+                   AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
+                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
+                   MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
+                   AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
+                   FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
+                   GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
+                   UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
+                   UploadImageView, UploadImageAPI
 
 app_name = "hobo_user"
 
@@ -73,6 +81,34 @@ urlpatterns = [
     path('personal-details-api/',
          PersonalDetailsAPI.as_view(),
          name='personal-details-api'),
+    path('profile-api/', UserProfileAPI.as_view(),
+         name='profile-api'),
+    path('add-coworker-api/', AddCoworkerAPI.as_view(),
+         name='add-coworker-api'),
+    path('edit-coworker-api/', EditCoworkerAPI.as_view(),
+         name='edit-coworker-api'),
+    path('add-agent-manager-api/', AddAgentManagerAPI.as_view(),
+         name='add-agent-manager-api'),
+    path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
+         name='remove-coworker-api'),
+    path('rate-user-api/', RateUserSkillsAPI.as_view(),
+         name='rate-user-api'),
+    path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
+         name='remove-agent-api'),
+    path('track-user-api/', TrackUserAPI.as_view(),
+         name='track-user-api'),
+    path('untrack-user-api/', UnTrackUserAPI.as_view(),
+         name='untrack-user-api'),
+    path('get-agent-manager-api/', GetAgentManagerAPI.as_view(),
+         name='get-agent-manager-api'),
+    path('get-user-settings-api/', GetSettingsAPI.as_view(),
+         name='get-user-settings-api'),
+    path('edit-agent-manager-api/', EditAgentManagerAPI.as_view(),
+         name='edit-agent-manager-api'),
+    path('change-photo-position-api/', ChangePhotoPositionAPI.as_view(),
+         name='change-photo-position-api'),
+    path('upload-image-api/', UploadImageAPI.as_view(),
+         name='upload-image-api'),
 
 
     # web-view endpoints
@@ -115,5 +151,23 @@ urlpatterns = [
          name='get-unblocked-members'),
     path('personal-details/', PersonalDetailsView.as_view(),
          name='personal-details'),
+    path('edit-profile/', UserProfileView.as_view(),
+         name='edit-profile'),
+    path('add-coworkers/', AddCoworkersView.as_view(),
+         name='add-coworkers'),
+    path('add-coworker-form/', AddCoworkerFormAjaxView.as_view(),
+         name='add-coworker-form'),
+    path('add-new-coworker-form/', AddNewCoworkerFormAjaxView.as_view(),
+         name='add-new-coworker-form'),
+    path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
+         name='add-new-agent-form'),
+    path('profile/<int:id>/', MemberProfileView.as_view(),
+         name='profile'),
+    path('friends-and-followers/', FriendsAndFollowersView.as_view(),
+         name='friends-and-followers'),
+    path('swap-image-position/', SwapImageAjaxView.as_view(),
+         name='swap-image-position'),
+    path('upload-image/', UploadImageView.as_view(),
+         name='upload-image'),
 
 ]

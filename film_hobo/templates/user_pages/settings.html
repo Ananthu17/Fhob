@@ -5,6 +5,13 @@
 
 {% block extracss %}
 {{ form.media.css }}
+<style>
+    .select2-container {
+    border:1px solid #000!important;
+    border-radius:.25rem;
+    outline:none;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -90,7 +97,7 @@
                                 maxlength=150
                                 autocomplete="off"
                                 disabled>
-                                <br><span class="setting-sf">Member since 06.01.2021</span>
+                                <br><span class="setting-sf">Member since {{user.date_of_joining}}</span>
                             </div>
                             <div class="col-2">
                                 <a class="settings-font" type = "button" id="edit_last_name">

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load user_account_tag %}
+{% load user_tracking_tag %}
+{% load token %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+{% get_my_token request as token %}
+<input type = "hidden" value="{{token}}" name="token" id="token"/>
+<div class="wrapper flex-grow-1">
+<div class="container">
+<div class="row">
+<div class="col-12">
+    <b>
+    {% if profile %}
+       Profile
+       {% if profile.user.id == request.user.id %}- <a href="{% url 'hobo_user:edit-profile' %}">Edit</a>{% endif %}
+       {% get_tracking_list request.user profile.user as is_tracking %}
+       {% if is_tracking %}
+            <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
+            <span class="track-btn">
+                <button class="btn" style="color:rgb(7, 128, 184);font-weight: bold;" id="un_track">Tracking</button>
+            </span>
+       {% else %}
+            {% can_track request.user profile.user as can_track %}
+            {% if profile.user.id != request.user.id and can_track == True %}
+                    <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
+                    <span class="track-btn">
+                        <button class="btn" style="color:rgb(7, 128, 184);font-weight: bold;" id="track">Track</button>
+                    </span>
+            {% endif %}
+        {% endif %}
+    </b>
+        <p>{{profile.user.get_full_name}} </p>
+        <b>Bio</b>{% if profile.bio %}<p>{{profile.bio}} </p>{% endif %}
+        {% if profile.imdb %}<p><a href="http://{{profile.imdb}}/">IMDB</a> </p>{% endif %}
+        <p><b>Status</b> {{profile.user.get_membership_display}}</p>
+        <p>{{profile.email}} </p>
+        {% if profile.job_types %}
+        <b>Skills:</b>
+        {% for obj in profile.job_types.all %}
+        <p>{{obj.title}} </p>
+        {% endfor %}
+        {% endif %}
+        <b>Personal Details:</b>
+        {% if profile.user.feet %}<span>{{profile.user.feet}}.{{profile.user.inch}} ({{profile.user.get_height_in_meters}}m)</span>{% endif %}
+        {% if profile.user.start_age and profile.user.stop_age %}
+        <span><b>Age Playing Range:</b>{{profile.user.start_age}}-{{profile.user.stop_age}}</span>
+        <span><a href="">More</a></span>
+        {% if profile.user.physique %}<p>Physique: {{profile.user.get_physique_display}}</p> {% endif %}
+        {% if profile.user.hair_color %}<p>Hair Color: {{profile.user.get_hair_color_display}}</p> {% endif %}
+        {% if profile.user.hair_length %}<p>Hair Length: {{profile.user.get_hair_length_display}}</p> {% endif %}
+        {% if profile.user.eyes %}<p>Eye color: {{profile.user.get_eyes_display}}</p> {% endif %}
+        {% if profile.user.ethnic_appearance %}<p>Ethnic Appearance: {{profile.user.ethnic_appearance}}</p> {% endif %}
+        {% if profile.user.user_athletic_skills %}
+        <p>Athletic Skills: 
+            {% for obj in profile.user.user_athletic_skills.all %}
+                {{obj.athletic_skill}}{% if not forloop.last %},{% endif%}
+            {% endfor %}
+        </p>
+        {% endif %}
+        {% endif %}
+        <b>Agents/Managers</b>
+        {% if all_agents %}
+            {% for agent in all_agents %}
+                {% user_has_account agent.agent_email as user_account_id %}
+                <p>{{agent.agent_type}}({{agent.agent_job_type}}):
+                    <a {% if user_account_id %} href="{% url 'hobo_user:profile' user_account_id %}" {% endif %}>
+                        {{agent.agent_name}}
+                    </a>
+                </p>
+            {% endfor %}
+        {% endif %}
+        {% if profile.user.guild_membership %}
+        <p><b>Guild Memberships:</b>
+            {% for item in profile.user.guild_membership.all %}
+            {{item}}{% if not forloop.last %},{% endif %}
+            {% endfor %}</p>
+        {% endif %}
+        {% if profile.company %}
+        <p>
+            <span><b>Company:</b>{{profile.company}}</span>
+            <span><b>Position:</b>{{profile.company_position}}</span>
+            <span><b>Website:</b><a href="http://{{profile.company_website}}/">{{profile.company_website}}</a></span>
+        </p>
+        {% endif %}
+    {% else %}
+        <p>{{message}}</p>
+    {% endif %}
+<a href="{% url 'hobo_user:friends-and-followers' %}">Friends and Followers</a>
+</div>
+</div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('body').on('click' , '#track', function(){
+        var token = $("#token").val();
+        var track_id = $("#track_id").val();
+        var data_dict = {}
+        data_dict['track_id'] = track_id;
+        console.log(track_id)
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/track-user-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                $('.track-btn').html(" ")
+                $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='un_track'>Tracking</button>");
+            }
+        });
+    });
+</script>
+<script>
+    $('body').on('click' , '#un_track', function(){
+        var token = $("#token").val();
+        var track_id = $("#track_id").val();
+        var data_dict = {}
+        data_dict['track_id'] = track_id;
+        console.log(track_id)
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/untrack-user-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                $('.track-btn').html(" ")
+                $('.track-btn').html("<button class='btn' style='color:rgb(7, 128, 184);font-weight: bold;' id='track'>Track</button>");
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+

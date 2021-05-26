@@ -1,0 +1,21 @@
+<div class="row ">
+    <div class="col-md-1 col-sm-4 ">
+        <label class="form-title mem-setup-blu-f">Name</label>
+    </div>
+    <div class="col-md-3 col-sm-4 form-group">
+        <input class="inp-line" autocomplete="off" placeholder="Name" name="name" id="name{{count}}"/>
+    </div>
+    <div class="col-md-1 col-sm-4 ">
+        <label class="form-title mem-setup-blu-f">Position</label>
+    </div>
+    <div class="col-md-3 col-sm-4 form-group">
+        <select name="designation" id="designation{{count}}"
+        class="form-control form-control-input mt-2">
+            <option value="" selected disabled hidden>Choose position</option>
+            {% for key,value in job_types.items %}
+            <option value="{{key}}">{{value}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+</div>

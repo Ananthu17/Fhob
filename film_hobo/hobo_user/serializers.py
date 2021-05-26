@@ -18,9 +18,10 @@ from rest_auth.serializers import PasswordResetSerializer
 from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
                       CustomCompanyUserAccountAdapter
 from .models import CustomUser, Country, GuildMembership, \
-    IndiePaymentDetails, ProPaymentDetails, PromoCode, \
+    IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
+    UserRating, UserAgentManager, Photo
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -666,26 +667,174 @@ class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
 
 
 class PersonalDetailsSerializer(serializers.ModelSerializer):
-    # ethnic_appearance = serializers.PrimaryKeyRelatedField(
-    #                   queryset=AthleticSkill.objects.all(),
-    #                   write_only=True, many=True)
     athletic_skills = serializers.ListField()
+    lbs = serializers.IntegerField(allow_null=True)
+    start_age = serializers.IntegerField(allow_null=True)
+    stop_age = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ['gender', 'feet', 'inch', 'lbs', 'start_age',
                   'stop_age', 'physique', 'hair_color', 'hair_length',
-                  'eyes', 'athletic_skills']
+                  'eyes', 'athletic_skills', 'ethnic_appearance']
+
+    def get_validation_exclusions(self, instance=None):
+        exclusions = super(PersonalDetailsSerializer,
+                           self).get_validation_exclusions(instance)
+        return exclusions + ['lbs', 'start_age', 'stop_age']
 
 
 class PasswordResetSerializer(PasswordResetSerializer):
 
     def get_email_options(self):
-        print("here----my serializer")
-        # email_template_name = ""
-        # html_email_template_name = 'registration/password_reset_email.html'
         return {
                 'subject_template_name': 'registration/password_reset_subject.txt',
                 'html_email_template_name': 'registration/'
                                         'password_reset_email.html',
         }
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    job_types = serializers.ListField(required=False)
+    membership = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    middle_name = serializers.CharField(
+        max_length=150,
+        allow_blank=True, required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    guild_membership = serializers.ListField(required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ['first_name', 'middle_name', 'last_name', 'job_types',
+                  'company', 'company_position', 'guild_membership',
+                  'company_website', 'imdb', 'bio',
+                  'membership']
+
+
+class CoWorkerSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        max_length=150,
+        required=False, allow_blank=True
+    )
+    user = serializers.CharField(
+        max_length=150,
+        required=False, allow_blank=True
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    id = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+    class Meta:
+        model = CoWorker
+        fields = ['id', 'user', 'name', 'position']
+
+
+class RemoveCoWorkerSerializer(serializers.Serializer):
+    id = serializers.ListField(required=False)
+
+
+class RemoveAgentManagerSerializer(serializers.Serializer):
+    id = serializers.ListField(required=False)
+
+
+class TrackUserSerializer(serializers.Serializer):
+    track_id =  serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class RateUserSkillsSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    job_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserRating
+        fields = ['user', 'job_type', 'rating']
+
+
+class AgentManagerSerializer(serializers.ModelSerializer):
+    agent_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_name = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_phone = PhoneNumberField(
+        required=True,
+    )
+    agent_job_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    agent_email = serializers.EmailField(
+        required=False, allow_blank=True
+    )
+    id = serializers.CharField(
+        required=False,
+        max_length=150
+    )
+
+    class Meta:
+        model = UserAgentManager
+        fields = ['id', 'agent_type', 'agent_name', 'agent_phone',
+                  'agent_email', 'agent_job_type']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name']
+
+
+class GetSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUserSettings
+        exclude = []
+
+
+class PhotoSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = Photo
+        exclude = ['id', 'position']
+
+
+class UploadPhotoSerializer(serializers.Serializer):
+    file = serializers.ImageField(required=True)
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

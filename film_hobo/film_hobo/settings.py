@@ -186,7 +186,8 @@ STATICFILES_DIRS = [
 ]
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
@@ -224,6 +225,9 @@ EMAIL_BCC = os.environ.get(
 
 OLD_PASSWORD_FIELD_ENABLED = True
 
+SITE_URL = os.environ.get('SITE_URL', '')
+
+
 # # production settings
 
 # AWS_DEFAULT_ACL = None
@@ -242,3 +246,4 @@ OLD_PASSWORD_FIELD_ENABLED = True
 # # AWS_S3_PUBLIC_URL_STATIC = "https://static.zappaguide.com/"
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
+

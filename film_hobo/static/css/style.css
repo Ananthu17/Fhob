@@ -116,12 +116,6 @@
   {
     outline:none;
   }
-.select2-container
-  {
-    border:1px solid #000!important;
-    border-radius:.25rem;
-    outline:none;
-  }
 .select2-container:focus
   {
     border:1px solid #000!important;
@@ -163,3 +157,29 @@ input.pw {
     font-family: Courier Bold;
     box-shadow: none;
   }
+  .repeat-agent, .repeat, .repeat-new
+    {
+      cursor: pointer;
+    }
+
+  .select2-results__options
+    {
+    font-family: "Myraid Pro";
+    font-size: 13px;
+    }
+
+.save_btn:focus
+    {
+      outline:none;
+      box-shadow: none;
+    }
+.img-btn
+    {
+      border:1px solid blue;
+      padding:2px ;
+      cursor:pointer;
+    }
+  .pos
+    {
+      cursor:pointer;
+    }

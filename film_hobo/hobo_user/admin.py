@@ -1,23 +1,26 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-
+from django.db import models
+from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
-                    EthnicAppearanceInline, AthleticSkill, \
-                    AthleticSkillInline, PromoCode, Team, Actor, Writer, \
+                    AthleticSkill, EthnicAppearanceInline, \
+                    PromoCode, Team, Actor, Writer, AthleticSkillInline, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
-                    HoboPaymentsDetails
+                    HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
+                    FriendRequest, UserTacking, UserRatingCombined, UserRating, \
+                    UserAgentManager, Photo, UserNotification
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource
+                    CountryResource, GuildMembershipResource, JobTypeResource
 
 
-class EthnicAppearanceInlineInline(admin.StackedInline):
-    model = EthnicAppearanceInline
-    insert_after = 'eyes'
+# class EthnicAppearanceInlineInline(admin.StackedInline):
+#     model = EthnicAppearanceInline
+#     insert_after = 'eyes'
 
 
 class AthleticSkillInlineInline(admin.StackedInline):
@@ -30,7 +33,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
     list_filter = ('email', 'is_staff', 'is_active',)
     fieldsets = (
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
-                             'email', 'password')}),
+                             'email', 'password', 'date_of_joining')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Membership', {'fields': ('membership', 'guild_membership',
                                    'payment_plan')}),
@@ -44,11 +47,11 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('Weight', {'fields': ('lbs',)}),
         ('Age-Playing Range', {'fields': ('start_age', 'stop_age')}),
         ('Build', {'fields': ('physique', 'hair_color', 'hair_length',
-                              'eyes',)})
+                              'ethnic_appearance', 'eyes')})
     )
     # adding personal details inline
     inlines = [
-        EthnicAppearanceInlineInline, AthleticSkillInlineInline
+        AthleticSkillInlineInline
     ]
     change_form_template = 'admin/custom/change_form.html'
 
@@ -93,6 +96,14 @@ admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
+admin.site.register(UserProfile)
+admin.site.register(CoWorker)
+admin.site.register(UserRating)
+admin.site.register(UserRatingCombined)
+admin.site.register(FriendRequest)
+admin.site.register(UserAgentManager)
+admin.site.register(Photo)
+admin.site.register(UserNotification)
 
 
 @admin.register(EthnicAppearance)
@@ -114,6 +125,10 @@ class CountryAdmin(ImportExportModelAdmin):
 class GuildMembershipAdmin(ImportExportModelAdmin):
     resource_class = GuildMembershipResource
 
+@admin.register(JobType)
+class JobTypeAdmin(ImportExportModelAdmin):
+    resource_class = JobTypeResource
+
 
 class CustomUserSettingsAdmin(admin.ModelAdmin):
     model = CustomUserSettings
@@ -133,3 +148,10 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
+
+class UserTackingAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+admin.site.register(UserTacking, UserTackingAdmin)
