@@ -358,7 +358,7 @@ class AddDiscountDetailAPI(APIView):
         midnight = 'T00:00:00Z'
         data['valid_from'] = data['valid_from'] + midnight
         data['valid_to'] = data['valid_to'] + midnight
-        data['user_type'] = 'ALL'
+        data['user_type'] = 'ADMIN'
         serializer = DiscountsSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

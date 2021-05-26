@@ -56,53 +56,55 @@
                 <!-- Links -->
                 <ul class="navbar-nav justify-content-between w-100">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">SCREEN ROOM</a>
+                        <a class="nav-link" href="#">SHOWCASE</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
+                        <a class="nav-link" href="{% url 'hobo_user:user_home' %}"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
                     </li>
                     <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            PROJECTS
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Start a Project</a>
-                            <a class="dropdown-item" href="#">Scenes</a>
-                            <a class="dropdown-item" href="#">Shorts</a>
-                            <a class="dropdown-item" href="#">Pilots/Features</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            SCENES
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            SHORTS
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            PILOTS/FEATURES
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
+                    {% if user.membership != HOB %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                PROJECTS
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Start a Project</a>
+                                <a class="dropdown-item" href="#">Scenes</a>
+                                <a class="dropdown-item" href="#">Shorts</a>
+                                <a class="dropdown-item" href="#">Pilots/Features</a>
+                            </div>
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                SCENES
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                SHORTS
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                PILOTS/FEATURES
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                     </li>

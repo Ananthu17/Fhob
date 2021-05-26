@@ -250,12 +250,10 @@ class HowTo(View):
         return render(request, 'user_pages/how_to.html')
 
 
-class HomePage(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'user_pages/user_home.html'
+class HomePage(View):
 
-    def get(self, request):
-        return Response({})
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_pages/user_home.html')
 
 
 class CustomUserList(APIView):

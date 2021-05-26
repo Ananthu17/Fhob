@@ -39,6 +39,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('membership', 'ADMIN')
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('Superuser must have is_staff=True.'))
@@ -48,11 +49,13 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
     MEMBERSHIP_CHOICES = [
+        (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
@@ -413,13 +416,13 @@ class PromoCode(models.Model):
         (FLAT_AMOUNT, 'Flat Amount'),
         (PERCENTAGE, 'Percentage'),
     ]
-    ALL = 'ALL'
+    ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
     USER_TYPE_CHOICES = [
-        (ALL, 'All'),
+        (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
