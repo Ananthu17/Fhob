@@ -29,7 +29,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
                    UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
-                   UploadImageView, UploadImageAPI
+                   UploadImageView, UploadImageAPI, GetNotificationAPI, \
+                   GetTrackingNotificationAjaxView, GetAllNotificationAjaxView, \
+                   ChangeNotificationStatusAPI
 
 app_name = "hobo_user"
 
@@ -109,6 +111,10 @@ urlpatterns = [
          name='change-photo-position-api'),
     path('upload-image-api/', UploadImageAPI.as_view(),
          name='upload-image-api'),
+    path('get-notification-api/', GetNotificationAPI.as_view(),
+         name='get-notification-api'),
+    path('change-notification-status-api/', ChangeNotificationStatusAPI.as_view(),
+         name='change-notification-status-api'),
 
 
     # web-view endpoints
@@ -168,5 +174,9 @@ urlpatterns = [
          name='swap-image-position'),
     path('upload-image/', UploadImageView.as_view(),
          name='upload-image'),
+    path('get-tracking-notification-html/', GetTrackingNotificationAjaxView.as_view(),
+         name='get-tracking-notification-html'),
+    path('get-all-notification-html/', GetAllNotificationAjaxView.as_view(),
+         name='get-all-notification-html'),
 
 ]

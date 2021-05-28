@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     'initial_user',
     'hobo_user',
     'payment',
-    'notifications',
 
     'bootstrap_datepicker_plus',
     'django_select2',
@@ -112,10 +111,9 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'film_hobo.wsgi.application'
+WSGI_APPLICATION = 'film_hobo.wsgi.application'
 # Channels
 ASGI_APPLICATION = "film_hobo.asgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -248,7 +246,7 @@ CHANNEL_LAYERS = {
         # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
         # 'CONFIG': {
         #      "hosts": [('127.0.0.1', 6379)],
-        # },
+        # }
         # 'ROUTING': 'notification_channels.routing.channel_routing',
     }
 }

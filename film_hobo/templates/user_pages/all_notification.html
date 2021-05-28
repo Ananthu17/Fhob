@@ -1,0 +1,23 @@
+{% load static %}
+{% load notification_tag %}
+{% for obj in notifications %}
+
+<a href="{% url 'hobo_user:profile' obj.from_user.id %}" target="_blank"
+id ="{{obj.id}}" class="notification_link">
+<div class="row unread_notification">
+    <div  class="col-2">
+            {% if obj.from_user.get_profile_photo %}
+            <img src="{{ obj.from_user.get_profile_photo }}" class="notification_img"/>
+            {% else %}
+            <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+            {% endif %}
+    </div>
+    <div class="col-10">
+        {{ obj.from_user.get_full_name }} started tracking you<br>
+        <b>{{ obj.from_user.get_membership_display }}</b><br>
+        {% get_notifications_time obj.created_time as time %}
+        {{time}}
+    </div>
+</div>
+</a>
+{% endfor %}
