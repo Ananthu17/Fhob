@@ -293,27 +293,27 @@
                     <div class="col-md-2 col-sm-4 form-group">
                         <input name="edit_agent_id" type="hidden" value="{{agent.id}}" required />
                         <select class="form-control form-control-input mt-2" name="edit_agent_type" id="">
-                            <option {% if agent.agent_type == 'agent' %}selected{% endif %}>Agent</option>
-                            <option {% if agent.agent_type == 'manager' %}selected{% endif %}>Manager</option>
+                            <option {% if agent.agent_type == 'agent' %}selected{% endif %} value="agent">Agent</option>
+                            <option {% if agent.agent_type == 'manager' %}selected{% endif %} value="manager">Manager</option>
                         </select>
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input class="inp-line" placeholder="Name"
-                         name="edit_agent_name" value="{{agent.agent_name}}" required />
+                         name="edit_agent_name" value="{{agent.agent_name}}" required autocomplete="off"/>
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input class="inp-line" placeholder="Job"
-                        name="edit_agent_job_type" value="{{agent.agent_job_type}}"  required/>
+                        name="edit_agent_job_type" value="{{agent.agent_job_type}}"  required autocomplete="off"/>
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input class="inp-line" placeholder="Phone"
-                        name="edit_agent_phone" value="{{agent.agent_phone}}" required />
+                        name="edit_agent_phone" value="{{agent.agent_phone}}" required autocomplete="off"/>
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input class="inp-line" placeholder="Email"
                         name="edit_agent_email"
                         {% if agent.agent_email != None  %}value="{{agent.agent_email}}"
-                        {% else%}value="" {% endif %} placeholder="Email" />
+                        {% else%}value="" {% endif %} placeholder="Email" autocomplete="off"/>
                     </div>
                     <div class="col-md-2 col-sm-4 p-0 text-center">
                         <div class="form-check mt-2">
@@ -394,7 +394,7 @@
                         <input class="inp-line" placeholder="Add a link"
                             name="{{ form.imdb.name }}"
                             value="{% if profile.imdb %}{{ profile.imdb}}{% endif%}"
-                            />
+                            autocomplete="off"/>
                             {% if errors.imdb %}
                             {% for err in errors.imdb %}
                             <p style="color: red">{{err}}</p>

@@ -259,6 +259,20 @@ class CustomUser(AbstractUser):
             in_meter = round(float(in_feet/3.281), 2)
         return in_meter
 
+    def get_profile_photo(self):
+        photo_obj = Photo.objects.filter(user=self).order_by('position').first()
+        if photo_obj:
+            image = photo_obj.image.url
+            return image
+        return ""
+
+    @property
+    def group_name(self):
+        """
+        Returns a group name based on the user's id to be used by Django Channels.
+        """
+        return "user_%s" % self.id
+
 
 class EthnicAppearance(models.Model):
     ethnic_appearance = models.CharField(_("Ethnic Appearance"),
@@ -947,34 +961,33 @@ class UserNotification(models.Model):
     TRACKING = 'tracking'
     FRIEND_REQUEST = 'friend_request'
     USER_RATING = 'user_rating'
+    READ = 'read'
+    UNREAD = 'unread'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
                                ]
+    STATUS_CHOICES = [
+                    (READ, 'Read'),
+                    (UNREAD, 'Unread'),
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='notification_to',
+                             verbose_name=_("User"),
+                             null=True)
     notification_type = models.CharField(_("Notification Type"),
                                          choices=NOTIFICATION_TYPE_CHOICES,
                                          max_length=150, default=TRACKING)
-    user = models.ForeignKey("hobo_user.CustomUser",
-                             on_delete=models.CASCADE,
-                             related_name='user_notification',
-                             verbose_name=_("User"),
-                             null=True)
-    tracked_by = models.ForeignKey("hobo_user.CustomUser",
-                                   on_delete=models.CASCADE,
-                                   related_name='tacked_by_user',
-                                   verbose_name=_("User"),
-                                   null=True)
-    friend_request_from = models.ForeignKey("hobo_user.CustomUser",
-                                            on_delete=models.CASCADE,
-                                            related_name='friend_request_from',
-                                            verbose_name=_("User"),
-                                            null=True)
-    user_rated_by = models.ForeignKey("hobo_user.CustomUser",
-                                      on_delete=models.CASCADE,
-                                      related_name='user_rated_by',
-                                      verbose_name=_("User"),
-                                      null=True)
+    from_user = models.ForeignKey("hobo_user.CustomUser",
+                                  on_delete=models.CASCADE,
+                                  related_name='notification_from',
+                                  verbose_name=_("Notifications from"),
+                                  null=True)
+    status_type = models.CharField(_("Status Type"),
+                                   choices=STATUS_CHOICES,
+                                   max_length=150, default=UNREAD)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
 

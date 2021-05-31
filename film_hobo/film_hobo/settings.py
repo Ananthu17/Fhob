@@ -74,7 +74,8 @@ INSTALLED_APPS = [
     'django_select2',
     'crispy_forms',
     'django_s3_storage',
-    'zappa_django_utils'
+    'zappa_django_utils',
+    'channels',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -111,7 +112,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'film_hobo.wsgi.application'
-
+# Channels
+ASGI_APPLICATION = "film_hobo.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -205,15 +207,6 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
-
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
-# Email settings
-AUTH_EMAIL_VERIFICATION = True
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
 EMAIL_FROM = os.environ.get(
     'AUTHEMAIL_DEFAULT_EMAIL_FROM', 'avin@techversantinfo.com')
 EMAIL_HOST_USER = os.environ.get(
@@ -247,3 +240,13 @@ SITE_URL = os.environ.get('SITE_URL', '')
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # }
+        # 'ROUTING': 'notification_channels.routing.channel_routing',
+    }
+}

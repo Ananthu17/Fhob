@@ -1,5 +1,7 @@
 {% load rest_framework %}
 {% load static %}
+{% load notification_tag %}
+{% load token %}
 {% block extracss %}
 {% endblock %}
 <!DOCTYPE html>
@@ -18,6 +20,13 @@
 
     </head>
     <body class="d-flex flex-column min-vh-100">
+        {% if request.user.is_authenticated %}
+        {% get_my_token request as token %}
+        <input type = "hidden" value="{{token}}" name="token" id="token"/>
+        <input type="hidden" value="{{request.user.id}}" name="current_user" id="current_user" />
+        {% else %}
+        <input type="hidden" value="" name="current_user" id="current_user" />
+        {% endif %}
         <div class="container">
             <header class="fh-header">
                 <div class="row no-wrap justify-content-between align-items-center">
@@ -37,8 +46,13 @@
                         <ul class="list-inline mb-0 mt-20">
                             <li class="list-inline-item"><i class="fa fa-envelope header-fnt-clr header-icon-pos"
                                     aria-hidden="true"></i></li>
-                            <li class="list-inline-item"  data-toggle="modal" data-target="#exampleModalLong"><i class="fa fa-bell header-fnt-clr header-icon-pos"
-                                    aria-hidden="true"></i>
+                            <li class="list-inline-item notification_icon"  data-toggle="modal" data-target="#notificationModal">
+                                <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
+                                    {% get_notifications_count request.user as count %}
+                                    {% if count %}
+                                    <span class="notification_count_span">{{count}}</span>
+                                    {% endif %}
+                                </i>
                             </li>
                             <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
@@ -153,17 +167,17 @@
 <!-- start notification -->
 
   <!-- Modal -->
-  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal " id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Notification</h5>
+          <h5 class="modal-title" id="notificationModalTitle">Notification</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          hiii
+        <div class="modal-body notification-modal-content">
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -209,6 +223,7 @@
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="{% static 'js/notification.js' %}"></script>
     <script>
     /*
     code to store token info into local storage on login

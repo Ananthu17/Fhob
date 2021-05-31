@@ -20,8 +20,8 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
-    UserRating, UserAgentManager, Photo
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, UserProfile, CoWorker, \
+    UserRating, UserAgentManager, Photo, UserNotification
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -838,3 +838,26 @@ class UploadPhotoSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class UserNotificationSerializer(serializers.ModelSerializer):
+    # unread_count = serializers.CharField(
+    #     max_length=150,
+    #     required=True,
+    # )
+    user = serializers.StringRelatedField()
+    from_user = serializers.StringRelatedField()
+
+    class Meta:
+        model = UserNotification
+        exclude = []
+
+
+class ChangeNotificationStatusSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = UserNotification
+        fields = ['id', 'status_type']

@@ -183,3 +183,26 @@ input.pw {
     {
       cursor:pointer;
     }
+.unread_notification
+    {
+      font-family: "Myraid Pro";
+      font-size: 14px;
+      /* background-color:#e7e7e7; */
+      padding:1em
+    }
+.notification_count_span
+    {
+      background-color:red;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:50px;
+    }
+.notification_img
+    {
+      width:100%;
+    }
+.notification_link
+    {
+      text-decoration: none!important;
+      color:#000;
+    }

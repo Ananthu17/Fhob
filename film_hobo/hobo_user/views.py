@@ -55,8 +55,9 @@ from .models import CoWorker, CustomUser, GuildMembership, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
-                    UserRating, UserRatingCombined, UserTacking, Photo
+                    EthnicAppearance, UserAgentManager, UserNotification, \
+                    UserProfile, JobType, UserRating, \
+                    UserRatingCombined, UserTacking
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -69,7 +70,10 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
+    UserNotificationSerializer, ChangeNotificationStatusSerializer
+
+from .utils import notify, get_notifications_time
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -2507,11 +2511,30 @@ class TrackUserAPI(APIView):
                                     }
                         return Response(response)
                     track_obj.tracked_by.add(track_by_user.id)
+
                 except UserTacking.DoesNotExist:
                     track_obj = UserTacking()
                     track_obj.user = track_user
                     track_obj.save()
                     track_obj.tracked_by.add(track_by_user.id)
+
+                # send notification
+                room_name = "user_"+str(track_obj.user.id)
+                notification_msg = {
+                        'type': 'send_notification',
+                        'message': str(track_by_user.get_full_name()),
+                        'track_by_user_id': str(track_by_user.id),
+                        "event": "TRACK"
+                    }
+                notify(room_name, notification_msg)
+
+                # update notification table
+                notification = UserNotification()
+                notification.user = track_user
+                notification.notification_type = UserNotification.TRACKING
+                notification.from_user = track_by_user
+                notification.save()
+
                 msg = "Started Tracking " + track_user.get_full_name()
                 response = {'message': msg,
                             'status': status.HTTP_200_OK,
@@ -2543,6 +2566,16 @@ class UnTrackUserAPI(APIView):
             try:
                 track_obj = UserTacking.objects.get(user=track_user)
                 track_obj.tracked_by.remove(track_by_user.id)
+                # remove from notification table
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=track_user) &
+                        Q(from_user=track_by_user) &
+                        Q(notification_type=UserNotification.TRACKING)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
             except UserTacking.DoesNotExist:
                 response = {'errors': "invalid id", 'status':
                              status.HTTP_400_BAD_REQUEST}
@@ -2689,6 +2722,83 @@ class UploadImageAPI(APIView):
                 photo_obj.user = user
                 photo_obj.save()
             response = {'message': "Image Uploaded",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetNotificationAPI(APIView):
+    serializer_class = UserNotificationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        response = {}
+        notifications = UserNotification.objects.filter(
+                        user=request.user).order_by('-created_time')
+        unread_count = notifications.filter(status_type=UserNotification.UNREAD).count()
+        for notification_obj in notifications:
+            response[notification_obj.id] = self.serializer_class(notification_obj).data
+        response['unread_count'] = unread_count
+        return Response(response)
+
+
+class GetTrackingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/tracking_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.TRACKING)).id
+        tracking_notification_html = render_to_string(
+                                'user_pages/tracking_notification.html',
+                                {'image': from_user.get_profile_photo(),
+                                'name': from_user.get_full_name(),
+                                'membership': from_user.get_membership_display,
+                                'id': id,
+                                'notification_id':notification_id})
+        context['tracking_notification_html'] = tracking_notification_html
+        return self.render_json_response(context)
+
+
+class GetAllNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/all_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        notifications = UserNotification.objects.filter(
+                        user=self.request.user).order_by('-created_time')
+        all_notification_html = render_to_string(
+                                'user_pages/all_notification.html',
+                                {'notifications': notifications}
+                                )
+        context['all_notification_html'] = all_notification_html
+        return self.render_json_response(context)
+
+
+class ChangeNotificationStatusAPI(APIView):
+    serializer_class = ChangeNotificationStatusSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            id = data_dict['id']
+            obj = UserNotification.objects.get(pk=id)
+            obj.status_type = data_dict['status_type']
+            obj.save()
+            response = {'message': "Status changed",
                         'status': status.HTTP_200_OK}
         else:
             print(serializer.errors)
