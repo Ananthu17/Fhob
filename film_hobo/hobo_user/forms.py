@@ -160,7 +160,7 @@ class SignUpFormCompany(UserCreationForm):
                   'password1', 'password2', 'phone_number',
                   'address', 'i_agree', 'date_of_birth', 'country',
                   'title', 'company_name', 'company_address',
-                  'company_phone', 'company_website')
+                  'company_phone', 'company_website', 'company_type')
 
         widgets = {
             'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
@@ -183,6 +183,7 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['company_address'].required = True
         self.fields['company_phone'].required = True
         self.fields['title'].required = True
+        self.fields['company_type'].required = True
         self.fields['company_website'].required = False
 
         self.fields['first_name'].widget.attrs['class'] = 'inp-line'

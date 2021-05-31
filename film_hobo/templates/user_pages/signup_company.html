@@ -274,6 +274,23 @@
                   </div>
                   <div class="row mt-2">
                       <div class="col-2">
+                          <label class="form-title">Company Type</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <select class="form-control form-control-input" name="{{ form.company_type.name }}"
+                        id="{{ form.company_type.id_for_label }}"
+                        placeholder="Company Type"
+                        required>
+                        <option value="production">Production</option>
+                        <option value="agency_management">Agency/Management</option>
+                        </select>
+                        {% if form.errors.company_type %}
+                          <p style="color: red">{{form.errors.company_type}}</p>
+                        {% endif %}
+                      </div>
+                  </div>
+                  <div class="row mt-2">
+                      <div class="col-2">
                           <label class="form-title" >Password</label>
                       </div>
                       <div class="col-4 form-group">

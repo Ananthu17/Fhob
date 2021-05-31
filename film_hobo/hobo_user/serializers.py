@@ -477,6 +477,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
     country = serializers.CharField()
+    company_type = serializers.CharField()
 
     # company details
     company_name = serializers.CharField()
@@ -492,7 +493,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
                   'last_name', 'password1', 'password2', 'phone_number',
                   'date_of_birth', 'address', 'country',
                   'company_name', 'company_address', 'company_website',
-                  'company_phone', 'title', 'membership']
+                  'company_phone', 'title', 'membership', 'company_type']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -548,6 +549,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
             'address': self.validated_data.get('address', ''),
             'country': self.validated_data.get('country', ''),
+            'company_type': self.validated_data.get('company_type', ''),
             'company_name': self.validated_data.get('company_name', ''),
             'company_address': self.validated_data.get('company_address', ''),
             'company_website': self.validated_data.get('company_website', ''),

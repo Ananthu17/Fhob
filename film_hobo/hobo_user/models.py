@@ -48,11 +48,26 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    PRODUCTION = 'production'
+    AGENCY_MANGEMENT = 'agency_management'
+    AGENCY = 'agency'
+    MANGEMENT = 'management'
+    NA = ''
     ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
+    COMPANY_TYPE_CHOICES = [
+        (PRODUCTION, 'Production'),
+        (AGENCY_MANGEMENT, 'Agency/Management'),
+        (NA, 'NA'),
+    ]
+    AGENCY_MANGEMENT_TYPE_CHOICES = [
+        (AGENCY, 'Agency'),
+        (MANGEMENT, 'Management'),
+        (NA, 'NA'),
+    ]
     MEMBERSHIP_CHOICES = [
         (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
@@ -146,6 +161,15 @@ class CustomUser(AbstractUser):
     membership = models.CharField(_("Membership Type"),
                                   choices=MEMBERSHIP_CHOICES,
                                   max_length=150, default=HOBO)
+    company_type = models.CharField(_("Company Type"),
+                                    choices=COMPANY_TYPE_CHOICES,
+                                    max_length=150, default=NA,
+                                    null=True, blank=True)
+    agency_management_type = models.CharField(
+                            _("Agency/Management Type"),
+                            choices=AGENCY_MANGEMENT_TYPE_CHOICES,
+                            max_length=150, default=NA,
+                            null=True, blank=True)
     i_agree = models.BooleanField(
         _('I Agree'),
         default=True,

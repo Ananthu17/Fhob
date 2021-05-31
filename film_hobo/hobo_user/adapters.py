@@ -62,6 +62,7 @@ class CustomCompanyUserAccountAdapter(DefaultAccountAdapter):
         signup form.
         """
         country_id = request.data.get('country', '')
+        company_type = request.data.get('company_type', '')
 
         user = super().save_user(request, user, form, False)
         user_field(user, 'first_name', request.data.get('first_name', ''))
@@ -88,5 +89,8 @@ class CustomCompanyUserAccountAdapter(DefaultAccountAdapter):
         if country_id is not None:
             country = Country.objects.get(pk=country_id)
             user.country = country
+            user.save()
+        if company_type is not None:
+            user.company_type = company_type
             user.save()
         return user
