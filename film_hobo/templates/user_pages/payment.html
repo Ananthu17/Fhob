@@ -65,18 +65,29 @@
                             <form>
                                 <div class="mt-4">Amount: $
                                     {% if payment_plan == 'monthly' %}
-                                    <span id="full_amount">{{ payment_details.monthly_amount }}</span>
+                                    <span id="full_amount">{{ payment_details.monthly_amount_with_tax }}</span>
+                                    <span id="full_amount_txt">(including {{ payment_details.estimated_tax }}% tax) </span>
                                     {% elif payment_plan == 'annually' %}
-                                    <span id="full_amount">{{ payment_details.annual_amount }}</span>
+                                    <span id="full_amount">{{ payment_details.annual_amount_with_tax }}</span>
+                                    <span id="full_amount_txt">(including {{ payment_details.estimated_tax }}% tax) </span>
                                     {% else %}
-                                    <span id="full_amount">0.00</span>
+                                    <span id="full_amount">0</span>
                                     {% endif %}
                                 </div>
                                 <div class="mt-4">Promotions: $
-                                    <span id="promotion_amount">0.00</span>
+                                    <span id="promotion_amount">0</span>
+                                    <input type="button" id="remove_promocode" value="Remove" class="promo_code_btn"/>
                                 </div>
-                                <div class="mt-4">Total Amount: $
-                                    <span id="final_amount">{{ payment_details.monthly_amount }}</span>
+                                <div class="mt-4">Final Amount: $
+                                    {% if payment_plan == 'monthly' %}
+                                    <span id="final_amount">{{ payment_details.monthly_amount_with_tax }}</span>
+                                    {% elif payment_plan == 'annually' %}
+                                    <span id="final_amount">{{ payment_details.annual_amount_with_tax }}</span>
+                                    {% else %}
+                                    <span id="final_amount">0</span>
+                                    {% endif %}
+                                </div>
+                                <div id="paypal-btn" class="mt-4">
                                 </div>
                             </form>
                         </div>
@@ -97,32 +108,54 @@
         </div>
     </div>
 </div>
+<!-- The Modal -->
+<div class="modal fade" id="promocode_modal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title">Modal Heading</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+        Modal body..
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button id="modal_cancel" type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extrajs %}
 <script>
-    $('body').on('click' , '#apply_promocode', function(){
-        $('.promo_code_status').html("");
-        var promocode = $("#promocode").val();
-        var user_id = $("#user_id").val();
-        var data_dict = {};
-        if(user_id){
-            data_dict['user_id']=user_id
-        }
-        if(promocode){
-            data_dict['promo_code']=promocode
-        }
-        $.post('/hobo_user/check-promocode-api/',data_dict)
-        .done(function(data) {
-            if(data.results!='')
-                {
-                    $('.promo_code_status').html(data['message']);
-                }
-            });
-        });
+    // $('body').on('click' , '#apply_promocode', function(){
+    //     $('.promo_code_status').html("");
+    //     var promocode = $("#promocode").val();
+    //     var user_id = $("#user_id").val();
+    //     var data_dict = {};
+    //     if(user_id){
+    //         data_dict['user_id']=user_id
+    //     }
+    //     if(promocode){
+    //         data_dict['promo_code']=promocode
+    //     }
+    //     $.post('/hobo_user/check-promocode-api/',data_dict)
+    //     .done(function(data) {
+    //         if(data.results!='')
+    //             {
+    //                 $('.promo_code_status').html(data['message']);
+    //             }
+    //         });
+    //     });
 </script>
 <script src="{% static 'js/registration_payment.js' %}"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=test"></script>
+<script>paypal.Buttons().render('#paypal-btn');</script>
 {% endblock %}
 
 

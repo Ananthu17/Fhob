@@ -74,7 +74,8 @@ INSTALLED_APPS = [
     'django_select2',
     'crispy_forms',
     'django_s3_storage',
-    'zappa_django_utils'
+    'zappa_django_utils',
+    'paypal.standard.ipn'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -214,14 +215,11 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_FROM = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_FROM', 'avin@techversantinfo.com')
-EMAIL_HOST_USER = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_USER', 'avin@techversantinfo.com')
-EMAIL_HOST_PASSWORD = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
-EMAIL_BCC = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
+
+EMAIL_FROM = env("AUTHEMAIL_DEFAULT_EMAIL_FROM")
+EMAIL_HOST_USER = env("AUTHEMAIL_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("AUTHEMAIL_EMAIL_HOST_PASSWORD")
+EMAIL_BCC = ''
 
 OLD_PASSWORD_FIELD_ENABLED = True
 
@@ -247,3 +245,6 @@ SITE_URL = os.environ.get('SITE_URL', '')
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
 
+# PAYPAL SETTINGS
+PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
+PAYPAL_TEST = True

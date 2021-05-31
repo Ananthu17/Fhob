@@ -1,7 +1,5 @@
 
 import datetime
-from django.utils import timezone
-from datetime import date
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -151,6 +149,12 @@ class CustomUser(AbstractUser):
         default=True,
         help_text=_(
             'Designates whether the user accepted the terms and conditions.'),
+    )
+    registration_complete = models.BooleanField(
+        _('Registration Complete'),
+        default=False,
+        help_text=_(
+            'Designates whether the user fully completed the registration.'),
     )
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
@@ -463,6 +467,9 @@ class PromoCode(models.Model):
                                  choices=USER_TYPE_CHOICES,
                                  max_length=150, default=HOBO)
 
+    def __str__(self):
+        return str(self.promo_code)
+
 
 class Team(models.Model):
     team = models.CharField(max_length=1000)
@@ -520,7 +527,11 @@ class HoboPaymentsDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250,
                                  null=True, blank=True)
     annual_amount = models.FloatField(_('Annual billing amount'))
+    annual_amount_with_tax = models.FloatField(
+        _('Annual billing amount (with tax)'))
     monthly_amount = models.FloatField(_('Monthly billing amount'))
+    monthly_amount_with_tax = models.FloatField(
+        _('Monthly billing amount (with tax)'))
     estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
@@ -537,7 +548,11 @@ class HoboPaymentsDetails(SingletonModel):
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.FloatField(_('Annual billing amount'))
+    annual_amount_with_tax = models.FloatField(
+        _('Annual billing amount (with tax)'))
     monthly_amount = models.FloatField(_('Monthly billing amount'))
+    monthly_amount_with_tax = models.FloatField(
+        _('Monthly billing amount (with tax)'))
     estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
@@ -554,7 +569,11 @@ class IndiePaymentDetails(SingletonModel):
 class ProPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.FloatField(_('Annual billing amount'))
+    annual_amount_with_tax = models.FloatField(
+        _('Annual billing amount (with tax)'), )
     monthly_amount = models.FloatField(_('Monthly billing amount'))
+    monthly_amount_with_tax = models.FloatField(
+        _('Monthly billing amount (with tax)'))
     estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:
@@ -571,7 +590,11 @@ class ProPaymentDetails(SingletonModel):
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
     annual_amount = models.FloatField(_('Annual billing amount'))
+    annual_amount_with_tax = models.FloatField(
+        _('Annual billing amount (with tax)'))
     monthly_amount = models.FloatField(_('Monthly billing amount'))
+    monthly_amount_with_tax = models.FloatField(
+        _('Monthly billing amount (with tax)'))
     estimated_tax = models.FloatField(_('Estimated Tax'))
 
     class Meta:

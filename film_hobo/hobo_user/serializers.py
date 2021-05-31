@@ -575,24 +575,24 @@ class IndiePaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IndiePaymentDetails
-        fields = ['free_days', 'annual_amount', 'monthly_amount',
-                  'estimated_tax']
+        fields = ['free_days', 'annual_amount', 'annual_amount_with_tax',
+                  'monthly_amount', 'monthly_amount_with_tax', 'estimated_tax']
 
 
 class ProPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProPaymentDetails
-        fields = ['free_days', 'annual_amount', 'monthly_amount',
-                  'estimated_tax']
+        fields = ['free_days', 'annual_amount', 'annual_amount_with_tax',
+                  'monthly_amount', 'monthly_amount_with_tax', 'estimated_tax']
 
 
 class CompanyPaymentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyPaymentDetails
-        fields = ['free_days', 'annual_amount', 'monthly_amount',
-                  'estimated_tax']
+        fields = ['free_days', 'annual_amount', 'annual_amount_with_tax',
+                  'monthly_amount', 'monthly_amount_with_tax', 'estimated_tax']
 
 
 class PromoCodeSerializer(serializers.ModelSerializer):

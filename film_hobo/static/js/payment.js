@@ -147,6 +147,14 @@ $( document ).ready(function() {
         $('#monthly_indie').val("$ " + response.data.monthly_indie);
         $('#monthly_pro').val("$ " + response.data.monthly_pro);
         $('#monthly_company').val("$ " + response.data.monthly_company);
+        $('#annual_hobo_with_tax').val("$ " + response.data.annual_hobo_with_tax);
+        $('#annual_indie_with_tax').val("$ " + response.data.annual_indie_with_tax);
+        $('#annual_pro_with_tax').val("$ " + response.data.annual_pro_with_tax);
+        $('#annual_company_with_tax').val("$ " + response.data.annual_company_with_tax);
+        $('#monthly_hobo_with_tax').val("$ " + response.data.monthly_hobo_with_tax);
+        $('#monthly_indie_with_tax').val("$ " + response.data.monthly_indie_with_tax);
+        $('#monthly_pro_with_tax').val("$ " + response.data.monthly_pro_with_tax);
+        $('#monthly_company_with_tax').val("$ " + response.data.monthly_company_with_tax);
         $('#tax_value').text(response.data.tax);
         $('#days_value').text(response.data.free_evaluation_time);
         var $renew_option = $('input:radio[name=renew_radio]');
@@ -196,11 +204,11 @@ $( document ).ready(function() {
 make the table column field editable
 */
 document.getElementById("membership_fee_edit").addEventListener("click", function() {
-    if ($('#annual_hobo').is('[readonly]')) {
-        $("#annual_hobo").prop("readonly", false);
-    } else {
-        $("#annual_hobo").prop("readonly", true);
-    }
+    // if ($('#annual_hobo').is('[readonly]')) {
+    //     $("#annual_hobo").prop("readonly", false);
+    // } else {
+    //     $("#annual_hobo").prop("readonly", true);
+    // }
 
     if ($('#annual_indie').is('[readonly]')) {
         $("#annual_indie").prop("readonly", false);
@@ -220,11 +228,11 @@ document.getElementById("membership_fee_edit").addEventListener("click", functio
         $("#annual_company").prop("readonly", true);
     }
 
-    if ($('#monthly_hobo').is('[readonly]')) {
-        $("#monthly_hobo").prop("readonly", false);
-    } else {
-        $("#monthly_hobo").prop("readonly", true);
-    }
+    // if ($('#monthly_hobo').is('[readonly]')) {
+    //     $("#monthly_hobo").prop("readonly", false);
+    // } else {
+    //     $("#monthly_hobo").prop("readonly", true);
+    // }
 
     if ($('#monthly_indie').is('[readonly]')) {
         $("#monthly_indie").prop("readonly", false);

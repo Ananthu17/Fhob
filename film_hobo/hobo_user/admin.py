@@ -35,6 +35,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         ('User', {'fields': ('first_name', 'middle_name', 'last_name',
                              'email', 'password', 'date_of_joining')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
+        ('Registration Process', {'fields': ('registration_complete',)}),
         ('Membership', {'fields': ('membership', 'guild_membership',
                                    'payment_plan')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
