@@ -16,7 +16,7 @@ id ="{{obj.id}}" class="notification_link">
         {{ obj.from_user.get_full_name }} started tracking you<br>
         <b>{{ obj.from_user.get_membership_display }}</b><br>
         {% get_notifications_time obj.created_time as time %}
-        {{time}}
+        {{time}} ago.
     </div>
 </div>
 </a>
