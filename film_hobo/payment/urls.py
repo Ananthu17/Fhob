@@ -1,4 +1,6 @@
-from django.urls import path
+from django.urls import path, include
+
+from payment import views
 
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
@@ -24,5 +26,8 @@ urlpatterns = [
          name='calculate_discount'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
-         name='payment_admin')
+         name='payment_admin'),
+    # paypal endpoints
+    path('paypal/', include("paypal.standard.ipn.urls")),
+    path('process-payment/', views.process_payment, name='process_payment'),
 ]

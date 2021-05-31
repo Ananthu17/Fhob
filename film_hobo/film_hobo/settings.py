@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'django_s3_storage',
     'zappa_django_utils',
     'channels',
+    'paypal.standard.ipn'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -207,14 +208,20 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
-EMAIL_FROM = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_FROM')
-EMAIL_HOST_USER = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_PASSWORD')
-EMAIL_BCC = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
+
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# Email settings
+AUTH_EMAIL_VERIFICATION = True
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+
+EMAIL_FROM = env("AUTHEMAIL_DEFAULT_EMAIL_FROM")
+EMAIL_HOST_USER = env("AUTHEMAIL_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("AUTHEMAIL_EMAIL_HOST_PASSWORD")
+EMAIL_BCC = ''
 
 OLD_PASSWORD_FIELD_ENABLED = True
 
@@ -250,3 +257,7 @@ CHANNEL_LAYERS = {
         # 'ROUTING': 'notification_channels.routing.channel_routing',
     }
 }
+# PAYPAL SETTINGS
+# PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
+# PAYPAL_TEST = True
+

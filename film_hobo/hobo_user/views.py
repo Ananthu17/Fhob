@@ -755,6 +755,7 @@ class PaymentProView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
         context['user'] = user
+        import pdb;pdb.set_trace()
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
         return context
