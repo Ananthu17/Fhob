@@ -1,31 +1,70 @@
 {% extends 'base.html' %}
 {% load rest_framework %}
-
-
-
+{% load static %}
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
 
-        <h1>Login</h1>
-        <form method="post" action="{% url 'hobo_user:user_login' %}">
-            {% csrf_token %}
-            <p> {{ form.non_field_errors }}</p>
-            <p>
-                Email {{form.username}}
-                {{form.username.errors}}
-            </p>
-            <p>
-                Password {{form.password}}
-                {{form.password.errors}}
-            </p>
-            <button id="login-submit" type="submit" class="btn btn-default">Sign in</button>
-        </form>
-        <a href="{% url 'hobo_user:forgot-password' %}">Forgot Password</a>
+<div class="wrapper flex-grow-1">
+    <div class="container mt-3 mb-3">
+        <div class="signup-form signup-section signup-border">
+            <!-- Nav pills -->
+            <form method="post">
+                {% csrf_token %}
+                <ul class="nav nav-pills nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="pill" href="{% url 'hobo_user:user_login' %}">Login</a>
+                    </li>
+                </ul>
+                <hr class="m-0 signup-border-hr">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div id="membership" class="container tab-pane active">
+                        <div class="signup-form mt-2 mb-2 ">
 
-
-
+                            <div class="row mt-4">
+                                <div class="col-2">
+                                    <label class="form-title">{{ form.username.label_tag }}</label>
+                                </div>
+                                <div class="col-8">
+                                    <input  name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="inp-line" placeholder="Email" />
+                                    {% if form.errors.username %}
+                                    <p style="color: red">{{ form.errors.username }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mt-4 mb-4">
+                                <div class="col-2">
+                                    <label class="form-title">{{ form.password.label_tag }}</label>
+                                </div>
+                                <div class="col-8 ">
+                                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="inp-line" placeholder="Password" />
+                                    {% if form.errors.password %}
+                                    <p style="color: red">{{ form.errors.password }}</p>
+                                    {% endif %}
+                                    {% if form.non_field_errors %}
+                                    <p style="color: red">{{ form.non_field_errors }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center  mt-4 mb-4">
+                                    <button id="login-submit" class="btn btn-login">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
+                    <ul class="list-inline m-0">
+                        <li class="list-inline-item"><a href="{% url 'hobo_user:forgot-password' %}" class="login-link">Forgot Password</a></li>
+                        <li class="list-inline-item"><a href="{% url 'hobo_user:choose-membership' %}" class="login-link">Register</a></li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block extrajs %}
+<script src="{% static 'js/base.js' %}"></script>
 {% endblock %}

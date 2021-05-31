@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
@@ -47,9 +47,9 @@
                             {% else %}
                             <div class="mt-2">Choose Payment plan to Proceed</div>
                             {% endif %}
-                            <div class="mt-2">Estimated Tax:$ {{ payment_details.estimated_tax }}</div>
+                            <div class="mt-2">Estimated Tax Percentage: {{ payment_details.estimated_tax }} %</div>
                             <div class="mt-2">Your credit card will be charged on
-                                ___/___/2021, 30 days from today</div>
+                                {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, {{ payment_details.free_days }} days from today</div>
                             <div class="row mt-2">
                                 <div class="col-3">
                                     <label class="form-title">Promo Code</label>
@@ -63,53 +63,21 @@
                         </div>
                         <div class="col-7 paymnt-lft-bar">
                             <form>
-                                <div class="row">
-                                    <div class="col-3 ">
-                                        <label class="form-title">Name on the card</label>
-                                    </div>
-                                    <div class="col-9">
-                                        <input class="inp-line" />
-                                    </div>
+                                <div class="mt-4">Amount: $
+                                    {% if payment_plan == 'monthly' %}
+                                    <span id="full_amount">{{ payment_details.monthly_amount }}</span>
+                                    {% elif payment_plan == 'annually' %}
+                                    <span id="full_amount">{{ payment_details.annual_amount }}</span>
+                                    {% else %}
+                                    <span id="full_amount">0.00</span>
+                                    {% endif %}
                                 </div>
-                                <div class="row mt-2">
-                                    <div class="col-3">
-                                        <label class="form-title">Card Number</label>
-                                    </div>
-                                    <div class="col-6 form-group mt-2">
-                                        <input type="password" class="form-control form-control-input">
-                                    </div>
+                                <div class="mt-4">Promotions: $
+                                    <span id="promotion_amount">0.00</span>
                                 </div>
-                                <div class="row">
-                                    <div class="col-3">
-                                        <label class="form-title">Experation</label>
-                                    </div>
-                                    <div class="col-2">
-                                        <input class="inp-line" />
-                                    </div><span class="dob-bar">/</span>
-                                    <div class="col-2">
-                                        <input class="inp-line" />
-                                    </div>
+                                <div class="mt-4">Total Amount: $
+                                    <span id="final_amount">{{ payment_details.monthly_amount }}</span>
                                 </div>
-                                <div class="row ">
-                                    <div class="col-3">
-                                        <label class="form-title">CVV</label>
-                                    </div>
-                                    <div class="col-2">
-                                        <input class="inp-line" />
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-3">
-                                        <label class="form-title">Billing Address</label>
-                                    </div>
-                                    <div class="col-5">
-                                        <input class="inp-line" placeholder="" />
-                                    </div>
-                                    <div class="col-4">
-                                        <input class="inp-line" placeholder="" />
-                                    </div>
-                                </div>
-                                <div class="mt-4">Total Amount: $15.00</div>
                             </form>
                         </div>
                     </div>
@@ -154,9 +122,8 @@
             });
         });
 </script>
+<script src="{% static 'js/registration_payment.js' %}"></script>
 {% endblock %}
-
-
 
 
 

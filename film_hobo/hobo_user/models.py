@@ -1,6 +1,4 @@
 
-import json
-import math
 import datetime
 from django.utils import timezone
 from datetime import date
@@ -40,6 +38,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('membership', 'ADMIN')
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('Superuser must have is_staff=True.'))
@@ -49,11 +48,13 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
     MEMBERSHIP_CHOICES = [
+        (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
@@ -245,7 +246,9 @@ class CustomUser(AbstractUser):
         return self.email
 
     def get_full_name(self):
-        if self.middle_name:
+        if self.is_superuser:
+            name = "Admin"
+        elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
         else:
             name = self.first_name+" "+self.last_name
@@ -447,17 +450,19 @@ class PromoCode(models.Model):
         (FLAT_AMOUNT, 'Flat Amount'),
         (PERCENTAGE, 'Percentage'),
     ]
+    ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
     USER_TYPE_CHOICES = [
+        (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
         (PRODUCTION_COMPANY, 'Production Company')
     ]
-    promo_code = models.CharField(max_length=1000)
+    promo_code = models.CharField(max_length=1000, unique=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
@@ -536,6 +541,12 @@ class HoboPaymentsDetails(SingletonModel):
         verbose_name = 'Hobo Members Payment Detail'
         verbose_name_plural = 'Hobo Members Payment Details'
 
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(HoboPaymentsDetails, self).save(*args, **kwargs)
+
 
 class IndiePaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
@@ -546,6 +557,12 @@ class IndiePaymentDetails(SingletonModel):
     class Meta:
         verbose_name = 'Indie Members Payment Detail'
         verbose_name_plural = 'Indie Members Payment Details'
+
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(IndiePaymentDetails, self).save(*args, **kwargs)
 
 
 class ProPaymentDetails(SingletonModel):
@@ -558,6 +575,12 @@ class ProPaymentDetails(SingletonModel):
         verbose_name = 'Pro Members Payment Detail'
         verbose_name_plural = 'Pro Members Payment Details'
 
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(ProPaymentDetails, self).save(*args, **kwargs)
+
 
 class CompanyPaymentDetails(SingletonModel):
     free_days = models.CharField(_('First free days'), max_length=250)
@@ -568,6 +591,12 @@ class CompanyPaymentDetails(SingletonModel):
     class Meta:
         verbose_name = 'Company Payment Detail'
         verbose_name_plural = 'Company Payment Details'
+
+    def save(self, *args, **kwargs):
+        self.annual_amount = round(self.annual_amount, 2)
+        self.monthly_amount = round(self.monthly_amount, 2)
+        self.estimated_tax = round(self.estimated_tax, 2)
+        super(CompanyPaymentDetails, self).save(*args, **kwargs)
 
 
 class DisabledAccount(models.Model):

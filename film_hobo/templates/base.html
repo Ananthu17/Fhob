@@ -32,7 +32,7 @@
                 <div class="row no-wrap justify-content-between align-items-center">
                     <div class="col-md-3 col-xs-6">
                         <a href="#home">
-                            <div><img src="{% static 'images/Film Hobo Logo.jpg' %}" class="img-fluid" style="height: 120px;"></div>
+                            <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
                         </a>
                     </div>
                     <div class="col-md-5 col-xs-6 text-center">
@@ -70,77 +70,100 @@
                 <!-- Links -->
                 <ul class="navbar-nav justify-content-between w-100">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">SCREEN ROOM</a>
+                        <a class="nav-link" href="#">SHOWCASE</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
+                        <a class="nav-link" href="{% url 'hobo_user:user_home' %}"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
                     </li>
                     <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            PROJECTS
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Start a Project</a>
-                            <a class="dropdown-item" href="#">Scenes</a>
-                            <a class="dropdown-item" href="#">Shorts</a>
-                            <a class="dropdown-item" href="#">Pilots/Features</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            SCENES
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            SHORTS
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
-                    <!-- Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            PILOTS/FEATURES
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Projects</a>
-                            <a class="dropdown-item" href="#">Films</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">HOW TO</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">LOGIN/SIGN UP</a>
-                    </li>
-                    <!-- Dropdown -->
-                    <!--<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                            KONSTANTIN
-                        </a>
-                        <div class="dropdown-menu FH-dropdown-font">
-                            <a class="dropdown-item" href="#">Settings & Privacy</a>
-                            <a class="dropdown-item" href="#">Edit Profile</a>
-                            <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                    {% if user.membership != HOB %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                PROJECTS
+                            </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Support</a>
-                                <a class="dropdown-item" href="#">Report a Problem</a>
+                                <a class="dropdown-item" href="#">Start a Project</a>
+                                <a class="dropdown-item" href="#">Scenes</a>
+                                <a class="dropdown-item" href="#">Shorts</a>
+                                <a class="dropdown-item" href="#">Pilots/Features</a>
                             </div>
-                            <a class="dropdown-item" href="#">Membership</a>
-                            <a class="dropdown-item" href="#">My Projects</a>
-                            <a class="dropdown-item" href="#">Logout</a>
-                        </div>
-                    </li>-->
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                SCENES
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                SHORTS
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                        <!-- Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                PILOTS/FEATURES
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="#">Films</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                    </li>
+                    <!-- Dropdown -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                {% if user.is_superuser %}
+                                    Admin
+                                {% else %}
+                                    {{ user.get_full_name }}
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu FH-dropdown-font">
+                                {% if user.is_superuser %}
+                                    <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
+                                    <a class="dropdown-item" href="#">Settings & Privacy</a>
+                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                                    <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="#">Support</a>
+                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                    </div>
+                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="#">My Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
+                                {% else %}
+                                    <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
+                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
+                                    <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="#">Support</a>
+                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                    </div>
+                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="#">My Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -223,6 +246,7 @@
 </body>
 <!-- Axios -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<<<<<<< HEAD
 <script src="{% static 'js/notification.js' %}"></script>
     <script>
     /*
@@ -252,5 +276,9 @@
     </script>
 </html>
 
+=======
+>>>>>>> 077595c66083b634007a3bedef0e466586622e04
 {% block extrajs %}
 {% endblock %}
+</html>
+

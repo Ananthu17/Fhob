@@ -2,7 +2,6 @@ from django.urls import path
 
 from rest_auth.views import LoginView
 
-
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
                    ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
@@ -21,6 +20,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
+                   PersonalDetailsView, HowTo, \
                    PersonalDetailsView, UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
                    AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
@@ -118,6 +118,7 @@ urlpatterns = [
 
 
     # web-view endpoints
+    path('how_to/', HowTo.as_view(), name='how_to'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),
