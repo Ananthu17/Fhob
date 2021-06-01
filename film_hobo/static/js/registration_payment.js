@@ -62,7 +62,3 @@ $("#remove_promocode").click(function(){
     $("#remove_promocode").remove();
     location.reload()
 });
-
-// $("#paypal-btn").click(function(){
-
-// });

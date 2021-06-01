@@ -138,27 +138,27 @@
 "></script>
 <script>
     paypal.Buttons({
-    //   createOrder: function(data, actions) {
-    //     return actions.order.create({
-    //       purchase_units: [{
-    //         amount: {
-    //           value: $("#final_amount")[0].innerText
-    //         }
-    //       }]
-    //     });
-    //   },
-    createOrder: function() {
-        return fetch('/my-server/create-paypal-transaction', {
-            method: 'post',
-            headers: {
-            'content-type': 'application/json'
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: $("#final_amount")[0].innerText
             }
-        }).then(function(res) {
-            return res.json();
-        }).then(function(data) {
-            return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+          }]
         });
       },
+    // createOrder: function() {
+    //     return fetch('/my-server/create-paypal-transaction', {
+    //         method: 'post',
+    //         headers: {
+    //         'content-type': 'application/json'
+    //         }
+    //     }).then(function(res) {
+    //         return res.json();
+    //     }).then(function(data) {
+    //         return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+    //     });
+    //   },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
           alert('Transaction completed by ' + details.payer.name.given_name);
