@@ -29,5 +29,4 @@ urlpatterns = [
          name='payment_admin'),
     # paypal endpoints
     path('paypal/', include("paypal.standard.ipn.urls")),
-    path('process-payment/', views.process_payment, name='process_payment'),
 ]

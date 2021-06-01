@@ -1,5 +1,6 @@
 $( document ).ready(function() {
     $("#remove_promocode").hide();
+    // $("#paypal-div").hide();
 
     var promotion_amount = localStorage.getItem("promotion_amount");
     if (promotion_amount){
@@ -61,3 +62,7 @@ $("#remove_promocode").click(function(){
     $("#remove_promocode").remove();
     location.reload()
 });
+
+// $("#paypal-btn").click(function(){
+
+// });

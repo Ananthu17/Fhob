@@ -45,9 +45,11 @@ class Transaction(models.Model):
                                     max_length=150,
                                     null=True)
     initial_amount = models.FloatField(_("Initial Amount"))
+    tax_applied = models.FloatField(_("Tax"), null=True, blank=True)
     promocodes_applied = models.OneToOneField(
-        PromoCode, on_delete=models.CASCADE)
-    promotion_amount = models.FloatField(_("Promotion Amount"))
+        PromoCode, null=True, blank=True, on_delete=models.CASCADE,)
+    promotion_amount = models.FloatField(_("Promotion Amount"),
+                                         null=True, blank=True)
     final_amount = models.FloatField(_("Final Amount"))
     paid = models.BooleanField(default=False)
 
