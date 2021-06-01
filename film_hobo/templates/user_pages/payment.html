@@ -137,28 +137,38 @@
 <script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2
 "></script>
 <script>
+    origin_url = window.location.origin
+    post_url = origin_url + '/payment/transaction_save/'
+    calculate_discount_args = {
+        "payment_plan": "annually",
+        "initial_amount": "500",
+        "tax_applied": "0",
+        "promocodes_applied": "",
+        "promotion_amount": "",
+        "final_amount": "500"
+    }
     paypal.Buttons({
-      createOrder: function(data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: $("#final_amount")[0].innerText
-            }
-          }]
-        });
-      },
-    // createOrder: function() {
-    //     return fetch('/my-server/create-paypal-transaction', {
-    //         method: 'post',
-    //         headers: {
-    //         'content-type': 'application/json'
+    //   createOrder: function(data, actions) {
+    //     return actions.order.create({
+    //       purchase_units: [{
+    //         amount: {
+    //           value: $("#final_amount")[0].innerText
     //         }
-    //     }).then(function(res) {
-    //         return res.json();
-    //     }).then(function(data) {
-    //         return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+    //       }]
     //     });
     //   },
+    createOrder: function() {
+        return fetch('/my-server/create-paypal-transaction', {
+            method: 'post',
+            headers: {
+            'content-type': 'application/json'
+            }
+        }).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+        });
+      },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
           alert('Transaction completed by ' + details.payer.name.given_name);

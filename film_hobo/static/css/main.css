@@ -1209,3 +1209,42 @@ input#visa:focus {
   height: 110px;
 }
 /*simple content page end*/
+/*membership page logistics*/
+.memship-row{
+  background-color: #EDEEF0 !important;
+  padding: 10px 0px 7px 0px;
+}
+.memship-row-head{
+  background-color: #EDEEF0 !important;
+  padding: 5px 0px 5px 0px;
+}
+.memship-row-btm{
+  padding: 10px 0px 7px 0px;
+}
+.memship-f{
+  font-family: Courier Bold;
+   font-size: 12px;
+}
+.memship-pro-font{
+  font-family: "Pooper Black Pro";
+   color: #C70039;
+   font-size: 17px;
+}
+.memship-head{
+  color:#a00164;
+  line-height: 24px;
+}
+.memship-check{
+  height: 14px;
+}
+.memship-btm-f{
+  font-family: "Myraid Pro";
+  font-size: 13px;
+  font-weight: 600;
+}
+.memship-btm-pro-f{
+  font-family: "Pooper Black Pro";
+   color: #C70039;
+   font-size: 17px;
+}
+/*membership page logistics end*/

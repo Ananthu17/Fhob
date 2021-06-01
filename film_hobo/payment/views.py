@@ -128,6 +128,103 @@ class GetMembershipFeeDetailsAPI(APIView):
         return Response(final_result, status=status.HTTP_200_OK)
 
 
+class GetMembershipFeeDetailsPublicAPI(APIView):
+    """
+    API for superuser to get the membership fee details
+    """
+
+    def get(self, request, *args, **kwargs):
+        final_result = {"monthly_hobo": "", "monthly_hobo_with_tax": "",
+                        "monthly_indie": "", "monthly_indie_with_tax": "",
+                        "monthly_pro": "", "monthly_pro_with_tax": "",
+                        "monthly_company": "", "monthly_company_with_tax": "",
+                        "annual_hobo": "", "annual_hobo_with_tax": "",
+                        "annual_indie": "", "annual_indie_with_tax": "",
+                        "annual_pro": "", "annual_pro_with_tax": "",
+                        "annual_company": "", "annual_company": "",
+                        "tax": "", "free_evaluation_time": "",
+                        "auto_renew": ""
+                        }
+        try:
+            hobo_details_dict = HoboPaymentsDetails.objects.first().__dict__
+            final_result['monthly_hobo'] = hobo_details_dict[
+                'monthly_amount']
+            final_result['monthly_hobo_with_tax'] = hobo_details_dict[
+                'monthly_amount_with_tax']
+            final_result['annual_hobo'] = hobo_details_dict[
+                'annual_amount']
+            final_result['annual_hobo_with_tax'] = hobo_details_dict[
+                'annual_amount_with_tax']
+        except AttributeError:
+            final_result['monthly_hobo'] = ""
+            final_result['monthly_hobo_with_tax'] = ""
+            final_result['annual_hobo'] = ""
+            final_result['annual_hobo_with_tax'] = ""
+
+        try:
+            indie_details_dict = IndiePaymentDetails.objects.first().__dict__
+            final_result['monthly_indie'] = indie_details_dict[
+                'monthly_amount']
+            final_result['monthly_indie_with_tax'] = indie_details_dict[
+                'monthly_amount_with_tax']
+            final_result['annual_indie'] = indie_details_dict[
+                'annual_amount']
+            final_result['annual_indie_with_tax'] = indie_details_dict[
+                'annual_amount_with_tax']
+        except AttributeError:
+            final_result['monthly_indie'] = ""
+            final_result['monthly_indie_with_tax'] = ""
+            final_result['annual_indie'] = ""
+            final_result['annual_indie_with_tax'] = ""
+
+        try:
+            pro_details_dict = ProPaymentDetails.objects.first().__dict__
+            final_result['monthly_pro'] = pro_details_dict[
+                'monthly_amount']
+            final_result['monthly_pro_with_tax'] = pro_details_dict[
+                'monthly_amount_with_tax']
+            final_result['annual_pro'] = pro_details_dict[
+                'annual_amount']
+            final_result['annual_pro_with_tax'] = pro_details_dict[
+                'annual_amount_with_tax']
+        except AttributeError:
+            final_result['monthly_pro'] = ""
+            final_result['monthly_pro_with_tax'] = ""
+            final_result['annual_pro'] = ""
+            final_result['annual_pro_with_tax'] = ""
+
+        try:
+            company_details_dict = CompanyPaymentDetails.objects.first().__dict__
+            final_result['monthly_company'] = company_details_dict[
+                'monthly_amount']
+            final_result['monthly_company_with_tax'] = company_details_dict[
+                'monthly_amount_with_tax']
+            final_result['annual_company'] = company_details_dict[
+                'annual_amount']
+            final_result['annual_company_with_tax'] = company_details_dict[
+                'annual_amount_with_tax']
+        except AttributeError:
+            final_result['monthly_company'] = ""
+            final_result['monthly_company_with_tax'] = ""
+            final_result['annual_company'] = ""
+            final_result['annual_company_with_tax'] = ""
+
+        try:
+            payment_options_dict = PaymentOptions.objects.first().__dict__
+            final_result['tax'] = payment_options_dict[
+                'tax']
+            final_result['free_evaluation_time'] = payment_options_dict[
+                'free_evaluation_time']
+            final_result['auto_renew'] = payment_options_dict[
+                'auto_renew'].lower().replace(" ", "")
+        except AttributeError:
+            final_result['tax'] = ""
+            final_result['free_evaluation_time'] = ""
+            final_result['auto_renew'] = ""
+
+        return Response(final_result, status=status.HTTP_200_OK)
+
+
 class UpdateMembershipFeeAPI(APIView):
     """
     API for superuser to update the membership fee details

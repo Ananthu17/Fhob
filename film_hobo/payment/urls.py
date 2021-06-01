@@ -4,7 +4,8 @@ from payment import views
 
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
-     EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI
+     EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
+     GetMembershipFeeDetailsPublicAPI
 
 app_name = "payment"
 
@@ -12,6 +13,8 @@ urlpatterns = [
     # api-view endpoints
     path('get_membership_fee_detail/', GetMembershipFeeDetailsAPI.as_view(),
          name='get_membership_fee_detail'),
+    path('get_membership_fee_detail_public/', GetMembershipFeeDetailsPublicAPI.as_view(),
+         name='get_membership_fee_detail_public'),
     path('update_membership_fee/', UpdateMembershipFeeAPI.as_view(),
          name='update_membership_fee'),
     path('add_discount_detail/', AddDiscountDetailAPI.as_view(),
