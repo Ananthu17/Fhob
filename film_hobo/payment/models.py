@@ -40,14 +40,16 @@ class Transaction(models.Model):
                              verbose_name=_("User"),
                              on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
+    days_free = models.IntegerField(_("Days Free"), null=True, blank=True)
     payment_plan = models.CharField(_("Payment Plan"),
                                     choices=PAYMENT_PLAN_CHOICES,
                                     max_length=150,
                                     null=True)
     initial_amount = models.FloatField(_("Initial Amount"))
     tax_applied = models.FloatField(_("Tax"), null=True, blank=True)
-    promocodes_applied = models.OneToOneField(
-        PromoCode, null=True, blank=True, on_delete=models.CASCADE,)
+    promocodes_applied = models.ForeignKey(
+        'hobo_user.Promocode', verbose_name=_("Promocodes Applied"),
+        null=True, blank=True, on_delete=models.CASCADE)
     promotion_amount = models.FloatField(_("Promotion Amount"),
                                          null=True, blank=True)
     final_amount = models.FloatField(_("Final Amount"))

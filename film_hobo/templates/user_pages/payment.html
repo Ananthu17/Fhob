@@ -39,15 +39,15 @@
                     <div class="row">
                         <div class="col-5">
                             <input type ="hidden" name = "user" value="{{user.id}}" id="user_id"/>
-                            <div class="mt-2">First {{ payment_details.free_days }} days free</div>
+                            <div class="mt-2">First <span id="days_free">{{ payment_details.free_days }}</span> days free</div>
                             {% if payment_plan == 'monthly' %}
-                            <div class="mt-2">Amount: ${{ payment_details.monthly_amount }} (billed monthly)</div>
+                            <div class="mt-2">Amount: $<span id="initial_amount_val">{{ payment_details.monthly_amount }}</span> (billed <span id="payment_plan">monthly</span>)</div>
                             {% elif payment_plan == 'annually' %}
-                            <div class="mt-2">Amount: ${{ payment_details.annual_amount }} (billed annually)</div>
+                            <div class="mt-2">Amount: $<span id="initial_amount_val">{{ payment_details.annual_amount }}</span> (billed <span id="payment_plan">annually</span>)</div>
                             {% else %}
                             <div class="mt-2">Choose Payment plan to Proceed</div>
                             {% endif %}
-                            <div class="mt-2">Estimated Tax Percentage: {{ payment_details.estimated_tax }} %</div>
+                            <div class="mt-2">Estimated Tax Percentage: <span id="tax_percentage">{{ payment_details.estimated_tax }}</span> %</div>
                             <div class="mt-2">Your credit card will be charged on
                                 {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, {{ payment_details.free_days }} days from today</div>
                             <div class="row mt-2">
@@ -139,36 +139,52 @@
 <script>
     origin_url = window.location.origin
     post_url = origin_url + '/payment/transaction_save/'
-    calculate_discount_args = {
-        "payment_plan": "annually",
-        "initial_amount": "500",
-        "tax_applied": "0",
-        "promocodes_applied": "",
-        "promotion_amount": "",
-        "final_amount": "500"
+    var token = localStorage.getItem("token");
+    token_str = "Token "
+    token_val = String(token)
+    var authorization_str = token_str.concat(token_val);
+
+    if (localStorage.getItem("promocode")){
+        applied_promo = localStorage.getItem("promocode")
     }
+    else{
+        applied_promo = ""
+    }
+    calculate_discount_args = {
+        "days_free": $("#days_free").text(),
+        "payment_plan": $("#payment_plan").text(),
+        "initial_amount": $("#initial_amount_val").text(),
+        "tax_applied": $("#tax_percentage").text(),
+        "promocodes_applied": applied_promo,
+        "promotion_amount": $("#promotion_amount").text(),
+        "final_amount": $("#final_amount").text(),
+    }
+    debugger
     paypal.Buttons({
-    //   createOrder: function(data, actions) {
-    //     return actions.order.create({
-    //       purchase_units: [{
-    //         amount: {
-    //           value: $("#final_amount")[0].innerText
-    //         }
-    //       }]
-    //     });
-    //   },
-    createOrder: function() {
-        return fetch('/my-server/create-paypal-transaction', {
-            method: 'post',
-            headers: {
-            'content-type': 'application/json'
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: $("#final_amount")[0].innerText
             }
-        }).then(function(res) {
-            return res.json();
-        }).then(function(data) {
-            return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+          }]
         });
       },
+    // createOrder: function() {
+    //     return fetch(post_url, {
+    //         method: 'post',
+    //         headers: {
+    //         'content-type': 'application/json',
+    //         'Authorization': authorization_str
+    //         },
+    //         body: JSON.stringify(calculate_discount_args),
+    //     }).then(function(res) {
+    //         debugger
+    //         return res.json();
+    //     }).then(function(data) {
+    //         return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+    //     });
+    //   },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
           alert('Transaction completed by ' + details.payer.name.given_name);

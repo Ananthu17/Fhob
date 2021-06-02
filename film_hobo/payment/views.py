@@ -16,8 +16,8 @@ from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest
 
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
-    ProPaymentDetails, CompanyPaymentDetails, PromoCode
-from .models import PaymentOptions
+    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser
+from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer
 # Create your views here.
 
@@ -616,6 +616,7 @@ class CalculateDiscountAPI(APIView):
                         final_amount = initial_amount - promotion_amount
                     return Response(
                         {"status": "success",
+                         "promocode": data['promocode'],
                          "initial_amount": round(initial_amount, 2),
                          "promotion_amount": round(promotion_amount, 2),
                          "final_amount": round(final_amount, 2)},
@@ -628,6 +629,45 @@ class CalculateDiscountAPI(APIView):
             return Response(
                 {"status": "promocode does not exist"},
                 status=status.HTTP_404_NOT_FOUND)
+
+
+class TransactionSave(APIView):
+    """
+    API for saveing transaction details
+    """
+
+    def post(self, request, format=None):
+        logged_user = CustomUser.objects.get(id=request.user.id)
+        payment_plan = request.data['payment_plan']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        if request.data['promocodes_applied'] == "":
+            promocodes_applied = None
+        else:
+            promocodes_applied = PromoCode.objects.get(
+                promo_code=request.data['promocodes_applied'])
+        if request.data['promotion_amount'] == '':
+            promotion_amount = 0
+        else:
+            promotion_amount = float(request.data['promotion_amount'])
+        final_amount = request.data['final_amount']
+        transaction = Transaction.objects.create(
+                                   user=logged_user, payment_plan=payment_plan,
+                                   days_free=days_free,
+                                   initial_amount=initial_amount,
+                                   tax_applied=tax_applied,
+                                   promocodes_applied=promocodes_applied,
+                                   promotion_amount=promotion_amount,
+                                   final_amount=final_amount)
+        if transaction:
+            return Response(
+                        {"status": "transaction recored successfullY"},
+                        status=status.HTTP_200_OK)
+        else:
+            return Response(
+                        {"status": "transaction record failure"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class PayPalClient:

@@ -5,7 +5,7 @@ from payment import views
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
-     GetMembershipFeeDetailsPublicAPI
+     GetMembershipFeeDetailsPublicAPI, TransactionSave
 
 app_name = "payment"
 
@@ -27,6 +27,8 @@ urlpatterns = [
          name='delete_discount_detail'),
     path('calculate_discount/', CalculateDiscountAPI.as_view(),
          name='calculate_discount'),
+    path('transaction_save/', TransactionSave.as_view(),
+         name='transaction_save'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
          name='payment_admin'),

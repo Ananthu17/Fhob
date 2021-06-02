@@ -26,6 +26,7 @@ $("#apply_promocode").click(function(){
     var token = localStorage.getItem("token");
     token_str = "Token "
     token_val = String(token)
+    var authorization_str = token_str.concat(token_val);
 
     calculate_discount_url = origin_url + '/payment/calculate_discount/'
     calculate_discount_args = {
@@ -45,6 +46,7 @@ $("#apply_promocode").click(function(){
             $("#promocode_modal").modal('show');
             $('#full_amount').text(response.data.initial_amount);
             $('#promotion_amount').text(response.data.promotion_amount);
+            localStorage.setItem('promocode', response.data.promocode);
             localStorage.setItem('promotion_amount', parseFloat(response.data.promotion_amount));
             $('#final_amount').text(response.data.final_amount);
         }
@@ -58,6 +60,7 @@ $("#apply_promocode").click(function(){
 });
 
 $("#remove_promocode").click(function(){
+    localStorage.removeItem("promocode");
     localStorage.removeItem("promotion_amount");
     $("#remove_promocode").remove();
     location.reload()
