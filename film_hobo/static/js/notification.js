@@ -78,6 +78,7 @@ $('body').on('click' , '.notification_link', function(){
         "id":id,
         "status_type":"read"
      }
+     $("#notificationModal").modal('hide');
     $.ajax
     ({
         type: "POST",
@@ -91,6 +92,27 @@ $('body').on('click' , '.notification_link', function(){
         error: function(data){},
         success: function(response){
             console.log("read ",id)
+            $.ajax
+            ({
+                type: "GET",
+                url: "/hobo_user/get-notification-api/",
+                dataType: 'json',
+                async: false,
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                error: function(data){},
+                success: function(response){
+                    console.log("unread_count", response['unread_count'])
+                    $('.notification-bell').html("");
+                    if(response['unread_count']!=0){
+                        $('.notification-bell').html(
+                            '<span class="notification_count_span">'+response['unread_count']+'</span>'
+                            )
+                    }
+                }
+            });
         }
     });
 });

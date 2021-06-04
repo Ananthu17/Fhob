@@ -22,8 +22,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, HowTo, \
                    PersonalDetailsView, UserProfileAPI, UserProfileView, \
-                   AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
-                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
+                   AddCoworkerAPI, RemoveCoworkerAPI, \
                    MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
@@ -31,7 +30,13 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
                    UploadImageView, UploadImageAPI, GetNotificationAPI, \
                    GetTrackingNotificationAjaxView, GetAllNotificationAjaxView, \
-                   ChangeNotificationStatusAPI
+                   ChangeNotificationStatusAPI, ProductionCompanyProfileView, \
+                   ProductionCompanyProfileAPI, EditProductionCompanyView, \
+                   AttachCoworkerAjaxView, AddUserInterestAjaxView, \
+                   AddUserInterestView, AddUserInterestAPI, \
+                   EditAgencyManagementCompanyView, CompanyClientAPI, \
+                   AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
+                   AgencyManagementCompanyProfileView, AttachClientAjaxView
 
 app_name = "hobo_user"
 
@@ -85,6 +90,11 @@ urlpatterns = [
          name='personal-details-api'),
     path('profile-api/', UserProfileAPI.as_view(),
          name='profile-api'),
+    path('production-company-profile-api/', ProductionCompanyProfileAPI.as_view(),
+         name='production-company-profile-api'),
+    path('agency-management-company-profile-api/',
+         AgencyManagementCompanyProfileAPI.as_view(),
+         name='agency-management-company-profile-api'),
     path('add-coworker-api/', AddCoworkerAPI.as_view(),
          name='add-coworker-api'),
     path('edit-coworker-api/', EditCoworkerAPI.as_view(),
@@ -93,6 +103,8 @@ urlpatterns = [
          name='add-agent-manager-api'),
     path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
          name='remove-coworker-api'),
+    path('remove-client-api/', RemoveClientAPI.as_view(),
+         name='remove-client-api'),
     path('rate-user-api/', RateUserSkillsAPI.as_view(),
          name='rate-user-api'),
     path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
@@ -115,6 +127,10 @@ urlpatterns = [
          name='get-notification-api'),
     path('change-notification-status-api/', ChangeNotificationStatusAPI.as_view(),
          name='change-notification-status-api'),
+    path('add-user-interest-api/', AddUserInterestAPI.as_view(),
+         name='add-user-interest-api'),
+    path('company-client-api/', CompanyClientAPI.as_view(),
+         name='company-client-api'),
 
 
     # web-view endpoints
@@ -159,16 +175,17 @@ urlpatterns = [
          name='personal-details'),
     path('edit-profile/', UserProfileView.as_view(),
          name='edit-profile'),
-    path('add-coworkers/', AddCoworkersView.as_view(),
-         name='add-coworkers'),
-    path('add-coworker-form/', AddCoworkerFormAjaxView.as_view(),
-         name='add-coworker-form'),
-    path('add-new-coworker-form/', AddNewCoworkerFormAjaxView.as_view(),
-         name='add-new-coworker-form'),
+    path('edit-production-company-profile/', EditProductionCompanyView.as_view(),
+         name='edit-production-company-profile'),
     path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
          name='add-new-agent-form'),
     path('profile/<int:id>/', MemberProfileView.as_view(),
          name='profile'),
+    path('production-company-profile/<int:id>/', ProductionCompanyProfileView.as_view(),
+         name='production-company-profile'),
+    path('agency-management-company-profile/<int:id>/',
+         AgencyManagementCompanyProfileView.as_view(),
+         name='agency-management-company-profile'),
     path('friends-and-followers/', FriendsAndFollowersView.as_view(),
          name='friends-and-followers'),
     path('swap-image-position/', SwapImageAjaxView.as_view(),
@@ -179,5 +196,16 @@ urlpatterns = [
          name='get-tracking-notification-html'),
     path('get-all-notification-html/', GetAllNotificationAjaxView.as_view(),
          name='get-all-notification-html'),
+    path('attach-coworker/', AttachCoworkerAjaxView.as_view(),
+         name='attach-coworker'),
+    path('add-user-interest-form/', AddUserInterestAjaxView.as_view(),
+         name='add-user-interest-form'),
+    path('add-user-interest/', AddUserInterestView.as_view(),
+         name='add-user-interest'),
+    path('edit-agency-management-company-profile/',
+         EditAgencyManagementCompanyView.as_view(),
+         name='edit-agency-management-company-profile'),
+    path('attach-client/', AttachClientAjaxView.as_view(),
+         name='attach-client'),
 
 ]

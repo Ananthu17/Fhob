@@ -25,6 +25,13 @@
   font-size:14px;
   color:Red;
 }
+.errormsg
+{
+  list-style-type:none;
+  font-family:Myraid Pro;
+  font-size:14px;
+  color:Red;
+}
 .submit_btn
   {
     border: none;
@@ -162,7 +169,7 @@ input.pw {
       cursor: pointer;
     }
 
-  .select2-results__options
+  .select2-results__options, .select2-search__field
     {
     font-family: "Myraid Pro";
     font-size: 13px;
@@ -206,3 +213,11 @@ input.pw {
       text-decoration: none!important;
       color:#000;
     }
+.warning-modal-title
+{
+  color:red;
+}
+.client-img
+  {
+    width:100%;
+  }

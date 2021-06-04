@@ -424,160 +424,7 @@
                     </div>
                 </div>
             </form>
-                <hr class="mem-set-acc-hr">
-                <div class="bold mt-3">Add Stuffs</div>
-                {% if user.membership == 'COM' %}
-                <form method="post" action="{% url 'hobo_user:add-coworkers' %}">
-                        {% csrf_token %}
-                {% for coworker in coworkers %}
-                <div class="row ">
-                    <div class="col-md-1 col-sm-4">
-                        <label class="form-title mem-setup-blu-f">Name</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group select2_style">
-                        <input name="saved_id" type="hidden" value="{{coworker.id}}" />
-                        {% if coworker.user %}
-                                <select name="saved_user"
-                                class="form-control form-control-input mt-2 saved_user">
-                                    <option value="" selected disabled hidden>--------</option>
-                                    {% for usr in all_users %}
-                                    <option value="{{usr.id}}"
-                                    {% if coworker.user.id == usr.id %}selected{% endif %}>
-                                    {{usr.get_full_name}}</option>
-                                    {% endfor %}
-                                </select>
-                                <input name="saved_name" value="" type="hidden"/>
-                        {% else %}
-                                <input name="saved_user" value="" type="hidden"/>
-                                <input name="saved_name" class="form-control form-control-input mt-2"
-                                value="{{coworker.name}}" required autocomplete="off"/>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-1 col-sm-4">
-                        <label class="form-title mem-setup-blu-f">Position</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group select2_style">
-                        <select name="saved_position"
-                        class="form-control form-control-input mt-2 saved_position">
-                            {% for job in job_types %}
-                            <option value="{{job.id}}"
-                            {% if coworker.position.id == job.id %}Selected{% endif %}>
-                            {{job}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-2 col-sm-4 p-0 text-center">
-                        <div class="form-check mt-2">
-                            <input type="checkbox"
-                            class="form-check-input mt-1 remove_coworker"
-                            name="remove" value="{{coworker.id}}"
-                            data-toggle="modal" data-target="#warning{{coworker.id}}">
-                            <label class="form-check-label mem-setup-blu-f" for="">Remove</label>
-                            <!-- The Modal -->
-                            <div class="modal fade" id="warning{{coworker.id}}">
-                                <div class="modal-dialog">
-                                <div class="modal-content">
 
-                                    <!-- Modal Header -->
-                                    <div class="modal-header">
-                                    <h5 class="modal-title">Warning !!</h5>
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    </div>
-
-                                    <!-- Modal body -->
-                                    <div class="modal-body">
-                                        Do you want to delete coworker {{coworker.name}}?
-                                    </div>
-
-                                    <!-- Modal footer -->
-                                    <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">Yes</button>
-                                    </div>
-
-                                </div>
-                                </div>
-                            </div>
-                            <!-- end of modal -->
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-                <div class="bold mt-3 mem-setup-blu-f" style="text-decoration: underline;">FilmHobo Members</div>
-
-                <span class="sec-1">
-                <div class="row ">
-                    <div class="col-md-1 col-sm-4">
-                        <label class="form-title mem-setup-blu-f">Name</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group select2_style" >
-                        <select name="user" id="user1"
-                        class="form-control form-control-input mt-2">
-                            <option value="" selected disabled hidden>Type a name</option>
-                            {% for usr in all_users %}
-                            <option value="{{usr.id}}">
-                            {{usr.first_name}} {{usr.last_name}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-1 col-sm-4">
-                        <label class="form-title mem-setup-blu-f">Position</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group select2_style">
-                        <select name="position" id="position1"
-                        class="form-control form-control-input mt-2">
-                            <option value="" selected disabled hidden>Choose position</option>
-                            {% for job in job_types %}
-                            <option value="{{job.id}}">
-                            {{job}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                </span>
-                <div class="row mt-0 mb-1">
-                    <div class="col-10">
-                        <a class="mem-setup-blu-f float-right repeat">Add Stuff</a>
-                    </div>
-                </div>
-                <div class="bold mt-2 mb-2 mem-setup-blu-f" style="text-decoration: underline;">Others</div>
-                <span class="sec-2">
-                <div class="row ">
-                    <div class="col-md-1 col-sm-4 ">
-                        <label class="form-title mem-setup-blu-f">Name</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group">
-                        <input name="name" id="name1" value=""
-                        class="inp-line" placeholder="Name"
-                        autocomplete="off"/>
-                    </div>
-                    <div class="col-md-1 col-sm-4 ">
-                        <label class="form-title mem-setup-blu-f">Position</label>
-                    </div>
-                    <div class="col-md-3 col-sm-4 form-group select2_style">
-                        <select name="designation" id="designation1"
-                        class="form-control form-control-input mt-2">
-                            <option value="" selected disabled hidden>Choose position</option>
-                            {% for job in job_types %}
-                            <option value="{{job.id}}">
-                            {{job}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                </div>
-                </span>
-                <div class="row mt-0 mb-1">
-                    <div class="col-10">
-                        <a class="mem-setup-blu-f float-right repeat-new">Add Stuff</a>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-11">
-                        <input type="submit" class="btn mem-setup-blu-f float-right save_btn" value="Save" />
-                    </div>
-                </div>
-            </form>
-            {% endif %}
                 </div>
             </div>
         </div>
@@ -592,50 +439,17 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
 <script>
 
-    $(document).ready(function() {
-        $('#user1').select2();
-        $('#position1').select2();
-        $('#designation1').select2();
-        $('.saved_position').select2();
-        $('.saved_user').select2();
-    });
+    // $(document).ready(function() {
+    //     $('#user1').select2();
+    //     $('#position1').select2();
+    //     $('#designation1').select2();
+    //     $('.saved_position').select2();
+    //     $('.saved_user').select2();
+    // });
 
-// add coworker - filmhobo users
-var count=1;
-$('body').on('click' , '.repeat', function(){
-    count++
-    var user_id ="#user"+count
-    var position_id ="#position"+count
-    data_dict = {'count':count}
-    // get add coworker form
-    $.get('/hobo_user/add-coworker-form/', data_dict)
-    .done(function(data) {
-    if(data.results!='')
-        {
-            $('.sec-1').append(data['add_coworker_form_html']);
-            $(user_id).select2();
-            $(position_id).select2();
-        }
-    });
-});
 
-// add coworker - new users
-var new_count=1;
-$('body').on('click' , '.repeat-new', function(){
-    new_count++
-    var name_id ="#name"+new_count
-    var designation_id ="#designation"+new_count
-    data_dict = {'new_count':new_count}
-    // get add coworker form
-    $.get('/hobo_user/add-new-coworker-form/', data_dict)
-    .done(function(data) {
-    if(data.results!='')
-        {
-            $('.sec-2').append(data['add_new_coworker_form_html']);
-            $(designation_id).select2();
-        }
-    });
-});
+
+
 
 // add agent/manager
 var agent_count=1;

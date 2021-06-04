@@ -20,8 +20,10 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, UserProfile, CoWorker, \
-    UserRating, UserAgentManager, Photo, UserNotification
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
+    UserProfile, CoWorker, UserInterest, \
+    UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
+    CompanyClient
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -721,10 +723,44 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'membership']
 
 
+class ProductionCompanyProfileSerializer(serializers.ModelSerializer):
+    membership = serializers.CharField(read_only=True)
+    company_name = serializers.CharField(
+                    max_length=150,
+                    required=True,)
+    company_website = serializers.CharField(
+                        max_length=150,
+                        required=False,)
+
+    class Meta:
+        model = CompanyProfile
+        fields = ['company_name', 'company_website', 'imdb', 'bio',
+                  'submission_policy_SAMR', 'membership']
+
+
+class AgentManagementCompanyProfileSerializer(serializers.ModelSerializer):
+    membership = serializers.CharField(read_only=True)
+    company_name = serializers.CharField(
+                    max_length=150,
+                    required=True,)
+    company_website = serializers.CharField(
+                        max_length=150,
+                        required=False,)
+    agency_management_type = serializers.CharField(
+                            max_length=150,
+                            required=False,)
+
+    class Meta:
+        model = CompanyProfile
+        fields = ['company_name', 'company_website', 'bio',
+                  'submission_policy_SAMR', 'membership',
+                  'agency_management_type']
+
+
 class CoWorkerSerializer(serializers.ModelSerializer):
     name = serializers.CharField(
         max_length=150,
-        required=False, allow_blank=True
+        required=True, allow_blank=True
     )
     user = serializers.CharField(
         max_length=150,
@@ -734,6 +770,7 @@ class CoWorkerSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+    email = serializers.EmailField()
     id = serializers.CharField(
         max_length=150,
         required=False,
@@ -741,11 +778,21 @@ class CoWorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CoWorker
-        fields = ['id', 'user', 'name', 'position']
+        fields = ['id', 'user', 'email', 'name', 'position']
 
 
 class RemoveCoWorkerSerializer(serializers.Serializer):
-    id = serializers.ListField(required=False)
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class RemoveClientSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
 
 
 class RemoveAgentManagerSerializer(serializers.Serializer):
@@ -860,6 +907,28 @@ class ChangeNotificationStatusSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+
     class Meta:
         model = UserNotification
         fields = ['id', 'status_type']
+
+
+class UserInterestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserInterest
+        fields = ['position', 'format', 'location']
+
+
+class CompanyClientSerializer(serializers.ModelSerializer):
+    position = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    new_position = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    class Meta:
+        model = CompanyClient
+        fields = ['name', 'email', 'position', 'new_position']

@@ -6,16 +6,18 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, Actor, Writer, AthleticSkillInline, \
+                    PromoCode, Team, Actor, UserInterest, Writer, AthleticSkillInline, \
                     Producer, Director, Editor, Makeup, Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
-                    UserAgentManager, Photo, UserNotification
+                    UserAgentManager, Photo, UserNotification, CompanyProfile, \
+                    Location, CompanyClient, NewJobType
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource, JobTypeResource
+                    CountryResource, GuildMembershipResource, JobTypeResource, \
+                    LocationResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -106,6 +108,10 @@ admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)
 admin.site.register(UserNotification)
+admin.site.register(CompanyProfile)
+admin.site.register(UserInterest)
+admin.site.register(CompanyClient)
+admin.site.register(NewJobType)
 
 
 @admin.register(EthnicAppearance)
@@ -130,6 +136,10 @@ class GuildMembershipAdmin(ImportExportModelAdmin):
 @admin.register(JobType)
 class JobTypeAdmin(ImportExportModelAdmin):
     resource_class = JobTypeResource
+
+@admin.register(Location)
+class LocationAdmin(ImportExportModelAdmin):
+    resource_class = LocationResource
 
 
 class CustomUserSettingsAdmin(admin.ModelAdmin):

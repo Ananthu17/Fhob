@@ -1,18 +1,26 @@
 {% load notification_tag %}
 {% load static %}
-<a href="{% url 'hobo_user:profile' id %}" target="_blank"
-id ="{{notification_id}}" class="notification_link">
+{% if from_user.membership != 'COM' %}
+    <a href="{% url 'hobo_user:profile' from_user.id %}"
+    target="_blank" id ="{{notification_id}}" class="notification_link">
+{%  elif from_user.membership == 'COM' and from_user.company_type == 'production' %}
+    <a href="{% url 'hobo_user:production-company-profile' from_user.id %}"
+    target="_blank" id ="{{notification_id}}" class="notification_link">
+{%  elif from_user.membership == 'COM' and from_user.company_type == 'agency_management' %}
+    <a href="{% url 'hobo_user:agency-management-company-profile' from_user.id %}"
+    target="_blank" id ="{{notification_id}}" class="notification_link">
+{% endif %}
 <div class="row unread_notification">
     <div  class="col-2">
-            {% if image %}
-            <img src="{{ image }}" class="notification_img"/>
+            {% if from_user.get_profile_photo %}
+            <img src="{{ from_user.get_profile_photo }}" class="notification_img"/>
             {% else %}
             <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
             {% endif %}
     </div>
     <div class="col-10">
-        {{ name }} started tracking you<br>
-        <b>{{ membership }}</b><br>
+        {{ from_user.get_full_name }} started tracking you<br>
+        <b>{{ from_user.get_membership_display }}</b><br>
         Now
 
     </div>

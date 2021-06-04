@@ -6,7 +6,8 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings, AthleticSkill, UserProfile, CoWorker
+    CustomUserSettings, AthleticSkill, UserInterest, UserProfile, CoWorker, \
+    CompanyProfile
 
 from .models import GuildMembership, Country, Photo
 
@@ -324,3 +325,41 @@ class EditProfileForm(forms.ModelForm):
         # self.fields['company'].required = False
 
 
+class EditProductionCompanyProfileForm(forms.ModelForm):
+    company_name = forms.CharField(max_length=100, required=True,
+                                   help_text='')
+    company_website = forms.CharField(max_length=100, required=False,
+                                      help_text='')
+
+    class Meta:
+        model = CompanyProfile
+        fields = ('company_name', 'submission_policy_SAMR', 'imdb', 'bio',
+                  'company_website')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProductionCompanyProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+
+class EditAgencyManagementCompanyProfileForm(forms.ModelForm):
+    company_name = forms.CharField(max_length=100, required=True,
+                                   help_text='')
+    company_website = forms.CharField(max_length=100, required=False,
+                                      help_text='')
+    agency_management_type = forms.CharField(max_length=100, required=False,
+                                             help_text='')
+
+    class Meta:
+        model = CompanyProfile
+        fields = ('company_name', 'submission_policy_SAMR', 'imdb', 'bio',
+                  'company_website', 'agency_management_type')
+
+    def __init__(self, *args, **kwargs):
+        super(EditAgencyManagementCompanyProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+
+class UserInterestForm(forms.ModelForm):
+    class Meta:
+        model = UserInterest
+        fields = ('position', 'format', 'location')

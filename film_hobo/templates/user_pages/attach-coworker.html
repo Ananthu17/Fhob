@@ -1,0 +1,53 @@
+{% if coworker.user %}
+<div>
+    {% if coworker.user.membership != 'COM' %}
+        <a href="{% url 'hobo_user:profile' coworker.user.id %}"
+        target="_blank">
+    {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'production' %}
+        <a href="{% url 'hobo_user:production-company-profile' coworker.user.id %}"
+        target="_blank">
+    {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'agency_management' %}
+        <a href="{% url 'hobo_user:agency-management-company-profile' coworker.user.id %}" target="_blank" >
+    {% endif %}
+    <span>{{coworker.name}}({{coworker.position.title}})</span>
+</a>
+<label class="form-check-label mem-setup-blu-f"
+data-toggle="modal"
+data-target="#warning{{coworker.id}}"
+for="">Remove</label>
+</div>
+{% else %}
+<div>
+    <span>{{coworker.name}}({{coworker.position.title}})</span>
+    <label class="form-check-label mem-setup-blu-f"
+    data-toggle="modal"
+    data-target="#warning{{coworker.id}}"
+    for="">Remove</label>
+</div>
+  <!-- The Modal -->
+  <div class="modal fade" id="warning{{coworker.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title">Warning !!</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            Do you want to delete staff {{coworker.name}}?
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <a class="btn btn-outline-danger btn-sm delete-coworker" id="{{coworker.id}}" data-dismiss="modal">Yes</a>
+        <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">No</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+{% endif %}

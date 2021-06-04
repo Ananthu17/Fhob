@@ -1,0 +1,26 @@
+<div class="row">
+<div class="col-3">
+    <select name="position" id="position_{{count}}"
+    class="form-control form-control-input mt-2" required>
+        {% for position in my_interest_form.position %}
+            {{position}}
+        {% endfor %}
+    </select>
+</div>
+<div class="col-3">
+    <select name="format" id="format_{{count}}"
+    class="form-control form-control-input mt-2" required>
+        {% for item in my_interest_form.format %}
+        {{item}}
+        {% endfor %}
+    </select>
+</div>
+<div class="col-3">
+    <select name="location" id="location_{{count}}"
+    class="form-control form-control-input mt-2" required>
+        {% for item in my_interest_form.location %}
+        {{item}}
+        {% endfor %}
+    </select>
+</div>
+</div>

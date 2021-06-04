@@ -71,7 +71,7 @@ class CustomUser(AbstractUser):
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
-        (PRODUCTION_COMPANY, 'Production Company')
+        (PRODUCTION_COMPANY, 'Company')
     ]
     MONTHLY = 'monthly'
     ANNUALLY = 'annually'
@@ -153,9 +153,9 @@ class CustomUser(AbstractUser):
                                  max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
     # bio = models.TextField(_("Bio"), null=True, blank=True)
-    imdb_url = models.URLField(_("IMDB URL"),
-                               null=True,
-                               blank=True)
+    # imdb_url = models.URLField(_("IMDB URL"),
+    #                            null=True,
+    #                            blank=True)
     membership = models.CharField(_("Membership Type"),
                                   choices=MEMBERSHIP_CHOICES,
                                   max_length=150, default=HOBO)
@@ -795,6 +795,17 @@ class JobType(models.Model):
         verbose_name_plural = 'Job Types'
 
 
+class NewJobType(models.Model):
+    title = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'New Job Type'
+        verbose_name_plural = 'New Job Types'
+
+
 class UserProfile(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -849,9 +860,44 @@ class UserProfile(models.Model):
             self.job_types.set(job_types)
         return str(self.user.email)
 
+
+class CompanyProfile(models.Model):
+    MEMBERS_WITH_RATING_1_STAR = 'members_with_rating_1_star'
+    MEMBERS_WITH_RATING_2_STAR = 'members_with_rating_2_star'
+    MEMBERS_WITH_RATING_3_STAR = 'members_with_rating_3_star'
+    MEMBERS_WITH_RATING_4_STAR = 'members_with_rating_4_star'
+    MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+    SAMR_CHOICES = [
+                        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+                        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+                        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+                        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+                        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+                        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='company_profile',
+                             verbose_name=_("User"),
+                             null=True)
+    imdb = models.CharField(_("IMDB"),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    bio = models.TextField(_("Bio/Info"), null=True, blank=True)
+    submission_policy_SAMR = models.CharField(_("SAMR"),
+                                              choices=SAMR_CHOICES,
+                                              max_length=150,
+                                              default=PROS_AND_COMPANIES_ONLY)
+
+    def __str__(self):
+        return str(self.user.email)
+
     class Meta:
-        verbose_name = 'User Profile'
-        verbose_name_plural = 'User Profiles'
+        verbose_name = 'Company Profile'
+        verbose_name_plural = 'Company Profiles'
 
 
 class CoWorker(models.Model):
@@ -870,10 +916,109 @@ class CoWorker(models.Model):
                             null=True,
                             blank=True
                             )
+    email = models.EmailField(_("Staff's email address"),
+                              null=True,
+                              blank=True)
     position = models.ForeignKey("hobo_user.JobType",
                                  on_delete=models.CASCADE,
                                  related_name='coworker',
                                  verbose_name=_("Position"),
+                                 null=True)
+
+    def __str__(self):
+        return str(self.company.company_name)
+
+    class Meta:
+        verbose_name = 'Coworker'
+        verbose_name_plural = 'Coworkers'
+
+
+class CompanyClient(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='client_user',
+                             verbose_name=_("User"),
+                             null=True, blank=True)
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_agency_management_client',
+                                verbose_name=_("Company"),
+                                null=True)
+    name = models.CharField(_('Name'),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    email = models.EmailField(_("Staff's email address"),
+                              null=True,
+                              blank=True)
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.SET_NULL,
+                                 related_name='client_position',
+                                 verbose_name=_("Position"),
+                                 null=True)
+    # new_position = models.ForeignKey("hobo_user.NewJobType",
+    #                                  on_delete=models.SET_NULL,
+    #                                  related_name='client_new_position',
+    #                                  verbose_name=_("New Position"),
+    #                                  null=True)
+    new_position = models.CharField(_('New Position'),
+                                    max_length=150,
+                                    null=True,
+                                    blank=True
+                                    )
+
+    def __str__(self):
+        return str(self.company.company_name)
+
+    class Meta:
+        verbose_name = 'Company Client'
+        verbose_name_plural = 'Company Clients'
+
+
+class Location(models.Model):
+    city = models.CharField(max_length=1000, verbose_name='City', null=True)
+    state = models.CharField(max_length=1000, verbose_name='State', null=True)
+    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+
+    def __str__(self):
+        location = self.city+","+self.state+","+self.country
+        return str(location)
+
+    class Meta:
+        verbose_name = 'Location'
+        verbose_name_plural = 'Locations'
+
+
+class UserInterest(models.Model):
+    SCENE = 'scene'
+    SHORT = 'short'
+    PILOT = 'pilot'
+    FEATURE = 'feature'
+    FORMAT_CHOICES = [
+                    (SCENE, 'Scene'),
+                    (SHORT, 'Short Film'),
+                    (PILOT, 'Pilot'),
+                    (FEATURE, 'Feature'),
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_interest',
+                             verbose_name=_("User"),
+                             null=True)
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.SET_NULL,
+                                 related_name='user_interest_position',
+                                 verbose_name=_("User"),
+                                 null=True)
+    format = models.CharField(_("Format"),
+                              choices=FORMAT_CHOICES,
+                              max_length=150,
+                              default=SCENE, null=True)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='user_interest_location',
+                                 verbose_name=_("Location"),
                                  null=True)
 
 
