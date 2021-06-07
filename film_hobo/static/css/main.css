@@ -1230,6 +1230,11 @@ input#visa:focus {
    color: #C70039;
    font-size: 17px;
 }
+.memship-pro-font:active, .memship-pro-font:focus,.memship-pro-font:hover {
+  font-family: "Pooper Black Pro";
+   color: #C70039;
+   font-size: 17px;
+}
 .memship-head{
   color:#a00164;
   line-height: 24px;

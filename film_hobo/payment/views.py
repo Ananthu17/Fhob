@@ -1,28 +1,26 @@
-import sys
-import environ
-
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.generic.base import View
 
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datetimerange import DateTimeRange
-from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
-from paypalcheckoutsdk.orders import OrdersCreateRequest
 
+from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser
 from .models import PaymentOptions, Transaction
-from .serializers import DiscountsSerializer
+from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-env = environ.Env()
-environ.Env.read_env()
+from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
+from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
 
 
 class IsSuperUser(IsAdminUser):
@@ -660,187 +658,119 @@ class TransactionSave(APIView):
                                    promocodes_applied=promocodes_applied,
                                    promotion_amount=promotion_amount,
                                    final_amount=final_amount)
+        serializer = TransactionSerializer(transaction)
         if transaction:
-            return Response(
-                        {"status": "transaction recored successfullY"},
-                        status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(
                         {"status": "transaction record failure"},
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-class PayPalClient:
-    def __init__(self):
-        self.client_id = env("PAYPAL-SANDBOX-CLIENT-ID")
-        self.client_secret = env("PAYPAL-SANDBOX-CLIENT-SECRET")
+class GetToken(APIView):
+    """
+    API for get token value
+    """
 
-        """Set up and return PayPal Python SDK environment with PayPal access
-           credentials. This sample uses SandboxEnvironment. In production,
-           use LiveEnvironment."""
+    def post(self, request, format=None):
+        email = request.data['email']
+        try:
+            custom_user = CustomUser.objects.get(email=email)
+            user_token = Token.objects.get(user=custom_user.id)
+            return Response(
+                {"token": user_token.key}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "invalid user"},
+                status=status.HTTP_404_NOT_FOUND)
 
-        self.environment = SandboxEnvironment(
-            client_id=self.client_id, client_secret=self.client_secret)
 
-        """ Returns PayPal HTTP client instance with environment that has access
-            credentials context. Use this instance to invoke PayPal APIs,
-            provided the credentials have access. """
-        self.client = PayPalHttpClient(self.environment)
+class CreateUserOrder(APIView):
 
-    def object_to_json(self, json_data):
-        """
-        Function to print all json data in an organized readable manner
-        """
-        result = {}
-        if sys.version_info[0] < 3:
-            itr = json_data.__dict__.iteritems()
+    def post(self, request, *args, **kwargs):
+        try:
+            logged_user = Token.objects.get(key=request.data['token']).user
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        if request.data['promocodes_applied'] == "":
+            promocodes_applied = None
         else:
-            itr = json_data.__dict__.items()
-        for key, value in itr:
-            # Skip internal attributes.
-            if key.startswith("__"):
-                continue
-            result[key] = self.array_to_json_array(value) if isinstance(value, list) else \
-                self.object_to_json(value) if not self.is_primittive(value) else \
-                value
-        return result
+            promocodes_applied = PromoCode.objects.get(
+                promo_code=request.data['promocodes_applied'])
+        if request.data['promotion_amount'] == '':
+            promotion_amount = 0
+        else:
+            promotion_amount = float(request.data['promotion_amount'])
+        final_amount = request.data['final_amount']
+        transaction = Transaction.objects.create(
+                                   user=logged_user, payment_plan=payment_plan,
+                                   days_free=days_free,
+                                   initial_amount=initial_amount,
+                                   tax_applied=tax_applied,
+                                   promocodes_applied=promocodes_applied,
+                                   promotion_amount=promotion_amount,
+                                   final_amount=final_amount)
+        if transaction:
+            environment = SandboxEnvironment(
+                client_id=settings.PAYPAL_CLIENT_ID,
+                client_secret=settings.PAYPAL_SECRET_ID)
+            client = PayPalHttpClient(environment)
+            create_order = OrdersCreateRequest()
 
-    def array_to_json_array(self, json_array):
-        result = []
-        if isinstance(json_array, list):
-            for item in json_array:
-                result.append(
-                    self.object_to_json(item) if not self.is_primittive(item)
-                    else self.array_to_json_array(item) if isinstance(
-                        item, list) else item)
-        return result
-
-    def is_primittive(self, data):
-        return isinstance(data, str) or isinstance(data, unicode) or isinstance(data, int)
-
-
-class CreateOrder(PayPalClient):
-    """ This is the sample function to create an order. It uses the
-    JSON body returned by buildRequestBody() to create an order."""
-
-    def create_order(self, debug=False):
-        request = OrdersCreateRequest()
-        request.prefer('return=representation')
-
-        request.request_body(self.build_request_body())
-        response = self.client.execute(request)
-        if debug:
-            print('Status Code: ', response.status_code)
-            print('Status: ', response.result.status)
-            print('Order ID: ', response.result.id)
-            print('Intent: ', response.result.intent)
-            print('Links:')
-        for link in response.result.links:
-            print('\t{}: {}\tCall Type: {}'.format(link.rel, link.href, link.method))
-        print('Total Amount: {} {}'.format(response.result.purchase_units[0].amount.currency_code,
-                                           response.result.purchase_units[0].amount.value))
-
-        return response
-
-    """Setting up the JSON request body for creating the order. Set the intent in the
-    request body to "CAPTURE" for capture intent flow."""
-    @staticmethod
-    def build_request_body():
-        """Method to create body with CAPTURE intent"""
-        return \
-        {
-            "intent": "CAPTURE",
-            "application_context": {
-            "brand_name": "EXAMPLE INC",
-            "landing_page": "BILLING",
-            "shipping_preference": "SET_PROVIDED_ADDRESS",
-            "user_action": "CONTINUE"
-            },
-            "purchase_units": [
-            {
-                "reference_id": "PUHF",
-                "description": "Sporting Goods",
-
-                "custom_id": "CUST-HighFashions",
-                "soft_descriptor": "HighFashions",
-                "amount": {
-                "currency_code": "USD",
-                "value": "230.00",
-                "breakdown": {
-                    "item_total": {
-                    "currency_code": "USD",
-                    "value": "180.00"
-                    },
-                    "shipping": {
-                    "currency_code": "USD",
-                    "value": "30.00"
-                    },
-                    "handling": {
-                    "currency_code": "USD",
-                    "value": "10.00"
-                    },
-                    "tax_total": {
-                    "currency_code": "USD",
-                    "value": "20.00"
-                    },
-                    "shipping_discount": {
-                    "currency_code": "USD",
-                    "value": "10"
-                    }
-                }
-                },
-                "items": [
+            # order
+            create_order.request_body(
                 {
-                    "name": "T-Shirt",
-                    "description": "Green XL",
-                    "sku": "sku01",
-                    "unit_amount": {
-                    "currency_code": "USD",
-                    "value": "90.00"
+                    "intent": "CAPTURE",
+                    "application_context": {
+                        "brand_name": "FILMHOBO INC",
+                        "shipping_preference": "NO_SHIPPING"
                     },
-                    "tax": {
-                    "currency_code": "USD",
-                    "value": "10.00"
-                    },
-                    "quantity": "1",
-                    "category": "PHYSICAL_GOODS"
-                },
-                {
-                    "name": "Shoes",
-                    "description": "Running, Size 10.5",
-                    "sku": "sku02",
-                    "unit_amount": {
-                    "currency_code": "USD",
-                    "value": "45.00"
-                    },
-                    "tax": {
-                    "currency_code": "USD",
-                    "value": "5.00"
-                    },
-                    "quantity": "2",
-                    "category": "PHYSICAL_GOODS"
+                    "purchase_units": [
+                        {
+                            "days_free": transaction.days_free,
+                            "payment_plan": transaction.payment_plan,
+                            "initial_amount": transaction.initial_amount,
+                            "amount": {
+                                "currency_code": "USD",
+                                "value": transaction.final_amount,
+                                "breakdown": {
+                                    "item_total": {
+                                        "currency_code": "USD",
+                                        "value": transaction.final_amount
+                                    }
+                                    },
+                                },
+                        }
+                    ],
                 }
-                ],
-                "shipping": {
-                "method": "United States Postal Service",
-                "address": {
-                    "name": {
-                    "full_name":"John",
-                    "surname":"Doe"
-                    },
-                    "address_line_1": "123 Townsend St",
-                    "address_line_2": "Floor 6",
-                    "admin_area_2": "San Francisco",
-                    "admin_area_1": "CA",
-                    "postal_code": "94107",
-                    "country_code": "US"
-                }
-                }
-            }
-            ]
-        }
+            )
 
-"""This is the driver function that invokes the createOrder function to create
-   a sample order."""
-if __name__ == "__main__":
-  CreateOrder().create_order(debug=True)
+            response = client.execute(create_order)
+            data = response.result.__dict__['_dict']
+            # return JsonResponse(data)
+            return Response(data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                        {"status": "transaction record failure"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class CaptureUserOrder(APIView):
+
+    def post(self, request, *args, **kwargs):
+        capture_order = OrdersCaptureRequest(kwargs['order_id'])
+        environment = SandboxEnvironment(
+            client_id=settings.PAYPAL_CLIENT_ID,
+            client_secret=settings.PAYPAL_SECRET_ID)
+        client = PayPalHttpClient(environment)
+
+        response = client.execute(capture_order)
+        data = response.result.__dict__['_dict']
+
+        return JsonResponse(data)

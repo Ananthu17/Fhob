@@ -3,8 +3,10 @@ $( document ).ready(function() {
     // $("#paypal-div").hide();
 
     var promotion_amount = localStorage.getItem("promotion_amount");
+    var final_amount = localStorage.getItem("final_amount");
     if (promotion_amount){
         $('#promotion_amount').text(promotion_amount);
+        $('#final_amount').text(final_amount);
         $("#remove_promocode").show();
     }
     else{
@@ -48,6 +50,7 @@ $("#apply_promocode").click(function(){
             $('#promotion_amount').text(response.data.promotion_amount);
             localStorage.setItem('promocode', response.data.promocode);
             localStorage.setItem('promotion_amount', parseFloat(response.data.promotion_amount));
+            localStorage.setItem('final_amount', parseFloat(response.data.final_amount));
             $('#final_amount').text(response.data.final_amount);
         }
     },(error) => {
@@ -62,6 +65,7 @@ $("#apply_promocode").click(function(){
 $("#remove_promocode").click(function(){
     localStorage.removeItem("promocode");
     localStorage.removeItem("promotion_amount");
+    localStorage.removeItem("final_amount");
     $("#remove_promocode").remove();
     location.reload()
 });

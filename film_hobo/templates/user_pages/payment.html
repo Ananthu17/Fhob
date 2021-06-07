@@ -62,7 +62,8 @@
                             </div>
                         </div>
                         <div class="col-7 paymnt-lft-bar">
-                            <form>
+                            <form method="post">
+                                {% csrf_token %}
                                 <div class="mt-4">Amount: $
                                     {% if payment_plan == 'monthly' %}
                                     <span id="full_amount">{{ payment_details.monthly_amount_with_tax }}</span>
@@ -138,7 +139,7 @@
 "></script>
 <script>
     origin_url = window.location.origin
-    post_url = origin_url + '/payment/transaction_save/'
+    post_url = origin_url + '/payment/paypal/create/'
     var token = localStorage.getItem("token");
     token_str = "Token "
     token_val = String(token)
@@ -150,52 +151,59 @@
     else{
         applied_promo = ""
     }
-    calculate_discount_args = {
-        "days_free": $("#days_free").text(),
-        "payment_plan": $("#payment_plan").text(),
-        "initial_amount": $("#initial_amount_val").text(),
-        "tax_applied": $("#tax_percentage").text(),
-        "promocodes_applied": applied_promo,
-        "promotion_amount": $("#promotion_amount").text(),
-        "final_amount": $("#final_amount").text(),
-    }
-    debugger
+
     paypal.Buttons({
-      createOrder: function(data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: $("#final_amount")[0].innerText
-            }
-          }]
+    createOrder: function() {
+            transaction_args = {
+            "token": localStorage.getItem("token"),
+            "days_free": $("#days_free").text(),
+            "payment_plan": $("#payment_plan").text(),
+            "initial_amount": $("#initial_amount_val").text(),
+            "tax_applied": $("#tax_percentage").text(),
+            "promocodes_applied": applied_promo,
+            "promotion_amount": $("#promotion_amount").text(),
+            "final_amount": $("#final_amount").text(),
+        }
+
+        return fetch(post_url, {
+            method: 'post',
+            headers: {
+            'content-type': 'application/json',
+            // 'Authorization': authorization_str
+            'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            body: JSON.stringify(transaction_args),
+        }).then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+        }).catch( function(err) {
+            debugger
+            alert( "$.get failed!" );
         });
-      },
-    // createOrder: function() {
-    //     return fetch(post_url, {
+        },
+
+    // onApprove: function(data, actions) {
+    //     return fetch('/paypal/' + data. + '/capture/', {
     //         method: 'post',
-    //         headers: {
-    //         'content-type': 'application/json',
-    //         'Authorization': authorization_str
-    //         },
-    //         body: JSON.stringify(calculate_discount_args),
+    //         headers: {"X-CSRFToken": csrftoken}
     //     }).then(function(res) {
-    //         debugger
     //         return res.json();
-    //     }).then(function(data) {
-    //         return data.id; // Use the key sent by your server's response, ex. 'id' or 'token'
+    //     }).then(function(orderData) {
+    //         var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
+    //         if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+    //             return actions.restart();
+    //         }
+    //         if (errorDetail) {
+    //             var msg = 'Sorry, your transaction could not be processed.';
+    //             if (errorDetail.description) msg += '\n\n' + errorDetail.description;
+    //             if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
+    //             return alert(msg);
+    //         }
+    //         alert('Transaction completed by ' + orderData.payer.name.given_name);
     //     });
-    //   },
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-          alert('Transaction completed by ' + details.payer.name.given_name);
-        });
-      }
+    // }
+
     }).render('#paypal-div'); // Display payment options on your web page
 </script>
 {% endblock %}
-
-
-
-
-
-

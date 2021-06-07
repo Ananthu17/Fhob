@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from hobo_user.models import PromoCode
+from .models import Transaction
 
 
 class DiscountsSerializer(serializers.ModelSerializer):
@@ -33,3 +34,12 @@ class DiscountsSerializer(serializers.ModelSerializer):
         promocode['amount'] = instance.amount
         promocode['user_type'] = instance.user_type
         return promocode
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = ['id', 'user', 'date', 'days_free', 'payment_plan',
+                  'initial_amount', 'tax_applied', 'promocodes_applied',
+                  'promotion_amount', 'final_amount', 'paid']

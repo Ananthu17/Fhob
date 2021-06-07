@@ -1,4 +1,5 @@
 import ast
+import environ
 import json
 from os import remove
 from django.contrib.auth.models import User
@@ -73,6 +74,9 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
+
+env = environ.Env()
+environ.Env.read_env()
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -726,6 +730,7 @@ class PaymentIndieView(TemplateView):
         context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
+        context['client-id'] = settings.PAYPAL_CLIENT_ID
         free_evaluation_time = payment_details['free_days']
         date_today = datetime.date.today()
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
@@ -751,7 +756,6 @@ class PaymentProView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         payment_details = ast.literal_eval(dict_str)
         context['user'] = user
-        import pdb;pdb.set_trace()
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
         return context
