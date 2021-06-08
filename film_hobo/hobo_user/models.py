@@ -2,7 +2,7 @@
 import datetime
 
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django.urls import reverse
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
@@ -295,6 +295,18 @@ class CustomUser(AbstractUser):
         if photo_obj:
             image = photo_obj.image.url
             return image
+        return ""
+
+    def get_profile_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:profile', kwargs={'id': self.id})
+        else:
+            if self.company_type == 'production':
+                return reverse('hobo_user:production-company-profile',
+                               kwargs={'id': self.id})
+            if self.company_type == 'agency_management':
+                return reverse('hobo_user:agency-management-company-profile',
+                               kwargs={'id': self.id})
         return ""
 
     @property

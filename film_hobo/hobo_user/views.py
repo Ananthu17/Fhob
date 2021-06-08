@@ -75,7 +75,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     UserNotificationSerializer, ChangeNotificationStatusSerializer, \
     ProductionCompanyProfileSerializer, UserInterestSerializer, \
     AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
-    RemoveClientSerializer
+    RemoveClientSerializer, FriendRequestSerializer
 
 from .utils import notify, get_notifications_time
 
@@ -1811,7 +1811,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['profile'] = profile
         pos_list = [2, 3, 4]
         all_photos = Photo.objects.filter(user=user)
-        photos = all_photos.filter(position__in=pos_list)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
         context['photos'] = photos[:3]
         context['all_photos'] = all_photos[:4]
         context['form'] = self.form_class(instance=profile)
@@ -2560,8 +2560,24 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         try:
             profile = UserProfile.objects.get(user=user)
             all_agents = UserAgentManager.objects.filter(user=user)
-            context['all_agents'] = all_agents
+            context['all_agents'] = all_agents.filter(agent_type='agent')
+            context['all_managers'] = all_agents.filter(agent_type='manager')
             context['profile'] = profile
+            pos_list = [2, 3, 4]
+            all_photos = Photo.objects.filter(user=user)
+            photos = all_photos.filter(position__in=pos_list).order_by('position')
+            context['photos'] = photos[:3]
+            try:
+                track_obj = UserTacking.objects.get(user=user)
+                trackers_list = track_obj.tracked_by.all()
+                tracking_list = UserTacking.objects.filter(
+                                tracked_by=user)
+                context['trackers_list_count'] = trackers_list.count()
+                context['tracking_list_count'] = tracking_list.count()
+                context['trackers_list'] = trackers_list[:6]
+                context['tracking_list'] = tracking_list[:6]
+            except UserTacking.DoesNotExist:
+                pass
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
@@ -2577,6 +2593,21 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
         context['user'] = user
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
+        context['photos'] = photos[:3]
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
+        except UserTacking.DoesNotExist:
+            pass
         try:
             profile = CompanyProfile.objects.get(user=user)
             context['profile'] = profile
@@ -2599,6 +2630,7 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+        context['user'] = user
         try:
             profile = CompanyProfile.objects.get(user=user)
             context['profile'] = profile
@@ -3212,30 +3244,21 @@ class CompanyClientAPI(APIView):
         return Response(response)
 
 
-class AttachClientAjaxView(View, JSONResponseMixin):
-    pass
-    # template_name = 'user_pages/attach-client.html'
+class SendFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
 
-    # def get(self, *args, **kwargs):
-    #     context = dict()
-    #     clients = CompanyClient.objects.filter(company=self.request.user)
-    #     client_dict = {}
-    #     for obj in clients:
-    #         if obj.position is not None and obj.position not in client_dict:
-    #             client_dict[obj.position] = []
-    #             client_dict[obj.position].append(obj)
-    #         elif obj.position is None and obj.new_position not in client_dict:
-    #             client_dict[obj.new_position] = []
-    #             client_dict[obj.new_position].append(obj)
-    #         elif obj.position is not None and obj.position in client_dict:
-    #             client_dict[obj.position].append(obj)
-    #         elif obj.position is None and obj.new_position in client_dict:
-    #             client_dict[obj.new_position].append(obj)
-    #         else:
-    #             pass
-    #     attach_client_html = render_to_string(
-    #                             'user_pages/attach-client.html', {
-    #                                 'client_dict': client_dict
-    #                                 })
-    #     context['attach_client_html'] = attach_client_html
-    #     return self.render_json_response(context)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        company = request.user
+        if serializer.is_valid():
+            data_dict = serializer.data
+            response = {'message': "Friend Request Send",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+

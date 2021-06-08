@@ -1,15 +1,7 @@
 {% load notification_tag %}
 {% load static %}
-{% if from_user.membership != 'COM' %}
-    <a href="{% url 'hobo_user:profile' from_user.id %}"
+<a href="{{ from_user.get_profile_url }}"
     target="_blank" id ="{{notification_id}}" class="notification_link">
-{%  elif from_user.membership == 'COM' and from_user.company_type == 'production' %}
-    <a href="{% url 'hobo_user:production-company-profile' from_user.id %}"
-    target="_blank" id ="{{notification_id}}" class="notification_link">
-{%  elif from_user.membership == 'COM' and from_user.company_type == 'agency_management' %}
-    <a href="{% url 'hobo_user:agency-management-company-profile' from_user.id %}"
-    target="_blank" id ="{{notification_id}}" class="notification_link">
-{% endif %}
 <div class="row unread_notification">
     <div  class="col-2">
             {% if from_user.get_profile_photo %}

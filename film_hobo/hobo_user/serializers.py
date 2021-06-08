@@ -23,7 +23,7 @@ from .models import CustomUser, Country, GuildMembership, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
     UserProfile, CoWorker, UserInterest, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient
+    CompanyClient, FriendRequest
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -932,3 +932,9 @@ class CompanyClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyClient
         fields = ['name', 'email', 'position', 'new_position']
+
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FriendRequest
+        fields = ['user', 'status', 'requested_by']

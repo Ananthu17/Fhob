@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load profile_photo_tag %}
 {% block extracss %}
 {% endblock %}
 
@@ -14,11 +13,10 @@
         {% for obj in trackers_list %}
         <div class="row">
         <div class="col-2">
-                {% get_profile_photo obj as image %}
-                {% if image %}
-                <img src="{{ image }}" class="" style="width:100%;">
+                {% if obj.user.get_profile_photo %}
+                <img src="{{ obj.user.get_profile_photo }}" title="{{obj.user.get_full_name}}" class="" style="width:100%;">
                 {% else %}
-                <img src="{% static 'images/default_profile_pic.png' %}" class="" style="width:100%;">
+                <img src="{% static 'images/default_profile_pic.png' %}" title="{{obj.user.get_full_name}}" class="" style="width:100%;">
                 {% endif %}
         </div>
         <div class="col-10">
@@ -30,11 +28,10 @@
         {% for obj in tracking_list %}
         <div class="row">
                 <div class="col-2">
-                        {% get_profile_photo obj as image %}
-                        {% if image %}
-                        <img src="{{ image }}" class="" style="width:100%;">
+                        {% if obj.user.get_profile_photo %}
+                        <img src="{{ obj.user.get_profile_photo }}" title="{{obj.user.get_full_name}}" class="" style="width:100%;">
                         {% else %}
-                        <img src="{% static 'images/default_profile_pic.png' %}" class="" style="width:100%;">
+                        <img src="{% static 'images/default_profile_pic.png' %}" title="{{obj.user.get_full_name}}" class="" style="width:100%;">
                         {% endif %}
                 </div>
                 <div class="col-10">

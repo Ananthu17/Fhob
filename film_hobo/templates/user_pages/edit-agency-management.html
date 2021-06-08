@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load profile_photo_tag %}
 {% load token %}
 
 {% block extracss %}
@@ -28,135 +27,12 @@
                     </a>
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
-                    <!-- <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests (5)</a></li>
-                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
-                    </ul> -->
+
                 </div>
                 <div class="left-mode-sec mt-3 p-2 blank-left-mode">
-                </div> 
+                </div>
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
-                <!-- <div class="left-mode-sec mem-img-p">
-                    <div class="row">
-                        <div class="col-12 mem-set-img">
-                            {% get_profile_photo request.user as image %}
-                            {% if image %}
-                            <img src="{{ image }}" class="img-fluid mem-set-top-img" />
-                            {% else %}
-                            <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid mem-set-top-img">
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row mt-1">
-                        {% for obj in photos %}
-                        <div class="col-4 mem-set-img">
-                            <img src="{{ obj.image.url }}" class="img-fluid  mem-set-img-s" />
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="mt-3 mem-set-add-sec">
-                    <div class=" mb-2 text-center"> <a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-setup-blu-f" >Add/Remove Pictures</a></div>
-                    <div class="row">
-                        {% for obj in all_photos %}
-                        <div class="col-3 mem-set-img">
-                            <img src="{{ obj.image.url }}" class="img-fluid mem-set-img-add">
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="mem-setup-blck-f mt-2 mb-3">#1 is a Profile Picture. You can
-                        flip pictures any time</div>
-                </div>
-                <div class="mem-set-network-sec mt-3">
-                    <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
-                    <div class="float-right"><a href="#" class="mem-setup-blck-f">Edit</a></div>
-                    <hr class="mem-setup-network-hr">
-                    <div class="row pl-1 pr-1">
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img0.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img1.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img2.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img3.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                    </div>
-                    <div class="row mt-3 pl-1 pr-1">
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img0.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img1.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img2.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img3.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mem-set-network-sec mt-3 mb-4">
-                    <div class="mb-1 float-left"><a href="#" class="mem-setup-orng-f">({{tracking_list.count}})Tracking</a></div>
-                    <div class="float-right"><a href="#" class="mem-setup-blu-f">({{trackers_list.count}})Trackers</a></div>
-                    <hr class="mem-setup-network-hr">
-                    <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list.count}})</div>
-                    <div class="row pl-3 pr-3">
-                        {% for usr in tracking_list %}
-                        <div class="col-2 mem-set-img">
-                            {% get_profile_photo usr as image %}
-                            {% if image %}
-                            <img src="{{ image }}" class="img-fluid mem-set-img-track">
-                            {% else %}
-                            <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid mem-set-img-track">
-                            {% endif %}
-                            <div class="mem-set-img-track-nam">{{ usr.user.get_full_name|truncatechars:"9"}}</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                    <div class="row">
-                        <div class="col-4 ">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Dynamo</span></div>
-                        </div>
-                        <div class="col-4 mem-set-track-padding">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#56</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Jack</span></div>
-                        </div>
-                        <div class="col-4 mem-set-track-padding pl-0">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#457</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Hammer</span></div>
-                        </div>
-                    </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
-                            <div class="track-blu-f">Team:<span class="track-orng-f">#3</span></div>
-                            <div class="track-blu-f">Location:<span class="track-orng-f">Dallas</span></div>
-                        </div>
-                        <div class="col-6 mem-set-track-padding">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#178</span></div>
-                            <div class="track-blu-f">Team:<span class="track-orng-f">#1</span></div>
-                            <div class="track-blu-f">Location:<span class="track-orng-f">New York</span></div>
-                        </div>
-                    </div>
-                </div> -->
             </div>
             <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
                 <div class="container p-0">

@@ -36,7 +36,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddUserInterestView, AddUserInterestAPI, \
                    EditAgencyManagementCompanyView, CompanyClientAPI, \
                    AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
-                   AgencyManagementCompanyProfileView, AttachClientAjaxView
+                   AgencyManagementCompanyProfileView
 
 app_name = "hobo_user"
 
@@ -205,7 +205,5 @@ urlpatterns = [
     path('edit-agency-management-company-profile/',
          EditAgencyManagementCompanyView.as_view(),
          name='edit-agency-management-company-profile'),
-    path('attach-client/', AttachClientAjaxView.as_view(),
-         name='attach-client'),
 
 ]
