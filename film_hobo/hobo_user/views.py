@@ -43,6 +43,8 @@ from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
+from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
+from django_filters.rest_framework import DjangoFilterBackend
 
 from authemail.views import SignupVerify
 
@@ -52,10 +54,10 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     EditProfileForm
 
 from .models import CoWorker, CustomUser, GuildMembership, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, Project, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
+                    EthnicAppearance, Team, UserAgentManager, UserProfile, CoWorker, JobType, \
                     UserRating, UserRatingCombined, UserTacking, Photo
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -69,7 +71,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, ProjectSerializer, \
+    TeamSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -2705,3 +2708,54 @@ class UploadImageAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+# Project CRUD
+class ProjectAPIView(ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = '__all__'
+
+class ProjectCreateAPIView(CreateAPIView):
+  permission_classes = (IsAuthenticated,)
+  queryset = Project.objects.all()
+  serializer_class = ProjectSerializer
+  
+
+class ProjectUpdateAPIView(UpdateAPIView):
+    queryset = Project.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = ProjectSerializer
+
+class ProjectDeleteAPIView(DestroyAPIView):
+    queryset = Project.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = ProjectSerializer
+
+# Team CRUD
+class TeamAPIView(ListAPIView):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = '__all__'
+
+class TeamCreateAPIView(CreateAPIView):
+  queryset = Team.objects.all()
+  serializer_class = TeamSerializer
+  permission_classes = (IsAuthenticated,)
+
+class TeamUpdateAPIView(UpdateAPIView):
+    queryset = Team.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = TeamSerializer
+
+class TeamDeleteAPIView(DestroyAPIView):
+    queryset = Team.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = TeamSerializer

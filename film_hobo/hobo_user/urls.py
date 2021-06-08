@@ -29,7 +29,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
                    UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
-                   UploadImageView, UploadImageAPI
+                   UploadImageView, UploadImageAPI, ProjectAPIView, \
+                   ProjectCreateAPIView, ProjectUpdateAPIView, ProjectDeleteAPIView, \
+                   TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
+                   TeamDeleteAPIView
 
 app_name = "hobo_user"
 
@@ -169,5 +172,20 @@ urlpatterns = [
          name='swap-image-position'),
     path('upload-image/', UploadImageView.as_view(),
          name='upload-image'),
-
+    path('projects/', ProjectAPIView.as_view(),
+         name='project-list'),
+    path('projects/create/', ProjectCreateAPIView.as_view(),
+         name='create-project'),
+    path('projects/delete/<id>', ProjectDeleteAPIView.as_view(),
+         name='delete-project'),
+    path('projects/update/<id>', ProjectUpdateAPIView.as_view(),
+         name='delete-project'),
+    path('teams/', TeamAPIView.as_view(),
+         name='team-list'),
+    path('teams/create/', TeamCreateAPIView.as_view(),
+         name='create-team'),
+    path('teams/delete/<id>', TeamDeleteAPIView.as_view(),
+         name='delete-team'),
+    path('teams/update/<id>', TeamUpdateAPIView.as_view(),
+         name='delete-project'),
 ]
