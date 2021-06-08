@@ -1,13 +1,13 @@
 from django.urls import path, include
 
-from payment import views
+# from payment import views
 
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder
-from .paypal import CreateOrder, CaptureOrder
+# from .paypal import CreateOrder, CaptureOrder
 
 app_name = "payment"
 

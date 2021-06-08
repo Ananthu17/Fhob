@@ -1,5 +1,4 @@
 import ast
-import environ
 import json
 from os import remove
 from django.contrib.auth.models import User
@@ -74,9 +73,6 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
-
-env = environ.Env()
-environ.Env.read_env()
 
 
 class ExtendedLoginView(AuthLoginView):
