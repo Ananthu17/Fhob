@@ -20,8 +20,8 @@ from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
-from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest, \
-    OrdersGetRequest
+from paypalcheckoutsdk.orders import OrdersCreateRequest, \
+    OrdersCaptureRequest, OrdersGetRequest
 
 
 class IsSuperUser(IsAdminUser):
@@ -255,7 +255,8 @@ class UpdateMembershipFeeAPI(APIView):
                     HoboPaymentsDetails.objects.all().update(
                         monthly_amount=float(data['monthly_hobo']))
                     final_result['monthly_hobo'] = \
-                        HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
+                        HoboPaymentsDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -269,7 +270,8 @@ class UpdateMembershipFeeAPI(APIView):
                     HoboPaymentsDetails.objects.all().update(
                         annual_amount=float(data['annual_hobo']))
                     final_result['annual_hobo'] = \
-                        HoboPaymentsDetails.objects.first().__dict__['annual_amount']
+                        HoboPaymentsDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -289,7 +291,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     IndiePaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_indie']))
-                    final_result['monthly_indie'] = IndiePaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_indie'] = \
+                        IndiePaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -302,7 +306,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     IndiePaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_indie']))
-                    final_result['annual_indie'] = IndiePaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_indie'] = \
+                        IndiePaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -322,7 +328,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     ProPaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_pro']))
-                    final_result['monthly_pro'] = ProPaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_pro'] = \
+                        ProPaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -334,7 +342,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     ProPaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_pro']))
-                    final_result['annual_pro'] = ProPaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_pro'] = \
+                        ProPaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -354,7 +364,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     CompanyPaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_company']))
-                    final_result['monthly_company'] = CompanyPaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_company'] = \
+                        CompanyPaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -366,7 +378,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     CompanyPaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_company']))
-                    final_result['annual_company'] = CompanyPaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_company'] = \
+                        CompanyPaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -384,7 +398,8 @@ class UpdateMembershipFeeAPI(APIView):
             try:
                 float(data['tax'])
                 if data['tax'] == "":
-                    final_result['tax'] = PaymentOptions.objects.first().__dict__['tax']
+                    final_result['tax'] = \
+                        PaymentOptions.objects.first().__dict__['tax']
                 elif (float(data['tax']) < 0.0) or (float(data['tax']) > 100.0):
                     return Response(
                             {"status": "failure",
@@ -434,7 +449,8 @@ class UpdateMembershipFeeAPI(APIView):
                 int(data['free_evaluation_time'])
                 if data['free_evaluation_time'] == "":
                     final_result['free_evaluation_time'] = \
-                        PaymentOptions.objects.first().__dict__['free_evaluation_time']
+                        PaymentOptions.objects.first().__dict__[
+                            'free_evaluation_time']
                 elif int(data['free_evaluation_time']) == 0:
                     final_result['free_evaluation_time'] = '0'
                 else:
@@ -447,7 +463,8 @@ class UpdateMembershipFeeAPI(APIView):
                      }, status=status.HTTP_400_BAD_REQUEST)
 
             if data['auto_renew'] == "":
-                final_result['auto_renew'] = PaymentOptions.objects.first().__dict__['auto_renew']
+                final_result['auto_renew'] = \
+                    PaymentOptions.objects.first().__dict__['auto_renew']
             elif data['auto_renew'].lower().replace(" ", "") == "on":
                 final_result['auto_renew'] = "on"
             elif data['auto_renew'].lower().replace(" ", "") == "off":
@@ -577,8 +594,9 @@ class EditDiscountDetailAPI(APIView):
             if serializer.is_valid():
                 serializer.update(PromoCode.objects.get(id=unique_id),
                                   request.data)
-                return Response({"status": "success",
-                                "message": "promocode record updated successfully"})
+                return Response(
+                    {"status": "success",
+                     "message": "promocode record updated successfully"})
             else:
                 return Response(serializer.errors)
         except ObjectDoesNotExist:
