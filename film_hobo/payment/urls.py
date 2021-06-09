@@ -41,5 +41,5 @@ urlpatterns = [
     path('paypal/<order_id>/capture/',
          CaptureUserOrder.as_view(), name="paypal-capture"),
     path('paypal/<order_id>/get_details/',
-         GetOrderDetails.as_view(), name="paypal-capture")
+         GetOrderDetails.as_view(), name="paypal-get-details")
 ]
