@@ -162,9 +162,10 @@ class CustomUser(AbstractUser):
     company_address = models.CharField(_("Company Address"),
                                        max_length=250,
                                        null=True, blank=True)
-    company_website = models.URLField(_("Company Website"),
-                                      null=True,
-                                      blank=True,)
+    company_website = models.CharField(_("Company Website"),
+                                       max_length=250,
+                                       null=True,
+                                       blank=True,)
     company_phone = PhoneNumberField(_("Phone Number"), null=True,
                                      unique=True)
     title = models.CharField(_('Title'),

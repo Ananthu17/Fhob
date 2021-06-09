@@ -481,7 +481,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     # company details
     company_name = serializers.CharField()
     company_address = serializers.CharField()
-    company_website = serializers.URLField(allow_blank=True)
+    company_website = serializers.CharField(allow_blank=True)
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
