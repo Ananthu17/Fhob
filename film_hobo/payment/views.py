@@ -830,9 +830,15 @@ class CaptureUserOrder(APIView):
         response = client.execute(capture_order)
         data = response.result.__dict__['_dict']
         if response.result.__dict__['_dict']['status'] == 'COMPLETED':
+            transaction_obj = Transaction.objects.get(
+                paypal_order_id=response.result.__dict__['_dict']['id']
+                )
             Transaction.objects.filter(
                 paypal_order_id=response.result.__dict__['_dict']['id']
                 ).update(paid=True)
+            CustomUser.objects.filter(
+                email=transaction_obj.user.email
+                ).update(registration_complete=True)
         return JsonResponse(data)
 
 
