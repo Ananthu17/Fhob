@@ -40,6 +40,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ['id', 'user', 'date', 'days_free', 'payment_plan',
-                  'initial_amount', 'tax_applied', 'promocodes_applied',
-                  'promotion_amount', 'final_amount', 'paid']
+        fields = ['id', 'user', 'date', 'days_free', 'membership',
+                  'payment_plan', 'initial_amount', 'tax_applied',
+                  'promocodes_applied', 'promotion_amount',
+                  'final_amount', 'paid']

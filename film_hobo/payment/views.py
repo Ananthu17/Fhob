@@ -20,7 +20,8 @@ from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
-from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
+from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest, \
+    OrdersGetRequest
 
 
 class IsSuperUser(IsAdminUser):
@@ -95,7 +96,8 @@ class GetMembershipFeeDetailsAPI(APIView):
             final_result['annual_pro_with_tax'] = ""
 
         try:
-            company_details_dict = CompanyPaymentDetails.objects.first().__dict__
+            company_details_dict = \
+                CompanyPaymentDetails.objects.first().__dict__
             final_result['monthly_company'] = company_details_dict[
                 'monthly_amount']
             final_result['monthly_company_with_tax'] = company_details_dict[
@@ -192,7 +194,8 @@ class GetMembershipFeeDetailsPublicAPI(APIView):
             final_result['annual_pro_with_tax'] = ""
 
         try:
-            company_details_dict = CompanyPaymentDetails.objects.first().__dict__
+            company_details_dict = \
+                CompanyPaymentDetails.objects.first().__dict__
             final_result['monthly_company'] = company_details_dict[
                 'monthly_amount']
             final_result['monthly_company_with_tax'] = company_details_dict[
@@ -251,7 +254,8 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     HoboPaymentsDetails.objects.all().update(
                         monthly_amount=float(data['monthly_hobo']))
-                    final_result['monthly_hobo'] = HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_hobo'] = \
+                        HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -264,7 +268,8 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     HoboPaymentsDetails.objects.all().update(
                         annual_amount=float(data['annual_hobo']))
-                    final_result['annual_hobo'] = HoboPaymentsDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_hobo'] = \
+                        HoboPaymentsDetails.objects.first().__dict__['annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -387,22 +392,38 @@ class UpdateMembershipFeeAPI(APIView):
                              }, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     final_result['tax'] = float(data['tax'])
-                    final_result['monthly_hobo_with_tax'] = final_result['monthly_hobo'] + \
-                        (final_result['monthly_hobo'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_indie_with_tax'] = final_result['monthly_indie'] + \
-                        (final_result['monthly_indie'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_pro_with_tax'] = final_result['monthly_pro'] + \
-                        (final_result['monthly_pro'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_company_with_tax'] = final_result['monthly_company'] + \
-                        (final_result['monthly_company'] * (float(data['tax']) / 100.0))
-                    final_result['annual_hobo_with_tax'] = final_result['annual_hobo'] + \
-                        (final_result['annual_hobo'] * (float(data['tax']) / 100.0))
-                    final_result['annual_indie_with_tax'] = final_result['annual_indie'] + \
-                        (final_result['annual_indie'] * (float(data['tax']) / 100.0))
-                    final_result['annual_pro_with_tax'] = final_result['annual_pro'] + \
-                        (final_result['annual_pro'] * (float(data['tax']) / 100.0))
-                    final_result['annual_company_with_tax'] = final_result['annual_company'] + \
-                        (final_result['annual_company'] * (float(data['tax']) / 100.0))
+                    final_result['monthly_hobo_with_tax'] = \
+                        final_result['monthly_hobo'] + \
+                        (final_result['monthly_hobo'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_indie_with_tax'] = \
+                        final_result['monthly_indie'] + \
+                        (final_result['monthly_indie'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_pro_with_tax'] = \
+                        final_result['monthly_pro'] + \
+                        (final_result['monthly_pro'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_company_with_tax'] = \
+                        final_result['monthly_company'] + \
+                        (final_result['monthly_company'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_hobo_with_tax'] = \
+                        final_result['annual_hobo'] + \
+                        (final_result['annual_hobo'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_indie_with_tax'] = \
+                        final_result['annual_indie'] + \
+                        (final_result['annual_indie'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_pro_with_tax'] = \
+                        final_result['annual_pro'] + \
+                        (final_result['annual_pro'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_company_with_tax'] = \
+                        final_result['annual_company'] + \
+                        (final_result['annual_company'] *
+                         (float(data['tax']) / 100.0))
             except ValueError:
                 return Response(
                         {"status": "failure",
@@ -412,11 +433,13 @@ class UpdateMembershipFeeAPI(APIView):
             try:
                 int(data['free_evaluation_time'])
                 if data['free_evaluation_time'] == "":
-                    final_result['free_evaluation_time'] = PaymentOptions.objects.first().__dict__['free_evaluation_time']
+                    final_result['free_evaluation_time'] = \
+                        PaymentOptions.objects.first().__dict__['free_evaluation_time']
                 elif int(data['free_evaluation_time']) == 0:
                     final_result['free_evaluation_time'] = '0'
                 else:
-                    final_result['free_evaluation_time'] = data['free_evaluation_time']
+                    final_result['free_evaluation_time'] = \
+                        data['free_evaluation_time']
             except ValueError:
                 return Response(
                     {"status": "failure",
@@ -606,12 +629,20 @@ class CalculateDiscountAPI(APIView):
                     if promocode_obj.amount_type == 'flat_amount':
                         initial_amount = float(data['amount'])
                         promotion_amount = float(promocode_obj.amount)
-                        final_amount = initial_amount - promotion_amount
+                        temp_amount = initial_amount - promotion_amount
+                        if temp_amount < 0:
+                            final_amount = 0
+                        else:
+                            final_amount = temp_amount
                     else:
                         initial_amount = float(data['amount'])
                         promotion_amount = float(data['amount']) * \
                             (float(promocode_obj.amount) / 100.0)
-                        final_amount = initial_amount - promotion_amount
+                        temp_amount = initial_amount - promotion_amount
+                        if temp_amount < 0:
+                            final_amount = 0
+                        else:
+                            final_amount = temp_amount
                     return Response(
                         {"status": "success",
                          "promocode": data['promocode'],
@@ -636,6 +667,7 @@ class TransactionSave(APIView):
 
     def post(self, request, format=None):
         logged_user = CustomUser.objects.get(id=request.user.id)
+        membership_type = logged_user.membership
         payment_plan = request.data['payment_plan']
         days_free = request.data['days_free']
         initial_amount = request.data['initial_amount']
@@ -651,7 +683,9 @@ class TransactionSave(APIView):
             promotion_amount = float(request.data['promotion_amount'])
         final_amount = request.data['final_amount']
         transaction = Transaction.objects.create(
-                                   user=logged_user, payment_plan=payment_plan,
+                                   user=logged_user,
+                                   membership=membership_type,
+                                   payment_plan=payment_plan,
                                    days_free=days_free,
                                    initial_amount=initial_amount,
                                    tax_applied=tax_applied,
@@ -690,6 +724,7 @@ class CreateUserOrder(APIView):
     def post(self, request, *args, **kwargs):
         try:
             logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
         except ObjectDoesNotExist:
             return Response(
                         {"status": "invalid user token"},
@@ -709,7 +744,9 @@ class CreateUserOrder(APIView):
             promotion_amount = float(request.data['promotion_amount'])
         final_amount = request.data['final_amount']
         transaction = Transaction.objects.create(
-                                   user=logged_user, payment_plan=payment_plan,
+                                   user=logged_user,
+                                   membership=membership_type,
+                                   payment_plan=payment_plan,
                                    days_free=days_free,
                                    initial_amount=initial_amount,
                                    tax_applied=tax_applied,
@@ -753,6 +790,8 @@ class CreateUserOrder(APIView):
 
             response = client.execute(create_order)
             data = response.result.__dict__['_dict']
+            Transaction.objects.filter(id=transaction.id).update(
+                paypal_order_id=data['id'])
             # return JsonResponse(data)
             return Response(data, status=status.HTTP_201_CREATED)
         else:
@@ -765,6 +804,24 @@ class CaptureUserOrder(APIView):
 
     def post(self, request, *args, **kwargs):
         capture_order = OrdersCaptureRequest(kwargs['order_id'])
+        environment = SandboxEnvironment(
+            client_id=settings.PAYPAL_CLIENT_ID,
+            client_secret=settings.PAYPAL_SECRET_ID)
+        client = PayPalHttpClient(environment)
+
+        response = client.execute(capture_order)
+        data = response.result.__dict__['_dict']
+        if response.result.__dict__['_dict']['status'] == 'COMPLETED':
+            Transaction.objects.filter(
+                paypal_order_id=response.result.__dict__['_dict']['id']
+                ).update(paid=True)
+        return JsonResponse(data)
+
+
+class GetOrderDetails(APIView):
+
+    def get(self, request, *args, **kwargs):
+        capture_order = OrdersGetRequest(kwargs['order_id'])
         environment = SandboxEnvironment(
             client_id=settings.PAYPAL_CLIENT_ID,
             client_secret=settings.PAYPAL_SECRET_ID)

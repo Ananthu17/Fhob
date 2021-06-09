@@ -198,6 +198,7 @@
 
     onApprove: function(data) {
         capture_url = origin_url + '/payment/paypal/' + data.orderID + '/capture/'
+        success_redirect = origin_url + '/hobo_user/user_login/'
         return fetch(capture_url, {
             method: 'post',
             headers: {
@@ -212,6 +213,8 @@
         }).then(function(details) {
             transaction_username = details.payer.name.given_name + ' ' + details.payer.name.surname
             alert('Transaction funds captured from ' + transaction_username);
+            var delay = 1000;
+            setTimeout(function(){ window.location = success_redirect; }, delay);
         })
     }
 

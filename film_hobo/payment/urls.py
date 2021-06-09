@@ -1,12 +1,10 @@
 from django.urls import path, include
 
-# from payment import views
-
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
-     CreateUserOrder, CaptureUserOrder
+     CreateUserOrder, CaptureUserOrder, GetOrderDetails
 # from .paypal import CreateOrder, CaptureOrder
 
 app_name = "payment"
@@ -15,7 +13,8 @@ urlpatterns = [
     # api-view endpoints
     path('get_membership_fee_detail/', GetMembershipFeeDetailsAPI.as_view(),
          name='get_membership_fee_detail'),
-    path('get_membership_fee_detail_public/', GetMembershipFeeDetailsPublicAPI.as_view(),
+    path('get_membership_fee_detail_public/',
+         GetMembershipFeeDetailsPublicAPI.as_view(),
          name='get_membership_fee_detail_public'),
     path('update_membership_fee/', UpdateMembershipFeeAPI.as_view(),
          name='update_membership_fee'),
@@ -40,5 +39,7 @@ urlpatterns = [
     path('paypal/', include("paypal.standard.ipn.urls")),
     path('paypal/create/', CreateUserOrder.as_view(), name="paypal-create"),
     path('paypal/<order_id>/capture/',
-         CaptureUserOrder.as_view(), name="paypal-capture")
+         CaptureUserOrder.as_view(), name="paypal-capture"),
+    path('paypal/<order_id>/get_details/',
+         GetOrderDetails.as_view(), name="paypal-capture")
 ]

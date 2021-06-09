@@ -35,12 +35,29 @@ class Transaction(models.Model):
         (MONTHLY, 'Monthly'),
         (ANNUALLY, 'Annually')
     ]
+    ADMIN = 'ADMIN'
+    HOBO = 'HOB'
+    INDIE = 'IND'
+    PRO = 'PRO'
+    PRODUCTION_COMPANY = 'COM'
+    MEMBERSHIP_CHOICES = [
+        (ADMIN, 'Admin'),
+        (HOBO, 'Hobo'),
+        (INDIE, 'Indie'),
+        (PRO, 'Pro'),
+        (PRODUCTION_COMPANY, 'Production Company')
+    ]
 
     user = models.ForeignKey('hobo_user.CustomUser',
                              verbose_name=_("User"),
                              on_delete=models.CASCADE)
+    paypal_order_id = models.CharField(_("Paypal Order ID"),
+                                       null=True, blank=True, max_length=150)
     date = models.DateTimeField(auto_now_add=True)
     days_free = models.IntegerField(_("Days Free"), null=True, blank=True)
+    membership = models.CharField(_("Membership Type"),
+                                  choices=MEMBERSHIP_CHOICES,
+                                  max_length=150, default=HOBO)
     payment_plan = models.CharField(_("Payment Plan"),
                                     choices=PAYMENT_PLAN_CHOICES,
                                     max_length=150,
