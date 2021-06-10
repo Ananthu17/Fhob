@@ -432,6 +432,21 @@
 .fb{
  color:#000;
 }
+.fb:active, .fb:hover, .fb:focus{
+  color:#000;
+  text-decoration: none;
+}
+.btn-link, .btn-link:hover, .btn-link:focus{
+  color: #2265b9;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn-link-b{
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+}
 .paymnt-lft-bar{
  border-left:1px solid#9c9c9c;
 }
@@ -540,196 +555,194 @@
 
 /*settings page*/
 .bor-bottom{
- border-bottom: 2px solid #000;
+  border-bottom: 1px solid #000;
 }
 .bor-top{
- border-top: 2px solid #000;
+  border-top: 1px solid #000;
 }
 .bor-right{
- border-right:2px solid #000;
+  border-right:1px solid #000;
 }
 .settings-font{
- font-family: Courier;
- font-size: 13px;
- color: #000;
- font-weight: 600;
+  font-family: Courier;
+  font-size: 13px;
+  color: #000;
 }
 .settings-head-font{
- font-family:Courier Bold;
- font-size: 13px;
+  font-family:Courier Bold;
+  font-size: 13px;
 }
 .fh-link-blck{
- text-decoration: none !important;
- color: #000;
+  text-decoration: none !important;
+  color: #000;
 }
 .fh-link-blck:active,.fh-link-blck:focus {
- text-decoration: none !important;
- color:#211bff;
+  text-decoration: none !important;
+  color:#211bff;
 }
 .fh-link-blck:hover{
- text-decoration: none !important;
- color:#000;
+  text-decoration: none !important;
+  color:#000;
 }
 .edit-icon{
- height: 15px;
- width: 15px;
+  height: 15px;
+  width: 15px;
 }
 .setting-sf{
- font-size: 11px;
+  font-size: 11px;
 }
 .settings-fb{
- color: #000;
- text-decoration: underline;
+  color: #000;
+  text-decoration: underline;
 }
 .settings-fb:active,.settings-fb:focus,.settings-fb:hover{
- color: #000;
- text-decoration: underline;
+  color: #000;
+  text-decoration: underline;
 }
 .settings-checkbx-f{
- font-family: "Myraid Pro";
- font-weight: 200;
-}
-.s-btn-disable{
- color: #000;
- border: 1px solid#000;
- background-color: #EDEEF0;
- font-family: "Myraid Pro";
- font-weight: 600;
- height: 24px;
- border-radius: 0rem;
- padding: 2px 15px;
- font-size: 13px;
- box-shadow: none;
- outline: none;
-}
-.s-cancel{
- color: #000;
- text-decoration: none;
-}
-.s-cancel:active,.s-cancel:hover,.s-cancel:focus{
- color: #000;
- text-decoration: none;
-}
-.btn-save{
- color: #f32121;
- background-color: #EDEEF0;
- height: 24px;
- border-radius: 0rem;
- padding: 2px 6px;
- font-size: 13px;
-}
-.btn-save:active,.btn-save:focus,.btn-save:hover{
- color: #f32121;
- background-color: #EDEEF0;
- height: 24px;
- border-radius: 0rem;
- padding: 2px 6px;
- font-size: 13px;
- box-shadow: none;
-}
-@media only screen and (max-width: 600px) {
- .top-h-xs-screen{
-    height: 40px;
- }
-}
-*{
- margin: 0;
- padding: 0;
-}
-.rate {
- float: left;
- height: 14px;
-}
-.rate:not(:checked) > input {
- position:absolute;
- top:-9999px;
-}
-.rate:not(:checked) > label {
- float:right;
- width: .80em;
- overflow:hidden;
- white-space:nowrap;
- cursor:pointer;
- font-size: 17px;
- color: #ccc;
- position: relative;
- top: -3px;
-}
-.rate:not(:checked) > label:before {
- content: "\2605";
-}
-.rate > input:checked ~ label {
- color: #e88b22;    
-}
-.noti-title{
- font-family: "Courier Bold"; 
-}
-.noti-checkbx-f{
- font-family: Courier;
- font-size: 13px;
- color: #000;
- font-weight: 600;
-}
-.ml-noti{
- margin-left: -5px;
-}
-.blocking-text{
- font-family: "Myraid Pro";
+  font-family: "Myraid Pro"; 
   font-weight: 200;
 }
+.s-btn-disable{
+  color: #000;
+  border: 1px solid#000;
+  background-color: #EDEEF0;
+  font-family: "Myraid Pro"; 
+  font-weight: 600;
+  height: 24px;
+  border-radius: 0rem;
+  padding: 2px 15px;
+  font-size: 13px;
+  box-shadow: none;
+  outline: none;
+}
+.s-cancel{
+  color: #000;
+  text-decoration: none;
+}
+.s-cancel:active,.s-cancel:hover,.s-cancel:focus{
+  color: #000;
+  text-decoration: none;
+}
+.btn-save{
+  color: #f32121;
+  background-color: #EDEEF0;
+  height: 24px;
+  border-radius: 0rem;
+  padding: 2px 6px;
+  font-size: 13px;
+}
+.btn-save:active,.btn-save:focus,.btn-save:hover{
+  color: #f32121;
+  background-color: #EDEEF0;
+  height: 24px;
+  border-radius: 0rem;
+  padding: 2px 6px;
+  font-size: 13px;
+  box-shadow: none;
+}
+@media only screen and (max-width: 600px) {
+  .top-h-xs-screen{
+     height: 40px;
+  }
+}
+*{
+  margin: 0;
+  padding: 0;
+}
+.rate {
+  float: left;
+  height: 14px;
+}
+.rate:not(:checked) > input {
+  position:absolute;
+  top:-9999px;
+}
+.rate:not(:checked) > label {
+  float:right;
+  width: .80em;
+  overflow:hidden;
+  white-space:nowrap;
+  cursor:pointer;
+  font-size: 17px;
+  color: #ccc;
+  position: relative;
+  top: -3px;
+}
+.rate:not(:checked) > label:before {
+  content: "\2605";
+}
+.rate > input:checked ~ label {
+  color: #e88b22;    
+}
+.noti-title{
+  font-family: "Courier Bold"; 
+}
+.noti-checkbx-f{
+  font-family: Courier;
+  font-size: 13px;
+  color: #000;
+}
+.ml-noti{
+  margin-left: -5px;
+}
+.blocking-text{
+  font-family: "Myraid Pro";
+   font-weight: 200;
+}
 .block-placeholder::-webkit-input-placeholder {
- text-align: center;
+  text-align: center;
 }
 
-.block-placeholder:-moz-placeholder { /* Firefox 18- */
- text-align: center;  
+.block-placeholder:-moz-placeholder { / Firefox 18- /
+  text-align: center;  
 }
 
-.block-placeholder::-moz-placeholder {  /* Firefox 19+ */
- text-align: center;  
+.block-placeholder::-moz-placeholder {  / Firefox 19+ /
+  text-align: center;  
 }
 
 .block-placeholder:-ms-input-placeholder {  
- text-align: center; 
+  text-align: center; 
 }
 
 .block-placeholder{
- width: 100%;
- height: 18px;
- font-size: 13px;
- margin-top: 0px;
- border: 1px solid #000;
+  width: 100%;
+  height: 18px;
+  font-size: 13px;
+  margin-top: 0px;
+  border: 1px solid #000;
 }
 .block-btn{
- color: #f32121;
- background-color: #EDEEF0;
- font-weight: 600;
- font-size: 13px;
- height: 25px;
- border-radius: 0rem;
- padding: 3px 16px;
- font-family: Courier Bold;
+  color: #f32121;
+  background-color: #EDEEF0;
+  font-weight: 600;
+  font-size: 13px;
+  height: 25px;
+  border-radius: 0rem;
+  padding: 3px 16px;
+  font-family: Courier Bold;
 }
 .block-btn:active,.block-btn:focus,.block-btn:hover{
- color: #f32121;
- background-color: #EDEEF0;
- font-weight: 600;
- font-size: 13px;
- height: 25px;
- border-radius: 0rem;
- padding: 3px 16px;
- font-family: Courier Bold;
- box-shadow: none;
+  color: #f32121;
+  background-color: #EDEEF0;
+  font-weight: 600;
+  font-size: 13px;
+  height: 25px;
+  border-radius: 0rem;
+  padding: 3px 16px;
+  font-family: Courier Bold;
+  box-shadow: none;
 }
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus,
 .form-control:focus{
- border: 1px solid #ced4da;
- outline: none;
- -webkit-box-shadow: none !important;
- -moz-box-shadow: none !important;
- box-shadow: none !important;
+  border: 1px solid #ced4da;
+  outline: none;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
 }
 button:focus,
 button:active,
@@ -738,54 +751,54 @@ label:focus,
 .btn:active,
 .btn.active
 {
-  outline:0px !important;
-  -webkit-appearance:none;
-  box-shadow: none !important;
+   outline:0px !important;
+   -webkit-appearance:none;
+   box-shadow: none !important;
 }
 .billing-form{
- font-family: "Myraid Pro";
-  font-weight: 200;
+  font-family: "Myraid Pro";
+   font-weight: 200;
 }
 .billing-label{
- font-weight: 600;
+  font-weight: 600;
 }
 input#visa {
- background-image: url('img/visa.png');
- background-size:contain;
- background-repeat: no-repeat;
- text-indent: 20px;
+  background-image: url('img/visa.png');
+  background-size:contain;
+  background-repeat: no-repeat;
+  text-indent: 20px;
 }
 input#visa:focus {
- background-image:none;
- text-indent:0px 
+  background-image:none;
+  text-indent:0px 
 }
 .billing-edit{
- font-family: Courier Bold;
- text-decoration: none;
- color: #211bff;
+  font-family: Courier Bold;
+  text-decoration: none;
+  color: #211bff;
 }
 .billing-edit:active,.billing-edit:hover,.billing-edit:focus{
- font-family: Courier Bold;
- text-decoration: none;
- color: #211bff;
+  font-family: Courier Bold;
+  text-decoration: none;
+  color: #211bff;
 }
 .billing-nw-card{
- font-family: Courier Bold;
- text-decoration: none;
- color: #b4127a;
+  font-family: Courier Bold;
+  text-decoration: none;
+  color: #b4127a;
 }
 .billing-nw-card:active,.billing-nw-card:hover,.billing-nw-card:focus{
- font-family: Courier Bold;
- text-decoration: none;
- color: #b4127a;
+  font-family: Courier Bold;
+  text-decoration: none;
+  color: #b4127a;
 }
 .inp-border-none {
- border:none;
- padding: 5px 10px;
- outline: none;
- width: 100%;
- font-size: 13px;
- color: #000;
+  border:none;
+  padding: 5px 10px;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  color: #000;
 }
 /*settings page end*/
 /*member page form*/

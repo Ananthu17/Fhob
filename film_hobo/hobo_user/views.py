@@ -169,7 +169,7 @@ class ExtendedRegisterCompanyView(RegisterView):
 
     def create(self, request, *args, **kwargs):
         user_input_data = request.data
-        user_input_data['membership'] = CustomUser.MEMBERSHIP_CHOICES[3][0]
+        user_input_data['membership'] = CustomUser.MEMBERSHIP_CHOICES[4][0]
         serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
