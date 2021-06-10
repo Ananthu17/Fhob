@@ -138,7 +138,6 @@ $(document).ready(function() {
         if(user_id){
             data_dict['user_id'] = user_id;
         }
-        console.log(data_dict)
         $.ajax
         ({
             type: "POST",

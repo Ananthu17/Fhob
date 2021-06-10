@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<style>
+    .email-container {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        padding: 30px;
+    }
+
+    .top-to {
+        margin-top: 5px;
+    }
+
+    .email-tp-sectn {
+        margin-top: 25px;
+        margin-bottom: 25px;
+
+    }
+
+    .ev-logo {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        height: 110px;
+    }
+
+    .email-btm-sectn {
+        margin-top: 25px;
+    }
+
+    .email-link {
+        color: #2276c3;
+    }
+
+    .hr-top {
+        margin-top: 25px;
+    }
+
+    .top-margin {
+        margin-top: 25px;
+    }
+</style>
+
+<body>
+    <div style="font-family: Arial, Helvetica, sans-serif;font-size: 16px;padding: 30px;">
+        <div>From: support@filmhobo.com</div>
+        <div style="margin-top: 5px;">To: </div>
+        <hr>
+        <a href="https://www.filmhobo.com/" target="_blank">
+        <img style="display: block;margin-left: auto;margin-right: auto;height: 110px;" src="static/images/FH_Logo.png"></a>
+        <div style="margin-top: 25px;margin-bottom: 25px;">Dear {{first_name}},</div>
+        <div style="margin-top: 25px;">
+            {{track_by_user.get_full_name}} started tracking you. Thank you!
+        </div>
+        <div style="margin-top: 25px;">Sincerely,</div>
+        <div style="margin-top: 5px;">Film Hobo team.</div>
+        <hr style=" margin-top: 25px;">
+    </div>
+</body>
+
+</html>
+

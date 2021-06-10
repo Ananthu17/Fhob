@@ -1194,12 +1194,15 @@ class UserNotification(models.Model):
     TRACKING = 'tracking'
     FRIEND_REQUEST = 'friend_request'
     USER_RATING = 'user_rating'
+    FRIEND_REQUEST_ACCEPT = 'accepted_friend_request'
     READ = 'read'
     UNREAD = 'unread'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
+                                (FRIEND_REQUEST_ACCEPT,
+                                 'Accepted Friend Request'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),

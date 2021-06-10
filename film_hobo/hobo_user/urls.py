@@ -36,7 +36,12 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddUserInterestView, AddUserInterestAPI, \
                    EditAgencyManagementCompanyView, CompanyClientAPI, \
                    AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
-                   AgencyManagementCompanyProfileView
+                   AgencyManagementCompanyProfileView, SendFriendRequestAPI, \
+                   AcceptFriendRequestAPI, ListFriendRequestAPI, \
+                   ListAllFriendsAPI, DeleteFriendRequestAPI, UnFriendUserAPI, \
+                   GetFriendRequestNotificationAjaxView, \
+                   CancelFriendRequestAPI, \
+                   GetFriendRequestAcceptNotificationAjaxView
 
 app_name = "hobo_user"
 
@@ -90,7 +95,8 @@ urlpatterns = [
          name='personal-details-api'),
     path('profile-api/', UserProfileAPI.as_view(),
          name='profile-api'),
-    path('production-company-profile-api/', ProductionCompanyProfileAPI.as_view(),
+    path('production-company-profile-api/',
+         ProductionCompanyProfileAPI.as_view(),
          name='production-company-profile-api'),
     path('agency-management-company-profile-api/',
          AgencyManagementCompanyProfileAPI.as_view(),
@@ -131,6 +137,20 @@ urlpatterns = [
          name='add-user-interest-api'),
     path('company-client-api/', CompanyClientAPI.as_view(),
          name='company-client-api'),
+    path('send-friend-request-api/', SendFriendRequestAPI.as_view(),
+         name='send-friend-request-api'),
+    path('accept-friend-request-api/', AcceptFriendRequestAPI.as_view(),
+         name='accept-friend-request-api'),
+    path('list-friend-requests-api/', ListFriendRequestAPI.as_view(),
+         name='list-friend-requests-api'),
+    path('list-all-friend-api/', ListAllFriendsAPI.as_view(),
+         name='list-all-friend-api'),
+    path('cancel-friend-request-api/', CancelFriendRequestAPI.as_view(),
+         name='cancel-friend-request-api'),
+    path('delete-friend-request-api/', DeleteFriendRequestAPI.as_view(),
+         name='delete-friend-request-api'),
+    path('unfriend-user-api/', UnFriendUserAPI.as_view(),
+         name='unfriend-user-api'),
 
 
     # web-view endpoints
@@ -194,6 +214,12 @@ urlpatterns = [
          name='upload-image'),
     path('get-tracking-notification-html/', GetTrackingNotificationAjaxView.as_view(),
          name='get-tracking-notification-html'),
+    path('get-friendrequest-notification-html/',
+         GetFriendRequestNotificationAjaxView.as_view(),
+         name='get-friendrequest-notification-html'),
+    path('get-friendrequest-accept-notification-html/',
+         GetFriendRequestAcceptNotificationAjaxView.as_view(),
+         name='get-friendrequest-accept-notification-html'),
     path('get-all-notification-html/', GetAllNotificationAjaxView.as_view(),
          name='get-all-notification-html'),
     path('attach-coworker/', AttachCoworkerAjaxView.as_view(),

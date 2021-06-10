@@ -52,12 +52,14 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
     EditAgencyManagementCompanyProfileForm
 
-from .models import CoWorker, CompanyClient, CustomUser, GuildMembership, \
+from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
+                    GuildMembership, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     PromoCode, Country, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserAgentManager, UserInterest, UserNotification, \
-                    UserProfile, JobType, UserRating, Location, \
+                    EthnicAppearance, UserAgentManager, UserInterest, \
+                    UserNotification, \
+                    UserProfile, JobType, UserRating, Location, FriendRequest, \
                     UserRatingCombined, UserTacking, CompanyProfile, NewJobType
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -75,7 +77,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     UserNotificationSerializer, ChangeNotificationStatusSerializer, \
     ProductionCompanyProfileSerializer, UserInterestSerializer, \
     AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
-    RemoveClientSerializer, FriendRequestSerializer
+    RemoveClientSerializer, FriendRequestSerializer, \
+    AcceptFriendRequestSerializer
 
 from .utils import notify, get_notifications_time
 
@@ -2578,6 +2581,8 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                 context['tracking_list'] = tracking_list[:6]
             except UserTacking.DoesNotExist:
                 pass
+            # try:
+            #     friends = FriendRequest.objects.filter()
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
@@ -2812,6 +2817,21 @@ class TrackUserAPI(APIView):
                 notification.from_user = track_by_user
                 notification.save()
 
+                # send email
+                try:
+                    user_settings = CustomUserSettings.objects.get(user=track_user)
+                    if user_settings.someone_tracks_me == True:
+                        subject = track_by_user.first_name + ' started tracking you'
+                        message = ''
+                        msg_html = loader.render_to_string('user_pages/tracking_email.html',
+                                    {'track_by_user': track_by_user,
+                                    'first_name':track_user.first_name })
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [track_user.email, ]
+                        send_mail( subject, message, email_from, recipient_list, html_message=msg_html)
+                except CustomUserSettings.DoesNotExist:
+                    pass
+
                 # send notification
                 room_name = "user_"+str(track_obj.user.id)
                 notification_msg = {
@@ -2957,7 +2977,6 @@ class SwapImageAjaxView(View, JSONResponseMixin):
             except Photo.DoesNotExist:
                 swap_obj1.position = position
                 swap_obj1.save()
-
         except Photo.DoesNotExist:
             pass
         return self.render_json_response(context)
@@ -3119,20 +3138,53 @@ class GetTrackingNotificationAjaxView(View, JSONResponseMixin):
                             Q(user=self.request.user) &
                             Q(from_user=from_user) &
                             Q(notification_type=UserNotification.TRACKING)).id
-        # tracking_notification_html = render_to_string(
-        #                         'user_pages/tracking_notification.html',
-        #                         {'image': from_user.get_profile_photo(),
-        #                         'name': from_user.get_full_name(),
-        #                         'membership': from_user.get_membership_display,
-        #                         'id': id,
-        #                         'notification_id':notification_id,
-        #                         })
         tracking_notification_html = render_to_string(
                                 'user_pages/tracking_notification.html',
                                 {'from_user': from_user,
                                 'notification_id':notification_id,
                                 })
         context['tracking_notification_html'] = tracking_notification_html
+        return self.render_json_response(context)
+
+class GetFriendRequestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/friend_request_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.FRIEND_REQUEST)).id
+        notification_html = render_to_string(
+                                'user_pages/friend_request_notification.html',
+                                {'from_user': from_user,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetFriendRequestAcceptNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/friend_request_accept_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)).id
+        notification_html = render_to_string(
+                                'user_pages/friend_request_accept_notification.html',
+                                {'from_user': from_user,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
         return self.render_json_response(context)
 
 
@@ -3251,11 +3303,282 @@ class SendFriendRequestAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         response = {}
-        company = request.user
         if serializer.is_valid():
             data_dict = serializer.data
-            response = {'message': "Friend Request Send",
-                        'status': status.HTTP_200_OK}
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+                try:
+                    request_obj = FriendRequest.objects.get(
+                                    Q(user=user) &
+                                    Q(requested_by=requested_by)
+                                    )
+                    response = {'errors': "Request Already Send", 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                except FriendRequest.DoesNotExist:
+                    request_obj = FriendRequest()
+                    request_obj.user = user
+                    request_obj.requested_by = requested_by
+                    request_obj.status = FriendRequest.REQUEST_SEND
+                    request_obj.save()
+
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = user
+                    notification.notification_type = UserNotification.FRIEND_REQUEST
+                    notification.from_user = requested_by
+                    notification.save()
+
+                    # send email
+                    try:
+                        user_settings = CustomUserSettings.objects.get(user=user)
+                        if user_settings.friend_request == True:
+                            subject = 'Friend Request'
+                            message = ''
+                            msg_html = loader.render_to_string('user_pages/friend_request_email.html',
+                                        {'requested_by': requested_by, 'first_name':user.first_name })
+                            email_from = settings.EMAIL_HOST_USER
+                            recipient_list = [user.email, ]
+                            send_mail( subject, message, email_from, recipient_list, html_message=msg_html)
+                    except CustomUserSettings.DoesNotExist:
+                        pass
+
+                    # send notification
+                    room_name = "user_"+str(user.id)
+                    notification_msg = {
+                            'type': 'send_friend_request_notification',
+                            'message': str(user.get_full_name()),
+                            'friend_request_from': str(requested_by.id),
+                            "event": "FRIEND_REQUEST"
+                        }
+                    notify(room_name, notification_msg)
+
+                    response = {'message': "Friend Request Send",
+                                'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AcceptFriendRequestAPI(APIView):
+    serializer_class = AcceptFriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = CustomUser.objects.get(id=data_dict['requested_by'])
+                user = self.request.user
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by)
+                                )
+                request_obj.status = FriendRequest.ACCEPTED
+                request_obj.save()
+
+                # update notification table
+                notification = UserNotification()
+                notification.user = requested_by
+                notification.notification_type = UserNotification.FRIEND_REQUEST_ACCEPT
+                notification.from_user = user
+                notification.save()
+                # send notification
+                room_name = "user_"+str(requested_by.id)
+                notification_msg = {
+                        'type': 'send_friend_request_accept_notification',
+                        'message': str(user.get_full_name()),
+                        'from': str(user.id),
+                        "event": "FRIEND_REQUEST_ACCEPT"
+                    }
+                notify(room_name, notification_msg)
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Accepted",
+                            'name': requested_by.get_full_name(),
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CancelFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND)
+                                )
+                request_obj.delete()
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Deleted",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeleteFriendRequestAPI(APIView):
+    serializer_class = AcceptFriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = CustomUser.objects.get(id=data_dict['requested_by'])
+                user = self.request.user
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND)
+                                )
+                request_obj.delete()
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Deleted",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ListFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        friend_request_dict = {}
+        user = request.user
+        friend_requests = FriendRequest.objects.filter(
+                          Q(user=user) &
+                          Q(status=FriendRequest.REQUEST_SEND))
+        for obj in friend_requests:
+            friend_request_dict[obj.id] = self.serializer_class(obj).data
+        response['friend_requests'] = friend_request_dict
+        return Response(response)
+
+
+class ListAllFriendsAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        friends_dict = {}
+        user = request.user
+        friends = FriendRequest.objects.filter(
+                          Q(user=user) &
+                          Q(status=FriendRequest.ACCEPTED))
+        for obj in friends:
+            friends_dict[obj.requested_by.id] = obj.requested_by.email
+        response['friends'] = friends_dict
+        return Response(response)
+
+
+class UnFriendUserAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.ACCEPTED)
+                                )
+                request_obj.delete()
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "UnFriend User",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':

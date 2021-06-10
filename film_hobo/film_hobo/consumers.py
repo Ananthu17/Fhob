@@ -36,12 +36,30 @@ class NotificationConsumer(WebsocketConsumer):
         if event == 'TRACK':
             # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-                {
-                'type': 'send.notification',
-                'message': message,
-                "event": "TRACK"
-                })
+                          self.room_group_name,
+                          {
+                            'type': 'send.notification',
+                            'message': message,
+                            "event": "TRACK"
+                          })
+        if event == 'FRIEND_REQUEST':
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                          self.room_group_name,
+                          {
+                            'type': 'send.friend_request_notification',
+                            'message': message,
+                            "event": "FRIEND_REQUEST"
+                          })
+        if event == 'FRIEND_REQUEST_ACCEPT':
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                          self.room_group_name,
+                          {
+                            'type': 'send_friend_request_accept_notification',
+                            'message': message,
+                            "event": "FRIEND_REQUEST_ACCEPT"
+                          })
 
     def receive_json(self, content, **kwargs):
         print("Received event: {}".format(content))
@@ -49,11 +67,30 @@ class NotificationConsumer(WebsocketConsumer):
 
     # Receive message from room group
     def send_notification(self, event):
-        print("---------------send_notification")
         message = event['message']
         id = event['track_by_user_id']
         self.send(text_data=json.dumps({
             'message': message,
             'user_id': id,
             'event': "TRACK"
+        }))
+
+    # Receive message from room group
+    def send_friend_request_notification(self, event):
+        message = event['message']
+        id = event['friend_request_from']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'user_id': id,
+            'event': "FRIEND_REQUEST"
+        }))
+
+    # Receive message from room group
+    def send_friend_request_accept_notification(self, event):
+        message = event['message']
+        id = event['from']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'user_id': id,
+            'event': "FRIEND_REQUEST_ACCEPT"
         }))

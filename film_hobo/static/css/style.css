@@ -225,3 +225,47 @@ input.pw {
 {
   cursor:pointer;
 }
+.custom-msg-box-success
+  {
+    display:none;
+    position:fixed;
+    top: 4em;
+    left: 31%;
+    z-index:999999;
+    width: 34em;
+    font-size:12px;
+    font-family:Myraid Pro;
+    padding:1em 3em;
+    border:1px solid #c3e6cb;
+    border-radius: 5px;
+    color: #155724;
+    background-color: #d4edda;
+  }
+.custom-msg-box-warning
+  {
+    display:none;
+    position:fixed;
+    top: 4em;
+    left: 31%;
+    z-index:999999;
+    width: 34em;
+    font-size:12px;
+    font-family:Myraid Pro;
+    padding:1em 3em;
+    border:1px solid #ffeeba;
+    border-radius: 5px;
+    color: #856404;
+    background-color: #fff3cd;
+  }
+  .btn-blue
+    {
+      color: #fff;
+      background-color: #2265b9;
+      padding:5px 10px;
+    }
+  .btn-grey
+    {
+      color: #000;
+      background-color: rgb(197, 189, 189);
+      padding:5px 10px;
+    }

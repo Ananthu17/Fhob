@@ -2,6 +2,7 @@
 {% load static %}
 {% load user_account_tag %}
 {% load user_tracking_tag %}
+{% load friend_request_tag %}
 {% load token %}
 
 
@@ -22,7 +23,63 @@
                 {% endif %}
                 <div class="left-mode-sec mt-3 p-2 mem-ad-banner-1">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="red-f bold ">Add Friend</a></li>
+                        <li>
+                            <span>
+                                {% if profile.user.id != request.user.id  %}
+                                {% can_contact request.user profile.user as can_contact %}
+                                {% get_friend_request_status request.user profile.user as request_status %}
+                                {% if request_status == '' and can_contact == True %}
+                                <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
+                                <span class="friend_request">
+                                    <span class="red-f bold cursor-pointer " id="send_friend_request">Friend Request</span>
+                                </span>
+                                {% elif request_status == 'request_send' %}
+                                <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
+                                <span class="friend_request">
+                                    <span class="red-f bold cursor-pointer " id="cancel_friend_request">Cancel Friend Request</span>
+                                </span>
+                                {% elif request_status == 'accepted' %}
+                                <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
+                                <span class="friend_request">
+                                    <span class="red-f bold cursor-pointer"
+                                    data-toggle="modal" data-target="#warning-unfriend">Friend</span>
+                                </span>
+                                {% endif %}
+                                <!-- The Modal -->
+                                <div class="modal fade" id="warning-unfriend">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+        
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h6 class="modal-title mem-setup-blu-f">Unfriend {{profile.user.get_full_name}}</h6>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+        
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <label class="">Do you want to unfriend {{profile.user.get_full_name}}?</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+        
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-danger btn-sm unfriend"
+                                                id="{{profile.user.get_full_name}}" data-dismiss="modal">Yes</button>
+                                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+        
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Modal End -->
+                                {% endif %}
+                            </span>
+                        </li>
                         <li class="mt-2"><a href="#" class="mem-blu-link">I<span
                                     class="mem-small-f">NVITE</span></a></li>
                         <li class="mt-1">
@@ -30,14 +87,14 @@
                             {% if is_tracking %}
                                     <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
                                     <span class="track-btn">
-                                        <a class="mem-blu-link cursor-pointer" id="un_track">T<span class="mem-small-f">RACKING</span></a>
+                                        <a class="mem-blu-link cursor-pointer un_track" id="{{profile.user.get_full_name}}">T<span class="mem-small-f">RACKING</span></a>
                                     </span>
                             {% else %}
                                     {% can_track request.user profile.user as can_track %}
                                     {% if profile.user.id != request.user.id and can_track == True %}
                                             <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
                                             <span class="track-btn">
-                                                <a class="mem-blu-link cursor-pointer" id="track" class="track">T<span class="mem-small-f">RACK</span></a>
+                                                <a class="mem-blu-link cursor-pointer track" id="{{profile.user.get_full_name}}">T<span class="mem-small-f">RACK</span></a>
                                             </span>
                                     {% endif %}
                             {% endif %}
@@ -413,52 +470,6 @@
 {% endblock %}
 
 {% block extrajs %}
-<script>
-        $('body').on('click' , '#track', function(){
-            var token = $("#token").val();
-            var track_id = $("#track_id").val();
-            var data_dict = {}
-            data_dict['track_id'] = track_id;
-            $.ajax
-            ({
-                type: "POST",
-                url: "/hobo_user/track-user-api/",
-                dataType: 'json',
-                async: false,
-                data: data_dict,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    $('.track-btn').html(" ")
-                    $('.track-btn').html("<a class='mem-blu-link cursor-pointer' id='un_track'>T<span class='mem-small-f'>RACKING</span></a>");
-                }
-            });
-        });
-    </script>
-    <script>
-        $('body').on('click' , '#un_track', function(){
-            var token = $("#token").val();
-            var track_id = $("#track_id").val();
-            var data_dict = {}
-            data_dict['track_id'] = track_id;
-            $.ajax
-            ({
-                type: "POST",
-                url: "/hobo_user/untrack-user-api/",
-                dataType: 'json',
-                async: false,
-                data: data_dict,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    $('.track-btn').html(" ")
-                    $('.track-btn').html("<a class='mem-blu-link cursor-pointer' id='track' class='track'>T<span class='mem-small-f'>RACK</span></a>");
-                }
-            });
-        });
-    </script>
 {% endblock %}
 
 

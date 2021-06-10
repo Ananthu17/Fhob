@@ -2,7 +2,6 @@
 var room_name = $("#current_user").val();
 if(room_name){
 var connectionString = 'ws://' + window.location.host+'/ws/notification/'+room_name + '/';
-console.log(connectionString)
 var notificationSocket = new WebSocket(connectionString);
 
 
@@ -25,14 +24,13 @@ notificationSocket.onmessage = function (e) {
         },
         error: function(data){},
         success: function(response){
-            console.log("unread_count", response['unread_count'])
             $('.notification-bell').html(
                 '<span class="notification_count_span">'+response['unread_count']+'</span>'
                 )
         }
     });
     let data = JSON.parse(e.data);
-    console.log(data);
+    // console.log(data)
     var message = data["message"];
     var user_id = data['user_id'];
     var event = data['event'];
@@ -47,6 +45,29 @@ notificationSocket.onmessage = function (e) {
                  if(data.results!='')
                      {
                          $('.notification-modal-content').prepend(data['tracking_notification_html'])
+                     }
+             });
+            break;
+        case "FRIEND_REQUEST":
+             // get friend request notification html
+             data_dict = {}
+             data_dict['from_user'] = user_id
+             $.get('/hobo_user/get-friendrequest-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+        case "FRIEND_REQUEST_ACCEPT":
+             // get friend request accept notification html
+             data_dict = {}
+             data_dict['from_user'] = user_id
+             $.get('/hobo_user/get-friendrequest-accept-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
                      }
              });
             break;

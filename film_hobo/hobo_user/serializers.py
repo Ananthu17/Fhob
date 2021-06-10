@@ -935,6 +935,35 @@ class CompanyClientSerializer(serializers.ModelSerializer):
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    status = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    requested_by = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
     class Meta:
         model = FriendRequest
         fields = ['user', 'status', 'requested_by']
+
+
+class AcceptFriendRequestSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    requested_by = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendRequest
+        fields = ['user', 'requested_by']
+
