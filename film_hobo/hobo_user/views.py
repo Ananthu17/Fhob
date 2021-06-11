@@ -55,12 +55,12 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
-                    PromoCode, Country, DisabledAccount, CustomUserSettings, \
+                    PromoCode, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
-                    UserNotification, \
-                    UserProfile, JobType, UserRating, Location, FriendRequest, \
-                    UserRatingCombined, UserTacking, CompanyProfile, NewJobType
+                    UserNotification, Friend, \
+                    UserProfile, JobType, UserRating, Location, \
+                    UserRatingCombined, UserTacking, CompanyProfile
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -2581,8 +2581,12 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                 context['tracking_list'] = tracking_list[:6]
             except UserTacking.DoesNotExist:
                 pass
-            # try:
-            #     friends = FriendRequest.objects.filter()
+            try:
+                friend_obj = Friend.objects.get(user=user)
+                friends = friend_obj.friends.all()
+                context['friends'] = friends[:8]
+            except FriendRequest.DoesNotExist:
+                pass
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
@@ -2612,6 +2616,12 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['trackers_list'] = trackers_list[:6]
             context['tracking_list'] = tracking_list[:6]
         except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
             pass
         try:
             profile = CompanyProfile.objects.get(user=user)
@@ -3379,10 +3389,9 @@ class AcceptFriendRequestAPI(APIView):
                 user = self.request.user
                 request_obj = FriendRequest.objects.get(
                                 Q(user=user) &
-                                Q(requested_by=requested_by)
-                                )
-                request_obj.status = FriendRequest.ACCEPTED
-                request_obj.save()
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND))
+                request_obj.delete()
 
                 # update notification table
                 notification = UserNotification()
@@ -3390,6 +3399,23 @@ class AcceptFriendRequestAPI(APIView):
                 notification.notification_type = UserNotification.FRIEND_REQUEST_ACCEPT
                 notification.from_user = user
                 notification.save()
+                # update friends list of both users
+                try:
+                    friend_obj = Friend.objects.get(user=user)
+                    friend_obj.friends.add(requested_by)
+                except Friend.DoesNotExist:
+                    friend_obj = Friend()
+                    friend_obj.user = user
+                    friend_obj.save()
+                    friend_obj.friends.add(requested_by)
+                try:
+                    friend_obj = Friend.objects.get(user=requested_by)
+                    friend_obj.friends.add(user)
+                except Friend.DoesNotExist:
+                    friend_obj = Friend()
+                    friend_obj.user = requested_by
+                    friend_obj.save()
+                    friend_obj.friends.add(user)
                 # send notification
                 room_name = "user_"+str(requested_by.id)
                 notification_msg = {
@@ -3556,17 +3582,32 @@ class UnFriendUserAPI(APIView):
             try:
                 requested_by = self.request.user
                 user = CustomUser.objects.get(id=data_dict['user'])
-                request_obj = FriendRequest.objects.get(
-                                Q(user=user) &
-                                Q(requested_by=requested_by) &
-                                Q(status=FriendRequest.ACCEPTED)
-                                )
-                request_obj.delete()
+
+                try:
+                    friend_obj = Friend.objects.get(user=user)
+                    friend_obj.friends.remove(requested_by)
+                except Friend.DoesNotExist:
+                    pass
+                try:
+                    friend_obj = Friend.objects.get(user=requested_by)
+                    friend_obj.friends.remove(user)
+                except Friend.DoesNotExist:
+                    pass
+                # update notification table
                 try:
                     notification = UserNotification.objects.get(
                         Q(user=user) &
                         Q(from_user=requested_by) &
-                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=requested_by) &
+                        Q(from_user=user) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)
                         )
                     notification.delete()
                 except UserNotification.DoesNotExist:
@@ -3576,12 +3617,25 @@ class UnFriendUserAPI(APIView):
             except CustomUser.DoesNotExist:
                 response = {'errors': "Invalid Id.", 'status':
                             status.HTTP_400_BAD_REQUEST}
-            except FriendRequest.DoesNotExist:
-                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
-                            status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
 
+
+class UpdateFriendStatusAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/update-friend-status.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        logged_user = self.request.user
+        id = self.request.GET.get('profile_id')
+        profile_user = CustomUser.objects.get(id=id)
+        friend_status_html = render_to_string(
+                                'user_pages/friend-status.html',
+                                {'profile_user': profile_user,
+                                 'logged_user': logged_user}
+                                )
+        context['friend_status_html'] = friend_status_html
+        return self.render_json_response(context)

@@ -1,6 +1,6 @@
 from django import template
 from hobo_user.models import CustomUser, CustomUserSettings, \
-    UserRatingCombined, FriendRequest
+    UserRatingCombined, FriendRequest, Friend
 from django.db.models import Q
 register = template.Library()
 
@@ -43,12 +43,27 @@ def can_contact(logged_user, profile):
 
 @register.simple_tag()
 def get_friend_request_status(logged_user, profile_user):
-    user_ids = FriendRequest.objects.filter(
-                        user=profile_user).values_list('requested_by', flat=True)
-    if logged_user.id in user_ids:
-        status = FriendRequest.objects.get(
-                        Q(user=profile_user) &
-                        Q(requested_by=logged_user)).status
-    else:
-        status = ''
+    status = ""
+    try:
+        friend_obj = Friend.objects.get(user=logged_user)
+        all_friends = friend_obj.friends.all()
+        if profile_user in all_friends:
+            status = 'friend'
+        else:
+            status = 'not-friend'
+    except Friend.DoesNotExist:
+        status = 'not-friend'
+
+    if status == 'not-friend':
+        user_ids = FriendRequest.objects.filter(
+                   user=profile_user).values_list('requested_by', flat=True)
+        if logged_user.id in user_ids:
+            status = FriendRequest.objects.get(
+                            Q(user=profile_user) &
+                            Q(requested_by=logged_user)).status
+        else:
+            user_ids = FriendRequest.objects.filter(
+                   user=logged_user).values_list('requested_by', flat=True)
+            if profile_user.id in user_ids:
+                status = 'respond'
     return status

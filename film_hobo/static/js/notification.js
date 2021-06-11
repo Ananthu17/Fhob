@@ -59,6 +59,7 @@ notificationSocket.onmessage = function (e) {
                          $('.notification-modal-content').prepend(data['notification_html'])
                      }
              });
+             break;
         case "FRIEND_REQUEST_ACCEPT":
              // get friend request accept notification html
              data_dict = {}

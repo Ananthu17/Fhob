@@ -1101,11 +1101,29 @@ class UserTacking(models.Model):
         verbose_name_plural = 'User Tracking'
 
 
+class Friend(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='friend_user',
+                             verbose_name=_("User"),
+                             null=True)
+    friends = models.ManyToManyField('hobo_user.CustomUser',
+                                     blank=True,
+                                     related_name="friend",
+                                     verbose_name=_("Friends")
+                                     )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Friend'
+        verbose_name_plural = 'Friends'
+
+
 class FriendRequest(models.Model):
-    ACCEPTED = 'accepted'
     REQUEST_SEND = 'request_send'
     STATUS_CHOICES = [
-        (ACCEPTED, 'Accepted'),
         (REQUEST_SEND, 'Request Send'),
     ]
     status = models.CharField(_("Account Status"),

@@ -40,7 +40,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AcceptFriendRequestAPI, ListFriendRequestAPI, \
                    ListAllFriendsAPI, DeleteFriendRequestAPI, UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
-                   CancelFriendRequestAPI, \
+                   CancelFriendRequestAPI, UpdateFriendStatusAjaxView, \
                    GetFriendRequestAcceptNotificationAjaxView
 
 app_name = "hobo_user"
@@ -231,5 +231,8 @@ urlpatterns = [
     path('edit-agency-management-company-profile/',
          EditAgencyManagementCompanyView.as_view(),
          name='edit-agency-management-company-profile'),
+    path('update-friend-status/',
+         UpdateFriendStatusAjaxView.as_view(),
+         name='update-friend-status'),
 
 ]

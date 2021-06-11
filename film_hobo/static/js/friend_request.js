@@ -130,6 +130,14 @@ $('body').on('click' , '.accept_friend_request', function(){
               var msg = "You and "+response['name']+" are now friends."
               $(".friend-req-btns").html(" ")
               $(".friend-req-btns").html(msg)
+              $.get('/hobo_user/update-friend-status/',{'profile_id':id})
+              .done(function(data) {
+                  if(data.results!='')
+                      {
+                          $('.friend-status').html("")
+                          $('.friend-status').html(data['friend_status_html'])
+                      }
+              });
             }
         });
 });

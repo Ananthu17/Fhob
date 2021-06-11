@@ -41,11 +41,11 @@ p{
                     </span>
             {% endif %}
         {% endif %}
-        <span>
+        <span class="friend-status">
             {% if profile.user.id != request.user.id  %}
             {% can_contact request.user profile.user as can_contact %}
             {% get_friend_request_status request.user profile.user as request_status %}
-            {% if request_status == '' and can_contact == True %}
+            {% if request_status == 'not-friend' and can_contact == True %}
             <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
             <span class="friend_request">
                 <span class="red-f bold cursor-pointer " id="send_friend_request">Friend Request</span>
@@ -55,11 +55,18 @@ p{
             <span class="friend_request">
                 <span class="red-f bold cursor-pointer " id="cancel_friend_request">Cancel Friend Request</span>
             </span>
-            {% elif request_status == 'accepted' %}
+            {% elif request_status == 'friend' %}
             <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
             <span class="friend_request">
                 <span class="red-f bold cursor-pointer"
                 data-toggle="modal" data-target="#warning-unfriend">Friend</span>
+            </span>
+            {% elif request_status == 'respond' %}
+            <input type ="hidden" name="profile_user" id="profile_user" value ="{{profile.user.id}}" />
+            <span class="friend_request">
+                <span class="red-f bold cursor-pointer"
+                data-toggle="modal" data-target="#respond-friend-request">
+                <i class="fa fa-user" aria-hidden="true"></i> Respond</span>
             </span>
             {% endif %}
             <!-- The Modal -->
@@ -76,7 +83,7 @@ p{
                         <!-- Modal body -->
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-12">
+                                <div class="col-12 text-left">
                                     <label class="">Do you want to unfriend {{profile.user.get_full_name}}?</label>
                                 </div>
                             </div>
@@ -88,6 +95,38 @@ p{
                             id="{{profile.user.get_full_name}}" data-dismiss="modal">Yes</button>
                             <button type="button" class="btn btn-outline-danger btn-sm"
                                 data-dismiss="modal">Close</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Modal End -->
+            <!-- The Modal -->
+            <div class="modal fade" id="respond-friend-request">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h6 class="modal-title mem-setup-blu-f">Friend Request</h6>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12 text-left">
+                                    <label class="">Accept friend request from {{profile.user.get_full_name}}?</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-danger btn-sm accept_friend_request"
+                            id="{{profile.user.id}}" data-dismiss="modal">Accept</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete_friend_request"
+                            id="{{profile.user.id}}" data-dismiss="modal">Delete</button>
                         </div>
 
                     </div>
