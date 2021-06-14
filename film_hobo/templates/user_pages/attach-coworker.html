@@ -1,31 +1,22 @@
-{% if coworker.user %}
-<div>
-    {% if coworker.user.membership != 'COM' %}
-        <a href="{% url 'hobo_user:profile' coworker.user.id %}"
+<input name="saved_id" type="hidden" value="{{coworker.id}}" />
+    <div class="col-md-12">
+        {% if coworker.user %}
+        <a href="{{coworker.user.get_profile_url}}"
         target="_blank">
-    {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'production' %}
-        <a href="{% url 'hobo_user:production-company-profile' coworker.user.id %}"
-        target="_blank">
-    {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'agency_management' %}
-        <a href="{% url 'hobo_user:agency-management-company-profile' coworker.user.id %}" target="_blank" >
-    {% endif %}
-    <span>{{coworker.name}}({{coworker.position.title}})</span>
-</a>
-<label class="form-check-label mem-setup-blu-f"
-data-toggle="modal"
-data-target="#warning{{coworker.id}}"
-for="">Remove</label>
-</div>
-{% else %}
-<div>
-    <span>{{coworker.name}}({{coworker.position.title}})</span>
-    <label class="form-check-label mem-setup-blu-f"
-    data-toggle="modal"
-    data-target="#warning{{coworker.id}}"
-    for="">Remove</label>
-</div>
-  <!-- The Modal -->
-  <div class="modal fade" id="warning{{coworker.id}}">
+        <span>{{coworker.name}}({{coworker.position.title}})</span>
+        </a>
+        <a href="#" class="mem-setup-blu-f float-right"
+        data-toggle="modal"
+        data-target="#warning{{coworker.id}}">remove</a>
+        {% else %}
+        <span>{{coworker.name}}({{coworker.position.title}})</span>
+        <a href="#" class="mem-setup-blu-f float-right"
+        data-toggle="modal"
+        data-target="#warning{{coworker.id}}">remove</a>
+        {% endif %}
+    </div>
+        <!-- The Modal -->
+<div class="modal fade" id="warning{{coworker.id}}">
     <div class="modal-dialog">
     <div class="modal-content">
 
@@ -50,4 +41,3 @@ for="">Remove</label>
     </div>
 </div>
 <!-- end of modal -->
-{% endif %}

@@ -174,17 +174,47 @@ input.pw {
     font-family: "Myraid Pro";
     font-size: 13px;
     }
-
+.txtbox-font-style
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+    }
+.custom-save-btn
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+      padding:0;
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn:focus
+    {
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn-2
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+      padding:0;
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn-2:focus
+    {
+      outline:none;
+      box-shadow:none;
+    }
 .save_btn:focus
     {
       outline:none;
       box-shadow: none;
     }
-.img-btn
+.img-btn label
     {
-      border:1px solid blue;
-      padding:2px ;
+      background-color: rgb(223, 193, 193);
       cursor:pointer;
+      color:red;
     }
   .pos
     {
@@ -268,4 +298,17 @@ input.pw {
       color: #000;
       background-color: rgb(197, 189, 189);
       padding:5px 10px;
+    }
+  .selected-mode
+    {
+      background-color:#cccccc;
+    }
+  .pcb-radio-toolbar input[type="radio"]:checked + label {
+      color :#ff0f0f;
+      background-color: rgb(223, 193, 193);
+   }
+   .clickable-mode:focus
+    {
+      outline:none;
+      box-shadow:none;
     }

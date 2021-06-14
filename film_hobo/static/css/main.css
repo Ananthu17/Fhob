@@ -341,6 +341,11 @@
  width: 100%;
  height: 35px;
 }
+.btn-link{
+ color: #2265b9;
+ font-size: 14px;
+ font-weight: 600;
+}
 /* The container */
 .containerradio {
  display: block;
@@ -428,6 +433,10 @@
 }
 .fb{
  color:#000;
+}
+.fb:active, .fb:hover, .fb:focus{
+ color:#000;
+ text-decoration: none;
 }
 .paymnt-lft-bar{
  border-left:1px solid#9c9c9c;
@@ -1181,16 +1190,16 @@ input#visa:focus {
 }
 .login-link{
  color: #2265b9;
-  font-family: "Myraid Pro";
-  font-weight: 600;
-  font-size: 14px;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
 }
 .login-link:active, .login-link:focus, .login-link:hover{
  color: #2265b9;
-  font-family: "Myraid Pro";
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
+ text-decoration: none;
 }
 /* login page end*/
 /*password-reset page*/
@@ -1260,8 +1269,8 @@ input#visa:focus {
 }
 .mem-list-head{
  color: #e88b24;
-  font-weight: 600;
-  padding: 11px 9px 1px 24px;
+ font-weight: 600;
+ padding: 11px 9px 1px 24px;
 }
 .underline{
  text-decoration: underline;
@@ -1277,9 +1286,9 @@ input#visa:focus {
 .mem-white-bg{
  background-color: #fff;
  margin: 1px 6px 1px 6px;
-  border-radius: 10px;
-  padding: 7px;
-  height: 342px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 342px;
 }
 .mem-b-placeholder::-webkit-input-placeholder {
  text-align: center;
@@ -1391,18 +1400,109 @@ input#visa:focus {
 .pc-mem-white-bg{
  background-color: #fff;
  margin: 1px 6px 1px 6px;
-  border-radius: 10px;
-  padding: 7px;
-  height: 450px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 450px;
 }
 .pc-mem-left-2{
  padding: 1px 9px;
  height: 466px;
 }
 .bio-sec{
-  border: 1px solid#000;
-  background-color: #fff;
-  padding: 4px;
-  color:#767778;
+ border: 1px solid#000;
+ background-color: #fff;
+ padding: 4px;
+ color:#767778;
 }
 /*production company page end*/
+/*production company edit page*/
+.pc_add-or-btn{
+ position: relative;
+ left: 4%;
+ top: 0px;
+ float: left;
+}
+.pc-img-addremove {
+ height: 49px;
+ width: 44px;
+}
+.pc-radio-toolbar label {
+ display: inline-block;
+ background-color: #bebdbd;
+ padding: 1px 2px;
+ font-family: "Arial Rounded Bold";
+ font-size: 7px;
+ color: #272525;
+ border: 1px solid #d6d6d6;
+ border-radius: 2px;
+}
+.pc-radio-toolbar label:hover {
+ background-color: rgb(223, 193, 193);
+}
+
+.pc-radio-toolbar input[type="radio"]:focus + label {
+   color :#ff0f0f;
+}
+.pc-radio-toolbar {
+ margin: 0px;
+}
+
+.pcb-radio-toolbar input[type="radio"] {
+ opacity: 0;
+ position: fixed;
+ width: 0;
+}
+.pcb-radio-toolbar label {
+ display: inline-block;
+ background-color: #bebdbd;
+ padding: 1px 3px;
+ font-family: "Arial Rounded Bold";
+ font-size: 8px;
+ color: #272525;
+ border: 1px solid #d6d6d6;
+ border-radius: 2px;
+}
+.pcb-radio-toolbar label:hover {
+ background-color: rgb(223, 193, 193);
+}
+
+.pcb-radio-toolbar input[type="radio"]:focus + label {
+   color :#ff0f0f;
+}
+.pcb-radio-toolbar {
+ margin: 0px;
+}
+
+.pc-radio-toolbar input[type="radio"] {
+ opacity: 0;
+ position: fixed;
+ width: 0;
+}
+.pc-choose-Location{
+  font-size: 10px;
+}
+.pc-custom-file-upload {
+ border: none;
+ border-bottom: 1px solid#9c9c9c;
+ display: inline-block;
+ padding: 3px 24px;
+ cursor: pointer;
+ font-size: 10px;
+}
+.fs-10{
+ font-size: 10px;
+}
+.pc-mem-img-p {
+ padding: 1px 16px;
+}
+.pcb-mem-white-bg{
+ background-color: #fff;
+ margin: 1px 6px 1px 6px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 200px;
+}
+.pc-mem-ad-banner-2{
+ height: 545px;
+}
+/*production company edit page end*/

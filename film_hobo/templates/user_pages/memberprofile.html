@@ -17,8 +17,8 @@
                 {% if profile.user.id == request.user.id  %}
                 <div class="left-mode-sec p-2">View profile in:
                     <a href="{% url 'hobo_user:edit-profile' %}"
-                    class="btn btn-mem-mode btn-block mt-2">Edit Mode</a>
-                    <button class="btn btn-mem-mode btn-block mt-2 ">Public Mode</button>
+                    class="btn btn-mem-mode btn-block mt-2 clickable-mode">Edit Mode</a>
+                    <button class="btn btn-mem-mode btn-block mt-2 selected-mode">Public Mode</button>
                 </div>
                 {% endif %}
                 <div class="left-mode-sec mt-3 p-2">

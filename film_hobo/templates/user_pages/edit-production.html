@@ -2,75 +2,280 @@
 {% load static %}
 {% load token %}
 
+
 {% block extracss %}
 <style>
-    .select2-container {
-      border: 1px solid transparent!important;
-      border-radius: 0;
-      margin-top:.5rem!important;
-  }
+.select2-container {
+    border: 1px solid transparent!important;
+    border-radius: 0;
+    margin-top:.5rem!important;
+    width:100%;
+}
 </style>
 {% endblock %}
 
 {% block content %}
-{% get_my_token request as token %}
-<input type = "hidden" value="{{token}}" name="token" id="token"/>
 <div class="wrapper flex-grow-1">
     <div class="container-fluid member-setup-sec">
-        <div class="row">
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                 <div class="left-mode-sec p-2">View profile in:
-                    <button class="btn btn-mem-mode btn-block mt-2">Edit Mode</button>
-                    <a class="btn btn-mem-mode btn-block mt-2"
-                    href="{% url 'hobo_user:production-company-profile' request.user.id %}">
-                        Public Mode
-                    </a>
+        <div class="row mb-4">
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 text-center">
+                <div class="left-mode-sec p-2">View profile in:
+                    <button class="btn btn-mem-mode btn-block mt-2 selected-mode">Edit Mode</button>
+                    <a class="btn btn-mem-mode btn-block mt-2 clickable-mode"
+                    href="{% url 'hobo_user:production-company-profile' request.user.id %}">Public Mode</a>
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
-
+                    <ul class="list-unstyled p-2 mb-0">
+                        <li class="mt-2"><a href="#" class="mem-blu-link">M<span
+                                    class="mem-small-f">Y</span>
+                                P<span
+                                class="mem-small-f">ROJECTS</span></a></li>
+                        <li class="mt-2"><a href="#" class="mem-blu-link">S<span class="mem-small-f">TART A</span> P<span class="mem-small-f">ROJECT</span></a>
+                        </li>
+                        <li class="mt-2"><a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-blu-link">M<span
+                            class="mem-small-f">Y</span>
+                        I<span
+                        class="mem-small-f">NTERESTS</span></a></li>
+                    </ul>
                 </div>
-                <div class="left-mode-sec mt-3 p-2 blank-left-mode">
-                </div> 
+                <div class="left-mode-sec mt-3 p-2  pc-mem-ad-banner-2">
+                    <ul class="list-unstyled p-2 mb-0">
+                        <li><a href="#" class="red-f bold ">A<span class="mem-small-f">D</span> B<span
+                                    class="mem-small-f">ANNER FOR</span> I<span class="mem-small-f">NTERNAL AND
+                                </span>
+                                O<span class="mem-small-f">UTSIDE</span> A<span class="mem-small-f">DS.</span></a>
+                        </li>
+                    </ul>
+                </div>
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
-               
-            </div>
-            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
-                <div class="container p-0">
-                <hr class="mem-set-acc-hr">
-                <div>Account Info <img src="{% static 'images/edit.png' %}" class="img-fluid edit-icon ml-3"></div>
-                <form method="post" action="{% url 'hobo_user:edit-production-company-profile' %}">
-                    {% csrf_token %}
-                <div class="row mt-2">
-                    <div class="col-1 ">
-                        <label class="mem-setup-blu-f mt-3">Company</label>
+                <div class="pc-mem-img-p">
+                    <div class="row">
+                        <div class="col-12 mem-set-img">
+                            {% if request.user.get_profile_photo %}
+                            <img src="{{ request.user.get_profile_photo }}" class="img-fluid mem-set-top-img" />
+                            {% else %}
+                            <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid mem-set-top-img">
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-5 ">
-                        <input class="inp-line" placeholder="Website"
-                        name="{{ form.company_name.name }}"
-                        value="{% if user.company_name %}{{ user.company_name}}{% endif%}"
-                        autocomplete="off"/>
-                        {% if errors.company_name %}
-                        {% for err in errors.company_name %}
-                        <p style="color: red">{{err}}</p>
+                </div>
+                <div class="mt-3 ml-1">
+                    <div class=" mb-2"> <a href="#" class="mem-setup-blu-f">Add/Remove Pictures</a></div>
+                    <div class="row add-align">
+                        {% for photo in all_photos %}
+                        <div class="col-3 p-0">
+                            <img src="{{ photo.image.url }}" class=" pc-img-addremove">
+
+                            <nav aria-label="Page navigation example">
+                                <div class="pc-radio-toolbar pc_add-or-btn">
+                                    <ul class="pagination justify-content-center mb-0">
+                                        <li class="">
+                                            <a href="" id="1_{{photo.id}}"
+                                            class="{% if photo.position != 1 %}pos{%else%}img-btn{% endif %}">
+                                            <label >1</label>
+                                            </a>
+                                        </li>
+                                        <li class="">
+                                            <a href="" id="2_{{photo.id}}"
+                                            class="{% if photo.position != 2 %}pos{%else%}img-btn{% endif %}">
+                                            <label >2</label></a>
+                                        </li>
+                                        <li class="">
+                                            <a href="" id="3_{{photo.id}}"
+                                            class="{% if photo.position != 3 %}pos{%else%}img-btn{% endif %}">
+                                            <label >3</label></a>
+                                        </li>
+                                        <li class="">
+                                            <a href="" id="4_{{photo.id}}"
+                                            class="{% if photo.position != 4 %}pos{%else%}img-btn{% endif %}">
+                                            <label >4</label></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+
+                        </div>
                         {% endfor %}
-                        {% endif %}
+                    </div>
+                    <form method="post" enctype="multipart/form-data"
+                action="{% url 'hobo_user:upload-image' %}">
+                        {% csrf_token %}
+                    <div class="row pl-3">
+                        <div class="col-md-4 col-sm p-0 ">
+                            <label class="pc-choose-Location">Choose Location</label>
+                        </div>
+                        <div class="col-md-8 col-sm">
+                            <div class="pcb-radio-toolbar">
+                                <ul class="pagination mb-0">
+                                    <li class=""><input type="radio" class="page-link img-position"
+                                        id="radio1"
+                                        name="position" value="1" >
+                                        <label for="radio1">1</label>
+                                    </li>
+                                    <li class=""><input type="radio" class="page-link img-position"
+                                        id="radio2"
+                                        name="position" value="2">
+                                        <label for="radio2">2</label>
+                                    </li>
+                                    <li class=""><input type="radio" class="page-link img-position"
+                                        id="radio3"
+                                        name="position" value="3">
+                                        <label for="radio3">3</label>
+                                    </li>
+                                    <li class=""><input type="radio" class="page-link img-position"
+                                        id="radio4"
+                                        name="position" value="4">
+                                        <label for="radio4">4</label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9 col-sm ">
+                            <label for="file" class="pc-custom-file-upload ">
+                                <span class="image-filename">Upload Photo</span>
+                            </label><span class="fs-10">(JPEG,PNG)</span>
+                            <input type="file" id="file"
+                            name="image"  class="inp-file">
+                        </div>
+                        <div class="col-md-2 col-sm">
+                            <input type="submit"
+                            class="btn mem-setup-blu-f float-right cursor-pointer custom-save-btn-2"
+                            value="Save">
+                        </div>
+                    </div>
+                </form>
+
+                </div>
+
+                <div class="mem-set-network-sec mt-3">
+                    <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
+                    <div class="float-right"><a href="{% url 'hobo_user:friends-and-followers' %}"
+                        class="mem-setup-blck-f">Edit</a></div>
+                    <hr class="mem-setup-network-hr">
+                    {% for item in friends %}
+                    {% if forloop.first or forloop.counter == 5 %}
+                    <div class="row pl-1 pr-1 {% if forloop.counter == 5 %} mt-3 {% endif %}">
+                    {% endif %}
+                        <div class="col-3 mem-set-net-img-sec2">
+                            {% if item.get_profile_photo %}
+                            <img src="{{item.get_profile_photo}}"
+                            title="{{item.get_full_name}}"
+                            class="img-fluid mem-set-img-add">
+                            {% else %}
+                            <img src="{% static 'images/default_profile_pic.png' %}"
+                            title="{{obj.user.get_full_name}}"
+                            class="img-fluid mem-set-img-add">
+                            {% endif %}
+                            <div class="mem-set-img-add-nam">{{item.get_full_name|truncatechars:"5"}}</div>
+                        </div>
+                    {% if forloop.last or forloop.counter == 4 %}
+                    </div>
+                    {% endif %}
+                    {% endfor%}
+                </div>
+
+                <div class="mem-set-network-sec mt-3 mb-4">
+                    <div class="mb-1 float-left">
+                        <a href="{% url 'hobo_user:friends-and-followers' %}"
+                        class="mem-setup-orng-f">({{tracking_list_count}})Tracking</a></div>
+                    <div class="float-right"><a href="{% url 'hobo_user:friends-and-followers' %}"
+                        class="mem-setup-blu-f">({{trackers_list_count}})Trackers</a></div>
+                    <hr class="mem-setup-network-hr">
+                    <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list_count}})</div>
+                    <div class="row pl-3 pr-3">
+                        {% for usr in tracking_list %}
+                        <div class="col-2 mem-set-img">
+                            <a href="{{ usr.user.get_profile_url }}">
+                                {% if usr.user.get_profile_photo %}
+                                <img src="{{ usr.user.get_profile_photo }}" title="{{usr.user.get_full_name}}" class="img-fluid mem-set-img-track">
+                                {% else %}
+                                <img src="{% static 'images/default_profile_pic.png' %}" title="{{usr.user.get_full_name}}" class="img-fluid mem-set-img-track">
+                                {% endif %}
+                                <div class="mem-set-img-track-nam">{{ usr.user.get_full_name|truncatechars:"9"}}</div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
+                    <div class="row">
+                        <div class="col-4 ">
+                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                            </div>
+                            <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Dynamo</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mem-set-track-padding-sec2">
+                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#56</span>
+                            </div>
+                            <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Jack</span>
+                            </div>
+                        </div>
+                        <div class="col-4 mem-set-track-padding-sec2 pl-0">
+                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#457</span>
+                            </div>
+                            <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Hammer</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                            </div>
+                            <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#3</span></div>
+                            <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">Dallas</span>
+                            </div>
+                        </div>
+                        <div class="col-6 mem-set-track-padding">
+                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#178</span>
+                            </div>
+                            <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#1</span></div>
+                            <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
+                                    York</span></div>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-1">
-                        <label class="form-title mem-setup-blu-f">Status:</label>
+
+            </div>
+            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
+                <div class="container p-0">
+                    <hr class="mem-set-acc-hr">
+                    <div>Account Info <img src="{% static 'images/edit.png' %}" class="img-fluid edit-icon ml-3"></div>
+                    <form method="post" action="{% url 'hobo_user:edit-production-company-profile' %}">
+                        {% csrf_token %}
+                    <div class="row">
+                        <div class="col-2 ">
+                            <label class="form-title mem-setup-blu-f">Company</label>
+                        </div>
+                        <div class="col-9">
+                            <input class="inp-line" placeholder="Website"
+                            name="{{ form.company_name.name }}"
+                            value="{% if user.company_name %}{{ user.company_name}}{% endif%}"
+                            autocomplete="off"/>
+                            {% if errors.company_name %}
+                            {% for err in errors.company_name %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-5 mt-2">
-                        <span class="mem-set-membr-f ">{{user.get_membership_display}}({{user.get_company_type_display}})</span>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="form-title mem-setup-blu-f">Membership</label>
+                        </div>
+                        <div class="col-9  mt-3">
+                            <span class="mem-set-membr-f ">{{user.get_membership_display}}({{user.get_company_type_display}})</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-1">
-                        <label class="form-title mem-setup-blu-f">Website</label>
-                    </div>
-                    <div class="col-4">
-                        <input class="inp-line" placeholder="Website"
+                    <div class="row">
+                        <div class="col-2 ">
+                            <label class="form-title mem-setup-blu-f">Website</label>
+                        </div>
+                        <div class="col-9">
+                            <input class="inp-line" placeholder="Website"
                             name="{{ form.company_website.name }}"
                             value="{% if user.company_website %}{{ user.company_website}}{% endif%}"
                             autocomplete="off"/>
@@ -79,38 +284,39 @@
                             <p style="color: red">{{err}}</p>
                             {% endfor %}
                             {% endif %}
+                        </div>
                     </div>
-                    <div class="col-1">
-                        <label class="form-title mem-setup-blu-f">IMDB</label>
+                    <div class="row">
+                        <div class="col-2 ">
+                            <label class="form-title mem-setup-blu-f">IMDB</label>
+                        </div>
+                        <div class="col-9">
+                            <input class="inp-line" placeholder="IMDB"
+                            name="{{ form.imdb.name }}"
+                            value="{% if profile.imdb %}{{ profile.imdb}}{% endif%}"
+                            autocomplete="off"/>
+                            {% if errors.imdb %}
+                            {% for err in errors.imdb %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <input class="inp-line" placeholder="IMDB"
-                        name="{{ form.imdb.name }}"
-                        value="{% if profile.imdb %}{{ profile.imdb}}{% endif%}"
-                        autocomplete="off"/>
-                        {% if errors.imdb %}
-                        {% for err in errors.imdb %}
-                        <p style="color: red">{{err}}</p>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-3">
-                        <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
-                    </div>
-                    <div class="col-5  mt-3">
-                        <ul class="list-unstyled settings-checkbx-f ml-4 w-100">
-                            <li>
-                                <div class="form-check">
+                    <div class="row">
+                        <div class="col-3">
+                            <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
+                        </div>
+                        <div class="col-8 mt-2">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                  <input type="radio"
+                                  name="submission_policy_SAMR" value="members_with_rating"
+                                  class="form-check-input"
+                                  {% if profile.submission_policy_SAMR != 'pros_and_companies_only' %}
+                                      checked
+                                  {% endif %}>Members with Rating
                                     <label class="form-check-label">
-                                        <input type="radio"
-                                        name="submission_policy_SAMR" value="members_with_rating"
-                                        {% if profile.submission_policy_SAMR != 'pros_and_companies_only' %}
-                                            checked
-                                        {% endif %}
-                                        class="radio-settings form-check-input">
-                                        <span class="rate"> Members with Rating &nbsp;
+                                        <span class="rate">
                                             <input type="radio" id="star5" name="rate" value="5"
                                             {% if profile.submission_policy_SAMR == 'members_with_rating_5_star' %}checked{% endif %}/>
                                             <label for="star5" title="text">5 stars</label>
@@ -133,81 +339,69 @@
 
                                         </span>
                                     </label>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input type="radio" 
-                                        name="submission_policy_SAMR" value="pros_and_companies_only"
-                                        {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
-                                        checked
-                                        {% endif %}
-                                        class="radio-settings form-check-input" />
-                                        Pros and Companies only
-                                    </label>
-                                </div>
-                            </li>
-                        </ul>
+                                </label>
+                              </div>
+                              <div class="form-check">
+                                <label class="form-check-label">
+                                  <input type="radio"
+                                  name="submission_policy_SAMR" value="pros_and_companies_only"
+                                  {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
+                                      checked
+                                  {% endif %}
+                                  class="form-check-input">Pros and Companies only
+                                </label>
+                              </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-10">
-                    <div class="form-group">
-                        <label for="comment" class="form-title mem-setup-blu-f ml-2"> Bio/Info</label>
-                        <textarea class="form-control" rows="4"
-                            name="{{ form.bio.name }}">
-                            {% if profile.bio %}{{ profile.bio}}{% endif%}
-                            </textarea>
-                            {% if errors.bio %}
-                            {% for err in errors.bio %}
-                            <p style="color: red">{{err}}</p>
-                            {% endfor %}
-                            {% endif %}
-                      </div>
+                    <div class="row">
+                        <div class="col-10">
+                            <div class="form-group">
+                                <label for="comment" class="form-title mem-setup-blu-f ml-2"> Bio/Info</label>
+                                <textarea class="form-control txtbox-font-style" rows="4"
+                                name="{{ form.bio.name }}">
+                                {% if profile.bio %}{{ profile.bio}}{% endif%}
+                                </textarea>
+                                {% if errors.bio %}
+                                {% for err in errors.bio %}
+                                <p style="color: red">{{err}}</p>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-11">
-                        <input type="submit" class="btn mem-setup-blu-f float-right save_btn" value="Save"/>
+                    <div class="row mt-3">
+                        <div class="col-11">
+                            <input type="submit"
+                            class="btn mem-setup-blu-f float-right save_btn custom-save-btn" value="Save"/>
+                        </div>
                     </div>
-                </div>
-            </form>
-            {% if user.membership == 'COM' %}
-                <hr class="mem-set-acc-hr">
-                <div class="bold mt-3">Staff</div>
-                <div class="row ">
-                    <div class="col-md-5 coworkers">
-                        {% for coworker in coworkers %}
-                        <input name="saved_id" type="hidden" value="{{coworker.id}}" />
-                        {% if coworker.user %}
-                        <div>
-                            {% if coworker.user.membership != 'COM' %}
-                                <a href="{% url 'hobo_user:profile' coworker.user.id %}"
+                    </form>
+                    <hr class="mem-set-acc-hr">
+                    <div class="bold mt-3 mem-setup-blu-f ">
+                        <a href="#" class="mem-blu-link">S<span
+                        class="mem-small-f">TAFF</span></a>
+                    </div>
+                    <div class="row ">
+                        <div class="col-md-5 col-sm-12 coworkers">
+                            {% for coworker in coworkers %}
+                            <input name="saved_id" type="hidden" value="{{coworker.id}}" />
+                            <div class="col-md-12">
+                                {% if coworker.user %}
+                                <a href="{{coworker.user.get_profile_url}}"
                                 target="_blank">
-                            {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'production' %}
-                                <a href="{% url 'hobo_user:production-company-profile' coworker.user.id %}"
-                                target="_blank">
-                            {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'agency_management' %}
-                                <a href="{% url 'hobo_user:agency-management-company-profile' coworker.user.id %}" target="_blank" >
-                            {% endif %}
-                            <span>{{coworker.name}}</span>
-                            </a>({{coworker.position.title}})
-                            <label class="form-check-label mem-setup-blu-f"
-                            data-toggle="modal"
-                            data-target="#warning{{coworker.id}}"
-                            for="">Remove</label>
-                       </div>
-                        {% else %}
-                        <div>
-                            <span>{{coworker.name}}({{coworker.position.title}})</span>
-                            <label class="form-check-label mem-setup-blu-f"
-                            data-toggle="modal"
-                            data-target="#warning{{coworker.id}}"
-                            for="">Remove</label>
-                      </div>
-                        {% endif %}
-                        <!-- The Modal -->
+                                <span>{{coworker.name}}({{coworker.position.title}})</span>
+                                </a>
+                                <a href="#" class="mem-setup-blu-f float-right"
+                                data-toggle="modal"
+                                data-target="#warning{{coworker.id}}">remove</a>
+                                {% else %}
+                                <span>{{coworker.name}}({{coworker.position.title}})</span>
+                                <a href="#" class="mem-setup-blu-f float-right"
+                                data-toggle="modal"
+                                data-target="#warning{{coworker.id}}">remove</a>
+                                {% endif %}
+                            </div>
+                               <!-- The Modal -->
                         <div class="modal fade" id="warning{{coworker.id}}">
                             <div class="modal-dialog">
                             <div class="modal-content">
@@ -233,36 +427,46 @@
                             </div>
                         </div>
                         <!-- end of modal -->
-                    {% endfor %}
-                    </div>
-                    <div class="col-md-5">
-                        <input name="name" id="coworker_name" value=""
-                        class="inp-line" placeholder="Name"
-                        autocomplete="off" /><br>
-
-                        <input name="name" id="coworker_email" value=""
-                        class="inp-line" placeholder="Email"
-                        autocomplete="off" />
-
-                        <select name="designation" id="coworker_position"
-                        class="form-control form-control-input mt-2">
-                            <option value="" selected disabled hidden>Choose position</option>
-                            {% for job in job_types %}
-                            <option value="{{job.id}}" >
-                            {{job}}</option>
                             {% endfor %}
-                        </select>
-                        <div class="col-10 add-coworker-error-msg"></div>
-                        <a class="btn mem-setup-blu-f float-right save_btn add-coworker">Attach</a>
+                        </div>
+                        <div class="col-md-7 col-sm-12">
+                        <div class="col-md-12">
+                            <input name="name" id="coworker_name" value=""
+                            class="inp-line" placeholder="Name"
+                            autocomplete="off" />
+                        </div>
+                        <div class="col-md-12">
+                            <input name="name" id="coworker_email" value=""
+                            class="inp-line" placeholder="Email"
+                            autocomplete="off" />
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <select name="designation" id="coworker_position"
+                            class="form-control form-control-input mt-2">
+                                <option value="" selected disabled hidden>Choose position</option>
+                                {% for job in job_types %}
+                                <option value="{{job.id}}" >
+                                {{job}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group add-coworker-error-msg">
+                        </div>
+                        <div class="col-11 mb-1">
+                            <a class="mem-setup-blu-f float-right add-coworker cursor-pointer">Attach</a>
+                        </div>
                     </div>
-                </div>
-                <hr class="mem-set-acc-hr">
-                <div class="bold ">My interests</div>
-                        <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
-                            {% csrf_token %}
-                        <div class="my-interests-section">
-                        <div class="row">
-                            <div class="col-3">Position
+                    </div>
+                    <hr class="mem-set-acc-hr">
+                    <div class="bold mt-3 mem-setup-blu-f "><a href="#" class="mem-blu-link">M<span
+                        class="mem-small-f">Y</span>
+                    I<span
+                    class="mem-small-f">NTERESTS</span></a></div>
+                    <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
+                        {% csrf_token %}
+                    <div class="my-interests-section">
+                    <div class="row ">
+                            <div class="col-md-4 col-sm-4 form-group">Position
                                 <select name="position" id="position_1"
                                 class="form-control form-control-input mt-2" required>
                                     {% for position in my_interest_form.position %}
@@ -270,7 +474,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3">Format
+                            <div class="col-md-4 col-sm-4 form-group">Format
                                 <select name="format" id = "format_1"
                                 class="form-control form-control-input mt-2 " required>
                                     {% for item in my_interest_form.format %}
@@ -278,7 +482,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-3">Location
+                            <div class="col-md-4 col-sm-4 form-group">Location
                                 <select name="location" id ="location_1"
                                 class="form-control form-control-input mt-2 " required>
                                     {% for item in my_interest_form.location %}
@@ -286,32 +490,135 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                    </div>
+                    </div>
+                    <div class="row mt-0 mb-1">
+                        <div class="col-11">
+                            <input type="submit"
+                            class="btn mem-setup-blu-f  save_btn float-right ml-3 custom-save-btn"
+                            value="Save"/>
+                            <a class="mem-setup-blu-f float-right cursor-pointer"
+                            id="add-more-interests">Add More</a>
                         </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-2">
-                                <a class="btn mem-setup-blu-f  save_btn" id="add-more-interests">Add More</a>
-                            </div>
-                            <div class="col-2">
-                                <input type="submit" class="btn mem-setup-blu-f  save_btn" value="Save"/>
-                            </div>
-                        </div>
-                        </form>
-            {% endif %}
-                <hr class="mem-set-acc-hr">
-                <div class="bold ">My Projects</div>
+                    </div>
+                </form>
+                    <hr class="mem-set-acc-hr">
                 </div>
+                <div class=" pl-2 pb-2">
+                    <div class="bold mt-3 mem-setup-blu-f "><a href="#" class="mem-blu-link">M<span
+                        class="mem-small-f">Y</span>
+                    P<span
+                    class="mem-small-f">ROJECTS</span></a> (5)</div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                            <div class="pc-img-title">Project......</div>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                            <div class="pc-img-title">Project......</div>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                            <div class="pc-img-title">Project......</div>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                            <div class="pc-img-title">Project......</div>
+                        </div>
+                        <div class="col">
+                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                            <div class="pc-img-title">Project......</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="left-mode-sec p-2 mt-3">
+                    <div class="row pcb-mem-white-bg">
+                        <div class="col-5 form-group">
+                            <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                placeholder="What’s on Your Mind">
+                        </div>
+                        <div class="col-4 form-group">
+                            <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                placeholder="Post Photo/Video">
+                        </div>
+                        <div class="col-3 form-group">
+                            <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                placeholder="Messenger">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                <div class="left-mode-sec">
+                    <div class="mem-list-head">Top Actors</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">John Smith</li>
+                        <li class="mt-1">John Dow</li>
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Aaron McCarty</li>
+                        <li class="mt-1">Toli Chew</li>
+                    </ol>
+                    <div class="mem-list-head">Top Writers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Tom Saint</li>
+                        <li class="mt-1">Lola Carola</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Jamal Smith</li>
+                        <li class="mt-1">Nikita Selivan</li>
+                    </ol>
+                    <div class="mem-list-head">Top Directors</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Ivan Drago</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Kendra Shulman</li>
+                        <li class="mt-1">Sandra O’brian</li>
+                    </ol>
+                    <div class="mem-list-head">Top Producers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top DPs</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top Editors</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head underline">TopTalent/Crew</div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extrajs %}
 <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+
+<script>
+    $("input[id='file']").change(function (e) {
+        var $this = $(this);
+        $(".image-filename").html($this.val().split('\\').pop());
+    });
+</script>
 <script>
 
     $(document).ready(function() {
@@ -321,24 +628,6 @@
         $('#format_1').select2();
     });
 
-// add coworker - filmhobo users
-// var count=1;
-// $('body').on('click' , '.repeat', function(){
-//     count++
-//     var user_id ="#user"+count
-//     var position_id ="#position"+count
-//     data_dict = {'count':count}
-//     // get add coworker form
-//     $.get('/hobo_user/add-coworker-form/', data_dict)
-//     .done(function(data) {
-//     if(data.results!='')
-//         {
-//             $('.sec-1').append(data['add_coworker_form_html']);
-//             $(user_id).select2();
-//             $(position_id).select2();
-//         }
-//     });
-// });
 
 // add more - my interests
 var count=1;
@@ -418,7 +707,6 @@ $('body').on('click' , '.add-coworker', function(){
                                 {
                                     $('.add-coworker-error-msg').html("");
                                     $('.coworkers').append(data['attach_coworker_html']);
-                                    window.location.reload();
                                 }
                         });
                     }
@@ -468,6 +756,23 @@ $('body').on('click' , '.delete-coworker', function(){
                 window.location.reload()
             }
         });
+    });
+</script>
+
+<script>
+    $('body').on('click' , '.pos', function(){
+        var id = $(this).attr('id');
+        position=id.split("_")[0]
+        image_id=id.split("_")[1]
+        data_dict = {"id":image_id, "position":position}
+        console.log(data_dict)
+        $.get('/hobo_user/swap-image-position/', data_dict)
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            location.reload();
+                        }
+                });
     });
 </script>
 {% endblock %}

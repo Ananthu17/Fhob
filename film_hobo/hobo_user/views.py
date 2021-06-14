@@ -1838,9 +1838,17 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             trackers_list = track_obj.tracked_by.all()
             tracking_list = UserTacking.objects.filter(
                             tracked_by=user)
-            context['trackers_list'] = trackers_list
-            context['tracking_list'] = tracking_list
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
         except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
             pass
         return context
 
@@ -2053,7 +2061,7 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         all_photos = Photo.objects.filter(user=user)
         photos = all_photos.filter(position__in=pos_list)
         context['photos'] = photos[:3]
-        context['all_photos'] = all_photos[:4]
+        context['all_photos'] = all_photos.order_by('position')[:4]
         context['form'] = self.form_class(instance=profile)
 
         coworkers = CoWorker.objects.filter(company=user)
@@ -2066,14 +2074,23 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
             trackers_list = track_obj.tracked_by.all()
             tracking_list = UserTacking.objects.filter(
                             tracked_by=user)
-            context['trackers_list'] = trackers_list
-            context['tracking_list'] = tracking_list
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
         except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
             pass
         return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
+        print(request.POST)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         profile = CompanyProfile.objects.get(user=user)
@@ -2515,7 +2532,6 @@ class RemoveAgentManagerAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
-
 
 
 class AttachCoworkerAjaxView(View, JSONResponseMixin):
@@ -3000,21 +3016,39 @@ class UploadImageView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        position = self.request.POST.get('position')
-        file = self.request.FILES['image']
-
-        photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
-        if photo_obj:
-            photo_obj.image = file
-            photo_obj.save()
-        else:
-            photo_obj = Photo()
-            photo_obj.image = file
-            photo_obj.position = position
-            photo_obj.user = user
-            photo_obj.save()
-        return HttpResponseRedirect(reverse("hobo_user:friends-and-followers"))
-
+        position = ""
+        file = ""
+        if 'position' in self.request.POST:
+            position = self.request.POST.get('position')
+        if 'image' in self.request.FILES:
+            file = self.request.FILES['image']
+        if position and file:
+            try:
+                photo_obj = Photo.objects.get(Q(user=user) & Q(position=position))
+                photo_obj.image = file
+                photo_obj.save()
+            except Photo.DoesNotExist:
+                photo_obj = Photo()
+                photo_obj.image = file
+                photo_obj.position = position
+                photo_obj.user = user
+                photo_obj.save()
+        elif position and not file:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please upload image'
+                    )
+        elif file and not position:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please choose position'
+                    )
+        elif not file and not position:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please upload image and choose position'
+                    )
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 class AddUserInterestAPI(APIView):
     serializer_class = UserInterestSerializer
@@ -3098,7 +3132,6 @@ class UploadImageAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
             user = self.request.user
             position = data_dict['position']
             file =  request.data['file']

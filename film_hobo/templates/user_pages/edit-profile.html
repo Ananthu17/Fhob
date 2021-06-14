@@ -20,8 +20,9 @@
         <div class="row">
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
                 <div class="left-mode-sec p-2 text-center">View profile in:
-                    <button class="btn btn-mem-mode btn-block mt-2">Edit Mode</button>
-                    <a class="btn btn-mem-mode btn-block mt-2" href="{% url 'hobo_user:profile' request.user.id %}">
+                    <button class="btn btn-mem-mode btn-block mt-2 selected-mode">Edit Mode</button>
+                    <a class="btn btn-mem-mode btn-block mt-2 clickable-mode"
+                    href="{% url 'hobo_user:profile' request.user.id %}">
                         Public Mode
                     </a>
                 </div>
@@ -69,42 +70,27 @@
                     <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
                     <div class="float-right"><a href="#" class="mem-setup-blck-f">Edit</a></div>
                     <hr class="mem-setup-network-hr">
-                    <div class="row pl-1 pr-1">
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img0.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
+                    {% for item in friends %}
+                    {% if forloop.first or forloop.counter == 5 %}
+                    <div class="row pl-1 pr-1 {% if forloop.counter == 5 %} mt-3 {% endif %}">
+                    {% endif %}
+                        <div class="col-3 mem-set-net-img-sec2">
+                            {% if item.get_profile_photo %}
+                            <img src="{{item.get_profile_photo}}"
+                            title="{{item.get_full_name}}"
+                            class="img-fluid mem-set-img-add">
+                            {% else %}
+                            <img src="{% static 'images/default_profile_pic.png' %}"
+                            title="{{obj.user.get_full_name}}"
+                            class="img-fluid mem-set-img-add">
+                            {% endif %}
+                            <div class="mem-set-img-add-nam">{{item.get_full_name|truncatechars:"5"}}</div>
                         </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img1.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img2.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img3.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
+                    {% if forloop.last or forloop.counter == 4 %}
                     </div>
-                    <div class="row mt-3 pl-1 pr-1">
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img0.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img1.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img2.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                        <div class="col-3 mem-set-net-img">
-                            <img src="{% static 'images/img3.PNG' %}" class="img-fluid mem-set-img-add">
-                            <div class="mem-set-img-add-nam">Name Name</div>
-                        </div>
-                    </div>
+                    {% endif %}
+                    {% endfor%}
+
                 </div>
 
                 <div class="mem-set-network-sec mt-3 mb-4">
