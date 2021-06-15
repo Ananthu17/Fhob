@@ -23,7 +23,7 @@ class InitialUserDetailSaveAPI(APIView):
         serializer.save(user=request.user)
         message = "Thank you for your help and consideration! " \
                   "We will be in contact when the site is up and ready. " \
-                  "Sincerely, Film Hobo team."
+                  "Sincerely, Filmhobo team."
         return Response([{"status": message}], status=status.HTTP_201_CREATED)
 
 
@@ -62,7 +62,7 @@ class InitialUserDetailSavePage(View):
                                   "href='https://www.instagram.com/filmhobo/'>" +
                                   "https://www.instagram.com/filmhobo/</a>" +
                                   "<br> <br> Sincerely,<br>" +
-                                  "The Film Hobo Team")
+                                  "The Filmhobo Team")
             messages.success(request, message)
             return render(request, 'landing_pages/landing_home.html',
                           {'form': form})
