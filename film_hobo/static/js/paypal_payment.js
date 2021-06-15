@@ -83,7 +83,6 @@ onApprove: function(data) {
 }).render('#paypal-div'); // Display payment options on your web page
 
 // If this returns false or the card fields aren't visible, see Step #1.
-debugger
 if (paypal.HostedFields.isEligible()) {
     // Renders card fields
     paypal.HostedFields.render({

@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -19,6 +21,7 @@ from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
+from paypal.standard.forms import PayPalPaymentsForm
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest, \
     OrdersCaptureRequest, OrdersGetRequest
@@ -855,3 +858,41 @@ class GetOrderDetails(APIView):
         data = response.result.__dict__['_dict']
 
         return JsonResponse(data)
+
+
+# class ProcessSubscription(APIView):
+
+#     def post(self, request, *args, **kwargs):
+#         subscription_plan = request.data['subscription_plan']
+#         host = request.get_host()
+
+#         if subscription_plan == 'monthly':
+#             price = request.data['price']
+#             billing_cycle = 1
+#             billing_cycle_unit = "M"
+#         else:
+#             price = request.data['price']
+#             billing_cycle = 1
+#             billing_cycle_unit = "Y"
+#         paypal_dict = {
+#             "cmd": "_xclick-subscriptions",
+#             'business': settings.PAYPAL_RECEIVER_EMAIL,
+#             "a3": price,  # monthly price
+#             "p3": billing_cycle,  # duration of each unit (depends on unit)
+#             "t3": billing_cycle_unit,  # duration unit ("M for Month")
+#             "src": "1",  # make payments recur
+#             "sra": "1",  # reattempt payment on payment error
+#             "no_note": "1",  # remove extra notes (optional)
+#             'item_name': 'Content subscription',
+#             'custom': 1,     # custom data, pass something meaningful here
+#             'currency_code': 'USD',
+#             'notify_url': 'http://{}{}'.format(
+#                 host, reverse('payment:paypal-ipn')),
+#             'return_url': 'http://{}{}'.format(
+#                 host, reverse('payment:done')),
+#             'cancel_return': 'http://{}{}'.format(host,
+#                                                   reverse('payment:canceled')),
+#         }
+
+#         form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
+#         return render(request, 'payment/process_subscription.html', locals())

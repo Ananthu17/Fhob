@@ -7,6 +7,8 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails
 # from .paypal import CreateOrder, CaptureOrder
 
+from paypal.standard.ipn import views
+
 app_name = "payment"
 
 urlpatterns = [
