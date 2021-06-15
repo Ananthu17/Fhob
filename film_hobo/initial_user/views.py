@@ -12,6 +12,10 @@ from .forms import InitialUserForm
 from .serializers import InitialIntrestedUsersSerializer
 
 
+def notfound(request, exception):
+    return render(request, '404.html')
+
+
 class InitialUserDetailSaveAPI(APIView):
     def post(self, request):
         serializer = InitialIntrestedUsersSerializer(data=request.data)

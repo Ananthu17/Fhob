@@ -421,7 +421,7 @@
  font-size: 13px
 }
 .signup-satistfy{
- font-family: "Pooper Black Pro"; 
+ font-family: "Pooper Black Pro";
  color: #C70039;
  font-size: 16px;
  font-weight: 400;
@@ -434,13 +434,12 @@
 }
 .fb:active, .fb:hover, .fb:focus{
   color:#000;
-  text-decoration: none;
+  text-decoration: underline;
 }
 .btn-link, .btn-link:hover, .btn-link:focus{
   color: #2265b9;
   font-size: 14px;
   font-weight: 600;
-  text-decoration: none;
 }
 .btn-link-b{
   color: #000;
@@ -695,15 +694,15 @@
 }
 
 .block-placeholder:-moz-placeholder { / Firefox 18- /
-  text-align: center;  
+  text-align: center;
 }
 
 .block-placeholder::-moz-placeholder {  / Firefox 19+ /
-  text-align: center;  
+  text-align: center;
 }
 
-.block-placeholder:-ms-input-placeholder {  
-  text-align: center; 
+.block-placeholder:-ms-input-placeholder {
+  text-align: center;
 }
 
 .block-placeholder{

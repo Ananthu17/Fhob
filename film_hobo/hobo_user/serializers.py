@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from rest_framework import serializers
 from phonenumber_field.serializerfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
@@ -134,7 +136,6 @@ class RegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
-
 
 
 class RegisterIndieSerializer(serializers.Serializer):
@@ -526,6 +527,26 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
                     "A company is already registered with this phone number."))
         except CustomUser.DoesNotExist:
             return company_phone
+
+    # def validate_company_website(self, company_website):
+    #     try:
+    #         match = CustomUser.objects.get(company_website=company_website)
+
+    #         if match:
+    #             raise serializers.ValidationError(_(
+    #                 "A company is already registered with this website."))
+    #         else:
+    #             p = urlparse.urlparse(company_website, 'http')
+    #             netloc = p.netloc or p.path
+    #             path = p.path if p.netloc else ''
+    #             if not netloc.startswith('www.'):
+    #                 netloc = 'www.' + netloc
+    #             p = urlparse.ParseResult('http', netloc, path, *p[3:])
+    #             company_website = p.geturl()
+    #             return company_website
+
+    #     except CustomUser.DoesNotExist:
+    #         return company_website
 
     def validate(self, data):
         if data['password1'] != data['password2']:

@@ -140,11 +140,12 @@
     border-radius: 58%;
     position: relative;
     top: 32px;
-}
+    background-color: #fff;
+ }
 .landing-des{
     font-family: "Caliban Std";
     color:#0b67bc;
-    text-align: justify;
+    text-align:left;
     font-size: 29px;
     line-height: 34px;
 }
@@ -152,14 +153,16 @@
     background-color: #3fa9f5;
     color: #fff;
     font-family: Arial, Helvetica, sans-serif;
-    border-radius: 7px;
+    border-radius: 20px;
     padding: 35px 49px;
-    text-align: justify;
+    text-align: left;
     font-size: 18px;
 }
 .landing-form-font{
     font-weight: 600;
+    padding-top: 25px;
 }
+
 .landing-page-footer{
     height: 100px;
     background-color: #3fa9f5;
@@ -169,5 +172,32 @@
 }
 .camera-height{
     height:125px;
+}
+.social-icon{
+    height: 25px;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+.form-control:focus{
+   border: 1px solid #ced4da;
+   outline: none;
+   -webkit-box-shadow: none !important;
+   -moz-box-shadow: none !important;
+   box-shadow: none !important;
+}
+button:focus,
+button:active,
+button:hover,
+label:focus,
+.btn:active,
+.btn.active
+{
+    outline:0px !important;
+    -webkit-appearance:none;
+    box-shadow: none !important;
+}
+.landing-des-orng{
+    color: #e88b22;
 }
 /*landing page end*/
