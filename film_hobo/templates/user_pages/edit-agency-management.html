@@ -1,0 +1,699 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load token %}
+
+{% block extracss %}
+<style>
+    .select2-container {
+      border: 1px solid transparent!important;
+      border-radius: 0;
+      margin-top:.5rem!important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{% get_my_token request as token %}
+<input type = "hidden" value="{{token}}" name="token" id="token"/>
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid member-setup-sec">
+        <div class="row">
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                 <div class="left-mode-sec p-2">View profile in:
+                    <button class="btn btn-mem-mode btn-block mt-2">Edit Mode</button>
+                    <a class="btn btn-mem-mode btn-block mt-2"
+                    href="{% url 'hobo_user:agency-management-company-profile' request.user.id %}">
+                        Public Mode
+                    </a>
+                </div>
+                <div class="left-mode-sec mt-3 p-2">
+
+                </div>
+                <div class="left-mode-sec mt-3 p-2 blank-left-mode">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
+                <div class="container p-0">
+                <hr class="mem-set-acc-hr">
+                <div>Account Info <img src="{% static 'images/edit.png' %}" class="img-fluid edit-icon ml-3"></div>
+                <form method="post" action="{% url 'hobo_user:edit-agency-management-company-profile' %}">
+                    {% csrf_token %}
+                <div class="row mt-2">
+                    <div class="col-1 ">
+                        <label class="mem-setup-blu-f mt-3">Company</label>
+                    </div>
+                    <div class="col-5 ">
+                        <input class="inp-line" placeholder="Website"
+                        name="{{ form.company_name.name }}"
+                        value="{% if user.company_name %}{{ user.company_name}}{% endif%}"
+                        autocomplete="off"/>
+                        {% if errors.company_name %}
+                        {% for err in errors.company_name %}
+                        <p style="color: red">{{err}}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+                        <label class="form-title mem-setup-blu-f">Status:</label>
+                    </div>
+                    <div class="col-5 mt-2">
+                        <span class="mem-set-membr-f ">{{user.get_membership_display}}</span>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-1">
+                    </div>
+                    <div class="col-5">
+                        <input type="radio" value="agency" name="agency_management_type"
+                        {% if user.agency_management_type == 'agency' %}checked{% endif %}/>Agency
+                        <input type="radio" value="management" name="agency_management_type"
+                        {% if user.agency_management_type == 'management' %}checked{% endif %}/>Management
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-1">
+                        <label class="form-title mem-setup-blu-f">Website</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="inp-line" placeholder="Website"
+                            name="{{ form.company_website.name }}"
+                            value="{% if user.company_website %}{{ user.company_website}}{% endif%}"
+                            autocomplete="off"/>
+                            {% if errors.company_website %}
+                            {% for err in errors.company_website %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-3">
+                        <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
+                    </div>
+                    <div class="col-5  mt-3">
+                        <ul class="list-unstyled settings-checkbx-f ml-4 w-100">
+                            <li>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio"
+                                        name="submission_policy_SAMR" value="members_with_rating"
+                                        {% if profile.submission_policy_SAMR != 'pros_and_companies_only' %}
+                                            checked
+                                        {% endif %}
+                                        class="radio-settings form-check-input">
+                                        <span class="rate"> Members with Rating &nbsp;
+                                            <input type="radio" id="star5" name="rate" value="5"
+                                            {% if profile.submission_policy_SAMR == 'members_with_rating_5_star' %}checked{% endif %}/>
+                                            <label for="star5" title="text">5 stars</label>
+
+                                            <input type="radio" id="star4" name="rate" value="4"
+                                            {% if profile.submission_policy_SAMR == 'members_with_rating_4_star' %}checked{% endif %}/>
+                                            <label for="star4" title="text">4 stars</label>
+
+                                            <input type="radio" id="star3" name="rate" value="3"
+                                            {% if profile.submission_policy_SAMR == 'members_with_rating_3_star' %}checked{% endif %}/>
+                                            <label for="star3" title="text">3 stars</label>
+
+                                            <input type="radio" id="star2" name="rate" value="2"
+                                            {% if profile.submission_policy_SAMR == 'members_with_rating_2_star' %}checked{% endif %}/>
+                                            <label for="star2" title="text">2 stars</label>
+
+                                            <input type="radio" id="star1" name="rate" value="1"
+                                            {% if profile.submission_policy_SAMR == 'members_with_rating_1_star' %}checked{% endif %}/>
+                                            <label for="star1" title="text">1 star</label>
+
+                                        </span>
+                                    </label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="radio" 
+                                        name="submission_policy_SAMR" value="pros_and_companies_only"
+                                        {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
+                                        checked
+                                        {% endif %}
+                                        class="radio-settings form-check-input" />
+                                        Pros and Companies only
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-10">
+                    <div class="form-group">
+                        <label for="comment" class="form-title mem-setup-blu-f ml-2"> Bio/Info</label>
+                        <textarea class="form-control" rows="4"
+                            name="{{ form.bio.name }}">
+                            {% if profile.bio %}{{ profile.bio}}{% endif%}
+                            </textarea>
+                            {% if errors.bio %}
+                            {% for err in errors.bio %}
+                            <p style="color: red">{{err}}</p>
+                            {% endfor %}
+                            {% endif %}
+                      </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-11">
+                        <input type="submit" class="btn mem-setup-blu-f float-right save_btn" value="Save"/>
+                    </div>
+                </div>
+            </form>
+            {% if user.membership == 'COM' %}
+                <hr class="mem-set-acc-hr">
+                <div class="bold mt-3">Staff</div>
+                <div class="row ">
+                    <div class="col-md-5 coworkers">
+                        {% for coworker in coworkers %}
+                        <input name="saved_id" type="hidden" value="{{coworker.id}}" />
+                        {% if coworker.user %}
+                        <div>
+                            {% if coworker.user.membership != 'COM' %}
+                                <a href="{% url 'hobo_user:profile' coworker.user.id %}"
+                                target="_blank">
+                            {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'production' %}
+                                <a href="{% url 'hobo_user:production-company-profile' coworker.user.id %}"
+                                target="_blank">
+                            {%  elif coworker.user.membership == 'COM' and coworker.user.company_type == 'agency_management' %}
+                                <a href="" target="_blank" >
+                            {% endif %}
+                            <span>{{coworker.name}}({{coworker.position.title}})</span>
+                            </a>
+                            <label class="form-check-label mem-setup-blu-f"
+                            data-toggle="modal"
+                            data-target="#warning{{coworker.id}}"
+                            for="">Remove</label>
+                       </div>
+                        {% else %}
+                        <div>
+                            <span>{{coworker.name}}({{coworker.position.title}})</span>
+                            <label class="form-check-label mem-setup-blu-f"
+                            data-toggle="modal"
+                            data-target="#warning{{coworker.id}}"
+                            for="">Remove</label>
+                      </div>
+                        {% endif %}
+                        <!-- The Modal -->
+                        <div class="modal fade" id="warning{{coworker.id}}">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                <h5 class="modal-title">Warning !!</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    Do you want to delete staff {{coworker.name}}?
+                                </div>
+
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                <a class="btn btn-outline-danger btn-sm delete-coworker" id="{{coworker.id}}" data-dismiss="modal">Yes</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">No</button>
+                                </div>
+
+                            </div>
+                            </div>
+                        </div>
+                        <!-- end of modal -->
+                    {% endfor %}
+                    </div>
+                    <div class="col-md-5">
+                        <input name="name" id="coworker_name" value=""
+                        class="inp-line" placeholder="Name"
+                        autocomplete="off" /><br>
+
+                        <input name="email" id="coworker_email" value=""
+                        class="inp-line" placeholder="Email"
+                        autocomplete="off" />
+
+                        <select name="designation" id="coworker_position"
+                        class="form-control form-control-input mt-2">
+                            <option value="" selected disabled hidden>Choose position</option>
+                            {% for job in job_types %}
+                            <option value="{{job.id}}" >
+                            {{job}}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="col-10 add-coworker-error-msg"></div>
+                        <a class="btn mem-setup-blu-f float-right save_btn add-coworker">Attach</a>
+                    </div>
+                </div>
+                <hr class="mem-set-acc-hr">
+                <div class="bold ">My interests</div>
+                        <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
+                            {% csrf_token %}
+                        <div class="my-interests-section">
+                        <div class="row">
+                            <div class="col-3">Position
+                                <select name="position" id="position_1"
+                                class="form-control form-control-input mt-2" required>
+                                    {% for position in my_interest_form.position %}
+                                        {{position}}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">Format
+                                <select name="format" id = "format_1"
+                                class="form-control form-control-input mt-2 " required>
+                                    {% for item in my_interest_form.format %}
+                                    {{item}}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">Location
+                                <select name="location" id ="location_1"
+                                class="form-control form-control-input mt-2 " required>
+                                    {% for item in my_interest_form.location %}
+                                    {{item}}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-2">
+                                <a class="btn mem-setup-blu-f  save_btn" id="add-more-interests">Add More</a>
+                            </div>
+                            <div class="col-2">
+                                <input type="submit" class="btn mem-setup-blu-f  save_btn" value="Save"/>
+                            </div>
+                        </div>
+                        </form>
+            {% endif %}
+            <hr class="mem-set-acc-hr">
+            <div class="bold mt-3">Clients</div>
+            <div class="row ">
+                <div class="col-md-5 clients">
+                    <div class="row">
+                    {% for position,clients in client_dict.items %}
+                    <div class="col-12 mem-setup-blu-f">{{position}}</div>
+                    {% for client in clients %}
+                    <div class="col-2">
+                    {% if client.user %}
+                        {% if client.user.membership != 'COM' %}
+                            <a href="{% url 'hobo_user:profile' client.user.id %}"
+                            target="_blank">
+                        {%  elif client.user.membership == 'COM' and client.user.company_type == 'production' %}
+                            <a href="{% url 'hobo_user:production-company-profile' client.user.id %}"
+                            target="_blank">
+                        {%  elif client.user.membership == 'COM' and client.user.company_type == 'agency_management' %}
+                            <a href="{% url 'hobo_user:agency-management-company-profile' client.user.id %}" target="_blank" >
+                        {% endif %}
+                        <img src ="{{ client.user.get_profile_photo }}" class="client-img"/>
+                        {{client.name|truncatechars:"5"}}</a>
+                        <input type="checkbox" name="remove-client" value="{{client.id}}"/>
+                    {% else %}
+                        <img src ="{% static 'images/default_profile_pic.png' %}" class="client-img"/>
+                        {{client.name|truncatechars:"5"}}
+                        <input type="checkbox" name="remove-client" value="{{client.id}}"/>
+                    {% endif %}
+
+                </div>
+                {% endfor %}
+                {% endfor %}
+                </div>
+                <div class="row">
+                    {% if client_dict %}
+                    <a class="btn mem-setup-blu-f save_btn remove-client" data-toggle="modal"
+                    data-target="#warning_client">Remove</a>
+                    {% endif %}
+                    <!-- The Modal -->
+                    <div class="modal fade" id="warning_client">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <!-- Modal Header -->
+                            <div class="modal-header">
+                            <h5 class="modal-title">Warning !!</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+
+                            <!-- Modal body -->
+                            <div class="modal-body">
+                                Do you want to delete selected clients?
+                            </div>
+
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                            <a class="btn btn-outline-danger btn-sm delete-client">Yes</a>
+                            <button type="button" class="btn btn-outline-danger btn-sm client_no"
+                            data-dismiss="modal" id="client_{{client.id}}">No</button>
+                            </div>
+
+                        </div>
+                        </div>
+                    </div>
+                    <!-- end of modal -->
+                </div>
+                </div>
+                <div class="col-md-5">
+                <div class="row add-client-form">
+                    <div class="col-md-12">
+                        <input name="name" id="client_name" value=""
+                        class="inp-line" placeholder="Name"
+                        autocomplete="off" />
+                    </div>
+                    <div class="col-md-12">
+                        <input name="email" id="client_email" value=""
+                        class="inp-line" placeholder="Email"
+                        autocomplete="off" />
+                    </div>
+                    <div class="col-md-6">
+                        <select name="client_position" id="client_position"
+                        class="form-control form-control-input mt-2">
+                            <option value="" selected disabled hidden>Choose position</option>
+                            <option value="new_job">Others</option>
+                            {% for job in job_types %}
+                            <option value="{{job.id}}" >
+                            {{job}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-10 add-client-error-msg"></div>
+                    <a class="btn mem-setup-blu-f float-right save_btn add-client">Attach</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+                <hr class="mem-set-acc-hr">
+                <div class="bold ">My Projects</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.9.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+<script>
+
+    $(document).ready(function() {
+        $('#coworker_position').select2();
+        $('#location_1').select2();
+        $('#position_1').select2();
+        $('#format_1').select2();
+        $('#client_position').select2();
+    });
+
+// add more - my interests
+var count=1;
+$('body').on('click' , '#add-more-interests', function(){
+    count++
+    var location_id ="#location_"+count
+    var position_id ="#position_"+count
+    var format_id ="#format_"+count
+    var data_dict = {}
+    data_dict = {'count':count}
+    // get add coworker form
+    $.get('/hobo_user/add-user-interest-form/',data_dict)
+    .done(function(data) {
+    if(data.results!='')
+        {
+            $('.my-interests-section').append(data['add_my_interests_form_html']);
+            $(location_id).select2();
+            $(position_id).select2();
+            $(format_id).select2();
+        }
+    });
+});
+
+
+$('body').on('click' , '.add-coworker', function(){
+    var name = $("#coworker_name").val();
+    var token = $("#token").val();
+    var email = $("#coworker_email").val();
+    var position = $("#coworker_position").find("option:selected").val();
+    var error_msg1 = ""
+    var error_msg2 = ""
+    var error_msg3 = ""
+    data_dict = {}
+    if(name!= ""){
+        data_dict['name']=name;
+    }else{
+        error_msg1 = "Name cannot be empty."
+    }
+    if(email!= ""){
+        data_dict['email']=email;
+    }else{
+        error_msg2 = "Email cannot be empty."
+    }
+    if(position!= ""){
+        data_dict['position']=position;
+    }else{
+        error_msg3 = "Position cannot be empty."
+    }
+    if(error_msg1 == "" & error_msg2 == "" & error_msg3 == ""){
+        // add coworker
+        $.ajax
+            ({
+                type: "POST",
+                url: "/hobo_user/add-coworker-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                error: function(data){
+                    $('.add-coworker-error-msg').html("");
+                    $('.add-coworker-error-msg').html("Enter a vaild email address.");
+                },
+                success: function (response){
+                    var coworker_id = response['id']
+                    console.log(response['errors'])
+                    if(response.errors){
+                        $('.add-coworker-error-msg').html("");
+                        $('.add-coworker-error-msg').html(
+                            "<div class='errormsg'>Enter a vaild email address.</div>"
+                            );
+                    }else{
+                        $.get('/hobo_user/attach-coworker/', {'id':coworker_id})
+                        .done(function(data) {
+                            if(data.results!='')
+                                {
+                                    $('.add-coworker-error-msg').html("");
+                                    $('.coworkers').append(data['attach_coworker_html']);
+                                    window.location.reload();
+                                }
+                        });
+                    }
+                }
+            });
+    }else{
+        $('.add-coworker-error-msg').html("");
+        if(error_msg1 != ""){
+            $('.add-coworker-error-msg').append(
+            "<div class='errormsg'>"+error_msg1+"</div>"
+            );
+        }
+        if(error_msg2 != ""){
+            $('.add-coworker-error-msg').append(
+            "<div class='errormsg'>"+error_msg2+"</div>"
+            );
+        }
+        if(error_msg3 != ""){
+            $('.add-coworker-error-msg').append(
+            "<div class='errormsg'>"+error_msg3+"</div>"
+            );
+        }
+
+    }
+});
+
+
+$('body').on('click' , '.delete-coworker', function(){
+    var id = $(this).attr('id');
+    var token = $("#token").val();
+    var data_dict = {}
+    data_dict['id'] = id
+    $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/remove-coworker-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            error: function(data){
+            },
+            success: function (response){
+                console.log(response['id'])
+                window.location.reload()
+            }
+        });
+    });
+</script>
+
+<script>
+    $('body').on('click' , '.add-client', function(){
+    var name = $("#client_name").val();
+    var token = $("#token").val();
+    var email = $("#client_email").val();
+    var new_job = $("#new_job").val();
+    console.log("new_job", new_job)
+    var position = $("#client_position").find("option:selected").val();
+    var error_msg1 = ""
+    var error_msg2 = ""
+    var error_msg3 = ""
+    var error_msg4 = ""
+    data_dict = {}
+    if(name!= ""){
+        data_dict['name']=name;
+    }else{
+        error_msg1 = "Name cannot be empty."
+    }
+    if(email!= ""){
+        data_dict['email']=email;
+    }else{
+        error_msg2 = "Email cannot be empty."
+    }
+    if((position!= "") & (position!='new_job')){
+        data_dict['position']=position;
+    }
+    if((position=='')){
+        error_msg3 = "Position cannot be empty."
+    }
+    if((position=='new_job') & (new_job!= "")){
+        data_dict['new_position']=new_job;
+    }
+    if((position=='new_job') & (new_job== "")){
+        error_msg4 = "Give new job title.";
+    }
+    console.log(data_dict)
+    if(error_msg1 == "" & error_msg2 == "" & error_msg3 == "" & error_msg4 == ""){
+        // add coworker
+        $.ajax
+            ({
+                type: "POST",
+                url: "/hobo_user/company-client-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                error: function(data){
+                    console.log("error", data)
+                    $('.add-client-error-msg').html("");
+                    $('.add-client-error-msg').html("Enter a vaild email address.");
+                },
+                success: function (response){
+                    console.log("success", response)
+                    var client_id = response['id']
+                    console.log(response['errors'])
+                    if(response.errors){
+                        $('.add-client-error-msg').html("");
+                        $('.add-client-error-msg').html(
+                            "<div class='errormsg'>Enter a vaild email address.</div>"
+                            );
+                    }else{
+                        window.location.reload()
+                        // $.get('/hobo_user/attach-client/', {})
+                        // .done(function(data) {
+                        //     if(data.results!='')
+                        //         {
+                        //             $('.add-client-error-msg').html("");
+                        //             $('.clients').html(data['attach_client_html']);
+                        //             $("#client_name").val("");
+                        //             $("#client_email").val("");
+                        //             // $("#client_position").val("");
+                        //             // $('#client_position').find("option:selected").val('');
+                        //              $('#client_position').val('').trigger("change");
+                        //              $("#new_job").val("");
+                        //             $(".client_new_job_div").hide();
+                        //         }
+                        // });
+                    }
+                }
+            });
+    }else{
+        $('.add-client-error-msg').html("");
+        if(error_msg1 != ""){
+            $('.add-client-error-msg').append(
+            "<div class='errormsg'>"+error_msg1+"</div>"
+            );
+        }
+        if(error_msg2 != ""){
+            $('.add-client-error-msg').append(
+            "<div class='errormsg'>"+error_msg2+"</div>"
+            );
+        }
+        if(error_msg3 != ""){
+            $('.add-client-error-msg').append(
+            "<div class='errormsg'>"+error_msg3+"</div>"
+            );
+        }
+        if(error_msg4 != ""){
+            $('.add-client-error-msg').append(
+            "<div class='errormsg'>"+error_msg4+"</div>"
+            );
+        }
+
+    }
+});
+
+
+$('body').on('change' , '#client_position', function(){
+    var choice = $(this).find("option:selected").val();
+    var field = "<div class='col-md-6 client_new_job_div'><input name='new_job' id='new_job' class='inp-line' placeholder='Position' autocomplete='off' /></div>"
+    if(choice=='new_job'){
+        $('.add-client-form').append(field);
+    }else{
+        $("#new_job").val("");
+        $(".client_new_job_div").hide();
+    }
+});
+
+$('body').on('click' , '.delete-client', function(){
+    var remove_ids = [];
+    // var remove_ids = $(".remove-client-checkbox").val();
+    $("input:checkbox[name=remove-client]:checked").each(function(){
+        remove_ids.push($(this).val());
+    });
+    var token = $("#token").val();
+    var data_dict = {}
+    for(i in remove_ids){
+        data_dict['id'] = remove_ids[i]
+        $.ajax
+            ({
+                type: "POST",
+                url: "/hobo_user/remove-client-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                error: function(data){
+                },
+                success: function (response){
+                }
+            });
+        }
+        window.location.reload()
+    });
+</script>
+{% endblock %}
+
+

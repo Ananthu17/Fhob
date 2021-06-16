@@ -83,6 +83,8 @@ class CustomCompanyUserAccountAdapter(DefaultAccountAdapter):
             user, 'title', request.data.get('title', ''))
         user_field(
             user, 'membership', request.data.get('membership', ''))
+        user_field(
+            user, 'company_type', request.data.get('company_type', ''))
         user.save()
 
         if country_id is not None:

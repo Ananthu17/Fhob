@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_s3_storage',
     'zappa_django_utils',
+    'channels',
     'paypal.standard.ipn'
 ]
 
@@ -112,7 +113,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'film_hobo.wsgi.application'
-
+# Channels
+ASGI_APPLICATION = "film_hobo.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -245,6 +247,16 @@ SITE_URL = os.environ.get('SITE_URL', '')
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # }
+        # 'ROUTING': 'notification_channels.routing.channel_routing',
+    }
+}
 # PAYPAL SETTINGS
 PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
 PAYPAL_TEST = True

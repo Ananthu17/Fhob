@@ -55,15 +55,15 @@
 }
 
 .search-placeholder:-moz-placeholder { /* Firefox 18- */
-   text-align: center;
+  text-align: center;  
 }
 
 .search-placeholder::-moz-placeholder {  /* Firefox 19+ */
-   text-align: center;
+  text-align: center;  
 }
 
-.search-placeholder:-ms-input-placeholder {
-   text-align: center;
+.search-placeholder:-ms-input-placeholder {  
+  text-align: center; 
 }
 
 .search-placeholder{
@@ -81,7 +81,7 @@
   color: #6F6F6C;
 }
 .pro-font{
-  font-family: "Pooper Black Pro";
+  font-family: "Pooper Black Pro"; 
   color: #C70039;
   font-size: 16px;
 }
@@ -123,14 +123,14 @@
   outline: none;
 }
 .navbar-light .navbar-nav .nav-link.active{
-   color: #e88b22;
+  color: #e88b22; 
 }
 /*navbar section end*/
 /*footer*/
 .fh-footer{
-   background-color: #8a8a89;
-   font-family: "Arial Rounded Bold";
-   font-size:10px;
+  background-color: #8a8a89;
+  font-family: "Arial Rounded Bold"; 
+  font-size:10px;
 }
 .fw{
   color: #fff;
@@ -184,8 +184,6 @@
 .landing-des-orng{
  color: #e88b22;
 }
-/*landing page end*/
- /*index page*/
 /*landing page end*/
 /*index page*/
 .index-des-head{
@@ -257,22 +255,22 @@
  border-top: none;
 }
 .signup-section .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
-  color: #2265b9;
-  background-color: #e6e6e6;
-  font-family: "Myraid Pro";
-  font-weight: 600;
-  font-size: 14px;
-  padding: 6px 5px;
-  height: 30px;
+ color: #2265b9;
+ background-color: #e6e6e6;
+ font-family: "Myraid Pro";  
+ font-weight: 600;
+ font-size: 14px;
+ padding: 6px 5px;
+ height: 30px;
 }
 .signup-section .nav-pills .nav-link {
-  border-radius: 0rem !important;
-  color: #2265b9;
-  font-family: "Myraid Pro";
-  font-weight: 600;
-  font-size: 14px;
-  padding: 6px 5px;
-  height: 30px;
+ border-radius: 0rem !important;
+ color: #2265b9;
+ font-family: "Myraid Pro";  
+ font-weight: 600;
+ font-size: 14px;
+ padding: 6px 5px;
+ height: 30px;
 }
 .btn-account {
  background-color: #fff;
@@ -299,8 +297,8 @@
  padding: 0px;
 }
 .signup-form{
-  font-family: "Myraid Pro";
-  font-size: 13px;
+ font-family: "Myraid Pro";  
+ font-size: 13px;
 }
 .inp-line {
  border:none;
@@ -310,17 +308,16 @@
  width: 100%;
 }
 [placeholder]:focus::-webkit-input-placeholder {
- transition: text-indent 0.5s 0.5s ease;
+ transition: text-indent 0.5s 0.5s ease; 
  text-indent: -200%;
  opacity: 1;
- font-family: "Myraid Pro";
+ font-family: "Myraid Pro";  
  font-size: 13px;
 }
 .form-title{
- font-family: "Myraid Pro";
+ font-family: "Myraid Pro";  
  font-size: 13px;
  margin-top: 15px;
- position: absolute;
  line-height: 13px;
 }
 .dob-bar{
@@ -336,13 +333,18 @@
  text-decoration:underline;
 }
 .signup-footer{
-  color: #2265b9;
-  background-color: #e6e6e6;
-  font-family: "Myraid Pro";
-  font-weight: 600;
-  font-size: 14px;
-  width: 100%;
-  height: 35px;
+ color: #2265b9;
+ background-color: #e6e6e6;
+ font-family: "Myraid Pro";  
+ font-weight: 600;
+ font-size: 14px;
+ width: 100%;
+ height: 35px;
+}
+.btn-link{
+ color: #2265b9;
+ font-size: 14px;
+ font-weight: 600;
 }
 /* The container */
 .containerradio {
@@ -554,18 +556,18 @@
 
 /*settings page*/
 .bor-bottom{
-  border-bottom: 1px solid #000;
+ border-bottom: 1px solid #000;
 }
 .bor-top{
-  border-top: 1px solid #000;
+ border-top: 1px solid #000;
 }
 .bor-right{
-  border-right:1px solid #000;
+ border-right:1px solid #000;
 }
 .settings-font{
-  font-family: Courier;
-  font-size: 13px;
-  color: #000;
+ font-family: Courier;
+ font-size: 13px;
+ color: #000;
 }
 .settings-head-font{
   font-family:Courier Bold;
@@ -599,14 +601,14 @@
   text-decoration: underline;
 }
 .settings-checkbx-f{
-  font-family: "Myraid Pro"; 
+  font-family: "Myraid Pro";
   font-weight: 200;
 }
 .s-btn-disable{
   color: #000;
   border: 1px solid#000;
   background-color: #EDEEF0;
-  font-family: "Myraid Pro"; 
+  font-family: "Myraid Pro";
   font-weight: 600;
   height: 24px;
   border-radius: 0rem;
@@ -811,249 +813,211 @@ input#visa:focus {
 }
 .input-group-text{
  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  padding: .375rem .75rem;
-  margin-bottom: 0;
-  font-size: 15px;
-  font-weight: 500 !important;
-  line-height: 1.5;
-  color: #171b1a;
-  text-align: center;
-  white-space: nowrap;
-  background-color: #edf0f2 !important;
-  border: 1px solid #8e9096 !important;
-  border-radius: .25rem;
-}
-.inp-border-none {
-  border:none;
-  padding: 5px 10px;
-  outline: none;
-  width: 100%;
-  font-size: 13px;
-  color: #000;
-}
-/*settings page end*/
-/*member page form*/
-.member-hr{
-  width:85%;
-  border: 1px solid#aadeee;
-}
-.member-edit{
-  color:#2e3092;
-  font-weight: 600;
-}
-.input-group-text{
-  display: flex;
-   -ms-flex-align: center;
-   align-items: center;
-   padding: .375rem .75rem;
-   margin-bottom: 0;
-   font-size: 15px;
-   font-weight: 500 !important;
-   line-height: 1.5;
-   color: #171b1a;
-   text-align: center;
-   white-space: nowrap;
-   background-color: #edf0f2 !important;
-   border: 1px solid #8e9096 !important;
-   border-radius: .25rem;
+ -ms-flex-align: center;
+ align-items: center;
+ padding: .375rem .75rem;
+ margin-bottom: 0;
+ font-size: 15px;
+ font-weight: 500 !important;
+ line-height: 1.5;
+ color: #171b1a;
+ text-align: center;
+ white-space: nowrap;
+ background-color: #edf0f2 !important;
+ border: 1px solid #8e9096 !important;
+ border-radius: .25rem;
 }
 .form-control-member{
-   font-weight: 500 !important;
-   color: #171b1a !important;
-   background-color: #edf0f2 !important;
-   border: 1px solid #8e9096 !important;
-   font-size: 15px !important;
-  }
+  font-weight: 500 !important;
+  color: #171b1a !important;
+  background-color: #edf0f2 !important;
+  border: 1px solid #8e9096 !important;
+  font-size: 15px !important;
+}
 .bold-label{
-  font-weight: 500;
+ font-weight: 500;
 }
 .member-form{
-  font-size: 15px;
-  font-weight: 500; 
+ font-size: 15px;
+ font-weight: 500; 
 }
 .mem-btn-save{
-  color: #ed038c;
-  box-shadow: none;
-  outline: none;
-  font-weight: 600;
+ color: #ed038c;
+ box-shadow: none;
+ outline: none;
+ font-weight: 600;
 }
 .mem-btn-save:active,.mem-btn-save:focus,.mem-btn-save:hover{
-  color: #ed038c;
-  box-shadow: none;
-  outline: none;
-  font-weight: 600;
+ color: #ed038c;
+ box-shadow: none;
+ outline: none;
+ font-weight: 600;
 }
 /*member page form end*/
 /*admin billing setup*/
 .admin-bill-sec{
-  font-family: "Myraid Pro";  
-  font-size:13px;
+ font-family: "Myraid Pro";  
+ font-size:13px;
 }
 .btn-admin-bill{
-  border:1px solid#b8b8b8;
-  background-color: #e6e6e6;
-  color: #0105f8;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
+ border:1px solid#b8b8b8;
+ background-color: #e6e6e6;
+ color: #0105f8;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
 .btn-admin-bill:hover,.btn-admin-bill:focus,.btn-admin-bill:active{
-  border:1px solid#b8b8b8;
-  background-color: #e6e6e6;
-  color: #0105f8;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
+ border:1px solid#b8b8b8;
+ background-color: #e6e6e6;
+ color: #0105f8;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
 .bold{
-  font-weight: 600;
+ font-weight: 600;
 }
 .admin-bill-hr{
-  border: 1px solid#b5b5b5;
+ border: 1px solid#b5b5b5;
 }
 .admin-bill-tbl{
-  border: 1px solid#d4d4d4;
-  border-top: 1px solid#d4d4d4;
-  line-height: 1rem;
+ border: 1px solid#d4d4d4;
+ border-top: 1px solid#d4d4d4;
+ line-height: 1rem;
 }
 .admin-bill-tbl, .table td, .table th {
-  padding: .2rem;
-  border-top: 1px solid#d4d4d4;
+ padding: .2rem;
+ border-top: 1px solid#d4d4d4;
 }
 .admin-bill-form-cntrl{
-  height: calc(.55em + .75rem + 2px);
-   padding: .375rem .75rem;
-   font-size: 13px;
-   border: 1px solid #000;
-   border-radius: 0;
+ height: calc(.55em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 13px;
+  border: 1px solid #000;
+  border-radius: 0;
 }
 .admin-bill-form-cntrl:active, .admin-bill-form-cntrl:focus, .admin-bill-form-cntrl:hover{
-  height: calc(.55em + .75rem + 2px);
-   padding: .375rem .75rem;
-   font-size: 13px;
-   border: 1px solid #000;
-   border-radius: 0;
+ height: calc(.55em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 13px;
+  border: 1px solid #000;
+  border-radius: 0;
 }
 .admin-bill-form-cntrl-b{
-  height: calc(.55em + .75rem + 2px);
-   padding: .375rem .75rem;
-   font-size: 13px;
-   border: none;
-   border-radius: 0;
+ height: calc(.55em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 13px;
+  border: none;
+  border-radius: 0;
 }
 .admin-bill-form-cntrl-b:active, .admin-bill-form-cntrl-b:focus, .admin-bill-form-cntrl-b:hover{
-  height: calc(.55em + .75rem + 2px);
-   padding: .375rem .75rem;
-   font-size: 13px;
-   border: none;
-   border-radius: 0;
+ height: calc(.55em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 13px;
+  border: none;
+  border-radius: 0;
 }
 .admin-bill-link{
-  color: #0105f8;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
+ color: #0105f8;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
 .admin-bill-link:active,.admin-bill-link:focus, .admin-bill-link:hover {
-  color: #0105f8;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
-  text-decoration: none;
+ color: #0105f8;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
-.btn-default-doller-per{
-  border: 1px solid#b8b8b8;
-  background-color: #e6e6e6;
-  color: #000;
-  font-family: "Courier Bold";
-  font-size: 15px;
-  padding: 0px 14px;
-  box-shadow: none;
-  outline: none;
-  height: 20px;
-  line-height: 2px;
+.btn-per{
+ border: 1px solid#b8b8b8;
+ background-color: #e6e6e6;
+ color: #000;
+ font-family: "Courier Bold";
+ font-size: 15px;
+ padding: 0px 14px;
+ box-shadow: none;
+ outline: none;
+ height: 20px;
+ line-height: 2px;
 }
-
+.btn-dollar{
+ border:1px solid#b8b8b8;
+ background-color: #29abe2;
+ color: #000;
+ font-family: "Courier Bold"; 
+ font-size: 15px;
+ padding: 0px 14px;
+ box-shadow: none;
+ outline: none;
+ height: 20px;
+ line-height: 2px;
+}
 .admin-bill-time{
-  border: 1px solid#b5b5b5;
-  padding: 1px 8px;
-  border-radius: 4px;
+ border: 1px solid#b5b5b5;
+ padding: 1px 8px;
+ border-radius: 4px;
 }
 .admin-bill-btnsave{
-  border:1px solid#b8b8b8;
-  background-color: #e6e6e6;
-  color: #ec1c24;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
+ border:1px solid#b8b8b8;
+ background-color: #e6e6e6;
+ color: #ec1c24;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
 .admin-bill-btnsave:hover,.admin-bill-btnsave:focus,.admin-bill-btnsave:active{
-  border:1px solid#b8b8b8;
-  background-color: #e6e6e6;
-  color: #ec1c24;
-  font-family: "Courier Bold"; 
-  font-size: 13px;
-  padding: 0px 8px;
-  box-shadow: none;
-  outline: none;
+ border:1px solid#b8b8b8;
+ background-color: #e6e6e6;
+ color: #ec1c24;
+ font-family: "Courier Bold"; 
+ font-size: 13px;
+ padding: 0px 8px;
+ box-shadow: none;
+ outline: none;
 }
 .admin-bill-tbl-bordered, .table-bordered td, .table-bordered th {
-  border: 1px solid#d0d0d0 !important;
+ border: 1px solid#d0d0d0 !important;
 }
 .admin-bill-dwn-btn{
-  color: #ec1c24;
-  border:1px solid #ec1c24;
-  border-radius:0px;
-  box-shadow: none;
-  outline: none;
+ color: #ec1c24;
+ border:1px solid #ec1c24;
+ border-radius:0px;
+ box-shadow: none;
+ outline: none;
 }
 .admin-bill-dwn-btn:active, .admin-bill-dwn-btn:focus, .admin-bill-dwn-btn:hover{
-  color: #ec1c24;
-  border:1px solid #ec1c24;
-  border-radius:0px;
-  box-shadow: none;
-  outline: none;
+ color: #ec1c24;
+ border:1px solid #ec1c24;
+ border-radius:0px;
+ box-shadow: none;
+ outline: none;
 }
 .admin-bill-placeholder{
-  font-size: 13px;
-}
-.dp_active_toggle, .toggle_dp:hover {
-  border:1px solid#b8b8b8;
-  background-color: #29abe2;
-  color: #000;
-  font-family: "Courier Bold";
-  font-size: 15px;
-  padding: 0px 14px;
-  box-shadow: none;
-  outline: none;
-  height: 20px;
-  line-height: 2px;
-}
-.membership_fee_edit {
-  background:#e6e6e6;
-}
-.membership_fee_edit.highlight {
-  background:#29abe2;
+ font-size: 13px;
 }
 .w-10{
-  width: 10%;
-  display: inline-block
+ width: 10%;
+ display: inline-block
+}
+.w-25{
+ width: 25%;
+ display: inline-block
 }
 .w-42{
-  width: 42%;
-  display: inline-block
+ width: 42%;
+ display: inline-block
 }
 /*admin billing setup end*/
 /*member setup page*/
@@ -1062,7 +1026,7 @@ input#visa:focus {
  border-radius: 12px;
 }
 .member-setup-sec{
- font-family: "Myraid Pro";
+ font-family: "Myraid Pro";  
  font-size:13px;
 }
 .btn-mem-mode{
@@ -1213,12 +1177,343 @@ input#visa:focus {
  margin-bottom: 0rem;
 }
 /*member setup page end*/
+/*login page*/
+.btn-login{
+ color: #2265b9;
+ background-color: #e6e6e6;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
+ padding: 4px 35px;
+ height: 30px;
+}
+.btn-login:hover, .btn-login:focus, .btn-login:active{
+ color: #2265b9;
+ background-color: #e6e6e6;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
+ padding: 4px 35px;
+ height: 30px;
+ outline: none;
+ box-shadow: none;
+}
+.login-link{
+ color: #2265b9;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
+}
+.login-link:active, .login-link:focus, .login-link:hover{
+ color: #2265b9;
+ font-family: "Myraid Pro";
+ font-weight: 600;
+ font-size: 14px;
+ text-decoration: none;
+}
+/* login page end*/
+/*password-reset page*/
+.pr-content{
+ font-size: 16px;
+}
+/*password-reset page end*/
 /*simple content page*/
 .content-page-logo{
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  height: 110px;
+ display: block;
+ margin-left: auto;
+ margin-right: auto;
+ height: 110px;
+}
+/*simple content page end*/
+/*member page logistics*/
+.red-f{
+ color: #ec1c24;
+}
+.mem-blu-link{
+ color:#0e62b5;
+ font-weight:600;
+ text-decoration: none;
+}
+.mem-blu-link:active, .mem-blu-link:hover, .mem-blu-link:focus{
+ color:#0e62b5;
+ font-weight:600;
+ text-decoration: none;
+}
+.mem-small-f{
+ font-size:9px;
+}
+.mem-ad-banner-1{
+ height: 175px;
+}
+.mem-ad-banner-2{
+ height: 491px;
+}
+.mem-left-2{
+ padding: 1px 9px;
+ height: 495px;
+}
+.mem-set-net-img-sec2 {
+ padding-left: 10px;
+ padding-right: 9px;
+}
+.mem-set-img-track-sec2 {
+ height: 25px;
+ width: 24px;
+}
+.mem-set-track-padding-sec2{
+ padding-left: 13px;
+ padding-right: 6px;
+}
+.track-blu-f-sec2 {
+ font-size: 9px;
+ color: #0e62b5;
+}
+.track-orng-f-sec2 {
+ font-size: 9px;
+ color: #e88b24;
+}
+.mem-list-cont{
+ font-size: 12px;
+ color: #0e62b5;
+ padding: 0px 10px 0px 35px;
+}
+.mem-list-head{
+ color: #e88b24;
+ font-weight: 600;
+ padding: 11px 9px 1px 24px;
+}
+.underline{
+ text-decoration: underline;
+}
+.mail-bx{
+ height: 14px;
+ margin-top: 15px;
+ color: #686868;
+}
+.orng-f{
+ color: #e88b24;
+}
+.mem-white-bg{
+ background-color: #fff;
+ margin: 1px 6px 1px 6px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 342px;
+}
+.mem-b-placeholder::-webkit-input-placeholder {
+ text-align: center;
+ font-size: 11px;
+}
+
+.mem-b-placeholder:-moz-placeholder { /* Firefox 18- */
+ text-align: center;  
+ font-size: 11px;
+}
+
+.mem-b-placeholder::-moz-placeholder {  /* Firefox 19+ */
+ text-align: center;  
+ font-size: 11px;
+}
+
+.mem-b-placeholder:-ms-input-placeholder {  
+ text-align: center; 
+ font-size: 11px;
+}
+@media only screen and (max-width: 600px) {
+ .xs-hide{
+    display: none;
+ }
+}
+/*member page logistics end*/
+/*membership page logistics*/
+.memship-row{
+ background-color: #EDEEF0 !important;
+ padding: 10px 0px 7px 0px;
+}
+.memship-row-head{
+ background-color: #EDEEF0 !important;
+ padding: 5px 0px 5px 0px;
+}
+.memship-row-btm{
+ padding: 10px 0px 7px 0px;
+}
+.memship-f{
+ font-family: Courier Bold;
+ font-size: 12px;
+}
+.memship-pro-font{
+ font-family: "Pooper Black Pro";
+ color: #C70039;
+ font-size: 17px;
+}
+.memship-head{
+ color:#a00164;
+ line-height: 24px;
+}
+.memship-check{
+ height: 14px;
+}
+.memship-btm-f{
+ font-family: "Myraid Pro";
+ font-size: 13px;
+ font-weight: 600;
+}
+.memship-btm-pro-f{
+ font-family: "Pooper Black Pro";
+ color: #C70039;
+ font-size: 17px;
+}
+.memship-pro-font:active, .memship-pro-font:focus,.memship-pro-font:hover {
+ font-family: "Pooper Black Pro";
+ color: #C70039;
+ font-size: 17px;
+}
+/*membership page logistics end*/
+/*production company page*/
+.pro-pic-sec-tp{
+ background-color: #c1272d;
+ color: #ff9021;
+ height: 216px;
+ width: 100%;
+ font-size: 210%;
+ font-weight: 600;
+ margin: 0 auto;
+}
+.pro-pic-sec-btm{
+ background-color: #c1272d;
+ color: #ff9021;
+ height: 68px;
+ width: 70px;
+ font-size: 64%;
+ font-weight: 600;
+ margin: 0 auto;
+}
+.blu-f{
+ color: #0e62b5;
+}
+.t-0{
+ top: 0px !important;
+}
+.pc-img{
+ height: 70px;
+ width: 95px;
+}
+.pc-img-title{
+ font-weight: 600;
+ width: 53px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ display: block;
+ white-space: nowrap;
+ margin: 0 auto;
+}
+.pc-mem-white-bg{
+ background-color: #fff;
+ margin: 1px 6px 1px 6px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 450px;
+}
+.pc-mem-left-2{
+ padding: 1px 9px;
+ height: 466px;
+}
+.bio-sec{
+ border: 1px solid#000;
+ background-color: #fff;
+ padding: 4px;
+ color:#767778;
+}
+/*production company page end*/
+/*production company edit page*/
+.pc_add-or-btn{
+ position: relative;
+ left: 4%;
+ top: 0px;
+ float: left;
+}
+.pc-img-addremove {
+ height: 49px;
+ width: 44px;
+}
+.pc-radio-toolbar label {
+ display: inline-block;
+ background-color: #bebdbd;
+ padding: 1px 2px;
+ font-family: "Arial Rounded Bold";
+ font-size: 7px;
+ color: #272525;
+ border: 1px solid #d6d6d6;
+ border-radius: 2px;
+}
+.pc-radio-toolbar label:hover {
+ background-color: rgb(223, 193, 193);
+}
+
+.pc-radio-toolbar input[type="radio"]:focus + label {
+   color :#ff0f0f;
+}
+.pc-radio-toolbar {
+ margin: 0px;
+}
+
+.pcb-radio-toolbar input[type="radio"] {
+ opacity: 0;
+ position: fixed;
+ width: 0;
+}
+.pcb-radio-toolbar label {
+ display: inline-block;
+ background-color: #bebdbd;
+ padding: 1px 3px;
+ font-family: "Arial Rounded Bold";
+ font-size: 8px;
+ color: #272525;
+ border: 1px solid #d6d6d6;
+ border-radius: 2px;
+}
+.pcb-radio-toolbar label:hover {
+ background-color: rgb(223, 193, 193);
+}
+
+.pcb-radio-toolbar input[type="radio"]:focus + label {
+   color :#ff0f0f;
+}
+.pcb-radio-toolbar {
+ margin: 0px;
+}
+
+.pc-radio-toolbar input[type="radio"] {
+ opacity: 0;
+ position: fixed;
+ width: 0;
+}
+.pc-choose-Location{
+  font-size: 10px;
+}
+.pc-custom-file-upload {
+ border: none;
+ border-bottom: 1px solid#9c9c9c;
+ display: inline-block;
+ padding: 3px 24px;
+ cursor: pointer;
+ font-size: 10px;
+}
+.fs-10{
+ font-size: 10px;
+}
+.pc-mem-img-p {
+ padding: 1px 16px;
+}
+.pcb-mem-white-bg{
+ background-color: #fff;
+ margin: 1px 6px 1px 6px;
+ border-radius: 10px;
+ padding: 7px;
+ height: 200px;
+}
+.pc-mem-ad-banner-2{
+ height: 545px;
 }
 /*simple content page end*/
 /*membership page logistics*/
@@ -1265,3 +1560,4 @@ input#visa:focus {
    font-size: 17px;
 }
 /*membership page logistics end*/
+/*production company edit page end*/

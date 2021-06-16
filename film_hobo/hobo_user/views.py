@@ -49,14 +49,18 @@ from authemail.views import SignupVerify
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
-    EditProfileForm
+    EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
+    EditAgencyManagementCompanyProfileForm
 
-from .models import CoWorker, CustomUser, GuildMembership, \
+from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
+                    GuildMembership, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
-                    PromoCode, Country, DisabledAccount, CustomUserSettings, \
+                    PromoCode, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
-                    EthnicAppearance, UserAgentManager, UserProfile, CoWorker, JobType, \
-                    UserRating, UserRatingCombined, UserTacking, Photo
+                    EthnicAppearance, UserAgentManager, UserInterest, \
+                    UserNotification, Friend, \
+                    UserProfile, JobType, UserRating, Location, \
+                    UserRatingCombined, UserTacking, CompanyProfile
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -69,7 +73,14 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
+    UserNotificationSerializer, ChangeNotificationStatusSerializer, \
+    ProductionCompanyProfileSerializer, UserInterestSerializer, \
+    AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
+    RemoveClientSerializer, FriendRequestSerializer, \
+    AcceptFriendRequestSerializer
+
+from .utils import notify, get_notifications_time
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -169,7 +180,7 @@ class ExtendedRegisterCompanyView(RegisterView):
 
     def create(self, request, *args, **kwargs):
         user_input_data = request.data
-        user_input_data['membership'] = CustomUser.MEMBERSHIP_CHOICES[4][0]
+        user_input_data['membership'] = CustomUser.PRODUCTION_COMPANY
         serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
@@ -178,7 +189,7 @@ class ExtendedRegisterCompanyView(RegisterView):
         obj = CustomUserSettings()
         obj.user = user
         obj.save()
-        profile = UserProfile()
+        profile = CompanyProfile()
         profile.user = user
         profile.save()
 
@@ -1688,6 +1699,115 @@ class UserProfileAPI(APIView):
         return Response(response)
 
 
+class ProductionCompanyProfileAPI(APIView):
+    serializer_class = ProductionCompanyProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        profile = CompanyProfile.objects.get(user=user)
+        profile_data = {}
+
+        profile_data['membership'] = user.membership
+        profile_data['company_name'] = user.company_name
+        profile_data['company_website'] = user.company_website
+        profile_data['imdb'] = profile.imdb
+        profile_data['bio'] = profile.bio
+        profile_data['submission_policy_SAMR'] = profile.submission_policy_SAMR
+        if user.membership == CustomUser.PRODUCTION_COMPANY:
+            coworkers = CoWorker.objects.filter(company=user)
+            coworkers_dict = {}
+            for obj in coworkers:
+                coworkers_dict[obj.id] = obj.position.title
+        profile_data['coworkers'] = coworkers_dict
+        response = {"profile_data": profile_data}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        user = request.user
+        profile = CompanyProfile.objects.get(user=user)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'company_name' in data_dict:
+                user.company_name = data_dict['company_name']
+            if 'company_website' in data_dict:
+                user.company_website = data_dict['company_website']
+            user.save()
+            if 'imdb' in data_dict:
+                profile.imdb = data_dict['imdb']
+            if 'bio' in data_dict:
+                profile.bio = data_dict['bio']
+            if 'submission_policy_SAMR' in data_dict:
+                profile.submission_policy_SAMR = data_dict[
+                                                'submission_policy_SAMR']
+            profile.save()
+            response = {'message': "Profile Updated",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
+class AgencyManagementCompanyProfileAPI(APIView):
+    serializer_class = AgentManagementCompanyProfileSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        profile = CompanyProfile.objects.get(user=user)
+        profile_data = {}
+
+        profile_data['membership'] = user.membership
+        profile_data['company_name'] = user.company_name
+        profile_data['company_website'] = user.company_website
+        profile_data['agency_management_type'] = user.agency_management_type
+        profile_data['bio'] = profile.bio
+        profile_data['submission_policy_SAMR'] = profile.submission_policy_SAMR
+        if user.membership == CustomUser.PRODUCTION_COMPANY:
+            coworkers = CoWorker.objects.filter(company=user)
+            coworkers_dict = {}
+            for obj in coworkers:
+                coworkers_dict[obj.id] = obj.position.title
+        profile_data['coworkers'] = coworkers_dict
+        response = {"profile_data": profile_data}
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        user = request.user
+        profile = CompanyProfile.objects.get(user=user)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'company_name' in data_dict:
+                user.company_name = data_dict['company_name']
+            if 'company_website' in data_dict:
+                user.company_website = data_dict['company_website']
+            if 'agency_management_type' in data_dict:
+                user.agency_management_type = data_dict[
+                                'agency_management_type']
+            user.save()
+            if 'bio' in data_dict:
+                profile.bio = data_dict['bio']
+            if 'submission_policy_SAMR' in data_dict:
+                profile.submission_policy_SAMR = data_dict[
+                                                'submission_policy_SAMR']
+            profile.save()
+            response = {'message': "Profile Updated",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+
+        return Response(response)
+
+
 class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/edit-profile.html'
     login_url = '/hobo_user/user_login/'
@@ -1705,7 +1825,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['profile'] = profile
         pos_list = [2, 3, 4]
         all_photos = Photo.objects.filter(user=user)
-        photos = all_photos.filter(position__in=pos_list)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
         context['photos'] = photos[:3]
         context['all_photos'] = all_photos[:4]
         context['form'] = self.form_class(instance=profile)
@@ -1724,12 +1844,23 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         coworkers = CoWorker.objects.filter(company=user)
         context['coworkers'] = coworkers
 
-        track_obj = UserTacking.objects.get(user=user)
-        trackers_list = track_obj.tracked_by.all()
-        tracking_list = UserTacking.objects.filter(
-                        tracked_by=user)
-        context['trackers_list'] = trackers_list
-        context['tracking_list'] = tracking_list
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
+        except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
+            pass
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1925,6 +2056,221 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect("/hobo_user/profile/%s/" % (user.id))
 
 
+class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-production.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = EditProductionCompanyProfileForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = get_object_or_404(CompanyProfile, user=user)
+        context['user'] = user
+        context['profile'] = profile
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list)
+        context['photos'] = photos[:3]
+        context['all_photos'] = all_photos.order_by('position')[:4]
+        context['form'] = self.form_class(instance=profile)
+
+        coworkers = CoWorker.objects.filter(company=user)
+        context['coworkers'] = coworkers
+        context['job_types'] = JobType.objects.all()
+        context['my_interest_form'] = UserInterestForm
+
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
+        except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
+            pass
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        print(request.POST)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        profile = CompanyProfile.objects.get(user=user)
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        if 'submission_policy_SAMR' in json_dict:
+            submission_policy_SAMR = json_dict['submission_policy_SAMR']
+            if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
+                SAMR_rate = json_dict['rate']
+                if SAMR_rate == '1':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if SAMR_rate == '2':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if SAMR_rate == '3':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if SAMR_rate == '4':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if SAMR_rate == '5':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif submission_policy_SAMR != 'members_with_rating':
+                submission_policy = json_dict['submission_policy_SAMR']
+            else:
+                messages.warning(
+                    self.request,
+                    'Cannot save!! Please provide ratings for submission policy SAMR'
+                    )
+                return HttpResponseRedirect(reverse('hobo_user:edit-production-company-profile'))
+        else:
+            submission_policy = ""
+        json_dict['submission_policy_SAMR'] = submission_policy
+        # Update Profile
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/production-company-profile-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Profile updated successfully')
+                return HttpResponseRedirect(
+                    "/hobo_user/production-company-profile/%s/" % (user.id))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    messages.warning(self.request, "Failed to update profile !!")
+                    return render(request, 'user_pages/edit-production.html',
+                                  {'errors': errors,
+                                   'form': self.form_class(instance=profile),
+                                   'profile': profile,
+                                   'user': user,
+                                   })
+        return HttpResponseRedirect("/hobo_user/production-company-profile/%s/" % (user.id))
+
+
+class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-agency-management.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    form_class = EditAgencyManagementCompanyProfileForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile = get_object_or_404(CompanyProfile, user=user)
+        context['user'] = user
+        context['profile'] = profile
+        pos_list = [2, 3, 4]
+        client_dict = {}
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list)
+        clients = CompanyClient.objects.filter(company=self.request.user)
+        for obj in clients:
+            if obj.position is not None and obj.position not in client_dict:
+                client_dict[obj.position] = []
+                client_dict[obj.position].append(obj)
+            elif obj.position is None and obj.new_position not in client_dict:
+                client_dict[obj.new_position] = []
+                client_dict[obj.new_position].append(obj)
+            elif obj.position is not None and obj.position in client_dict:
+                client_dict[obj.position].append(obj)
+            elif obj.position is None and obj.new_position in client_dict:
+                client_dict[obj.new_position].append(obj)
+            else:
+                pass
+
+        context['photos'] = photos[:3]
+        context['all_photos'] = all_photos[:4]
+        context['form'] = self.form_class(instance=profile)
+        coworkers = CoWorker.objects.filter(company=user)
+        context['coworkers'] = coworkers
+        context['job_types'] = JobType.objects.all()
+        context['my_interest_form'] = UserInterestForm
+        context['client_dict'] = client_dict
+
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            context['trackers_list'] = trackers_list
+            context['tracking_list'] = tracking_list
+        except UserTacking.DoesNotExist:
+            pass
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        profile = CompanyProfile.objects.get(user=user)
+        json_response = json.dumps(request.POST)
+        json_dict = ast.literal_eval(json_response)
+        if 'submission_policy_SAMR' in json_dict:
+            submission_policy_SAMR = json_dict['submission_policy_SAMR']
+            if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
+                SAMR_rate = json_dict['rate']
+                if SAMR_rate == '1':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_1_STAR
+                if SAMR_rate == '2':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_2_STAR
+                if SAMR_rate == '3':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_3_STAR
+                if SAMR_rate == '4':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_4_STAR
+                if SAMR_rate == '5':
+                    submission_policy = CustomUserSettings.MEMBERS_WITH_RATING_5_STAR
+            elif submission_policy_SAMR != 'members_with_rating':
+                submission_policy = json_dict['submission_policy_SAMR']
+            else:
+                messages.warning(
+                    self.request,
+                    'Cannot save!! Please provide ratings for submission policy SAMR'
+                    )
+                return HttpResponseRedirect(reverse('hobo_user:edit-agency-management-company-profile'))
+        else:
+            submission_policy = ""
+        json_dict['submission_policy_SAMR'] = submission_policy
+        # Update Profile
+        user_response = requests.post(
+                            'http://127.0.0.1:8000/hobo_user/agency-management-company-profile-api/',
+                            data=json.dumps(json_dict),
+                            headers={'Content-type': 'application/json',
+                                     'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] == 200:
+                messages.success(self.request, 'Profile updated successfully')
+                return HttpResponseRedirect(
+                    "/hobo_user/agency-management-company-profile/%s/" % (user.id))
+            else:
+                if 'errors' in response:
+                    errors = response['errors']
+                    messages.warning(self.request, "Failed to update profile !!")
+                    return render(request, 'user_pages/edit-agency-management.html',
+                                  {'errors': errors,
+                                   'form': self.form_class(instance=profile),
+                                   'profile': profile,
+                                   'user': user,
+                                   })
+        return HttpResponseRedirect("/hobo_user/agency-management-company-profile/%s/" % (user.id))
+
+
 class AddCoworkerAPI(APIView):
     serializer_class = CoWorkerSerializer
     permission_classes = (IsAuthenticated,)
@@ -1935,27 +2281,31 @@ class AddCoworkerAPI(APIView):
         company = request.user
         if serializer.is_valid():
             data_dict = serializer.data
-            if 'user' not in data_dict and 'name' not in data_dict:
-                response = {'errors': "Either User id or Name is required", 'status':
-                            status.HTTP_400_BAD_REQUEST}
-            else:
-                coworker = CoWorker()
-                coworker.company = company
-                if 'position' in data_dict:
-                    position = JobType.objects.get(id=data_dict['position'])
-                    coworker.position = position
-                if 'user' in data_dict:
-                    user = CustomUser.objects.get(id=data_dict['user'])
+            coworker = CoWorker()
+            coworker.company = company
+            if 'position' in data_dict:
+                position = JobType.objects.get(id=data_dict['position'])
+                coworker.position = position
+            if 'name' in data_dict:
+                coworker.name = data_dict['name']
+            if 'email' in data_dict:
+                coworker.email = data_dict['email']
+                try:
+                    user = CustomUser.objects.get(email=data_dict['email'])
                     coworker.user = user
                     coworker.name = user.get_full_name()
-                    profile = UserProfile.objects.get(user=user)
-                    profile.update_job_type(position.id)
-                    profile.save()
-                if 'name' in data_dict:
-                    coworker.name = data_dict['name']
-                coworker.save()
-                response = {'message': "Stuff Added",
-                            'status': status.HTTP_200_OK}
+                    try:
+                        profile = UserProfile.objects.get(user=user)
+                        profile.update_job_type(position.id)
+                        profile.save()
+                    except UserProfile.DoesNotExist:
+                        pass
+                except CustomUser.DoesNotExist:
+                    pass
+            coworker.save()
+            response = {'message': "Staff Added",
+                        'id': coworker.id,
+                        'status': status.HTTP_200_OK}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2117,26 +2467,49 @@ class RemoveCoworkerAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            remove_ids = data_dict['id']
-            for id in remove_ids:
+            remove_id = data_dict['id']
+            if remove_id:
                 try:
-                    obj = CoWorker.objects.get(id=id)
-
-                    # Remove job type from this profile if this user doesnot
-                    # participate in any other projects in this job type
-
-                    # if obj.user:
-                    #     profile = UserProfile.objects.get(user=obj.user)
-                    #     profile.remove_job_type(obj.position.id)
-                    #     profile.save()
-
+                    obj = CoWorker.objects.get(Q(id=remove_id) &
+                                               Q(company=self.request.user))
                     obj.delete()
-                    response = {'message': "Stuff Removed",
+                    response = {'message': "Staff Removed",
+                                'id': remove_id,
                                 'status': status.HTTP_200_OK}
                 except CoWorker.DoesNotExist:
                     response = {'message': "Invalid Id",
                                 'status': status.HTTP_400_BAD_REQUEST}
                     return Response(response)
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveClientAPI(APIView):
+    serializer_class = RemoveClientSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            if id:
+                try:
+                    obj = CompanyClient.objects.get(Q(id=id) &
+                                                    Q(company=self.request.user))
+                    obj.delete()
+                except CompanyClient.DoesNotExist:
+                    response = {'message': "Invalid Id",
+                            'status': status.HTTP_400_BAD_REQUEST}
+                    return Response(response)
+                response = {'message': "Client Removed",
+                            'id': id,
+                            'status': status.HTTP_200_OK}
+                return Response(response)
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2172,186 +2545,18 @@ class RemoveAgentManagerAPI(APIView):
         return Response(response)
 
 
-class AddCoworkersView(LoginRequiredMixin, TemplateView):
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        json_dict = {}
-        edit_dict = {}
-        remove_ids = request.POST.getlist('remove')
-
-        users = list(request.POST.getlist('user'))
-        position = list(request.POST.getlist('position'))
-        designation = list(request.POST.getlist('designation'))
-
-        saved_id = list(request.POST.getlist('saved_id'))
-        saved_user = list(request.POST.getlist('saved_user'))
-        saved_name = list(request.POST.getlist('saved_name'))
-        saved_position = list(request.POST.getlist('saved_position'))
-
-        edit_count = len(saved_position)
-        user_count = len(users)
-        position_count = len(position)
-        designation_count = len(designation)
-
-        new_users = request.POST.get('name')
-        if new_users == "":
-            new_users_count = 0
-        else:
-            new_users = list(request.POST.getlist('name'))
-            new_users_count = len(new_users)
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        if(
-           (user_count != position_count) or
-           (new_users_count != designation_count)
-           ):
-            messages.warning(
-                self.request,
-                "Failed to update Stuff. Provide name & position")
-            return HttpResponseRedirect(reverse('hobo_user:edit-profile'))
-
-        if((user_count == position_count) and (user_count != 0)):
-            for i in range(user_count):
-                json_dict['user'] = users[i]
-                json_dict['position'] = position[i]
-                user_response = requests.post(
-                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
-                                    data=json.dumps(json_dict),
-                                    headers={'Content-type': 'application/json',
-                                            'Authorization': token})
-                byte_str = user_response.content
-                dict_str = byte_str.decode("UTF-8")
-                response = ast.literal_eval(dict_str)
-                response = dict(response)
-                if 'status' in response:
-                    if response['status'] != 200:
-                        if 'errors' in response:
-                            # errors = response['errors']
-                            messages.warning(
-                                self.request, "Failed to update Stuff !!")
-                            return HttpResponseRedirect(
-                                reverse('hobo_user:edit-profile'))
-        json_dict = {}
-        if((new_users_count == designation_count) and (new_users_count != 0)):
-            for i in range(new_users_count):
-                json_dict['name'] = new_users[i]
-                json_dict['position'] = designation[i]
-                user_response = requests.post(
-                                    'http://127.0.0.1:8000/hobo_user/add-coworker-api/',
-                                    data=json.dumps(json_dict),
-                                    headers={
-                                        'Content-type': 'application/json',
-                                        'Authorization': token})
-                byte_str = user_response.content
-                dict_str = byte_str.decode("UTF-8")
-                response = ast.literal_eval(dict_str)
-                response = dict(response)
-                if 'status' in response:
-                    if response['status'] != 200:
-                        if 'errors' in response:
-                            # errors = response['errors']
-                            messages.warning(
-                                self.request, "Failed to update Stuff !!")
-                            return HttpResponseRedirect(
-                                reverse('hobo_user:edit-profile'))
-
-        for i in range(edit_count):
-            edit_dict['id'] = saved_id[i]
-            edit_dict['name'] = saved_name[i]
-            edit_dict['position'] = saved_position[i]
-            edit_dict['user'] = saved_user[i]
-            user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/edit-coworker-api/',
-                                data=json.dumps(edit_dict),
-                                headers={
-                                    'Content-type': 'application/json',
-                                    'Authorization': token})
-            byte_str = user_response.content
-            dict_str = byte_str.decode("UTF-8")
-            response = ast.literal_eval(dict_str)
-            response = dict(response)
-            if 'status' in response:
-                if response['status'] != 200:
-                    if 'errors' in response:
-                        messages.warning(
-                            self.request, "Failed to update Stuff !!")
-                        return HttpResponseRedirect(
-                            reverse('hobo_user:edit-profile'))
-        json_dict = {}
-        if remove_ids:
-            json_dict['id'] = remove_ids
-            user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/remove-coworker-api/',
-                                data=json.dumps(json_dict),
-                                headers={
-                                    'Content-type': 'application/json',
-                                    'Authorization': token})
-            byte_str = user_response.content
-            dict_str = byte_str.decode("UTF-8")
-            response = ast.literal_eval(dict_str)
-            response = dict(response)
-            if 'status' in response:
-                if response['status'] != 200:
-                    if 'errors' in response:
-                        # errors = response['errors']
-                        messages.warning(
-                            self.request, "Failed to remove Stuff !!")
-                        return HttpResponseRedirect(
-                            reverse('hobo_user:edit-profile'))
-        messages.success(self.request, 'Stuffs updated successfully')
-        return HttpResponseRedirect("/hobo_user/profile/%s/" % (user.id))
-
-
-class AddCoworkerFormAjaxView(View, JSONResponseMixin):
-    template_name = 'user_pages/add-coworker-form1.html'
+class AttachCoworkerAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/attach-coworker.html'
 
     def get(self, *args, **kwargs):
         context = dict()
-        user = self.request.user
-        count = self.request.GET.get('count')
-        all_users_dict = {}
-        job_types_dict = {}
-
-        # exclude super user and current user
-        user_ids = []
-        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
-        for id in super_users:
-            user_ids.append(id)
-        user_ids.append(user.id)
-        all_users = CustomUser.objects.exclude(id__in=user_ids)
-
-        job_types = JobType.objects.all()
-        for usr in all_users:
-            all_users_dict[usr.id] = usr.first_name+" "+usr.last_name
-        for job in job_types:
-            job_types_dict[job.id] = job.title
-        add_coworker_form_html = render_to_string(
-                                'user_pages/add-coworker-form1.html', {
-                                    'all_users': all_users_dict,
-                                    'job_types': job_types_dict,
-                                    'count': count
+        id = self.request.GET.get('id')
+        coworker = CoWorker.objects.get(id=id)
+        attach_coworker_html = render_to_string(
+                                'user_pages/attach-coworker.html', {
+                                    'coworker': coworker
                                     })
-        context['add_coworker_form_html'] = add_coworker_form_html
-        return self.render_json_response(context)
-
-
-class AddNewCoworkerFormAjaxView(View, JSONResponseMixin):
-    template_name = 'user_pages/add-coworker-form2.html'
-
-    def get(self, *args, **kwargs):
-        context = dict()
-        count = self.request.GET.get('new_count')
-        job_types_dict = {}
-        job_types = JobType.objects.all()
-        for job in job_types:
-            job_types_dict[job.id] = job.title
-        add_new_coworker_form_html = render_to_string(
-                                'user_pages/add-coworker-form2.html', {
-                                    'job_types': job_types_dict,
-                                    'count': count
-                                    })
-        context['add_new_coworker_form_html'] = add_new_coworker_form_html
+        context['attach_coworker_html'] = attach_coworker_html
         return self.render_json_response(context)
 
 
@@ -2385,9 +2590,117 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         try:
             profile = UserProfile.objects.get(user=user)
             all_agents = UserAgentManager.objects.filter(user=user)
-            context['all_agents'] = all_agents
+            context['all_agents'] = all_agents.filter(agent_type='agent')
+            context['all_managers'] = all_agents.filter(agent_type='manager')
             context['profile'] = profile
+            pos_list = [2, 3, 4]
+            all_photos = Photo.objects.filter(user=user)
+            photos = all_photos.filter(position__in=pos_list).order_by('position')
+            context['photos'] = photos[:3]
+            try:
+                track_obj = UserTacking.objects.get(user=user)
+                trackers_list = track_obj.tracked_by.all()
+                tracking_list = UserTacking.objects.filter(
+                                tracked_by=user)
+                context['trackers_list_count'] = trackers_list.count()
+                context['tracking_list_count'] = tracking_list.count()
+                context['trackers_list'] = trackers_list[:6]
+                context['tracking_list'] = tracking_list[:6]
+            except UserTacking.DoesNotExist:
+                pass
+            try:
+                friend_obj = Friend.objects.get(user=user)
+                friends = friend_obj.friends.all()
+                context['friends'] = friends[:8]
+            except FriendRequest.DoesNotExist:
+                pass
         except UserProfile.DoesNotExist:
+            message = "No Data Available"
+            context['message'] = message
+        return context
+
+
+class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/production-company-profile.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+        context['user'] = user
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
+        context['photos'] = photos[:3]
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            tracking_list = UserTacking.objects.filter(
+                            tracked_by=user)
+            context['trackers_list_count'] = trackers_list.count()
+            context['tracking_list_count'] = tracking_list.count()
+            context['trackers_list'] = trackers_list[:6]
+            context['tracking_list'] = tracking_list[:6]
+        except UserTacking.DoesNotExist:
+            pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
+            pass
+        try:
+            profile = CompanyProfile.objects.get(user=user)
+            context['profile'] = profile
+            try:
+                coworkers = CoWorker.objects.filter(company=user)
+                context['staff'] = coworkers
+            except CoWorker.DoesNotExist:
+                pass
+        except CompanyProfile.DoesNotExist:
+            message = "No Data Available"
+            context['message'] = message
+        return context
+
+
+class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/agency-management-company-profile.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+        context['user'] = user
+        try:
+            profile = CompanyProfile.objects.get(user=user)
+            context['profile'] = profile
+            try:
+                coworkers = CoWorker.objects.filter(company=user)
+                context['staff'] = coworkers
+            except CoWorker.DoesNotExist:
+                pass
+            try:
+                clients = CompanyClient.objects.filter(company=user)
+                client_dict = {}
+                for obj in clients:
+                    if obj.position is not None and obj.position not in client_dict:
+                        client_dict[obj.position] = []
+                        client_dict[obj.position].append(obj)
+                    elif obj.position is None and obj.new_position not in client_dict:
+                        client_dict[obj.new_position] = []
+                        client_dict[obj.new_position].append(obj)
+                    elif obj.position is not None and obj.position in client_dict:
+                        client_dict[obj.position].append(obj)
+                    elif obj.position is None and obj.new_position in client_dict:
+                        client_dict[obj.new_position].append(obj)
+                    else:
+                        pass
+                context['client_dict'] = client_dict
+            except CoWorker.DoesNotExist:
+                pass
+        except CompanyProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
         return context
@@ -2527,11 +2840,45 @@ class TrackUserAPI(APIView):
                                     }
                         return Response(response)
                     track_obj.tracked_by.add(track_by_user.id)
+
                 except UserTacking.DoesNotExist:
                     track_obj = UserTacking()
                     track_obj.user = track_user
                     track_obj.save()
                     track_obj.tracked_by.add(track_by_user.id)
+
+                # update notification table
+                notification = UserNotification()
+                notification.user = track_user
+                notification.notification_type = UserNotification.TRACKING
+                notification.from_user = track_by_user
+                notification.save()
+
+                # send email
+                try:
+                    user_settings = CustomUserSettings.objects.get(user=track_user)
+                    if user_settings.someone_tracks_me == True:
+                        subject = track_by_user.first_name + ' started tracking you'
+                        message = ''
+                        msg_html = loader.render_to_string('user_pages/tracking_email.html',
+                                    {'track_by_user': track_by_user,
+                                    'first_name':track_user.first_name })
+                        email_from = settings.EMAIL_HOST_USER
+                        recipient_list = [track_user.email, ]
+                        send_mail( subject, message, email_from, recipient_list, html_message=msg_html)
+                except CustomUserSettings.DoesNotExist:
+                    pass
+
+                # send notification
+                room_name = "user_"+str(track_obj.user.id)
+                notification_msg = {
+                        'type': 'send_notification',
+                        'message': str(track_by_user.get_full_name()),
+                        'track_by_user_id': str(track_by_user.id),
+                        "event": "TRACK"
+                    }
+                notify(room_name, notification_msg)
+
                 msg = "Started Tracking " + track_user.get_full_name()
                 response = {'message': msg,
                             'status': status.HTTP_200_OK,
@@ -2563,6 +2910,16 @@ class UnTrackUserAPI(APIView):
             try:
                 track_obj = UserTacking.objects.get(user=track_user)
                 track_obj.tracked_by.remove(track_by_user.id)
+                # remove from notification table
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=track_user) &
+                        Q(from_user=track_by_user) &
+                        Q(notification_type=UserNotification.TRACKING)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
             except UserTacking.DoesNotExist:
                 response = {'errors': "invalid id", 'status':
                              status.HTTP_400_BAD_REQUEST}
@@ -2591,7 +2948,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         tracking_list = UserTacking.objects.filter(
                         tracked_by=user)
         photos = Photo.objects.filter(user=user).order_by('position')
+        myinterests = UserInterest.objects.filter(user=user)
 
+        context['myinterests'] = myinterests
         context['trackers_list'] = trackers_list
         context['tracking_list'] = tracking_list
         context['photos'] = photos
@@ -2655,7 +3014,6 @@ class SwapImageAjaxView(View, JSONResponseMixin):
             except Photo.DoesNotExist:
                 swap_obj1.position = position
                 swap_obj1.save()
-
         except Photo.DoesNotExist:
             pass
         return self.render_json_response(context)
@@ -2669,20 +3027,111 @@ class UploadImageView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        position = self.request.POST.get('position')
-        file = self.request.FILES['image']
+        position = ""
+        file = ""
+        if 'position' in self.request.POST:
+            position = self.request.POST.get('position')
+        if 'image' in self.request.FILES:
+            file = self.request.FILES['image']
+        if position and file:
+            try:
+                photo_obj = Photo.objects.get(Q(user=user) & Q(position=position))
+                photo_obj.image = file
+                photo_obj.save()
+            except Photo.DoesNotExist:
+                photo_obj = Photo()
+                photo_obj.image = file
+                photo_obj.position = position
+                photo_obj.user = user
+                photo_obj.save()
+        elif position and not file:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please upload image'
+                    )
+        elif file and not position:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please choose position'
+                    )
+        elif not file and not position:
+            messages.warning(
+                    self.request,
+                    'Cannot save!! Please upload image and choose position'
+                    )
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-        photo_obj = Photo.objects.filter(Q(user=user) & Q(position=position)).first()
-        if photo_obj:
-            photo_obj.image = file
-            photo_obj.save()
+class AddUserInterestAPI(APIView):
+    serializer_class = UserInterestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user_interests = UserInterest.objects.filter(user=self.request.user)
+        data_dict = {}
+        for obj in user_interests:
+             serializer = self.serializer_class(obj).data
+             data_dict[obj.id] = serializer
+        return Response(data_dict)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            obj = UserInterest()
+            obj.user = self.request.user
+            obj.position = JobType.objects.get(pk=data_dict['position'])
+            obj.location = Location.objects.get(pk=data_dict['location'])
+            obj.format = data_dict['format']
+            obj.save()
+            response = {'message': "User interest added.",
+                        'status': status.HTTP_200_OK}
         else:
-            photo_obj = Photo()
-            photo_obj.image = file
-            photo_obj.position = position
-            photo_obj.user = user
-            photo_obj.save()
-        return HttpResponseRedirect(reverse("hobo_user:friends-and-followers"))
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddUserInterestView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-production.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        positions = self.request.POST.getlist('position')
+        formats = self.request.POST.getlist('format')
+        locations = self.request.POST.getlist('location')
+        count = len(locations)
+        json_dict = {}
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        for i in range(count):
+            print("count", i)
+            json_dict['position'] = positions[i]
+            json_dict['format'] = formats[i]
+            json_dict['location'] = locations[i]
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
+                                data=json.dumps(json_dict),
+                                headers={'Content-type': 'application/json',
+                                        'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        errors = response['errors']
+                        print(errors)
+                        messages.warning(
+                            self.request, "Failed to update My interests !!")
+                        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "My Interests updated successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class UploadImageAPI(APIView):
@@ -2694,7 +3143,6 @@ class UploadImageAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
             user = self.request.user
             position = data_dict['position']
             file =  request.data['file']
@@ -2715,3 +3163,523 @@ class UploadImageAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class GetNotificationAPI(APIView):
+    serializer_class = UserNotificationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        response = {}
+        notifications = UserNotification.objects.filter(
+                        user=request.user).order_by('-created_time')
+        unread_count = notifications.filter(status_type=UserNotification.UNREAD).count()
+        for notification_obj in notifications:
+            response[notification_obj.id] = self.serializer_class(notification_obj).data
+        response['unread_count'] = unread_count
+        return Response(response)
+
+
+class GetTrackingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/tracking_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.TRACKING)).id
+        tracking_notification_html = render_to_string(
+                                'user_pages/tracking_notification.html',
+                                {'from_user': from_user,
+                                'notification_id':notification_id,
+                                })
+        context['tracking_notification_html'] = tracking_notification_html
+        return self.render_json_response(context)
+
+class GetFriendRequestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/friend_request_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.FRIEND_REQUEST)).id
+        notification_html = render_to_string(
+                                'user_pages/friend_request_notification.html',
+                                {'from_user': from_user,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetFriendRequestAcceptNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/friend_request_accept_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.get(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)).id
+        notification_html = render_to_string(
+                                'user_pages/friend_request_accept_notification.html',
+                                {'from_user': from_user,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetAllNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/all_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        notifications = UserNotification.objects.filter(
+                        user=self.request.user).order_by('-created_time')
+        all_notification_html = render_to_string(
+                                'user_pages/all_notification.html',
+                                {'notifications': notifications}
+                                )
+        context['all_notification_html'] = all_notification_html
+        return self.render_json_response(context)
+
+
+class AddUserInterestAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-my-interest-form.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        count = self.request.GET.get('count')
+        add_my_interests_form_html = render_to_string(
+                                'user_pages/add-my-interest-form.html',
+                                {'my_interest_form': UserInterestForm,
+                                 'count': count}
+                                )
+        context['add_my_interests_form_html'] = add_my_interests_form_html
+        return self.render_json_response(context)
+
+
+class ChangeNotificationStatusAPI(APIView):
+    serializer_class = ChangeNotificationStatusSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            id = data_dict['id']
+            obj = UserNotification.objects.get(pk=id)
+            obj.status_type = data_dict['status_type']
+            obj.save()
+            response = {'message': "Status changed",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CompanyClientAPI(APIView):
+    serializer_class = CompanyClientSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        clients = CompanyClient.objects.filter(company=self.request.user)
+        response = {}
+        for client in clients:
+            response[client.id] = self.serializer_class(client).data
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        company = request.user
+        if serializer.is_valid():
+            data_dict = serializer.data
+            client = CompanyClient()
+            client.company = company
+            if 'position' in data_dict and data_dict['position'] != 'new_job':
+                position = JobType.objects.get(id=data_dict['position'])
+                client.position = position
+            if 'name' in data_dict:
+                client.name = data_dict['name']
+            if 'new_position' in data_dict:
+                pos = data_dict['new_position']
+                client.new_position = pos.capitalize()
+            if 'email' in data_dict:
+                client.email = data_dict['email']
+                try:
+                    user = CustomUser.objects.get(email=data_dict['email'])
+                    client.user = user
+                    client.name = user.get_full_name()
+                    if 'position' in data_dict and data_dict['position'] != 'new_job':
+                        try:
+                            profile = UserProfile.objects.get(user=user)
+                            profile.update_job_type(position.id)
+                            profile.save()
+                        except UserProfile.DoesNotExist:
+                            pass
+                except CustomUser.DoesNotExist:
+                    pass
+            client.save()
+            response = {'message': "Client Added",
+                        'id': client.id,
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class SendFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+                try:
+                    request_obj = FriendRequest.objects.get(
+                                    Q(user=user) &
+                                    Q(requested_by=requested_by)
+                                    )
+                    response = {'errors': "Request Already Send", 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                except FriendRequest.DoesNotExist:
+                    request_obj = FriendRequest()
+                    request_obj.user = user
+                    request_obj.requested_by = requested_by
+                    request_obj.status = FriendRequest.REQUEST_SEND
+                    request_obj.save()
+
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = user
+                    notification.notification_type = UserNotification.FRIEND_REQUEST
+                    notification.from_user = requested_by
+                    notification.save()
+
+                    # send email
+                    try:
+                        user_settings = CustomUserSettings.objects.get(user=user)
+                        if user_settings.friend_request == True:
+                            subject = 'Friend Request'
+                            message = ''
+                            msg_html = loader.render_to_string('user_pages/friend_request_email.html',
+                                        {'requested_by': requested_by, 'first_name':user.first_name })
+                            email_from = settings.EMAIL_HOST_USER
+                            recipient_list = [user.email, ]
+                            send_mail( subject, message, email_from, recipient_list, html_message=msg_html)
+                    except CustomUserSettings.DoesNotExist:
+                        pass
+
+                    # send notification
+                    room_name = "user_"+str(user.id)
+                    notification_msg = {
+                            'type': 'send_friend_request_notification',
+                            'message': str(user.get_full_name()),
+                            'friend_request_from': str(requested_by.id),
+                            "event": "FRIEND_REQUEST"
+                        }
+                    notify(room_name, notification_msg)
+
+                    response = {'message': "Friend Request Send",
+                                'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AcceptFriendRequestAPI(APIView):
+    serializer_class = AcceptFriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = CustomUser.objects.get(id=data_dict['requested_by'])
+                user = self.request.user
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND))
+                request_obj.delete()
+
+                # update notification table
+                notification = UserNotification()
+                notification.user = requested_by
+                notification.notification_type = UserNotification.FRIEND_REQUEST_ACCEPT
+                notification.from_user = user
+                notification.save()
+                # update friends list of both users
+                try:
+                    friend_obj = Friend.objects.get(user=user)
+                    friend_obj.friends.add(requested_by)
+                except Friend.DoesNotExist:
+                    friend_obj = Friend()
+                    friend_obj.user = user
+                    friend_obj.save()
+                    friend_obj.friends.add(requested_by)
+                try:
+                    friend_obj = Friend.objects.get(user=requested_by)
+                    friend_obj.friends.add(user)
+                except Friend.DoesNotExist:
+                    friend_obj = Friend()
+                    friend_obj.user = requested_by
+                    friend_obj.save()
+                    friend_obj.friends.add(user)
+                # send notification
+                room_name = "user_"+str(requested_by.id)
+                notification_msg = {
+                        'type': 'send_friend_request_accept_notification',
+                        'message': str(user.get_full_name()),
+                        'from': str(user.id),
+                        "event": "FRIEND_REQUEST_ACCEPT"
+                    }
+                notify(room_name, notification_msg)
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Accepted",
+                            'name': requested_by.get_full_name(),
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CancelFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND)
+                                )
+                request_obj.delete()
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Deleted",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeleteFriendRequestAPI(APIView):
+    serializer_class = AcceptFriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = CustomUser.objects.get(id=data_dict['requested_by'])
+                user = self.request.user
+                request_obj = FriendRequest.objects.get(
+                                Q(user=user) &
+                                Q(requested_by=requested_by) &
+                                Q(status=FriendRequest.REQUEST_SEND)
+                                )
+                request_obj.delete()
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "Friend Request Deleted",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+            except FriendRequest.DoesNotExist:
+                response = {'errors': "Invalid Id. Friend Request object not found", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ListFriendRequestAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        friend_request_dict = {}
+        user = request.user
+        friend_requests = FriendRequest.objects.filter(
+                          Q(user=user) &
+                          Q(status=FriendRequest.REQUEST_SEND))
+        for obj in friend_requests:
+            friend_request_dict[obj.id] = self.serializer_class(obj).data
+        response['friend_requests'] = friend_request_dict
+        return Response(response)
+
+
+class ListAllFriendsAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        friends_dict = {}
+        user = request.user
+        friends = FriendRequest.objects.filter(
+                          Q(user=user) &
+                          Q(status=FriendRequest.ACCEPTED))
+        for obj in friends:
+            friends_dict[obj.requested_by.id] = obj.requested_by.email
+        response['friends'] = friends_dict
+        return Response(response)
+
+
+class UnFriendUserAPI(APIView):
+    serializer_class = FriendRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                requested_by = self.request.user
+                user = CustomUser.objects.get(id=data_dict['user'])
+
+                try:
+                    friend_obj = Friend.objects.get(user=user)
+                    friend_obj.friends.remove(requested_by)
+                except Friend.DoesNotExist:
+                    pass
+                try:
+                    friend_obj = Friend.objects.get(user=requested_by)
+                    friend_obj.friends.remove(user)
+                except Friend.DoesNotExist:
+                    pass
+                # update notification table
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=user) &
+                        Q(from_user=requested_by) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(user=requested_by) &
+                        Q(from_user=user) &
+                        Q(notification_type=UserNotification.FRIEND_REQUEST_ACCEPT)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+                response = {'message': "UnFriend User",
+                            'status': status.HTTP_200_OK}
+            except CustomUser.DoesNotExist:
+                response = {'errors': "Invalid Id.", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class UpdateFriendStatusAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/update-friend-status.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        logged_user = self.request.user
+        id = self.request.GET.get('profile_id')
+        profile_user = CustomUser.objects.get(id=id)
+        friend_status_html = render_to_string(
+                                'user_pages/friend-status.html',
+                                {'profile_user': profile_user,
+                                 'logged_user': logged_user}
+                                )
+        context['friend_status_html'] = friend_status_html
+        return self.render_json_response(context)

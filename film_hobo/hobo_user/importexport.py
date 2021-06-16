@@ -1,7 +1,7 @@
 from import_export.resources import ModelResource
 
 from .models import EthnicAppearance, AthleticSkill, Country, \
-    GuildMembership, JobType
+    GuildMembership, JobType, Location
 
 
 class EthnicAppearanceResource(ModelResource):
@@ -32,4 +32,10 @@ class JobTypeResource(ModelResource):
 
     class Meta:
         model = JobType
+
+
+class LocationResource(ModelResource):
+
+    class Meta:
+        model = Location
 

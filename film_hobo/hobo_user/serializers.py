@@ -22,8 +22,10 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
-    UserRating, UserAgentManager, Photo
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
+    UserProfile, CoWorker, UserInterest, \
+    UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
+    CompanyClient, FriendRequest
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -478,6 +480,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
     country = serializers.CharField()
+    company_type = serializers.CharField()
 
     # company details
     company_name = serializers.CharField()
@@ -493,7 +496,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
                   'last_name', 'password1', 'password2', 'phone_number',
                   'date_of_birth', 'address', 'country',
                   'company_name', 'company_address', 'company_website',
-                  'company_phone', 'title', 'membership']
+                  'company_phone', 'title', 'membership', 'company_type']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -569,6 +572,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
             'date_of_birth': self.validated_data.get('date_of_birth', ''),
             'address': self.validated_data.get('address', ''),
             'country': self.validated_data.get('country', ''),
+            'company_type': self.validated_data.get('company_type', ''),
             'company_name': self.validated_data.get('company_name', ''),
             'company_address': self.validated_data.get('company_address', ''),
             'company_website': self.validated_data.get('company_website', ''),
@@ -740,10 +744,44 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'membership']
 
 
+class ProductionCompanyProfileSerializer(serializers.ModelSerializer):
+    membership = serializers.CharField(read_only=True)
+    company_name = serializers.CharField(
+                    max_length=150,
+                    required=True,)
+    company_website = serializers.CharField(
+                        max_length=150,
+                        required=False,)
+
+    class Meta:
+        model = CompanyProfile
+        fields = ['company_name', 'company_website', 'imdb', 'bio',
+                  'submission_policy_SAMR', 'membership']
+
+
+class AgentManagementCompanyProfileSerializer(serializers.ModelSerializer):
+    membership = serializers.CharField(read_only=True)
+    company_name = serializers.CharField(
+                    max_length=150,
+                    required=True,)
+    company_website = serializers.CharField(
+                        max_length=150,
+                        required=False,)
+    agency_management_type = serializers.CharField(
+                            max_length=150,
+                            required=False,)
+
+    class Meta:
+        model = CompanyProfile
+        fields = ['company_name', 'company_website', 'bio',
+                  'submission_policy_SAMR', 'membership',
+                  'agency_management_type']
+
+
 class CoWorkerSerializer(serializers.ModelSerializer):
     name = serializers.CharField(
         max_length=150,
-        required=False, allow_blank=True
+        required=True, allow_blank=True
     )
     user = serializers.CharField(
         max_length=150,
@@ -753,6 +791,7 @@ class CoWorkerSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+    email = serializers.EmailField()
     id = serializers.CharField(
         max_length=150,
         required=False,
@@ -760,11 +799,21 @@ class CoWorkerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CoWorker
-        fields = ['id', 'user', 'name', 'position']
+        fields = ['id', 'user', 'email', 'name', 'position']
 
 
 class RemoveCoWorkerSerializer(serializers.Serializer):
-    id = serializers.ListField(required=False)
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class RemoveClientSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
 
 
 class RemoveAgentManagerSerializer(serializers.Serializer):
@@ -859,3 +908,83 @@ class UploadPhotoSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class UserNotificationSerializer(serializers.ModelSerializer):
+    # unread_count = serializers.CharField(
+    #     max_length=150,
+    #     required=True,
+    # )
+    user = serializers.StringRelatedField()
+    from_user = serializers.StringRelatedField()
+
+    class Meta:
+        model = UserNotification
+        exclude = []
+
+
+class ChangeNotificationStatusSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserNotification
+        fields = ['id', 'status_type']
+
+
+class UserInterestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserInterest
+        fields = ['position', 'format', 'location']
+
+
+class CompanyClientSerializer(serializers.ModelSerializer):
+    position = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    new_position = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    class Meta:
+        model = CompanyClient
+        fields = ['name', 'email', 'position', 'new_position']
+
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    status = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    requested_by = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+    class Meta:
+        model = FriendRequest
+        fields = ['user', 'status', 'requested_by']
+
+
+class AcceptFriendRequestSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    requested_by = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendRequest
+        fields = ['user', 'requested_by']
+
