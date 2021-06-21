@@ -860,6 +860,38 @@ class GetOrderDetails(APIView):
         return JsonResponse(data)
 
 
+class SubscriptionDetails(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        if membership_type == 'IND':
+            if payment_plan == 'monthly':
+                plan_id = settings.INDIE_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.INDIE_PAYMENT_YEARLY
+        elif membership_type == 'PRO':
+            if payment_plan == 'monthly':
+                plan_id = settings.PRO_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.PRO_PAYMENT_YEARLY
+        elif membership_type == 'COM':
+            if payment_plan == 'monthly':
+                plan_id = settings.COMPANY_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.COMPANY_PAYMENT_YEARLY
+        else:
+            pass
+        return Response(
+                {"plan_id": plan_id}, status=status.HTTP_200_OK)
+
+
 # class ProcessSubscription(APIView):
 
 #     def post(self, request, *args, **kwargs):

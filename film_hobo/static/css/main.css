@@ -125,6 +125,15 @@
 .navbar-light .navbar-nav .nav-link.active{
   color: #e88b22; 
 }
+.navbar-light .navbar-nav .active>.nav-link,
+.navbar-light .navbar-nav .nav-link.active,
+ .navbar-light .navbar-nav .nav-link.show, 
+ .navbar-light .navbar-nav .show>.nav-link {
+  color: #e88b22; 
+ }
+ .navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+  color: #e88b22; 
+}
 /*navbar section end*/
 /*footer*/
 .fh-footer{

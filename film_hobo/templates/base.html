@@ -11,6 +11,7 @@
         <title></title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/main1.css' %}">
@@ -261,27 +262,36 @@
     /*
     code to store token info into local storage on login
     */
-    document.getElementById("login-submit").addEventListener("click", function() {
-        var email = $('#id_username').val();
-        var password = $('#id_password').val();
-        origin_url = window.location.origin
-        post_url = origin_url + '/hobo_user/login/'
-        extra_args = {"email": email.toString(), "password": password.toString()}
-        axios.post(post_url, extra_args)
-        .then((response) => {
-            localStorage.setItem('token', response.data.key);
-        }, (error) => {
-            console.log(error);
+    login_element = $("[id=login-submit]")
+    if (login_element.length != 0){
+        document.getElementById("login-submit").addEventListener("click", function() {
+            var email = $('#id_username').val();
+            var password = $('#id_password').val();
+            origin_url = window.location.origin
+            post_url = origin_url + '/hobo_user/login/'
+            extra_args = {"email": email.toString(), "password": password.toString()}
+            axios.post(post_url, extra_args)
+            .then((response) => {
+                localStorage.setItem('token', response.data.key);
+            }, (error) => {
+                console.log(error);
+            });
         });
-    });
+    }
+
     </script>
     <script>
     /*
     code to clear token info from local storage on logout
     */
-    document.getElementById("logout_link").addEventListener("click", function() {
-        localStorage.removeItem("token");
-    });
+    logout_element = $("[id=logout_link]")
+    if (login_element.length != 0){
+        document.getElementById("logout_link").addEventListener("click", function() {
+            localStorage.removeItem("token");
+        });
+    }
+
+
     </script>
 </html>
 {% block extrajs %}

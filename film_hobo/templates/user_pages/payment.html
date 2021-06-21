@@ -88,7 +88,7 @@
                                     <span id="final_amount">0</span>
                                     {% endif %}
                                 </div><br>
-                                <div id="paypal-div" class="mt-4">
+                                    <div id="paypal-div" class="mt-4">
                                 </div>
                             </form>
                         </div>
@@ -134,7 +134,6 @@
 
 {% block extrajs %}
 <script src="{% static 'js/registration_payment.js' %}"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2
-&vault=true&intent=subscription"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2&vault=true&intent=subscription"></script>
 <script src="{% static 'js/paypal_payment.js' %}"></script>
 {% endblock %}
