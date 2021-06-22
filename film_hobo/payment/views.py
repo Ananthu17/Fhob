@@ -1,8 +1,9 @@
+import json
+import requests
+
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -890,6 +891,26 @@ class SubscriptionDetails(APIView):
             pass
         return Response(
                 {"plan_id": plan_id}, status=status.HTTP_200_OK)
+
+
+class PaypalToken(APIView):
+
+    def post(self, request, *args, **kwargs):
+        paypal_client_id = settings.PAYPAL_CLIENT_ID
+        paypal_secret = settings.PAYPAL_SECRET_ID
+        data = {'grant_type': 'client_credentials'}
+        user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                            data=data,
+                            auth=(paypal_client_id, paypal_secret),
+                            headers={'Accept': 'application/json',
+                                     'Accept-Language': 'en_US'})
+        if user_response.status_code == 200:
+            access_token = json.loads(user_response.content)['access_token']
+            return Response(
+                {"access_token": access_token}, status=status.HTTP_200_OK)
+        else:
+            return HttpResponse('Could not save data')
 
 
 # class ProcessSubscription(APIView):

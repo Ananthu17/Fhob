@@ -1252,3 +1252,17 @@ class UserNotification(models.Model):
     class Meta:
         verbose_name = 'User Notification'
         verbose_name_plural = 'User Notifications'
+
+
+class Feedback(models.Model):
+    email = models.EmailField(_('Email'))
+    name = models.CharField(_('Name'),
+                            max_length=150, null=True, blank=True)
+    user_rating = models.FloatField(_("Rating"), null=True, blank=True)
+    user_feedback = models.TextField(_("Feedback"), blank=True, null=True)
+    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        verbose_name = 'Feedback'
+        verbose_name_plural = 'Feedbacks'

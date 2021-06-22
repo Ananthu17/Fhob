@@ -60,7 +60,8 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, \
                     UserProfile, JobType, UserRating, Location, \
-                    UserRatingCombined, UserTacking, CompanyProfile
+                    UserRatingCombined, UserTacking, CompanyProfile, \
+                    Feedback
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -78,7 +79,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     ProductionCompanyProfileSerializer, UserInterestSerializer, \
     AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
-    AcceptFriendRequestSerializer
+    AcceptFriendRequestSerializer, FeedbackSerializer
 
 from .utils import notify, get_notifications_time
 
@@ -3683,3 +3684,20 @@ class UpdateFriendStatusAjaxView(View, JSONResponseMixin):
                                 )
         context['friend_status_html'] = friend_status_html
         return self.render_json_response(context)
+
+
+class FeedbackView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        email = request.data['email']
+        name = request.data['name']
+        user_rating = request.data['user_rating']
+        feedback = request.data['feedback']
+        feedback_obj = Feedback.objects.create(email=email,
+            name=name, user_rating=user_rating, user_feedback=feedback)
+        serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

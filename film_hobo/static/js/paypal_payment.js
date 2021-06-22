@@ -43,6 +43,13 @@ axios.post(subscription_details_url, subscription_details_args)
 }, (error) => {
     console.log(error);
 });
+
+const headers = {
+    'Accept': 'application/json',
+    'Authorization': 'Bearer Access-Token',
+    'Content-Type': 'application/json',
+  }
+
 paypal.Buttons({
 
 createSubscription: function(data, actions) {

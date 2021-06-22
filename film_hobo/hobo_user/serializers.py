@@ -25,7 +25,7 @@ from .models import CustomUser, Country, GuildMembership, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
     UserProfile, CoWorker, UserInterest, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient, FriendRequest
+    CompanyClient, FriendRequest, Feedback
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -988,3 +988,9 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
+
+class FeedbackSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'
