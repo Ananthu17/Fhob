@@ -37,6 +37,8 @@ subscription_details_args = {
     "payment_plan": $("#payment_plan").text(),
 }
 
+var plan_id = ""
+
 axios.post(subscription_details_url, subscription_details_args)
 .then((response) => {
     plan_id = response.data.plan_id
