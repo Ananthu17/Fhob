@@ -52,6 +52,7 @@ const headers = {
     'Content-Type': 'application/json',
   }
 
+success_redirect = origin_url + '/hobo_user/user_login/'
 paypal.Buttons({
 
 createSubscription: function(data, actions) {
@@ -64,8 +65,31 @@ createSubscription: function(data, actions) {
 },
 
 onApprove: function(data, actions) {
+    transaction_args = {
+        "token": localStorage.getItem("token"),
+        "days_free": $("#days_free").text(),
+        "payment_plan": $("#payment_plan").text(),
+        "initial_amount": $("#initial_amount_val").text(),
+        "tax_applied": $("#tax_percentage").text(),
+        "promocodes_applied": applied_promo,
+        "promotion_amount": $("#promotion_amount").text(),
+        "final_amount": $("#final_amount").text(),
+    }
 
-    alert('You have successfully created subscription ' + data.subscriptionID);
+    return fetch(create_url, {
+        method: 'post',
+        headers: {
+            'content-type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify(transaction_args),
+    }).then(function(res) {
+        alert('You have successfully created subscription ' + data.subscriptionID);
+        var delay = 1000;
+        setTimeout(function(){ window.location = success_redirect; }, delay);
+    }).then(function(data) {
+        return data.id;
+    });
 
   }
 
