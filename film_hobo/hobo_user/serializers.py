@@ -23,7 +23,7 @@ from .models import CustomUser, Country, GuildMembership, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
     UserProfile, CoWorker, UserInterest, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient, FriendRequest
+    CompanyClient, FriendRequest, FriendGroup
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -967,3 +967,40 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
+
+class AddGroupSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    title = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendGroup
+        fields = ['user', 'title']
+
+
+class AddFriendToGroupSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    groups = serializers.ListField(required=True)
+    friend = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendGroup
+        fields = ['user', 'friend', 'groups']
+
+
+class RemoveFriendGroupSerializer(serializers.Serializer):
+    group = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

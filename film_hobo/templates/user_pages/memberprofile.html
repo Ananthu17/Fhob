@@ -157,7 +157,11 @@
                 <div class="left-mode-sec mem-img-p">
                     <div class="row">
                         <div class="col-12 mem-set-img">
+                            {% if profile.user.get_profile_photo %}
                             <img src="{{ profile.user.get_profile_photo}}" class="img-fluid mem-set-top-img" />
+                            {% else %}
+                            <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid mem-set-top-img" />
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row mt-1">
@@ -184,6 +188,7 @@
                         {% endif %}
                             <div class="col-3 mem-set-net-img-sec2">
                                 {% if item.get_profile_photo %}
+                                <a href="{{item.get_profile_url }}">
                                 <img src="{{item.get_profile_photo}}"
                                 title="{{item.get_full_name}}"
                                 class="img-fluid mem-set-img-add">
@@ -191,7 +196,7 @@
                                 <img src="{% static 'images/default_profile_pic.png' %}"
                                 title="{{obj.user.get_full_name}}"
                                 class="img-fluid mem-set-img-add">
-                                {% endif %}
+                                {% endif %}</a>
                                 <div class="mem-set-img-add-nam">{{item.get_full_name|truncatechars:"5"}}</div>
                             </div>
                         {% if forloop.last or forloop.counter == 4 %}
@@ -214,12 +219,14 @@
                         <div class="row pl-3 pr-3">
                             {% for obj in tracking_list %}
                             <div class="col-2 mem-set-img">
+                                <a href="{{ obj.user.get_profile_url }}">
                                 {% if obj.user.get_profile_photo %}
                                 <img src="{{obj.user.get_profile_photo}}" title="{{obj.user.get_full_name}}" class="img-fluid mem-set-img-track-sec2">
                                 {% else %}
                                 <img src="{% static 'images/default_profile_pic.png' %}" title="{{obj.user.get_full_name}}"
                                 class="img-fluid mem-set-img-track-sec2">
                                 {% endif %}
+                                </a>
                                 <div class="mem-set-img-track-nam">{{obj.user.first_name|truncatechars:"5"}}</div>
                             </div>
                            {% endfor %}

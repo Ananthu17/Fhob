@@ -1,0 +1,129 @@
+{% load static %}
+{% load friend_request_tag %}
+{% for friend in all_friends %}
+{% if forloop.first or forloop.counter0|divisibleby:4 %}
+<div class="row ">
+{% endif %}
+    <div class="s-12 m-3 l-3 {% if forloop.first or forloop.counter0|divisibleby:4 %} mem-width {% endif %}">
+        <div class="row">
+            <div class="col-md-6 col-sm-6">
+                {% if friend.get_profile_photo %}
+                <img src="{{friend.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                {% endif %}
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <span class="symbols">
+                    <i class="fa fa-user-times cursor-pointer"
+                    data-toggle="modal" data-target="#unfriend-{{friend.id}}"
+                    title="Unfriend" aria-hidden="true"></i>
+                    <i class="fa fa-users mt-5 cursor-pointer"  data-toggle="modal"
+                    data-target="#add-to-group-{{friend.id}}" title="Group" aria-hidden="true"></i>
+                </span>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-12">
+            <lable>{{friend.get_full_name|truncatechars:"18"}} </lable>
+            </div>
+        </div>
+        <div class=" row star-alg mt-2">
+            <div class="col-12">
+            <span class="fa fa-star checked "></span>
+            <span class="fa fa-star checked "></span>
+            <span class="fa fa-star checked"></span>
+            <span class="fa fa-star-o"></span>
+            <span class="fa fa-star-o"></span>
+            </div>
+        </div>
+    </div>
+{% if forloop.last or forloop.counter|divisibleby:4 %}
+</div>
+{% endif %}
+    <!-- The Modal -->
+    <div class="modal fade" id="add-to-group-{{friend.id}}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title mem-setup-blu-f">Add to Group</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    {% get_groups friend as friend_groups %}
+                    {% if groups %}
+                    {% for group in groups %}
+                    <div class="col-12">
+                        <input type="checkbox" name="group"
+                        class="group" value="{{group.id}}"
+                        {% if group in friend_groups %} checked {% endif %}>
+                        <label for="{{group}}"> {{group}}</label><br>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="col-12">
+                    <p>No groups available.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <!-- <a class="btn mem-setup-blu-f  save_btn" id="add-friend-to-groups" data-dismiss="modal">Save</a> -->
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                {% if groups %}
+                <button type="button" class="btn btn-outline-danger btn-sm add-friend-to-groups"
+                    data-dismiss="modal" id="{{friend.id}}">Save</button>
+                {% else %}
+                <div class="col-12">
+                    <button type="button" class="btn btn-outline-danger btn-sm"
+                    data-dismiss="modal" >Close</button>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end of modal -->
+    <!-- The Modal -->
+    <div class="modal fade" id="unfriend-{{friend.id}}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title mem-setup-blu-f">Unfriend {{friend.get_full_name}}!!!</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                    <p>Do you want to unfriend {{friend.get_full_name}}?</p>
+                    <input type ="hidden" name="unfriend-user-name"
+                    id="unfriend-user-name" value ="{{friend.get_full_name}}" />
+                    </div>
+                </div>
+                <!-- <a class="btn mem-setup-blu-f  save_btn" id="add-friend-to-groups" data-dismiss="modal">Save</a> -->
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm unfriend-user"
+                    data-dismiss="modal" id="{{friend.id}}">Unfriend</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm"
+                    data-dismiss="modal" >Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end of modal -->
+{% endfor %}

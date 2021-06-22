@@ -48,12 +48,12 @@
         <hr>
         <a href="https://www.filmhobo.com/" target="_blank">
         <img style="display: block;margin-left: auto;margin-right: auto;height: 110px;" src="static/images/FH_Logo.png"></a>
-        <div style="margin-top: 25px;margin-bottom: 25px;">Dear {{to_user}},</div>
+        <div style="margin-top: 25px;margin-bottom: 25px;">Dear {{first_name}},</div>
         <div style="margin-top: 25px;">
-            You have a friend Request from {{from_user}}. Thank you!
+            You have a friend Request from {{requested_by.get_full_name}}. Thank you!
         </div>
         <div style="margin-top: 25px;">Sincerely,</div>
-        <div style="margin-top: 5px;">Film Hobo team.</div>
+        <div style="margin-top: 5px;">FilmHobo team.</div>
         <hr style=" margin-top: 25px;">
     </div>
 </body>

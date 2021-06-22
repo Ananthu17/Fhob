@@ -36,6 +36,7 @@ $('body').on('click' , '.unfriend', function(){
     if(profile_user){
         data_dict['user'] = profile_user;
     }
+    console.log(data_dict)
     $.ajax
         ({
             type: "POST",
@@ -130,14 +131,14 @@ $('body').on('click' , '.accept_friend_request', function(){
               var msg = "You and "+response['name']+" are now friends."
               $(".friend-req-btns").html(" ")
               $(".friend-req-btns").html(msg)
-              $.get('/hobo_user/update-friend-status/',{'profile_id':id})
-              .done(function(data) {
-                  if(data.results!='')
-                      {
-                          $('.friend-status').html("")
-                          $('.friend-status').html(data['friend_status_html'])
-                      }
-              });
+            //   $.get('/hobo_user/update-friend-status/',{'profile_id':id})
+            //   .done(function(data) {
+            //       if(data.results!='')
+            //           {
+            //               $('.friend-status').html("")
+            //               $('.friend-status').html(data['friend_status_html'])
+            //           }
+            //   });
             }
         });
 });

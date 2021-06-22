@@ -1251,3 +1251,46 @@ class UserNotification(models.Model):
     class Meta:
         verbose_name = 'User Notification'
         verbose_name_plural = 'User Notifications'
+
+
+class FriendGroup(models.Model):
+    title = models.CharField(max_length=1000)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='friend_group_user',
+                             verbose_name=_("User"),
+                             null=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'Friend Group'
+        verbose_name_plural = 'Friend Groups'
+
+
+class GroupUsers(models.Model):
+    group = models.ForeignKey("hobo_user.FriendGroup",
+                              on_delete=models.CASCADE,
+                              related_name='group',
+                              verbose_name=_("Group"),
+                              null=True)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='group_user',
+                             verbose_name=_("User"),
+                             null=True)
+    friends = models.ManyToManyField('hobo_user.CustomUser',
+                                     blank=True,
+                                     related_name="group_members",
+                                     verbose_name=_("Friends")
+                                     )
+
+    def __str__(self):
+        title = str(self.user.get_full_name())+"-"+str(self.group)
+        return str(title)
+
+    class Meta:
+        verbose_name = 'Group User'
+        verbose_name_plural = 'Groups Users'
+

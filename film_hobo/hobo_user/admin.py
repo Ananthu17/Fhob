@@ -13,7 +13,8 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
-                    Location, CompanyClient, NewJobType, Friend
+                    Location, CompanyClient, NewJobType, Friend, FriendGroup, \
+                    GroupUsers
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, JobTypeResource, \
@@ -112,6 +113,7 @@ admin.site.register(CompanyProfile)
 admin.site.register(UserInterest)
 admin.site.register(CompanyClient)
 admin.site.register(NewJobType)
+admin.site.register(FriendGroup)
 
 
 @admin.register(EthnicAppearance)
@@ -161,16 +163,29 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
 
+
 class UserTackingAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+
 admin.site.register(UserTacking, UserTackingAdmin)
+
 
 class FriendAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+
 admin.site.register(Friend, FriendAdmin)
+
+
+class GroupUsersAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(GroupUsers, GroupUsersAdmin)

@@ -40,8 +40,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AcceptFriendRequestAPI, ListFriendRequestAPI, \
                    ListAllFriendsAPI, DeleteFriendRequestAPI, UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
-                   CancelFriendRequestAPI, UpdateFriendStatusAjaxView, \
-                   GetFriendRequestAcceptNotificationAjaxView
+                   CancelFriendRequestAPI, AddGroupAPI, RemoveFriendGroupAPI, \
+                   GetFriendRequestAcceptNotificationAjaxView, \
+                   AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
+                   FilterFriendByGroupAjaxView
 
 app_name = "hobo_user"
 
@@ -151,6 +153,12 @@ urlpatterns = [
          name='delete-friend-request-api'),
     path('unfriend-user-api/', UnFriendUserAPI.as_view(),
          name='unfriend-user-api'),
+    path('add-group-api/', AddGroupAPI.as_view(),
+         name='add-group-api'),
+    path('add-friend-to-group-api/', AddFriendToGroupAPI.as_view(),
+         name='add-friend-to-group-api'),
+    path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
+         name='remove-friend-group-api'),
 
 
     # web-view endpoints
@@ -231,8 +239,10 @@ urlpatterns = [
     path('edit-agency-management-company-profile/',
          EditAgencyManagementCompanyView.as_view(),
          name='edit-agency-management-company-profile'),
-    path('update-friend-status/',
-         UpdateFriendStatusAjaxView.as_view(),
-         name='update-friend-status'),
+    path('update-friend-groups/',
+         UpdateFriendGroupAjaxView.as_view(),
+         name='update-friend-groups'),
+    path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
+         name='filter-friend-by-groups'),
 
 ]

@@ -312,3 +312,16 @@ input.pw {
       outline:none;
       box-shadow:none;
     }
+
+.radio-toolbar input[type="radio"]:checked + label {
+  background-color: rgb(223, 193, 193);
+  color :#ff0f0f;
+}
+.page-nav
+  {
+    font-size:18px;
+  }
+.current-page
+  {
+    font-size:14px;
+  }
