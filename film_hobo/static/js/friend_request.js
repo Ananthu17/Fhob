@@ -112,6 +112,7 @@ $('body').on('click' , '.delete_friend_request', function(){
 // Accept friend request
 $('body').on('click' , '.accept_friend_request', function(){
     var token = $("#token").val();
+    console.log("here=---------")
     var id = $(this).attr('id');
     var data_dict = {}
     if(id){

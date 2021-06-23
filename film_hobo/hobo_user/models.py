@@ -309,6 +309,16 @@ class CustomUser(AbstractUser):
                                kwargs={'id': self.id})
         return ""
 
+    def get_edit_profile_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:edit-profile')
+        else:
+            if self.company_type == 'production':
+                return reverse('hobo_user:edit-production-company-profile')
+            if self.company_type == 'agency_management':
+                return reverse('hobo_user:edit-agency-management-company-profile')
+        return ""
+
     @property
     def group_name(self):
         """

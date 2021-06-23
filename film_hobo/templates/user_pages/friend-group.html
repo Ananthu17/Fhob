@@ -1,8 +1,11 @@
 {% for group in groups %}
-<div class="col-3" style="text-align:left;">
-    <p>{{group}}</p>
-</div>
-<div class="col-9" style="text-align:left;">
-    <a id="{{group.id}}" class="remove-friend-group cursor-pointer">Remove</a>
+<div class="row ">
+    <div class="col">
+        <label class="modal-font">{{group}}</label>
+    </div>
+    <div class="col">
+        <a class="modal-tag float-left remove-friend-group cursor-pointer"
+        id="{{group.id}}">Remove</a>
+    </div>
 </div>
 {% endfor %}

@@ -2985,7 +2985,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         try:
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
-            paginator = Paginator(friends, 12)
+            paginator = Paginator(friends, 20)
             page = self.request.GET.get('page1')
             try:
                 friends = paginator.page(page)
@@ -3002,7 +3002,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
-            paginator = Paginator(trackers_list, 12)
+            paginator = Paginator(trackers_list, 5)
             page = self.request.GET.get('page1')
             try:
                 trackers_list = paginator.page(page)
@@ -3015,7 +3015,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
             context['trackers_list_count'] = 0
         tracking_list = UserTacking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
-        paginator = Paginator(tracking_list, 12)
+        paginator = Paginator(tracking_list, 1)
         page = self.request.GET.get('page1')
         try:
             tracking_list = paginator.page(page)
