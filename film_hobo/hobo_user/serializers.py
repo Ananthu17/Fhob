@@ -21,7 +21,7 @@ from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
-    UserRating, UserAgentManager, Photo, Project, Team
+    UserRating, UserAgentManager, Photo, Project, Team, UserRating
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -850,4 +850,10 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['__all__']
+        fields = '__all__'
+
+class UserRatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserRating
+        fields = '__all__'

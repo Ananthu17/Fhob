@@ -32,7 +32,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    UploadImageView, UploadImageAPI, ProjectAPIView, \
                    ProjectCreateAPIView, ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView
+                   TeamDeleteAPIView,ProjectSearchView,UserRatingAPI
 
 app_name = "hobo_user"
 
@@ -188,4 +188,8 @@ urlpatterns = [
          name='delete-team'),
     path('teams/update/<id>', TeamUpdateAPIView.as_view(),
          name='delete-project'),
+    path('projects/search/',ProjectSearchView.as_view(),
+         name="project-search"),
+    path('projects/rating',UserRatingAPI.as_view(),
+         name="rate-api")
 ]

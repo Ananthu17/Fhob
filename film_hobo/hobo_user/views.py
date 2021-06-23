@@ -45,6 +45,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
 from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 from authemail.views import SignupVerify
 
@@ -72,7 +73,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, ProjectSerializer, \
-    TeamSerializer
+    TeamSerializer, UserRatingSerializer
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -2746,7 +2747,7 @@ class TeamAPIView(ListAPIView):
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
   serializer_class = TeamSerializer
-  permission_classes = (IsAuthenticated,)
+ 
 
 class TeamUpdateAPIView(UpdateAPIView):
     queryset = Team.objects.all()
@@ -2759,3 +2760,52 @@ class TeamDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
+
+# Search API for project
+class ProjectSearchView(ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["title"]
+
+# API to rate user associated the project
+class UserRatingAPI(CreateAPIView):
+    queryset = UserRating.objects.all()
+    serializer_class = UserRatingSerializer
+    permission_classes = (IsAuthenticated,)
+
+# class UserRatingAPI(CreateAPIView):
+#     queryset = UserRating.objects.all()
+#     serializer_class = UserRatingSerializer
+#     # permission_classes = (IsAuthenticated,)
+
+    # def post(self,request):
+    #     serializer = self.serializer_class(data=request.data)
+    #     response = {}
+    #     if serializer.is_valid():
+    #         data_dict = serializer.data
+    #         print("Data kittiyath:",data_dict)
+
+
+#  Combined Video rating 
+
+# def combined_rating(user):
+#     ratings = UserRating.objects.filter(user=user)
+#     combined_rating = 0
+#     for item in ratings:
+#         combined_rating + int(item.rating)
+#     return combined_rating % len(ratings)
+
+# UserRatingCombined(user=user,rating=combined_rating(user))
+
+# project=Project.objects.get(pk=1)
+# team = project.team.all()
+# rating= 0
+# for member in team:
+#     rating + find_rating(member)
+# video_rating = rating % len(team)
+
+# def find_rating(user):
+#     obj=UserRatingCombined.objects.get(user=user)
+#     return obj.rating
