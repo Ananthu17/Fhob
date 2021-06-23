@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
+    'django_filters',
 
     # project apps
     'initial_user',
@@ -196,6 +197,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DATE_INPUT_FORMATS': ["%Y-%m-%d"],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
 }
 
 
