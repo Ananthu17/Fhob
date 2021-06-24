@@ -3042,6 +3042,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         groups = FriendGroup.objects.filter(user=user)
         context['groups'] = groups
         context['my_interest_form'] = UserInterestForm
+        context['positions'] = JobType.objects.all()
+        context['locations'] = Location.objects.all()
+        context['format'] = UserInterest.FORMAT_CHOICES
         return context
 
 

@@ -1031,7 +1031,7 @@ class UserInterest(models.Model):
     position = models.ForeignKey("hobo_user.JobType",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_position',
-                                 verbose_name=_("User"),
+                                 verbose_name=_("Position"),
                                  null=True)
     format = models.CharField(_("Format"),
                               choices=FORMAT_CHOICES,

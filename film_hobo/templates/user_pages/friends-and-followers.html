@@ -3,6 +3,7 @@
 {% load friend_request_tag %}
 
 {% block extracss %}
+
 {% endblock %}
 
 {% block content %}
@@ -20,7 +21,7 @@
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests (5)</a></li>
+                        <li><a href="#" class="membr-setup-m">My Interests ({{myinterests.count}})</a></li>
                         <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
                     </ul>
                 </div>
@@ -229,7 +230,7 @@
 
                             <div class="container mb-1">
                                 <div class="card border border-dark img-grp-flow">
-                                    <div class="ml-2 mt-2 mb-2">
+                                    <div class="ml-2 mt-2 mb-2 friend-list">
 
                                         {% for friend in all_friends %}
                                         {% if forloop.first or forloop.counter0|divisibleby:5 %}
@@ -238,11 +239,13 @@
                                             <div class="s-12 m-3 l-3  img-group">
                                                 <div class="row">
                                                     <div class="col-md-6 col-sm-12">
+                                                        <a href="{{friend.get_profile_url}}">
                                                         {% if friend.get_profile_photo %}
                                                         <img src="{{friend.get_profile_photo}}" class=" mem-set-img-networkorfriends">
                                                         {% else %}
                                                         <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
                                                         {% endif %}
+                                                    </a>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -375,7 +378,7 @@
                                     </div>
                             </div>
                     
-                </div>
+                        </div>
                 <hr class="mem-set-acc-hr-1">
                 <!-- Tracking and trackers -->
                 <div class="row">
@@ -456,7 +459,7 @@
                                     </div>
                                 <!-- end dropdown bar     -->
 
-                                <div class="container mb-3">
+                                <div class="container mb-2">
                                     <!-- Tracking div  -->
                                     <div class="card border border-dark img-grp-flow-tracker" id="Menu1">
                                         <div class="ml-2 mt-2 mb-2">
@@ -492,21 +495,6 @@
                                             {% endfor %}
                                             <!-- Tracking  first row End-->
                                         </div>
-                                        <div class="step-links text-center tracking-pagination">
-                                            {% if tracking_list.has_previous %}
-                                                <a href="?page1={{ tracking_list.previous_page_number }}&tracking=true" class="page-nav">
-                                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
-                                                </a>
-                                            {% endif %}
-                                            <span class="current current-page">
-                                                {{ tracking_list.number }}/{{ tracking_list.paginator.num_pages }}
-                                            </span>
-                                            {% if tracking_list.has_next %}
-                                                <a href="?page1={{ tracking_list.next_page_number }}&tracking=true" class="page-nav">
-                                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
-                                                </a>
-                                            {% endif %}
-                                        </div>
                                     </div>
 
                                     <!-- Tracking div end  -->
@@ -541,21 +529,36 @@
                                             {% endfor %}
                                             <!-- Trackers First row End-->
                                         </div>
-                                        <div class="step-links text-center " >
-                                            {% if trackers_list.has_previous %}
-                                                <a href="?page1={{ trackers_list.previous_page_number }}&trackers=true" class="page-nav">
-                                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
-                                                </a>
-                                            {% endif %}
-                                            <span class="current current-page">
-                                                {{ trackers_list.number }}/{{ trackers_list.paginator.num_pages }}
-                                            </span>
-                                            {% if trackers_list.has_next %}
-                                                <a href="?page1={{ trackers_list.next_page_number }}&trackers=true" class="page-nav">
-                                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
-                                                </a>
-                                            {% endif %}
-                                        </div>
+                                    </div>
+                                    <div class="step-links text-center menu1-pagination">
+                                        {% if tracking_list.has_previous %}
+                                            <a href="?page1={{ tracking_list.previous_page_number }}&tracking=true" class="page-nav">
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                        <span class="current current-page">
+                                            {{ tracking_list.number }}/{{ tracking_list.paginator.num_pages }}
+                                        </span>
+                                        {% if tracking_list.has_next %}
+                                            <a href="?page1={{ tracking_list.next_page_number }}&tracking=true" class="page-nav">
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="step-links text-center menu2-pagination" style="display:none;">
+                                        {% if trackers_list.has_previous %}
+                                            <a href="?page1={{ trackers_list.previous_page_number }}&trackers=true" class="page-nav">
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                        <span class="current current-page">
+                                            {{ trackers_list.number }}/{{ trackers_list.paginator.num_pages }}
+                                        </span>
+                                        {% if trackers_list.has_next %}
+                                            <a href="?page1={{ trackers_list.next_page_number }}&trackers=true" class="page-nav">
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 </div>
                     <!-- Tracking and Trackers img End -->
@@ -576,52 +579,52 @@
                     </div>
 
                     <div class="container font-weight-bold interest-font">
+                        <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
+                            {% csrf_token %}
                         <span class="my-interests-section"></span>
                         <div class="row intrest-input ">
                             <div class="sm-12">
                                 <label class="intrest-lab">position:</label>
-                                <select class="inp-interest" >
+                                <select class="inp-interest"
+                                name="position" id="position_1" required>
                                     <option></option>
-                                    <option>position 1</option>
-                                    <option>position 2</option>
-                                    <option>position 3</option>
-                                    <option>position 4</option>
-                                    <option>position 5</option>
+                                    {% for item in my_interest_form.position %}
+                                    {{item}}
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="sm-12">
                                 <label class="intrest-lab">Format:</label>
-                                <select class="inp-interest format-space" >
-                                    <option></option>
-                                    <option>Format 1</option>
-                                    <option>Format 2</option>
-                                    <option>Format 3</option>
-                                    <option>Format 4</option>
-                                    <option>Format 5</option>
-                                </select>
+                                <select name="format" id = "format_1"
+                                    class="inp-interest format-space" required>
+                                        {% for item in my_interest_form.format %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
                             </div>
                             <div class="sm-12">
                                 <label class="intrest-lab">Location:</label>
-                                <select class="inp-interest" >
-                                    <option></option>
-                                    <option>Location 1</option>
-                                    <option>Location 2</option>
-                                    <option>Location 3</option>
-                                    <option>Location 4</option>
-                                    <option>Location 5</option>
-                                </select>
+                                <select name="location" id ="location_1"
+                                    class="inp-interest" required>
+                                        {% for item in my_interest_form.location %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
                             </div>
                        </div>
                        </span>
                         <div class="row mt-2">
                             <div class="col-md-6 col-sm-4">
                                 <button
-                                    class="btn btn-light btn-sm btn rounded-0 border border-dark font-weight-bold ad-or-save">Add
-                                    More</button>
-                                <input type="button" class="btn btn-light btn-sm  btn rounded-0 border border-dark font-weight-bold ad-or-save font-clr" value="save">
+                                    class="btn btn-light btn-sm btn rounded-0 border border-dark font-weight-bold ad-or-save"
+                                    id="add-more-interests">Add More</button>
+                                <input type="submit"
+                                class="btn btn-light btn-sm  btn rounded-0 border border-dark font-weight-bold ad-or-save font-clr"
+                                value="save">
 
                             </div>
                         </div>
+                        </form>
                         <div class="row mt-2">
                             <div class="col-md-12 col-sm-4">
                                 <span class="intrest-lab-md">
@@ -636,14 +639,16 @@
                     <br>
                     <div class="table-responsive-sm  ml-2">
                         <div class="card tab-with">
-                            <label class="col-sm-3 my-interest-2">My Interests (2)</label>
+                            <label class="col-sm-3 my-interest-2">My Interests ({{myinterests.count}})</label>
                             <hr class="mem-set-acc-hr-interest">
                             <div>
+                                {% for obj in myinterests %}
+                                <hr class="mem-set-acc-hr-1">
                                 <table class="table borderless table-responsive-sm font-weight-bold mem-table">
                                         <tr class="interest-font">
-                                            <th scope="col">Position: <u>Director</u> </th>
-                                            <th scope="col">Format: <u>Feature</u> </th>
-                                            <th scope="col">Location: <u>Boston, MA</u></th>
+                                            <th scope="col">Position: <u>{{obj.position}}</u> </th>
+                                            <th scope="col">Format: <u>{{obj.format}}</u> </th>
+                                            <th scope="col">Location: <u>{{obj.location}}</u></th>
                                         </tr>
                                         <tr>
                                             <th><a class="tbl-tag" href="">Project # 233</a></th>
@@ -655,39 +660,7 @@
                                             <td class="int-red">(on 08/05/21)</td>
                                         </tr>
                                 </table>
-                                <div>
-                                    <hr class="mem-set-acc-hr-1">
-                                    <table class="table borderless  table-responsive-sm font-weight-bold mem-table">
-
-                                        <tr class="interest-font">
-                                            <th>Position: <u> Editor</u> </th>
-                                            <th>Format: <u> Scene</u> </th>
-                                            <th>Location: <u>Boston, MA</u></th>
-                                        </tr>
-
-                                        <tr>
-                                            <th><a class="tbl-tag" href="">Project # 346 </a></th>
-                                            <td> Title: Girls</td>
-                                            <td>Team: <a class="tbl-tag" href=""># 7 </a></td>
-                                            <td>Posted on 07/30/21</td>
-                                            <td class="int-applied">Applied</td>
-                                            <td class="int-red">Passed</td>
-                                            <td class="int-green">Attached</td>
-                                            <td class="int-green">(on 08/05/21)</td>
-                                        </tr>
-                                        <tr>
-                                            <th><a class="tbl-tag" href="">Project # 233</a></th>
-                                            <td>Title: Ripples of Moonlight</td>
-                                            <td>Team:<a class="tbl-tag" href=""># 7 </a> </td>
-                                            <td>Posted on 07/23/21</td>
-                                            <td class="int-applied">Applied</td>
-                                            <td class="int-red">Passed</td>
-                                            <td class="int-grey">Attached</td>
-                                            <td class="int-red">(on 08/05/21)</td>
-                                        </tr>
-
-                                    </table>
-                                </div>
+                                 {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -756,14 +729,15 @@
 
                     <!-- End Add your post -->
                 </div>
-            </div>
+                    </div>
 
         <!-- End screen row -->
+                </div>
+            </div>
         </div>
     </div>
-</div>       
 </div>
-</div>
+
 {% endblock %}
 
 {% block extrajs %}
@@ -1010,6 +984,13 @@ $('body').on('click' , '.close-add-togroup-modal', function(){
     } else {
         visibleDivId = divId;
     }
+    if(divId=="Menu1") {
+        $(".menu1-pagination").show();
+        $(".menu2-pagination").hide();
+    }else{
+        $(".menu2-pagination").show();
+        $(".menu1-pagination").hide();
+    }
     hideNonVisibleDivs();
     }
     function hideNonVisibleDivs() {
@@ -1032,6 +1013,11 @@ $('body').on('click' , '.close-add-togroup-modal', function(){
     event.stopPropagation();
 });
 </script> -->
+<script>
+$(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
+    e.stopPropagation();
+    });
+</script>
 {% endblock %}
 
 
