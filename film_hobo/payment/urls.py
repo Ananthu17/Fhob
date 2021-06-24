@@ -1,10 +1,14 @@
 from django.urls import path, include
 
-from payment import views
-
 from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaymentAdmin, AddDiscountDetailAPI, GetDiscountDetailListAPI, \
-     EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI
+     EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
+     GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
+     CreateUserOrder, CaptureUserOrder, GetOrderDetails, SubscriptionDetails, \
+     PaypalToken
+# from .paypal import CreateOrder, CaptureOrder
+
+from paypal.standard.ipn import views
 
 app_name = "payment"
 
@@ -12,6 +16,9 @@ urlpatterns = [
     # api-view endpoints
     path('get_membership_fee_detail/', GetMembershipFeeDetailsAPI.as_view(),
          name='get_membership_fee_detail'),
+    path('get_membership_fee_detail_public/',
+         GetMembershipFeeDetailsPublicAPI.as_view(),
+         name='get_membership_fee_detail_public'),
     path('update_membership_fee/', UpdateMembershipFeeAPI.as_view(),
          name='update_membership_fee'),
     path('add_discount_detail/', AddDiscountDetailAPI.as_view(),
@@ -24,10 +31,22 @@ urlpatterns = [
          name='delete_discount_detail'),
     path('calculate_discount/', CalculateDiscountAPI.as_view(),
          name='calculate_discount'),
+    path('transaction_save/', TransactionSave.as_view(),
+         name='transaction_save'),
+    path('get_user_token/', GetToken.as_view(),
+         name='get_user_token'),
+    path('subscription_details', SubscriptionDetails.as_view(),
+         name='subscription_details'),
+    path('get_paypal_token', PaypalToken.as_view(),
+         name='get_paypal_token'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
          name='payment_admin'),
     # paypal endpoints
     path('paypal/', include("paypal.standard.ipn.urls")),
-    path('process-payment/', views.process_payment, name='process_payment'),
+    path('paypal/create/', CreateUserOrder.as_view(), name="paypal-create"),
+    path('paypal/<order_id>/capture/',
+         CaptureUserOrder.as_view(), name="paypal-capture"),
+    path('paypal/<order_id>/get_details/',
+         GetOrderDetails.as_view(), name="paypal-get-details")
 ]

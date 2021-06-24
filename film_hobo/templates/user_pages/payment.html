@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extracss %}
+<!-- <link rel="stylesheet" type="text/css" href="https://www.paypalobjects.com/webstatic/en_US/developer/docs/css/cardfields.css"/> -->
 {% endblock %}
 
 {% block content %}
@@ -39,17 +40,16 @@
                     <div class="row">
                         <div class="col-5">
                             <input type ="hidden" name = "user" value="{{user.id}}" id="user_id"/>
-                            <div class="mt-2">First {{ payment_details.free_days }} days free</div>
                             {% if payment_plan == 'monthly' %}
-                            <div class="mt-2">Amount: ${{ payment_details.monthly_amount }} (billed monthly)</div>
+                            <div class="mt-2">Amount: $<span id="initial_amount_val">{{ payment_details.monthly_amount }}</span> (billed <span id="payment_plan">monthly</span>)</div>
                             {% elif payment_plan == 'annually' %}
-                            <div class="mt-2">Amount: ${{ payment_details.annual_amount }} (billed annually)</div>
+                            <div class="mt-2">Amount: $<span id="initial_amount_val">{{ payment_details.annual_amount }}</span> (billed <span id="payment_plan">annually</span>)</div>
                             {% else %}
                             <div class="mt-2">Choose Payment plan to Proceed</div>
                             {% endif %}
-                            <div class="mt-2">Estimated Tax Percentage: {{ payment_details.estimated_tax }} %</div>
+                            <div class="mt-2">Estimated Tax Percentage: <span id="tax_percentage">{{ payment_details.estimated_tax }}</span> %</div>
                             <div class="mt-2">Your credit card will be charged on
-                                {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, {{ payment_details.free_days }} days from today</div>
+                                {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, <span id="days_free">{{ payment_details.free_days }}</span> days from today</div>
                             <div class="row mt-2">
                                 <div class="col-3">
                                     <label class="form-title">Promo Code</label>
@@ -62,7 +62,8 @@
                             </div>
                         </div>
                         <div class="col-7 paymnt-lft-bar">
-                            <form>
+                            <form method="post">
+                                {% csrf_token %}
                                 <div class="mt-4">Amount: $
                                     {% if payment_plan == 'monthly' %}
                                     <span id="full_amount">{{ payment_details.monthly_amount_with_tax }}</span>
@@ -86,8 +87,8 @@
                                     {% else %}
                                     <span id="final_amount">0</span>
                                     {% endif %}
-                                </div>
-                                <div id="paypal-btn" class="mt-4">
+                                </div><br>
+                                    <div id="paypal-div" class="mt-4">
                                 </div>
                             </form>
                         </div>
@@ -132,34 +133,7 @@
 {% endblock %}
 
 {% block extrajs %}
-<script>
-    // $('body').on('click' , '#apply_promocode', function(){
-    //     $('.promo_code_status').html("");
-    //     var promocode = $("#promocode").val();
-    //     var user_id = $("#user_id").val();
-    //     var data_dict = {};
-    //     if(user_id){
-    //         data_dict['user_id']=user_id
-    //     }
-    //     if(promocode){
-    //         data_dict['promo_code']=promocode
-    //     }
-    //     $.post('/hobo_user/check-promocode-api/',data_dict)
-    //     .done(function(data) {
-    //         if(data.results!='')
-    //             {
-    //                 $('.promo_code_status').html(data['message']);
-    //             }
-    //         });
-    //     });
-</script>
 <script src="{% static 'js/registration_payment.js' %}"></script>
-<script src="https://www.paypal.com/sdk/js?client-id=test"></script>
-<script>paypal.Buttons().render('#paypal-btn');</script>
+<script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2&vault=true&intent=subscription"></script>
+<script src="{% static 'js/paypal_payment.js' %}"></script>
 {% endblock %}
-
-
-
-
-
-

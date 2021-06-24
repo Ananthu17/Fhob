@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from rest_framework import serializers
 from phonenumber_field.serializerfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
@@ -23,7 +25,9 @@ from .models import CustomUser, Country, GuildMembership, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
     UserProfile, CoWorker, UserInterest, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient, FriendRequest, FriendGroup
+    CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
+    UserRating
+
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -136,7 +140,6 @@ class RegisterSerializer(serializers.Serializer):
         self.custom_signup(request, user)
         setup_user_email(request, user, [])
         return user
-
 
 
 class RegisterIndieSerializer(serializers.Serializer):
@@ -484,7 +487,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     # company details
     company_name = serializers.CharField()
     company_address = serializers.CharField()
-    company_website = serializers.URLField(allow_blank=True)
+    company_website = serializers.CharField(allow_blank=True)
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
@@ -529,6 +532,26 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
                     "A company is already registered with this phone number."))
         except CustomUser.DoesNotExist:
             return company_phone
+
+    # def validate_company_website(self, company_website):
+    #     try:
+    #         match = CustomUser.objects.get(company_website=company_website)
+
+    #         if match:
+    #             raise serializers.ValidationError(_(
+    #                 "A company is already registered with this website."))
+    #         else:
+    #             p = urlparse.urlparse(company_website, 'http')
+    #             netloc = p.netloc or p.path
+    #             path = p.path if p.netloc else ''
+    #             if not netloc.startswith('www.'):
+    #                 netloc = 'www.' + netloc
+    #             p = urlparse.ParseResult('http', netloc, path, *p[3:])
+    #             company_website = p.geturl()
+    #             return company_website
+
+    #     except CustomUser.DoesNotExist:
+    #         return company_website
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -876,6 +899,7 @@ class PhotoSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
     class Meta:
         model = Photo
         exclude = ['id', 'position']
@@ -929,6 +953,7 @@ class CompanyClientSerializer(serializers.ModelSerializer):
         max_length=150,
         required=False,
     )
+
     class Meta:
         model = CompanyClient
         fields = ['name', 'email', 'position', 'new_position']
@@ -967,7 +992,6 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
-
 class AddGroupSerializer(serializers.ModelSerializer):
     user = serializers.CharField(
         max_length=150,
@@ -1004,3 +1028,24 @@ class RemoveFriendGroupSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+class FeedbackSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+
+class TeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = ['__all__']
+

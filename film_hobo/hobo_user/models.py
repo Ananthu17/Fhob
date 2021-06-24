@@ -186,9 +186,10 @@ class CustomUser(AbstractUser):
     company_address = models.CharField(_("Company Address"),
                                        max_length=250,
                                        null=True, blank=True)
-    company_website = models.URLField(_("Company Website"),
-                                      null=True,
-                                      blank=True,)
+    company_website = models.CharField(_("Company Website"),
+                                       max_length=250,
+                                       null=True,
+                                       blank=True,)
     company_phone = PhoneNumberField(_("Phone Number"), null=True,
                                      unique=True)
     title = models.CharField(_('Title'),
@@ -479,7 +480,9 @@ class Project(models.Model):
                                on_delete=models.CASCADE)
     makeup = models.ForeignKey('hobo_user.Makeup', verbose_name=_("Makeup"),
                                on_delete=models.CASCADE)
-
+    def __str__(self):
+        return self.title
+    
 
 class ProjectReaction(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
@@ -534,30 +537,44 @@ class PromoCode(models.Model):
 class Team(models.Model):
     team = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.team
+
 
 class Actor(models.Model):
     actor = models.CharField(max_length=1000)
-
+    
+    def __str__(self):
+        return self.actor
 
 class Writer(models.Model):
     writer = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.writer
 
 class Producer(models.Model):
     producer = models.CharField(max_length=1000)
 
-
+    def __str__(self):
+        return self.producer
 class Director(models.Model):
     director = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.director
 
 class Editor(models.Model):
     editor = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.editor
 
 class Makeup(models.Model):
     makeup = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.makeup
 
 class Country(models.Model):
     name = models.CharField(max_length=1000)
@@ -1303,4 +1320,18 @@ class GroupUsers(models.Model):
     class Meta:
         verbose_name = 'Group User'
         verbose_name_plural = 'Groups Users'
+
+
+class Feedback(models.Model):
+    email = models.EmailField(_('Email'))
+    name = models.CharField(_('Name'),
+                            max_length=150, null=True, blank=True)
+    user_rating = models.FloatField(_("Rating"), null=True, blank=True)
+    user_feedback = models.TextField(_("Feedback"), blank=True, null=True)
+    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        verbose_name = 'Feedback'
+        verbose_name_plural = 'Feedbacks'
 

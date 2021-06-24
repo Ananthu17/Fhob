@@ -43,6 +43,8 @@ from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
+from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
+from django_filters.rest_framework import DjangoFilterBackend
 
 from authemail.views import SignupVerify
 
@@ -59,8 +61,9 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
-                    UserProfile, JobType, UserRating, Location, \
-                    UserRatingCombined, UserTacking, CompanyProfile
+                    Project, Team, UserProfile, JobType, UserRating, Location, \
+                    UserRatingCombined, UserTacking, CompanyProfile, \
+                    Feedback
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -71,15 +74,18 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
-    RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
-    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
+    RemoveCoWorkerSerializer, RateUserSkillsSerializer, \
+    AgentManagerSerializer, RemoveAgentManagerSerializer, \
+    TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
     UserNotificationSerializer, ChangeNotificationStatusSerializer, \
     ProductionCompanyProfileSerializer, UserInterestSerializer, \
     AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
-    AddFriendToGroupSerializer, RemoveFriendGroupSerializer
+    AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
+    FeedbackSerializer, \
+    ProjectSerializer, TeamSerializer
 
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -740,6 +746,7 @@ class PaymentIndieView(TemplateView):
         context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
+        context['client-id'] = settings.PAYPAL_CLIENT_ID
         free_evaluation_time = payment_details['free_days']
         date_today = datetime.date.today()
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
@@ -767,6 +774,11 @@ class PaymentProView(TemplateView):
         context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
+        free_evaluation_time = payment_details['free_days']
+        date_today = datetime.date.today()
+        date_interval = datetime.timedelta(days=int(free_evaluation_time))
+        bill_date = date_today + date_interval
+        context['bill_date'] = bill_date
         return context
 
 
@@ -789,6 +801,11 @@ class PaymentCompanyView(TemplateView):
         context['user'] = user
         context['payment_details'] = payment_details
         context['payment_plan'] = user.payment_plan
+        free_evaluation_time = payment_details['free_days']
+        date_today = datetime.date.today()
+        date_interval = datetime.timedelta(days=int(free_evaluation_time))
+        bill_date = date_today + date_interval
+        context['bill_date'] = bill_date
         return context
 
 
@@ -3899,3 +3916,72 @@ class FilterFriendByGroupAjaxView(View, JSONResponseMixin):
                                 )
         context['friends_html'] = friends_html
         return self.render_json_response(context)
+
+
+
+class FeedbackView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        email = request.data['email']
+        name = request.data['name']
+        user_rating = request.data['user_rating']
+        feedback = request.data['feedback']
+        feedback_obj = Feedback.objects.create(email=email,
+            name=name, user_rating=user_rating, user_feedback=feedback)
+        serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# Project CRUD
+class ProjectAPIView(ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = '__all__'
+
+class ProjectCreateAPIView(CreateAPIView):
+  permission_classes = (IsAuthenticated,)
+  queryset = Project.objects.all()
+  serializer_class = ProjectSerializer
+
+
+class ProjectUpdateAPIView(UpdateAPIView):
+    queryset = Project.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = ProjectSerializer
+
+class ProjectDeleteAPIView(DestroyAPIView):
+    queryset = Project.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = ProjectSerializer
+
+# Team CRUD
+class TeamAPIView(ListAPIView):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = '__all__'
+
+class TeamCreateAPIView(CreateAPIView):
+  queryset = Team.objects.all()
+  serializer_class = TeamSerializer
+  permission_classes = (IsAuthenticated,)
+
+class TeamUpdateAPIView(UpdateAPIView):
+    queryset = Team.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = TeamSerializer
+
+class TeamDeleteAPIView(DestroyAPIView):
+    queryset = Team.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = TeamSerializer
+

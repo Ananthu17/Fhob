@@ -4,15 +4,17 @@ from rest_auth.views import LoginView
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
-                   CustomUserSignupIndieView, CustomUserSignupCompany, \
+                   ExtendedLoginView, ExtendedLogoutView, \
+                   ChooseMembershipPage, CustomUserSignupIndieView, \
+                   CustomUserSignupCompany, \
                    ExtendedRegisterIndieView, SendEmailVerificationView, \
                    EmailVerificationStatusView, CustomUserSignupProView, \
                    ExtendedRegisterProView, SelectPaymentPlanIndieView, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
-                   SettingsView, CustomUserLogout, ExtendedRegisterCompanyView, \
+                   SettingsView, CustomUserLogout, \
+                   ExtendedRegisterCompanyView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
@@ -21,7 +23,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, HowTo, \
-                   PersonalDetailsView, UserProfileAPI, UserProfileView, \
+                   UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, RemoveCoworkerAPI, \
                    MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
@@ -29,7 +31,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
                    UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
                    UploadImageView, UploadImageAPI, GetNotificationAPI, \
-                   GetTrackingNotificationAjaxView, GetAllNotificationAjaxView, \
+                   GetTrackingNotificationAjaxView, \
+                   GetAllNotificationAjaxView, \
                    ChangeNotificationStatusAPI, ProductionCompanyProfileView, \
                    ProductionCompanyProfileAPI, EditProductionCompanyView, \
                    AttachCoworkerAjaxView, AddUserInterestAjaxView, \
@@ -38,12 +41,18 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
                    AgencyManagementCompanyProfileView, SendFriendRequestAPI, \
                    AcceptFriendRequestAPI, ListFriendRequestAPI, \
-                   ListAllFriendsAPI, DeleteFriendRequestAPI, UnFriendUserAPI, \
+                   ListAllFriendsAPI, DeleteFriendRequestAPI, \
+                   UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
                    CancelFriendRequestAPI, AddGroupAPI, RemoveFriendGroupAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
                    AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
-                   FilterFriendByGroupAjaxView
+                   FilterFriendByGroupAjaxView, \
+                   FeedbackView, ProjectAPIView, ProjectCreateAPIView, \
+                   ProjectUpdateAPIView, ProjectDeleteAPIView, \
+                   TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
+                   TeamDeleteAPIView
+
 
 app_name = "hobo_user"
 
@@ -133,7 +142,8 @@ urlpatterns = [
          name='upload-image-api'),
     path('get-notification-api/', GetNotificationAPI.as_view(),
          name='get-notification-api'),
-    path('change-notification-status-api/', ChangeNotificationStatusAPI.as_view(),
+    path('change-notification-status-api/',
+         ChangeNotificationStatusAPI.as_view(),
          name='change-notification-status-api'),
     path('add-user-interest-api/', AddUserInterestAPI.as_view(),
          name='add-user-interest-api'),
@@ -159,6 +169,7 @@ urlpatterns = [
          name='add-friend-to-group-api'),
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
+    path('feedback/', FeedbackView.as_view(), name='feedback'),
 
 
     # web-view endpoints
@@ -203,13 +214,15 @@ urlpatterns = [
          name='personal-details'),
     path('edit-profile/', UserProfileView.as_view(),
          name='edit-profile'),
-    path('edit-production-company-profile/', EditProductionCompanyView.as_view(),
+    path('edit-production-company-profile/',
+         EditProductionCompanyView.as_view(),
          name='edit-production-company-profile'),
     path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
          name='add-new-agent-form'),
     path('profile/<int:id>/', MemberProfileView.as_view(),
          name='profile'),
-    path('production-company-profile/<int:id>/', ProductionCompanyProfileView.as_view(),
+    path('production-company-profile/<int:id>/',
+         ProductionCompanyProfileView.as_view(),
          name='production-company-profile'),
     path('agency-management-company-profile/<int:id>/',
          AgencyManagementCompanyProfileView.as_view(),
@@ -220,7 +233,8 @@ urlpatterns = [
          name='swap-image-position'),
     path('upload-image/', UploadImageView.as_view(),
          name='upload-image'),
-    path('get-tracking-notification-html/', GetTrackingNotificationAjaxView.as_view(),
+    path('get-tracking-notification-html/',
+         GetTrackingNotificationAjaxView.as_view(),
          name='get-tracking-notification-html'),
     path('get-friendrequest-notification-html/',
          GetFriendRequestNotificationAjaxView.as_view(),
@@ -245,4 +259,20 @@ urlpatterns = [
     path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
          name='filter-friend-by-groups'),
 
+    path('projects/', ProjectAPIView.as_view(),
+         name='project-list'),
+    path('projects/create/', ProjectCreateAPIView.as_view(),
+         name='create-project'),
+    path('projects/delete/<id>', ProjectDeleteAPIView.as_view(),
+         name='delete-project'),
+    path('projects/update/<id>', ProjectUpdateAPIView.as_view(),
+         name='delete-project'),
+    path('teams/', TeamAPIView.as_view(),
+         name='team-list'),
+    path('teams/create/', TeamCreateAPIView.as_view(),
+         name='create-team'),
+    path('teams/delete/<id>', TeamDeleteAPIView.as_view(),
+         name='delete-team'),
+    path('teams/update/<id>', TeamUpdateAPIView.as_view(),
+         name='delete-project'),
 ]

@@ -11,6 +11,7 @@
         <title></title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="{% static 'css/main.css' %}">
         <link rel="stylesheet" href="{% static 'css/main1.css' %}">
@@ -71,14 +72,18 @@
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <!-- Links -->
                 <ul class="navbar-nav justify-content-between w-100">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">SHOWCASE</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'hobo_user:user_home' %}"><i class="fa fa-home f-18" aria-hidden="true"></i></a>
-                    </li>
+                    {% if user.is_authenticated and user.registration_complete %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">SHOWCASE</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'hobo_user:user_home' %}">SCREENING ROOM</a>
+                        </li>
+                    {% endif %}
                     <!-- Dropdown -->
-                    {% if user.membership != HOB %}
+                    {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 PROJECTS
@@ -124,6 +129,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                     </li>
+
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item dropdown">
@@ -220,7 +226,7 @@
         <div class="container">
             <div class="row no-wrap">
                 <div class="col-sm-4 align-self-end">
-                    <div class="mb-2">Film Hobo Inc. 2021</div>
+                    <div class="mb-2">Filmhobo Inc. 2021</div>
                 </div>
                 <div class="col-sm-4 mt-4 mb-2">
                     <ul class="list-unstyled fw">
@@ -256,27 +262,36 @@
     /*
     code to store token info into local storage on login
     */
-    document.getElementById("login-submit").addEventListener("click", function() {
-        var email = $('#id_username').val();
-        var password = $('#id_password').val();
-        origin_url = window.location.origin
-        post_url = origin_url + '/hobo_user/login/'
-        extra_args = {"email": email.toString(), "password": password.toString()}
-        axios.post(post_url, extra_args)
-        .then((response) => {
-            localStorage.setItem('token', response.data.key);
-        }, (error) => {
-            console.log(error);
+    login_element = $("[id=login-submit]")
+    if (login_element.length != 0){
+        document.getElementById("login-submit").addEventListener("click", function() {
+            var email = $('#id_username').val();
+            var password = $('#id_password').val();
+            origin_url = window.location.origin
+            post_url = origin_url + '/hobo_user/login/'
+            extra_args = {"email": email.toString(), "password": password.toString()}
+            axios.post(post_url, extra_args)
+            .then((response) => {
+                localStorage.setItem('token', response.data.key);
+            }, (error) => {
+                console.log(error);
+            });
         });
-    });
+    }
+
     </script>
     <script>
     /*
     code to clear token info from local storage on logout
     */
-    document.getElementById("logout_link").addEventListener("click", function() {
-        localStorage.removeItem("token");
-    });
+    logout_element = $("[id=logout_link]")
+    if (login_element.length != 0){
+        document.getElementById("logout_link").addEventListener("click", function() {
+            localStorage.removeItem("token");
+        });
+    }
+
+
     </script>
 </html>
 {% block extrajs %}

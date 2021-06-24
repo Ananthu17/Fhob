@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
+    'django_filters',
 
     # project apps
     'initial_user',
@@ -196,6 +197,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DATE_INPUT_FORMATS': ["%Y-%m-%d"],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
 }
 
 
@@ -258,6 +262,17 @@ CHANNEL_LAYERS = {
     }
 }
 # PAYPAL SETTINGS
-# PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
-# PAYPAL_TEST = True
+PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
+PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET_ID = env("PAYPAL_SECRET_ID")
 
+PRODUCT_ID = env("PRODUCT_ID")
+INDIE_PAYMENT_MONTHLY = env("INDIE_PAYMENT_MONTHLY")
+INDIE_PAYMENT_YEARLY = env("INDIE_PAYMENT_YEARLY")
+
+PRO_PAYMENT_MONTHLY = env("PRO_PAYMENT_MONTHLY")
+PRO_PAYMENT_YEARLY = env("PRO_PAYMENT_YEARLY")
+
+COMPANY_PAYMENT_MONTHLY = env("COMPANY_PAYMENT_MONTHLY")
+COMPANY_PAYMENT_YEARLY = env("COMPANY_PAYMENT_YEARLY")

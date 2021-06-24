@@ -1,24 +1,115 @@
 {% extends 'base.html' %}
 {% load rest_framework %}
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-3">
-                <h3><a href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></h3>
-            </div>
-            <div class="col-sm-3">
-                <h3><a href = "{% url 'hobo_user:signup_indie' %}">Indie</a></h3>
-            </div>
-            <div class="col-sm-3">
-                <h3><a href = "{% url 'hobo_user:signup_pro' %}">Pro</a></h3>
-            </div>
-            <div class="col-sm-3">
-                <h3><a href = "{% url 'hobo_user:signup_company' %}">Company</a></h3>
+    <div class="container-fluid memship-f">
+        <div class="row memship-row-head mt-2 ml-2 mr-2">
+            <div class="col-4 memship-head">CHOOSE YOUR MEMBERSHIP</div>
+            <div class="col-2 memship-pro-font underline" ><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_indie' %}">Indie</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_pro' %}">Pro *</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_company' %}">Company</a></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">COST (YEARLY/MONTHLY)</div>
+            <div class="col-2 ">FREE</div>
+            <div class="col-2 ">$<span id="annual_indie">120</span>/$<span id="monthly_indie">15</span></div>
+            <div class="col-2 ">$<span id="annual_pro">120</span>/$<span id="monthly_pro">15</span></div>
+            <div class="col-2 ">$<span id="annual_company">250</span>/$<span id="monthly_company">30</span></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">FIRST MONTH FREE</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">VOTING</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">PERSONAL PAGE</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">INTERNAL COMMUNICATION</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">SHOWCASE VIDEOS (Watch and like)</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">START A PROJECT (Scenes and Short Films)</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">START A PROJECT (Pilots and Features)</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">ATTACHMENT TO A PROJECT (Any) </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">RATE TALENT, CREW AND PROJECTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">INDUSTRY GUILD REQUIREMENTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">ADMIN ACCOUNTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row-btm mt-3 ml-2 mr-2 mb-4">
+            <div class="col-1 memship-pro-font">Pro *</div>
+            <div class="col-11 memship-btm-f pl-0">
+                You can become <span class="memship-btm-pro-f">Pro</span> only if You belong to any of the Film Industry Guilds, or you must advance from
+                your <span class="memship-btm-pro-f">Indie </span>Membership, by building up your Talent and/or Crew Rating. You have to have
+                five gigs rated  <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i> or higher. to advance. After you achive the requirement your account will become <span class="memship-btm-pro-f">Pro </span>
+                automatically.
             </div>
         </div>
     </div>
@@ -26,4 +117,5 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/choose_membership.js' %}"></script>
 {% endblock %}

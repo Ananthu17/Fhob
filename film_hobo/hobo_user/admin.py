@@ -14,7 +14,8 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers
+                    GroupUsers, Feedback
+
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, JobTypeResource, \
@@ -81,9 +82,9 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-admin.site.site_header = "Film Hobo Admin"
-admin.site.site_title = "Film Hobo Admin Portal"
-admin.site.index_title = "Welcome to Film Hobo Admin Portal"
+admin.site.site_header = "Filmhobo Admin"
+admin.site.site_title = "Filmhobo Admin Portal"
+admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
@@ -189,3 +190,5 @@ class GroupUsersAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GroupUsers, GroupUsersAdmin)
+admin.site.register(Feedback)
+

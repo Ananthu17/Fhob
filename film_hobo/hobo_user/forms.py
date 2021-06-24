@@ -12,7 +12,6 @@ from .models import CustomUser, GuildMembership, DisabledAccount, \
 from .models import GuildMembership, Country, Photo
 
 
-
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=100, required=False,
                                  help_text='')
