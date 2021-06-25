@@ -13,7 +13,9 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
-                    Location, CompanyClient, NewJobType, Friend, Feedback
+                    Location, CompanyClient, NewJobType, Friend, FriendGroup, \
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
+
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, JobTypeResource, \
@@ -100,7 +102,6 @@ admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
-admin.site.register(UserProfile)
 admin.site.register(CoWorker)
 admin.site.register(UserRating)
 admin.site.register(UserRatingCombined)
@@ -108,11 +109,12 @@ admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)
 admin.site.register(UserNotification)
-admin.site.register(CompanyProfile)
 admin.site.register(UserInterest)
 admin.site.register(CompanyClient)
 admin.site.register(NewJobType)
-
+admin.site.register(FriendGroup)
+admin.site.register(CompanyRating)
+admin.site.register(CompanyRatingCombined)
 
 @admin.register(EthnicAppearance)
 class EthnicAppearanceAdmin(ImportExportModelAdmin):
@@ -178,4 +180,31 @@ class FriendAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Friend, FriendAdmin)
+
+
+class GroupUsersAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(GroupUsers, GroupUsersAdmin)
 admin.site.register(Feedback)
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
+
+
+class CompanyProfileAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(CompanyProfile, CompanyProfileAdmin)

@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     'django_s3_storage',
     'zappa_django_utils',
     'channels',
-    'paypal.standard.ipn'
+    'paypal.standard.ipn',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

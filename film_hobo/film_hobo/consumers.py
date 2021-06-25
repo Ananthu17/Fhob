@@ -6,7 +6,7 @@ import json
 
 class NotificationConsumer(WebsocketConsumer):
     def connect(self):
-        print("---------------connect")
+        print("connect")
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'user_%s' % self.room_name
 
@@ -28,7 +28,7 @@ class NotificationConsumer(WebsocketConsumer):
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        print("---------------receive")
+        print("receive")
         response = json.loads(text_data)
         print(response)
         event = response.get("event", None)

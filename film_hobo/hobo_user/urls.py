@@ -4,7 +4,7 @@ from rest_auth.views import LoginView
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView, \
+                   ExtendedLogoutView, \
                    ChooseMembershipPage, CustomUserSignupIndieView, \
                    CustomUserSignupCompany, \
                    ExtendedRegisterIndieView, SendEmailVerificationView, \
@@ -19,7 +19,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
-                   ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
+                   ForgotPasswordAPI, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, HowTo, \
@@ -44,12 +44,17 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ListAllFriendsAPI, DeleteFriendRequestAPI, \
                    UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
-                   CancelFriendRequestAPI, UpdateFriendStatusAjaxView, \
+                   CancelFriendRequestAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
-                   FeedbackAPIView, ProjectAPIView, ProjectCreateAPIView, \
+                   FeedbackAPIView, FeedbackWebView, \
+                   AddGroupAPI, RemoveFriendGroupAPI, \
+                   AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
+                   FilterFriendByGroupAjaxView, \
+                   ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView, FeedbackWebView
+                   TeamDeleteAPIView, RateCompanyAPI
+
 
 app_name = "hobo_user"
 
@@ -160,7 +165,16 @@ urlpatterns = [
          name='delete-friend-request-api'),
     path('unfriend-user-api/', UnFriendUserAPI.as_view(),
          name='unfriend-user-api'),
+    path('add-group-api/', AddGroupAPI.as_view(),
+         name='add-group-api'),
+    path('add-friend-to-group-api/', AddFriendToGroupAPI.as_view(),
+         name='add-friend-to-group-api'),
+    path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
+         name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+    path('rate-company-api/',
+         RateCompanyAPI.as_view(), name='rate-company-api'),
+
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
@@ -243,9 +257,11 @@ urlpatterns = [
     path('edit-agency-management-company-profile/',
          EditAgencyManagementCompanyView.as_view(),
          name='edit-agency-management-company-profile'),
-    path('update-friend-status/',
-         UpdateFriendStatusAjaxView.as_view(),
-         name='update-friend-status'),
+    path('update-friend-groups/',
+         UpdateFriendGroupAjaxView.as_view(),
+         name='update-friend-groups'),
+    path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
+         name='filter-friend-by-groups'),
     path('feedback/',
          FeedbackWebView.as_view(),
          name='feedback-web'),

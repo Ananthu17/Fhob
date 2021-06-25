@@ -67,3 +67,11 @@ def get_friend_request_status(logged_user, profile_user):
             if profile_user.id in user_ids:
                 status = 'respond'
     return status
+
+
+@register.simple_tag()
+def get_groups(friend):
+    lst = []
+    for obj in friend.group_members.all():
+        lst.append(obj.group)
+    return lst

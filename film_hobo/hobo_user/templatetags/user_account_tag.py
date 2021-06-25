@@ -20,3 +20,10 @@ def get_url(url):
     else:
         hyperlink = "http://www."+url
     return hyperlink
+
+@register.simple_tag()
+def get_more_modal_id(position):
+    pos = []
+    pos = str(position).split(" ")
+    position = '_'.join(pos)
+    return position

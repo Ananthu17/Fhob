@@ -8,6 +8,7 @@ import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.db.models import Sum
 from django.core.files import File
 from django.db.models import Q
 from django.template import loader
@@ -57,16 +58,15 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     EditAgencyManagementCompanyProfileForm, FeedbackForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, IndiePaymentDetails, Photo, \
-                    ProPaymentDetails, Project, PromoCode, \
-                    DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails, AthleticSkill, \
-                    AthleticSkillInline, EthnicAppearance, Team, \
-                    UserAgentManager, UserInterest, \
-                    UserNotification, Friend, \
-                    UserProfile, JobType, UserRating, Location, \
+                    GuildMembership, GroupUsers, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, \
+                    PromoCode, DisabledAccount, CustomUserSettings, \
+                    CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
+                    EthnicAppearance, UserAgentManager, UserInterest, \
+                    UserNotification, Friend, FriendGroup, \
+                    Project, Team, UserProfile, JobType, UserRating, Location, \
                     UserRatingCombined, UserTacking, CompanyProfile, \
-                    Feedback
+                    Feedback, CompanyRating, CompanyRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -85,13 +85,17 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     ProductionCompanyProfileSerializer, UserInterestSerializer, \
     AgentManagementCompanyProfileSerializer, CompanyClientSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
-    AcceptFriendRequestSerializer, FeedbackSerializer, \
+    AcceptFriendRequestSerializer, AddGroupSerializer, \
+    AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
+    FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer
 
-from .utils import notify
+from .utils import notify, get_notifications_time
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
+
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -1832,7 +1836,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         context['profile'] = profile
         pos_list = [2, 3, 4]
-        all_photos = Photo.objects.filter(user=user)
+        all_photos = Photo.objects.filter(user=user).order_by('position')
         photos = all_photos.filter(position__in=pos_list).order_by('position')
         context['photos'] = photos[:3]
         context['all_photos'] = all_photos[:4]
@@ -1855,14 +1859,14 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
-            tracking_list = UserTacking.objects.filter(
-                            tracked_by=user)
             context['trackers_list_count'] = trackers_list.count()
-            context['tracking_list_count'] = tracking_list.count()
             context['trackers_list'] = trackers_list[:6]
-            context['tracking_list'] = tracking_list[:6]
         except UserTacking.DoesNotExist:
-            pass
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+
         try:
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
@@ -2078,7 +2082,7 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['profile'] = profile
         pos_list = [2, 3, 4]
         all_photos = Photo.objects.filter(user=user)
-        photos = all_photos.filter(position__in=pos_list)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
         context['photos'] = photos[:3]
         context['all_photos'] = all_photos.order_by('position')[:4]
         context['form'] = self.form_class(instance=profile)
@@ -2088,17 +2092,18 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
 
+
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
-            tracking_list = UserTacking.objects.filter(
-                            tracked_by=user)
             context['trackers_list_count'] = trackers_list.count()
-            context['tracking_list_count'] = tracking_list.count()
             context['trackers_list'] = trackers_list[:6]
-            context['tracking_list'] = tracking_list[:6]
         except UserTacking.DoesNotExist:
-            pass
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+
         try:
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
@@ -2182,8 +2187,8 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         context['profile'] = profile
         pos_list = [2, 3, 4]
         client_dict = {}
-        all_photos = Photo.objects.filter(user=user)
-        photos = all_photos.filter(position__in=pos_list)
+        all_photos = Photo.objects.filter(user=user).order_by('position')
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
         clients = CompanyClient.objects.filter(company=self.request.user)
         for obj in clients:
             if obj.position is not None and obj.position not in client_dict:
@@ -2208,14 +2213,22 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         context['my_interest_form'] = UserInterestForm
         context['client_dict'] = client_dict
 
+
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
-            tracking_list = UserTacking.objects.filter(
-                            tracked_by=user)
-            context['trackers_list'] = trackers_list
-            context['tracking_list'] = tracking_list
+            context['trackers_list_count'] = trackers_list.count()
+            context['trackers_list'] = trackers_list[:6]
         except UserTacking.DoesNotExist:
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except FriendRequest.DoesNotExist:
             pass
         return context
 
@@ -2595,6 +2608,24 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
+
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            context['trackers_list_count'] = trackers_list.count()
+            context['trackers_list'] = trackers_list[:6]
+        except UserTacking.DoesNotExist:
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except Friend.DoesNotExist:
+            pass
         try:
             profile = UserProfile.objects.get(user=user)
             all_agents = UserAgentManager.objects.filter(user=user)
@@ -2605,23 +2636,6 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             all_photos = Photo.objects.filter(user=user)
             photos = all_photos.filter(position__in=pos_list).order_by('position')
             context['photos'] = photos[:3]
-            try:
-                track_obj = UserTacking.objects.get(user=user)
-                trackers_list = track_obj.tracked_by.all()
-                tracking_list = UserTacking.objects.filter(
-                                tracked_by=user)
-                context['trackers_list_count'] = trackers_list.count()
-                context['tracking_list_count'] = tracking_list.count()
-                context['trackers_list'] = trackers_list[:6]
-                context['tracking_list'] = tracking_list[:6]
-            except UserTacking.DoesNotExist:
-                pass
-            try:
-                friend_obj = Friend.objects.get(user=user)
-                friends = friend_obj.friends.all()
-                context['friends'] = friends[:8]
-            except FriendRequest.DoesNotExist:
-                pass
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
@@ -2644,31 +2658,32 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
-            tracking_list = UserTacking.objects.filter(
-                            tracked_by=user)
-            context['trackers_list_count'] = trackers_list.count()
-            context['tracking_list_count'] = tracking_list.count()
             context['trackers_list'] = trackers_list[:6]
-            context['tracking_list'] = tracking_list[:6]
+            context['trackers_list_count'] = trackers_list.count()
         except UserTacking.DoesNotExist:
             pass
+        tracking_list = UserTacking.objects.filter(
+            tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+
         try:
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
         try:
             profile = CompanyProfile.objects.get(user=user)
             context['profile'] = profile
-            try:
-                coworkers = CoWorker.objects.filter(company=user)
-                context['staff'] = coworkers
-            except CoWorker.DoesNotExist:
-                pass
         except CompanyProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
+        try:
+            coworkers = CoWorker.objects.filter(company=user)
+            context['staff'] = coworkers
+        except CoWorker.DoesNotExist:
+            pass
         return context
 
 
@@ -2681,36 +2696,60 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
         context['user'] = user
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
+        context['photos'] = photos[:3]
+
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            context['trackers_list_count'] = trackers_list.count()
+            context['trackers_list'] = trackers_list[:6]
+        except UserTacking.DoesNotExist:
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        context['tracking_list'] = tracking_list[:6]
+
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+        except Friend.DoesNotExist:
+            pass
         try:
             profile = CompanyProfile.objects.get(user=user)
             context['profile'] = profile
-            try:
-                coworkers = CoWorker.objects.filter(company=user)
-                context['staff'] = coworkers
-            except CoWorker.DoesNotExist:
-                pass
-            try:
-                clients = CompanyClient.objects.filter(company=user)
-                client_dict = {}
-                for obj in clients:
-                    if obj.position is not None and obj.position not in client_dict:
-                        client_dict[obj.position] = []
-                        client_dict[obj.position].append(obj)
-                    elif obj.position is None and obj.new_position not in client_dict:
-                        client_dict[obj.new_position] = []
-                        client_dict[obj.new_position].append(obj)
-                    elif obj.position is not None and obj.position in client_dict:
-                        client_dict[obj.position].append(obj)
-                    elif obj.position is None and obj.new_position in client_dict:
-                        client_dict[obj.new_position].append(obj)
-                    else:
-                        pass
-                context['client_dict'] = client_dict
-            except CoWorker.DoesNotExist:
-                pass
         except CompanyProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
+        try:
+            coworkers = CoWorker.objects.filter(company=user)
+            context['staff'] = coworkers
+        except CoWorker.DoesNotExist:
+            pass
+        try:
+            clients = CompanyClient.objects.filter(company=user)
+            client_count = clients.count()
+            context['client_count'] = client_count
+            client_dict = {}
+            for obj in clients:
+                if obj.position is not None and obj.position not in client_dict:
+                    client_dict[obj.position] = []
+                    client_dict[obj.position].append(obj)
+                elif obj.position is None and obj.new_position not in client_dict:
+                    client_dict[obj.new_position] = []
+                    client_dict[obj.new_position].append(obj)
+                elif obj.position is not None and obj.position in client_dict:
+                    client_dict[obj.position].append(obj)
+                elif obj.position is None and obj.new_position in client_dict:
+                    client_dict[obj.new_position].append(obj)
+                else:
+                    pass
+            context['client_dict'] = client_dict
+        except CompanyClient.DoesNotExist:
+            pass
         return context
 
 
@@ -2723,13 +2762,15 @@ class RateUserSkillsAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            user = CustomUser.objects.get(id=data_dict['user'])
-            job_type = JobType.objects.get(id=data_dict['job_type'])
+            user_id = data_dict['user']
+            job_id = data_dict['job_type']
+            user = CustomUser.objects.get(id=user_id)
+            job_type = JobType.objects.get(id=job_id)
             try:
                 user_rating = UserRating.objects.get(
-                               Q(user=data_dict['user']) &
-                               Q(rated_by=request.user) &
-                               Q(job_type=data_dict['job_type'])
+                               Q(user=user) &
+                               Q(rated_by=self.request.user) &
+                               Q(job_type=job_type)
                                )
             except UserRating.DoesNotExist:
                 user_rating = UserRating()
@@ -2738,28 +2779,86 @@ class RateUserSkillsAPI(APIView):
                 user_rating.job_type = job_type
             user_rating.rating = data_dict['rating']
             user_rating.save()
-            # try:
-            #     user_rating_combined = UserRatingCombined.objects.filter(
-            #                             Q(user=data_dict['user']) &
-            #                             Q(job_type=data_dict['job_type'])
-            #                             )
-            #     count = UserRating.objects.filter(
-            #             Q(user=user) &
-            #             Q(job_type=job_type)
-            #             ).count()
-            #     rating = user_rating_combined.rating
-            #     total_rating = user_rating_combined.total_rating
-            #     # new_rating = 
-            # except UserRating.DoesNotExist:
-            #     user_rating_combined = UserRatingCombined()
-            #     user = CustomUser.objects.get(id=data_dict['user'])
-            #     job_type = JobType.objects.get(id=data_dict['job_type'])
-            #     user_rating_combined.user = user
-            #     user_rating_combined.job_type = job_type
-            #     user_rating_combined.rating = data_dict['rating']
+
+            # update combined rating
+            try:
+                user_rating_combined = UserRatingCombined.objects.get(
+                                        Q(user=user) &
+                                        Q(job_type=job_type)
+                                        )
+                count = UserRating.objects.filter(
+                        Q(user=user) &
+                        Q(job_type=job_type)
+                        ).count()
+                aggregate_rating = UserRating.objects.filter(
+                        Q(user=user) &
+                        Q(job_type=job_type)
+                        ).aggregate(Sum('rating'))
+                rating_sum = aggregate_rating['rating__sum']
+                new_rating = rating_sum/count
+                user_rating_combined.rating = new_rating
+                user_rating_combined.save()
+            except UserRatingCombined.DoesNotExist:
+                user_rating_combined = UserRatingCombined()
+                user_rating_combined.user = user
+                user_rating_combined.job_type = job_type
+                user_rating_combined.rating = data_dict['rating']
+                user_rating_combined.save()
 
             response = {'message': "User skill rated sucessfully",
-                        'status': status.HTTP_200_OK}
+                        'status': status.HTTP_200_OK,
+                        'combined_rating': user_rating_combined.rating}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RateCompanyAPI(APIView):
+    serializer_class = RateCompanySerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            company_id = data_dict['company']
+            company = CustomUser.objects.get(id=company_id)
+            try:
+                company_rating = CompanyRating.objects.get(
+                               Q(company=company) &
+                               Q(rated_by=self.request.user)
+                               )
+            except CompanyRating.DoesNotExist:
+                company_rating = CompanyRating()
+                company_rating.company = company
+                company_rating.rated_by = self.request.user
+            company_rating.rating = data_dict['rating']
+            company_rating.save()
+
+            # update combined rating
+            try:
+                company_rating_combined = CompanyRatingCombined.objects.get(
+                                        company=company)
+                count = CompanyRating.objects.filter(
+                        company=company).count()
+                aggregate_rating = CompanyRating.objects.filter(
+                        company=company).aggregate(Sum('rating'))
+                rating_sum = aggregate_rating['rating__sum']
+                new_rating = rating_sum/count
+                company_rating_combined.rating = new_rating
+                company_rating_combined.save()
+            except CompanyRatingCombined.DoesNotExist:
+                company_rating_combined = CompanyRatingCombined()
+                company_rating_combined.company = company
+                company_rating_combined.rating = data_dict['rating']
+                company_rating_combined.save()
+
+            response = {'message': "Company rated sucessfully",
+                        'status': status.HTTP_200_OK,
+                        'combined_rating': company_rating_combined.rating}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2951,18 +3050,81 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        track_obj = UserTacking.objects.get(user=user)
-        trackers_list = track_obj.tracked_by.all()
-        tracking_list = UserTacking.objects.filter(
-                        tracked_by=user)
-        photos = Photo.objects.filter(user=user).order_by('position')
+        if user.membership == CustomUser.PRODUCTION_COMPANY:
+            try:
+                profile = CompanyProfile.objects.get(user=user)
+                context['profile'] = profile
+            except CompanyProfile.DoesNotExist:
+                pass
+        else:
+            try:
+                profile = UserProfile.objects.get(user=user)
+                context['profile'] = profile
+            except UserProfile.DoesNotExist:
+                pass
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            paginator = Paginator(friends, 20)
+            page = self.request.GET.get('page1')
+            try:
+                friends = paginator.page(page)
+            except PageNotAnInteger:
+                friends = paginator.page(1)
+            except EmptyPage:
+                friends = paginator.page(paginator.num_pages)
+            context['all_friends'] = friends
+            context['friends'] = friends[:8]
+
+        except Friend.DoesNotExist:
+            pass
+        try:
+            track_obj = UserTacking.objects.get(user=user)
+            trackers_list = track_obj.tracked_by.all()
+            context['trackers_list_count'] = trackers_list.count()
+            paginator = Paginator(trackers_list, 5)
+            page = self.request.GET.get('page1')
+            try:
+                trackers_list = paginator.page(page)
+            except PageNotAnInteger:
+                trackers_list = paginator.page(1)
+            except EmptyPage:
+                trackers_list = paginator.page(paginator.num_pages)
+            context['trackers_list'] = trackers_list
+        except UserTacking.DoesNotExist:
+            context['trackers_list_count'] = 0
+        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        context['tracking_list_count'] = tracking_list.count()
+        paginator = Paginator(tracking_list, 1)
+        page = self.request.GET.get('page1')
+        try:
+            tracking_list = paginator.page(page)
+        except PageNotAnInteger:
+            tracking_list = paginator.page(1)
+        except EmptyPage:
+            tracking_list = paginator.page(paginator.num_pages)
+        context['tracking_list'] = tracking_list
+        pos_list = [2, 3, 4]
+        all_photos = Photo.objects.filter(user=user)
+        photos = all_photos.filter(position__in=pos_list).order_by('position')
+        context['photos'] = photos[:3]
+        context['all_photos'] = all_photos.order_by('position')[:4]
         myinterests = UserInterest.objects.filter(user=user)
 
+        friend_request = FriendRequest.objects.filter(
+                         Q(user=user) &
+                         Q(status=FriendRequest.REQUEST_SEND)
+                        )
+        context['friend_request'] = friend_request
+        context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
-        context['trackers_list'] = trackers_list
-        context['tracking_list'] = tracking_list
-        context['photos'] = photos
         context['user'] = user
+        groups = FriendGroup.objects.filter(user=user)
+        context['groups'] = groups
+        context['my_interest_form'] = UserInterestForm
+        context['positions'] = JobType.objects.all()
+        context['locations'] = Location.objects.all()
+        context['format'] = UserInterest.FORMAT_CHOICES
         return context
 
 
@@ -3068,6 +3230,7 @@ class UploadImageView(LoginRequiredMixin, TemplateView):
                     'Cannot save!! Please upload image and choose position'
                     )
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
 
 class AddUserInterestAPI(APIView):
     serializer_class = UserInterestSerializer
@@ -3207,6 +3370,7 @@ class GetTrackingNotificationAjaxView(View, JSONResponseMixin):
                                 })
         context['tracking_notification_html'] = tracking_notification_html
         return self.render_json_response(context)
+
 
 class GetFriendRequestNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'user_pages/friend_request_notification.html'
@@ -3645,6 +3809,16 @@ class UnFriendUserAPI(APIView):
                     friend_obj.friends.remove(user)
                 except Friend.DoesNotExist:
                     pass
+
+                friend_groups = GroupUsers.objects.filter(user=user)
+                for group in friend_groups:
+                    if requested_by in group.friends.all():
+                        group.friends.remove(requested_by)
+                friend_groups = GroupUsers.objects.filter(user=requested_by)
+                for group in friend_groups:
+                    if user in group.friends.all():
+                        group.friends.remove(user)
+
                 # update notification table
                 try:
                     notification = UserNotification.objects.get(
@@ -3676,20 +3850,134 @@ class UnFriendUserAPI(APIView):
         return Response(response)
 
 
-class UpdateFriendStatusAjaxView(View, JSONResponseMixin):
-    template_name = 'user_pages/update-friend-status.html'
+class AddGroupAPI(APIView):
+    serializer_class = AddGroupSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            new_group = FriendGroup()
+            new_group.title = data_dict['title']
+            new_group.user = self.request.user
+            new_group.save()
+            response = {'message': "Group Added",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddFriendToGroupAPI(APIView):
+    serializer_class = AddFriendToGroupSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        response = {}
+        user = self.request.user
+        friend = self.request.POST.get('friend')
+        groups = self.request.POST.getlist('groups')
+        # print("groups--", groups)
+        if friend!=None and groups!=None :
+            # remove previous groups
+            friend_obj = CustomUser.objects.get(id=friend)
+            friend_groups = friend_obj.group_members.all()
+            for obj in friend_groups:
+                obj.friends.remove(friend)
+
+            # add new groups
+            for group in groups:
+                print("group--", group)
+                try:
+                    obj = GroupUsers.objects.get(
+                            Q(user=user) &
+                            Q(group=group)
+                            )
+                    obj.friends.add(friend)
+                except GroupUsers.DoesNotExist:
+                    obj = GroupUsers()
+                    obj.group = FriendGroup.objects.get(id=group)
+                    obj.user = user
+                    obj.save()
+                    obj.friends.add(friend)
+            response = {'message': "User added to group",
+                        'status': status.HTTP_200_OK}
+        return Response(response)
+
+
+class RemoveFriendGroupAPI(APIView):
+    serializer_class =  RemoveFriendGroupSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                group = FriendGroup.objects.get(pk=data_dict['group'])
+                group.delete()
+                response = {'message': "Group Removed",
+                'status': status.HTTP_200_OK}
+            except FriendGroup.DoesNotExist:
+                response = {'errors': 'Invalid Id', 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class UpdateFriendGroupAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/add-my-interest-form.html'
 
     def get(self, *args, **kwargs):
         context = dict()
-        logged_user = self.request.user
-        id = self.request.GET.get('profile_id')
-        profile_user = CustomUser.objects.get(id=id)
-        friend_status_html = render_to_string(
-                                'user_pages/friend-status.html',
-                                {'profile_user': profile_user,
-                                 'logged_user': logged_user}
+        user = self.request.user
+        groups = FriendGroup.objects.filter(user=user)
+        groups_html = render_to_string(
+                                'user_pages/friend-group.html',
+                                {'groups': groups}
                                 )
-        context['friend_status_html'] = friend_status_html
+        context['groups_html'] = groups_html
+        return self.render_json_response(context)
+
+
+class FilterFriendByGroupAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/filter-friends.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        friends = []
+        user = self.request.user
+        group_id = self.request.GET.get('group')
+        groups = FriendGroup.objects.filter(user=user)
+        if group_id == "all":
+            try:
+                friend_obj = Friend.objects.get(user=user)
+                friends = friend_obj.friends.all()
+            except Friend.DoesNotExist:
+                pass
+        else:
+            try:
+                friend_obj = GroupUsers.objects.get(
+                            Q(group=group_id) &
+                            Q(user=user)
+                            )
+                friends = friend_obj.friends.all()
+            except GroupUsers.DoesNotExist:
+                friends = []
+        friends_html = render_to_string(
+                                'user_pages/filter-friends.html',
+                                {'all_friends': friends,
+                                'groups': groups}
+                                )
+        context['friends_html'] = friends_html
         return self.render_json_response(context)
 
 
@@ -3768,3 +4056,22 @@ class TeamDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
+
+
+# class CompanyRatingView(LoginRequiredMixin, TemplateView):
+#     template_name = 'user_pages/friends-and-followers.html'
+#     login_url = '/hobo_user/user_login/'
+#     redirect_field_name = 'login_url'
+
+#     def post(self, request, *args, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         user = self.request.user
+#         position = ""
+#         file = ""
+#         if 'position' in self.request.POST:
+#             position = self.request.POST.get('position')
+#         if 'image' in self.request.FILES:
+#             file = self.request.FILES['image']
+#         if position and file:
+
+#         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

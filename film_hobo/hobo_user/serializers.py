@@ -23,8 +23,11 @@ from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
-    UserProfile, CoWorker, UserInterest, UserRating, CompanyProfile, \
-    CompanyClient, FriendRequest, Feedback, Project, Team
+    UserProfile, CoWorker, UserInterest, \
+    UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
+    CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
+    UserRating
+
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -845,6 +848,21 @@ class RateUserSkillsSerializer(serializers.ModelSerializer):
         fields = ['user', 'job_type', 'rating']
 
 
+class RateCompanySerializer(serializers.ModelSerializer):
+    company = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserRating
+        fields = ['company', 'rating']
+
+
 class AgentManagerSerializer(serializers.ModelSerializer):
     agent_type = serializers.CharField(
         max_length=150,
@@ -989,6 +1007,42 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
+class AddGroupSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    title = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendGroup
+        fields = ['user', 'title']
+
+
+class AddFriendToGroupSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    groups = serializers.ListField(required=True)
+    friend = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = FriendGroup
+        fields = ['user', 'friend', 'groups']
+
+
+class RemoveFriendGroupSerializer(serializers.Serializer):
+    group = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
 
 class FeedbackSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
@@ -1012,3 +1066,4 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['__all__']
+

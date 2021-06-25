@@ -160,6 +160,7 @@
                     <div class="row pl-1 pr-1 {% if forloop.counter == 5 %} mt-3 {% endif %}">
                     {% endif %}
                         <div class="col-3 mem-set-net-img-sec2">
+                            <a href="{{item.get_profile_url}}">
                             {% if item.get_profile_photo %}
                             <img src="{{item.get_profile_photo}}"
                             title="{{item.get_full_name}}"
@@ -169,6 +170,7 @@
                             title="{{obj.user.get_full_name}}"
                             class="img-fluid mem-set-img-add">
                             {% endif %}
+                            </a>
                             <div class="mem-set-img-add-nam">{{item.get_full_name|truncatechars:"5"}}</div>
                         </div>
                     {% if forloop.last or forloop.counter == 4 %}
@@ -193,9 +195,8 @@
                                 <img src="{{ usr.user.get_profile_photo }}" title="{{usr.user.get_full_name}}" class="img-fluid mem-set-img-track">
                                 {% else %}
                                 <img src="{% static 'images/default_profile_pic.png' %}" title="{{usr.user.get_full_name}}" class="img-fluid mem-set-img-track">
-                                {% endif %}
+                                {% endif %}</a>
                                 <div class="mem-set-img-track-nam">{{ usr.user.get_full_name|truncatechars:"9"}}</div>
-                            </a>
                         </div>
                         {% endfor %}
                     </div>

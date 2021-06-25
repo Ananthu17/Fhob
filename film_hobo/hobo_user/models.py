@@ -310,6 +310,16 @@ class CustomUser(AbstractUser):
                                kwargs={'id': self.id})
         return ""
 
+    def get_edit_profile_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:edit-profile')
+        else:
+            if self.company_type == 'production':
+                return reverse('hobo_user:edit-production-company-profile')
+            if self.company_type == 'agency_management':
+                return reverse('hobo_user:edit-agency-management-company-profile')
+        return ""
+
     @property
     def group_name(self):
         """
@@ -1046,7 +1056,7 @@ class UserInterest(models.Model):
     position = models.ForeignKey("hobo_user.JobType",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_position',
-                                 verbose_name=_("User"),
+                                 verbose_name=_("Position"),
                                  null=True)
     format = models.CharField(_("Format"),
                               choices=FORMAT_CHOICES,
@@ -1062,7 +1072,7 @@ class UserInterest(models.Model):
 class UserRatingCombined(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating',
+                             related_name='user_rating_combined',
                              verbose_name=_("User"),
                              null=True)
     job_type = models.ForeignKey('hobo_user.JobType',
@@ -1070,7 +1080,7 @@ class UserRatingCombined(models.Model):
                                  related_name="user_job_type_rating_combined",
                                  verbose_name=_("Job Types")
                                  )
-    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1080,10 +1090,26 @@ class UserRatingCombined(models.Model):
         verbose_name_plural = 'User Rating Combined'
 
 
+class CompanyRatingCombined(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating_combined',
+                                verbose_name=_("Company"),
+                                null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating Combined'
+        verbose_name_plural = 'Company Rating Combined'
+
+
 class UserRating(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating_combined',
+                             related_name='user_rating',
                              verbose_name=_("User"),
                              null=True)
     rated_by = models.ForeignKey("hobo_user.CustomUser",
@@ -1103,7 +1129,28 @@ class UserRating(models.Model):
 
     class Meta:
         verbose_name = 'User Rating'
-        verbose_name_plural = 'User Rating'
+        verbose_name_plural = 'User Ratings'
+
+
+class CompanyRating(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating',
+                                verbose_name=_("Company"),
+                                null=True)
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='company_rated_by_user',
+                                 verbose_name=_("Rated by"),
+                                 null=True)
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating'
+        verbose_name_plural = 'Company Ratings'
 
 
 class UserTacking(models.Model):
@@ -1278,6 +1325,48 @@ class UserNotification(models.Model):
         verbose_name_plural = 'User Notifications'
 
 
+class FriendGroup(models.Model):
+    title = models.CharField(max_length=1000)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='friend_group_user',
+                             verbose_name=_("User"),
+                             null=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'Friend Group'
+        verbose_name_plural = 'Friend Groups'
+
+
+class GroupUsers(models.Model):
+    group = models.ForeignKey("hobo_user.FriendGroup",
+                              on_delete=models.CASCADE,
+                              related_name='group',
+                              verbose_name=_("Group"),
+                              null=True)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='group_user',
+                             verbose_name=_("User"),
+                             null=True)
+    friends = models.ManyToManyField('hobo_user.CustomUser',
+                                     blank=True,
+                                     related_name="group_members",
+                                     verbose_name=_("Friends")
+                                     )
+
+    def __str__(self):
+        title = str(self.user.get_full_name())+"-"+str(self.group)
+        return str(title)
+
+    class Meta:
+        verbose_name = 'Group User'
+        verbose_name_plural = 'Groups Users'
+
+
 class Feedback(models.Model):
     email = models.EmailField(_('Email'))
     name = models.CharField(_('Name'),
@@ -1290,3 +1379,4 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Feedback'
         verbose_name_plural = 'Feedbacks'
+

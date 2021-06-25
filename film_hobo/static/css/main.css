@@ -127,12 +127,12 @@
 }
 .navbar-light .navbar-nav .active>.nav-link,
 .navbar-light .navbar-nav .nav-link.active,
- .navbar-light .navbar-nav .nav-link.show, 
- .navbar-light .navbar-nav .show>.nav-link {
-  color: #e88b22; 
- }
- .navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
-  color: #e88b22; 
+.navbar-light .navbar-nav .nav-link.show, 
+.navbar-light .navbar-nav .show>.nav-link {
+ color: #e88b22; 
+}
+.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+ color: #e88b22; 
 }
 /*navbar section end*/
 /*footer*/
@@ -1524,6 +1524,40 @@ input#visa:focus {
 .pc-mem-ad-banner-2{
  height: 545px;
 }
+/*production company edit page end*/
+/*talent agency company page*/
+.tac-img-title{
+ width: 54px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ display: block;
+ font-size: 11px;
+ white-space: nowrap;
+}
+.tac-img{
+ height: 60px;
+ width: 60px;
+}
+.tac-mem-white-bg{
+ background-color: #fff;
+  margin: 1px 6px 1px 6px;
+  border-radius: 10px;
+  padding: 7px;
+  height: 330px;
+}
+.tac-img-edit{
+ height: 42px;
+  width: 42px;
+}
+.tac-img-title-edit {
+ width: 43px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ display: block;
+ font-size: 9px;
+ white-space: nowrap;
+}
+/*talent aganecy company page end*/
 /*simple content page end*/
 /*membership page logistics*/
 .memship-row{
