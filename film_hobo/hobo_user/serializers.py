@@ -848,6 +848,21 @@ class RateUserSkillsSerializer(serializers.ModelSerializer):
         fields = ['user', 'job_type', 'rating']
 
 
+class RateCompanySerializer(serializers.ModelSerializer):
+    company = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserRating
+        fields = ['company', 'rating']
+
+
 class AgentManagerSerializer(serializers.ModelSerializer):
     agent_type = serializers.CharField(
         max_length=150,

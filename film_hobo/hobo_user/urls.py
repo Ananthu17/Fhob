@@ -51,7 +51,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FeedbackView, ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView
+                   TeamDeleteAPIView, RateCompanyAPI
 
 
 app_name = "hobo_user"
@@ -170,6 +170,7 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback/', FeedbackView.as_view(), name='feedback'),
+    path('rate-company-api/', RateCompanyAPI.as_view(), name='rate-company-api'),
 
 
     # web-view endpoints

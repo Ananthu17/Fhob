@@ -1064,7 +1064,7 @@ class UserInterest(models.Model):
 class UserRatingCombined(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating',
+                             related_name='user_rating_combined',
                              verbose_name=_("User"),
                              null=True)
     job_type = models.ForeignKey('hobo_user.JobType',
@@ -1072,7 +1072,7 @@ class UserRatingCombined(models.Model):
                                  related_name="user_job_type_rating_combined",
                                  verbose_name=_("Job Types")
                                  )
-    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1082,10 +1082,26 @@ class UserRatingCombined(models.Model):
         verbose_name_plural = 'User Rating Combined'
 
 
+class CompanyRatingCombined(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating_combined',
+                                verbose_name=_("Company"),
+                                null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating Combined'
+        verbose_name_plural = 'Company Rating Combined'
+
+
 class UserRating(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating_combined',
+                             related_name='user_rating',
                              verbose_name=_("User"),
                              null=True)
     rated_by = models.ForeignKey("hobo_user.CustomUser",
@@ -1105,7 +1121,28 @@ class UserRating(models.Model):
 
     class Meta:
         verbose_name = 'User Rating'
-        verbose_name_plural = 'User Rating'
+        verbose_name_plural = 'User Ratings'
+
+
+class CompanyRating(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating',
+                                verbose_name=_("Company"),
+                                null=True)
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='company_rated_by_user',
+                                 verbose_name=_("Rated by"),
+                                 null=True)
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating'
+        verbose_name_plural = 'Company Ratings'
 
 
 class UserTacking(models.Model):

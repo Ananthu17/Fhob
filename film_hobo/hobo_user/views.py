@@ -8,6 +8,7 @@ import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
+from django.db.models import Sum
 from django.core.files import File
 from django.db.models import Q
 from django.template import loader
@@ -63,7 +64,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, UserRating, Location, \
                     UserRatingCombined, UserTacking, CompanyProfile, \
-                    Feedback
+                    Feedback, CompanyRating, CompanyRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -84,7 +85,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
-    FeedbackSerializer, \
+    FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer
 
 from .utils import notify, get_notifications_time
@@ -2759,13 +2760,15 @@ class RateUserSkillsAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            user = CustomUser.objects.get(id=data_dict['user'])
-            job_type = JobType.objects.get(id=data_dict['job_type'])
+            user_id = data_dict['user']
+            job_id = data_dict['job_type']
+            user = CustomUser.objects.get(id=user_id)
+            job_type = JobType.objects.get(id=job_id)
             try:
                 user_rating = UserRating.objects.get(
-                               Q(user=data_dict['user']) &
-                               Q(rated_by=request.user) &
-                               Q(job_type=data_dict['job_type'])
+                               Q(user=user) &
+                               Q(rated_by=self.request.user) &
+                               Q(job_type=job_type)
                                )
             except UserRating.DoesNotExist:
                 user_rating = UserRating()
@@ -2774,28 +2777,86 @@ class RateUserSkillsAPI(APIView):
                 user_rating.job_type = job_type
             user_rating.rating = data_dict['rating']
             user_rating.save()
-            # try:
-            #     user_rating_combined = UserRatingCombined.objects.filter(
-            #                             Q(user=data_dict['user']) &
-            #                             Q(job_type=data_dict['job_type'])
-            #                             )
-            #     count = UserRating.objects.filter(
-            #             Q(user=user) &
-            #             Q(job_type=job_type)
-            #             ).count()
-            #     rating = user_rating_combined.rating
-            #     total_rating = user_rating_combined.total_rating
-            #     # new_rating = 
-            # except UserRating.DoesNotExist:
-            #     user_rating_combined = UserRatingCombined()
-            #     user = CustomUser.objects.get(id=data_dict['user'])
-            #     job_type = JobType.objects.get(id=data_dict['job_type'])
-            #     user_rating_combined.user = user
-            #     user_rating_combined.job_type = job_type
-            #     user_rating_combined.rating = data_dict['rating']
+
+            # update combined rating
+            try:
+                user_rating_combined = UserRatingCombined.objects.get(
+                                        Q(user=user) &
+                                        Q(job_type=job_type)
+                                        )
+                count = UserRating.objects.filter(
+                        Q(user=user) &
+                        Q(job_type=job_type)
+                        ).count()
+                aggregate_rating = UserRating.objects.filter(
+                        Q(user=user) &
+                        Q(job_type=job_type)
+                        ).aggregate(Sum('rating'))
+                rating_sum = aggregate_rating['rating__sum']
+                new_rating = rating_sum/count
+                user_rating_combined.rating = new_rating
+                user_rating_combined.save()
+            except UserRatingCombined.DoesNotExist:
+                user_rating_combined = UserRatingCombined()
+                user_rating_combined.user = user
+                user_rating_combined.job_type = job_type
+                user_rating_combined.rating = data_dict['rating']
+                user_rating_combined.save()
 
             response = {'message': "User skill rated sucessfully",
-                        'status': status.HTTP_200_OK}
+                        'status': status.HTTP_200_OK,
+                        'combined_rating': user_rating_combined.rating}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RateCompanyAPI(APIView):
+    serializer_class = RateCompanySerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            company_id = data_dict['company']
+            company = CustomUser.objects.get(id=company_id)
+            try:
+                company_rating = CompanyRating.objects.get(
+                               Q(company=company) &
+                               Q(rated_by=self.request.user)
+                               )
+            except CompanyRating.DoesNotExist:
+                company_rating = CompanyRating()
+                company_rating.company = company
+                company_rating.rated_by = self.request.user
+            company_rating.rating = data_dict['rating']
+            company_rating.save()
+
+            # update combined rating
+            try:
+                company_rating_combined = CompanyRatingCombined.objects.get(
+                                        company=company)
+                count = CompanyRating.objects.filter(
+                        company=company).count()
+                aggregate_rating = CompanyRating.objects.filter(
+                        company=company).aggregate(Sum('rating'))
+                rating_sum = aggregate_rating['rating__sum']
+                new_rating = rating_sum/count
+                company_rating_combined.rating = new_rating
+                company_rating_combined.save()
+            except CompanyRatingCombined.DoesNotExist:
+                company_rating_combined = CompanyRatingCombined()
+                company_rating_combined.company = company
+                company_rating_combined.rating = data_dict['rating']
+                company_rating_combined.save()
+
+            response = {'message': "Company rated sucessfully",
+                        'status': status.HTTP_200_OK,
+                        'combined_rating': company_rating_combined.rating}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -3918,7 +3979,6 @@ class FilterFriendByGroupAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
-
 class FeedbackView(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -3985,3 +4045,21 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
+
+# class CompanyRatingView(LoginRequiredMixin, TemplateView):
+#     template_name = 'user_pages/friends-and-followers.html'
+#     login_url = '/hobo_user/user_login/'
+#     redirect_field_name = 'login_url'
+
+#     def post(self, request, *args, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         user = self.request.user
+#         position = ""
+#         file = ""
+#         if 'position' in self.request.POST:
+#             position = self.request.POST.get('position')
+#         if 'image' in self.request.FILES:
+#             file = self.request.FILES['image']
+#         if position and file:
+
+#         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
