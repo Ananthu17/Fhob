@@ -860,7 +860,7 @@ class RateCompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['company', 'rating']
+        fields = ['company', 'rating', 'reason']
 
 
 class AgentManagerSerializer(serializers.ModelSerializer):
@@ -1006,6 +1006,7 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = ['user', 'requested_by']
+
 
 class AddGroupSerializer(serializers.ModelSerializer):
     user = serializers.CharField(

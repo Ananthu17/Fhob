@@ -2637,6 +2637,12 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
+        try:
+            rating_obj = UserRatingCombined.objects.get(user=user)
+            rating = rating_obj.rating * 20
+        except UserRatingCombined.DoesNotExist:
+            rating = 0
+        context['rating'] = rating
         return context
 
 
@@ -2682,6 +2688,12 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['staff'] = coworkers
         except CoWorker.DoesNotExist:
             pass
+        try:
+            rating_obj = CompanyRatingCombined.objects.get(company=user)
+            rating = rating_obj.rating * 20
+        except CompanyRatingCombined.DoesNotExist:
+            rating = 0
+        context['rating'] = rating
         return context
 
 
@@ -2748,6 +2760,12 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['client_dict'] = client_dict
         except CompanyClient.DoesNotExist:
             pass
+        try:
+            rating_obj = CompanyRatingCombined.objects.get(company=user)
+            rating = rating_obj.rating * 20
+        except CompanyRatingCombined.DoesNotExist:
+            rating = 0
+        context['rating'] = rating
         return context
 
 
@@ -2822,6 +2840,7 @@ class RateCompanyAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
+            print("data_dict", data_dict)
             company_id = data_dict['company']
             company = CustomUser.objects.get(id=company_id)
             try:
@@ -2834,6 +2853,7 @@ class RateCompanyAPI(APIView):
                 company_rating.company = company
                 company_rating.rated_by = self.request.user
             company_rating.rating = data_dict['rating']
+            company_rating.reason = data_dict['reason']
             company_rating.save()
 
             # update combined rating
@@ -2857,6 +2877,10 @@ class RateCompanyAPI(APIView):
             response = {'message': "Company rated sucessfully",
                         'status': status.HTTP_200_OK,
                         'combined_rating': company_rating_combined.rating}
+            msg = 'Rated '+data_dict['rating']+' stars !!'
+            messages.success(
+                    self.request, msg
+                    )
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -4046,20 +4070,25 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-# class CompanyRatingView(LoginRequiredMixin, TemplateView):
-#     template_name = 'user_pages/friends-and-followers.html'
-#     login_url = '/hobo_user/user_login/'
-#     redirect_field_name = 'login_url'
+class GetCurrentUserRating(APIView):
+    serializer_class = UserNotificationSerializer
+    permission_classes = (IsAuthenticated,)
 
-#     def post(self, request, *args, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user
-#         position = ""
-#         file = ""
-#         if 'position' in self.request.POST:
-#             position = self.request.POST.get('position')
-#         if 'image' in self.request.FILES:
-#             file = self.request.FILES['image']
-#         if position and file:
-
-#         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    def get(self, request):
+        response = {}
+        current_user = self.request.user
+        profile_id = self.request.GET.get('profile_id')
+        rating = 0
+        profile_user = CustomUser.objects.get(pk=profile_id)
+        if profile_user.membership == CustomUser.PRODUCTION_COMPANY:
+            try:
+                rating = CompanyRating.objects.get(
+                        Q(rated_by=current_user.id) &
+                        Q(company=profile_id)
+                        ).rating
+            except CompanyRating.DoesNotExist:
+                rating = 0
+        else:
+            pass
+        response['rating'] = rating
+        return Response(response)

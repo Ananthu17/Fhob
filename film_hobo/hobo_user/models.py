@@ -1115,6 +1115,7 @@ class UserRating(models.Model):
                                  verbose_name=_("Job Types")
                                  )
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1136,6 +1137,7 @@ class CompanyRating(models.Model):
                                  verbose_name=_("Rated by"),
                                  null=True)
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.company)
