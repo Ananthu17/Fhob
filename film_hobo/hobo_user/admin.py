@@ -6,8 +6,8 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, Actor, UserInterest, Writer, AthleticSkillInline, \
-                    Producer, Director, Editor, Makeup, Country, \
+                    PromoCode, Team, UserInterest, AthleticSkillInline, \
+                    Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
@@ -91,12 +91,6 @@ admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
 admin.site.register(Team)
-admin.site.register(Actor)
-admin.site.register(Writer)
-admin.site.register(Producer)
-admin.site.register(Director)
-admin.site.register(Editor)
-admin.site.register(Makeup)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)

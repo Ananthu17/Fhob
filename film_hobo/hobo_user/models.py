@@ -466,20 +466,6 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
-    actor = models.ForeignKey('hobo_user.Actor', verbose_name=_("Actor"),
-                              on_delete=models.CASCADE)
-    writer = models.ForeignKey('hobo_user.Writer', verbose_name=_("Writer"),
-                               on_delete=models.CASCADE)
-    producer = models.ForeignKey('hobo_user.Producer',
-                                 verbose_name=_("Producer"),
-                                 on_delete=models.CASCADE)
-    director = models.ForeignKey('hobo_user.Director',
-                                 verbose_name=_("Director"),
-                                 on_delete=models.CASCADE)
-    editor = models.ForeignKey('hobo_user.Editor', verbose_name=_("Editor"),
-                               on_delete=models.CASCADE)
-    makeup = models.ForeignKey('hobo_user.Makeup', verbose_name=_("Makeup"),
-                               on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -540,48 +526,6 @@ class Team(models.Model):
 
     def __str__(self):
         return self.team
-
-
-class Actor(models.Model):
-    actor = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.actor
-
-
-class Writer(models.Model):
-    writer = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.writer
-
-
-class Producer(models.Model):
-    producer = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.producer
-
-
-class Director(models.Model):
-    director = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.director
-
-
-class Editor(models.Model):
-    editor = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.editor
-
-
-class Makeup(models.Model):
-    makeup = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.makeup
 
 
 class Country(models.Model):
