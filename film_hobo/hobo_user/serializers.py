@@ -991,10 +991,13 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=True)
+    user_rating = serializers.FloatField(required=True)
 
     class Meta:
         model = Feedback
-        fields = '__all__'
+        fields = ['email', 'name', 'user_rating', 'user_feedback',
+                  'timestamp']
 
 
 class ProjectSerializer(serializers.ModelSerializer):

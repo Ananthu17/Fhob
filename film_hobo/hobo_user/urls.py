@@ -45,11 +45,11 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
                    CancelFriendRequestAPI, UpdateFriendStatusAjaxView, \
-                   GetFriendRequestAcceptNotificationAjaxView, FeedbackView, \
-                   ProjectAPIView, ProjectCreateAPIView, \
+                   GetFriendRequestAcceptNotificationAjaxView, \
+                   FeedbackAPIView, ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView
+                   TeamDeleteAPIView, FeedbackWebView
 
 app_name = "hobo_user"
 
@@ -160,7 +160,7 @@ urlpatterns = [
          name='delete-friend-request-api'),
     path('unfriend-user-api/', UnFriendUserAPI.as_view(),
          name='unfriend-user-api'),
-    path('feedback/', FeedbackView.as_view(), name='feedback'),
+    path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
@@ -246,6 +246,9 @@ urlpatterns = [
     path('update-friend-status/',
          UpdateFriendStatusAjaxView.as_view(),
          name='update-friend-status'),
+    path('feedback/',
+         FeedbackWebView.as_view(),
+         name='feedback-web'),
 
     path('projects/', ProjectAPIView.as_view(),
          name='project-list'),

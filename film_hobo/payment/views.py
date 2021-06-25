@@ -913,6 +913,18 @@ class PaypalToken(APIView):
             return HttpResponse('Could not save data')
 
 
+class PaypalPlanID(APIView):
+    def get(self, request, *args, **kwargs):
+        paypal_plans = {
+            'Indie_Payment_Monthly': settings.INDIE_PAYMENT_MONTHLY,
+            'Indie_Payment_Yearly': settings.INDIE_PAYMENT_YEARLY,
+            'Prp_Payment_Monthly': settings.PRO_PAYMENT_MONTHLY,
+            'Pro_Payment_Yearly': settings.PRO_PAYMENT_YEARLY,
+            'Company_Payment_Monthly': settings.COMPANY_PAYMENT_MONTHLY,
+            'Company_Payment_Yearly': settings.COMPANY_PAYMENT_YEARLY
+        }
+        return JsonResponse(paypal_plans)
+
 # class ProcessSubscription(APIView):
 
 #     def post(self, request, *args, **kwargs):

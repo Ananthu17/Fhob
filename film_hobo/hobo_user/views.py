@@ -43,7 +43,9 @@ from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
-from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
+from rest_framework.generics import (ListAPIView,
+                                     CreateAPIView, DestroyAPIView,
+                                     UpdateAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 
 from authemail.views import SignupVerify
@@ -52,7 +54,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm
+    EditAgencyManagementCompanyProfileForm, FeedbackForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, IndiePaymentDetails, Photo, \
@@ -3691,7 +3693,7 @@ class UpdateFriendStatusAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
-class FeedbackView(APIView):
+class FeedbackAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         email = request.data['email']
@@ -3706,6 +3708,16 @@ class FeedbackView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FeedbackWebView(View):
+    """
+    Web View to load the feedback page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_pages/feedback.html')
+
+
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()

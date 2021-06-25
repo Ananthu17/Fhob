@@ -470,9 +470,10 @@ class Project(models.Model):
                                on_delete=models.CASCADE)
     makeup = models.ForeignKey('hobo_user.Makeup', verbose_name=_("Makeup"),
                                on_delete=models.CASCADE)
+
     def __str__(self):
         return self.title
-    
+
 
 class ProjectReaction(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
@@ -533,9 +534,10 @@ class Team(models.Model):
 
 class Actor(models.Model):
     actor = models.CharField(max_length=1000)
-    
+
     def __str__(self):
         return self.actor
+
 
 class Writer(models.Model):
     writer = models.CharField(max_length=1000)
@@ -543,16 +545,20 @@ class Writer(models.Model):
     def __str__(self):
         return self.writer
 
+
 class Producer(models.Model):
     producer = models.CharField(max_length=1000)
 
     def __str__(self):
         return self.producer
+
+
 class Director(models.Model):
     director = models.CharField(max_length=1000)
 
     def __str__(self):
         return self.director
+
 
 class Editor(models.Model):
     editor = models.CharField(max_length=1000)
@@ -560,11 +566,13 @@ class Editor(models.Model):
     def __str__(self):
         return self.editor
 
+
 class Makeup(models.Model):
     makeup = models.CharField(max_length=1000)
 
     def __str__(self):
         return self.makeup
+
 
 class Country(models.Model):
     name = models.CharField(max_length=1000)
