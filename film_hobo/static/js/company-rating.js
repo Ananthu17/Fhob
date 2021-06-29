@@ -20,7 +20,7 @@ $("input[name='rate']").change(function(){
     var rate = $('input[name="rate"]:checked').val();
     if(rate<='2'){
         $('.reason-div').html(" ");
-        var field = "<div class='row reason-div'>Reason<textarea class='reason form-control' rows='4' name='reason'></textarea></div>";
+        var field = "<div class='row reason-div'>Reason<textarea class='reason form-control' rows='4' name='reason'></textarea><div class='reason-error'></div></div>";
         $('.rating-form').append(field);
     }else{
         $('.reason-div').html(" ");
@@ -42,19 +42,24 @@ $('body').on('click' , '.submit-rating', function(){
   if(reason){
     data_dict['reason']=reason;
   }
-  $.ajax
-      ({
-          type: "POST",
-          url: "/hobo_user/rate-company-api/",
-          dataType: 'json',
-          async: false,
-          data: data_dict,
-          beforeSend: function (xhr) {
-              xhr.setRequestHeader ("Authorization", token);
-          },
-          success: function(response){
-            window.location.reload();
-          }
-      });
+  if((rate>2)|((rate<=2)&(reason!=""))){
+    $.ajax
+    ({
+        type: "POST",
+        url: "/hobo_user/rate-company-api/",
+        dataType: 'json',
+        async: false,
+        data: data_dict,
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", token);
+        },
+        success: function(response){
+          window.location.reload();
+        }
+    });
+  }else{
+    $('.reason-error').html("This field is required.");
+  }
+
 });
 

@@ -845,7 +845,7 @@ class RateUserSkillsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['user', 'job_type', 'rating']
+        fields = ['user', 'job_type', 'rating', 'reason']
 
 
 class RateCompanySerializer(serializers.ModelSerializer):
@@ -956,7 +956,7 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location']
+        fields = ['position', 'format', 'location', 'budget']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):

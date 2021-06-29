@@ -2637,12 +2637,22 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
-        try:
-            rating_obj = UserRatingCombined.objects.get(user=user)
-            rating = rating_obj.rating * 20
-        except UserRatingCombined.DoesNotExist:
-            rating = 0
-        context['rating'] = rating
+
+        rating_dict = {}
+        job_dict = {}
+        for job in profile.job_types.all():
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                            Q(user=user) &
+                            Q(job_type=job))
+                rating = rating_obj.rating * 20
+                job_dict[job.id]=job.title
+                rating_dict[job.id]=rating
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[job.id]=0
+                job_dict[job.id]=job.title
+        context['job_dict'] = job_dict
+        context['rating_dict'] = rating_dict
         return context
 
 
@@ -2780,6 +2790,8 @@ class RateUserSkillsAPI(APIView):
             data_dict = serializer.data
             user_id = data_dict['user']
             job_id = data_dict['job_type']
+            reason = data_dict['reason']
+            rating = data_dict['rating']
             user = CustomUser.objects.get(id=user_id)
             job_type = JobType.objects.get(id=job_id)
             try:
@@ -2793,7 +2805,8 @@ class RateUserSkillsAPI(APIView):
                 user_rating.user = user
                 user_rating.rated_by = self.request.user
                 user_rating.job_type = job_type
-            user_rating.rating = data_dict['rating']
+            user_rating.rating = rating
+            user_rating.reason = reason
             user_rating.save()
 
             # update combined rating
@@ -2818,12 +2831,34 @@ class RateUserSkillsAPI(APIView):
                 user_rating_combined = UserRatingCombined()
                 user_rating_combined.user = user
                 user_rating_combined.job_type = job_type
-                user_rating_combined.rating = data_dict['rating']
+                user_rating_combined.rating = rating
                 user_rating_combined.save()
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = user
+            notification.notification_type = UserNotification.USER_RATING
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" rated your "+job_type.title+" skill as "+rating+" stars"
+            notification.save()
+            # send notification
+            room_name = "user_"+str(user.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(self.request.user.id),
+                    "event": "USER_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
 
             response = {'message': "User skill rated sucessfully",
                         'status': status.HTTP_200_OK,
                         'combined_rating': user_rating_combined.rating}
+            msg = "'"+job_type.title +"' skill rated "+rating+" stars !!"
+            messages.success(
+                    self.request, msg
+                    )
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2836,24 +2871,26 @@ class RateCompanyAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        print("here----------------------")
         serializer = self.serializer_class(data=request.data)
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print("data_dict", data_dict)
             company_id = data_dict['company']
+            reason = data_dict['reason']
+            rating = int(data_dict['rating'])
             company = CustomUser.objects.get(id=company_id)
             try:
                 company_rating = CompanyRating.objects.get(
-                               Q(company=company) &
-                               Q(rated_by=self.request.user)
-                               )
+                            Q(company=company) &
+                            Q(rated_by=self.request.user)
+                            )
             except CompanyRating.DoesNotExist:
                 company_rating = CompanyRating()
                 company_rating.company = company
                 company_rating.rated_by = self.request.user
-            company_rating.rating = data_dict['rating']
-            company_rating.reason = data_dict['reason']
+            company_rating.rating = rating
+            company_rating.reason = reason
             company_rating.save()
 
             # update combined rating
@@ -2873,6 +2910,24 @@ class RateCompanyAPI(APIView):
                 company_rating_combined.company = company
                 company_rating_combined.rating = data_dict['rating']
                 company_rating_combined.save()
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = company
+            notification.notification_type = UserNotification.USER_RATING
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" rated you with "+str(rating)+" stars"
+            notification.save()
+            # send notification
+            room_name = "user_"+str(company.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(self.request.user.id),
+                    "event": "USER_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
 
             response = {'message': "Company rated sucessfully",
                         'status': status.HTTP_200_OK,
@@ -3276,6 +3331,7 @@ class AddUserInterestAPI(APIView):
             obj.position = JobType.objects.get(pk=data_dict['position'])
             obj.location = Location.objects.get(pk=data_dict['location'])
             obj.format = data_dict['format']
+            obj.budget = data_dict['budget']
             obj.save()
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
@@ -3297,6 +3353,7 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
         positions = self.request.POST.getlist('position')
         formats = self.request.POST.getlist('format')
         locations = self.request.POST.getlist('location')
+        budget = self.request.POST.getlist('budget')
         count = len(locations)
         json_dict = {}
         key = Token.objects.get(user=user).key
@@ -3306,6 +3363,7 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['position'] = positions[i]
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
+            json_dict['budget'] = budget[i]
             user_response = requests.post(
                                 'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
                                 data=json.dumps(json_dict),
@@ -3436,6 +3494,29 @@ class GetFriendRequestAcceptNotificationAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
+class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/get-profile-rating-notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'user_pages/get-profile-rating-notification.html',
+                                {'from_user': from_user,
+                                'message':message,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
 class GetAllNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'user_pages/all_notification.html'
 
@@ -3459,11 +3540,19 @@ class AddUserInterestAjaxView(View, JSONResponseMixin):
         context = dict()
         user = self.request.user
         count = self.request.GET.get('count')
-        add_my_interests_form_html = render_to_string(
-                                'user_pages/add-my-interest-form.html',
+        form = self.request.GET.get('form')
+        if form:
+             add_my_interests_form_html = render_to_string(
+                                'user_pages/add-my-interest-form2.html',
                                 {'my_interest_form': UserInterestForm,
                                  'count': count}
                                 )
+        else:
+            add_my_interests_form_html = render_to_string(
+                                    'user_pages/add-my-interest-form.html',
+                                    {'my_interest_form': UserInterestForm,
+                                    'count': count}
+                                    )
         context['add_my_interests_form_html'] = add_my_interests_form_html
         return self.render_json_response(context)
 
@@ -4070,25 +4159,25 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class GetCurrentUserRating(APIView):
-    serializer_class = UserNotificationSerializer
-    permission_classes = (IsAuthenticated,)
+# class GetCurrentUserRating(APIView):
+#     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        response = {}
-        current_user = self.request.user
-        profile_id = self.request.GET.get('profile_id')
-        rating = 0
-        profile_user = CustomUser.objects.get(pk=profile_id)
-        if profile_user.membership == CustomUser.PRODUCTION_COMPANY:
-            try:
-                rating = CompanyRating.objects.get(
-                        Q(rated_by=current_user.id) &
-                        Q(company=profile_id)
-                        ).rating
-            except CompanyRating.DoesNotExist:
-                rating = 0
-        else:
-            pass
-        response['rating'] = rating
-        return Response(response)
+#     def post(self, request):
+#         response = {}
+#         current_user = self.request.user
+#         profile_id = self.request.POST.get('profile_id')
+#         print("profile_id", profile_id)
+#         rating = 0
+#         profile_user = CustomUser.objects.get(pk=profile_id)
+#         if profile_user.membership == CustomUser.PRODUCTION_COMPANY:
+#             try:
+#                 rating = CompanyRating.objects.get(
+#                         Q(rated_by=current_user.id) &
+#                         Q(company=profile_id)
+#                         ).rating
+#             except CompanyRating.DoesNotExist:
+#                 rating = 0
+#         else:
+#             pass
+#         response['rating'] = rating
+#         return Response(response)

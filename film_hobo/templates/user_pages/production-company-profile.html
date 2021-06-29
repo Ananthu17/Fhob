@@ -305,7 +305,7 @@
                                     <span class="">{{user.get_membership_display}}</span>
                                 </div>
                                 <div class="col-4  mt-3">
-                                    <div class="containerdiv ratings" data-toggle="modal" data-target="#rating-modal">
+                                    <div class="containerdiv ratings" {% if profile.user.id != request.user.id %} data-toggle="modal" data-target="#rating-modal" {% endif %}>
                                         <div>
                                         <img src="{% static 'images/stars_blank.png' %}"
                                         class="star-img" alt="img" />
@@ -375,7 +375,7 @@
                                                 <!-- Modal footer -->
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-outline-danger btn-sm submit-rating"
-                                                    id="{{profile.user.id}}" data-dismiss="modal">Submit</button>
+                                                    id="{{profile.user.id}}">Submit</button>
                                                     <button type="button" class="btn btn-outline-danger btn-sm "
                                                     data-dismiss="modal">Cancel</button>
                                                 </div>

@@ -334,7 +334,7 @@
                         </div>
                     </div>
                     {% if profile.job_types %}
-                    {% for obj in profile.job_types.all %}
+                    {% for job,rating in rating_dict.items %}
                     <div class="row">
                         <div class="col-3">
                             {% if forloop.first %}
@@ -342,10 +342,13 @@
                             {% endif %}
                         </div>
                         <div class="col-2  mt-3">
-                            <span class="">{{obj.title}}</span>
+                            <span class="">
+                                {% get_dict_value job_dict job  as job_title %}
+                                {{job_title}}
+                            </span>
                         </div>
                         <div class="col-3  mt-3">
-                            <div class="containerdiv">
+                            <div class="containerdiv ratings" {% if profile.user.id != request.user.id %} data-toggle="modal" data-target="#rating-modal-{{job}}" {% endif %}>
                                 <div>
                                 <img src="{% static 'images/stars_blank.png' %}"
                                 class="star-img" alt="img" />
@@ -355,6 +358,72 @@
                                 class="star-img" alt="" />
                                 </div>
                             </div>
+                            <!-- The Modal -->
+                            <div class="modal fade" id="rating-modal-{{job}}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <!-- Modal Header -->
+                                        <div class="modal-header">
+                                            <h6 class="modal-title mem-setup-blu-f">Rate {{profile.user.get_full_name}} as {{job_title}}</h6>
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+
+                                        <!-- Modal body -->
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12 ">
+                                                        <div class="row" >
+                                                            <div class="col-12" >
+                                                                {% get_my_skill_rating request.user.id profile.user.id job as my_rating %}
+                                                                {% if my_rating != 0 %}
+                                                                    <p>You have already given {{my_rating}} star rating for {{profile.user.get_full_name}} as '{{job_title}}'.</p>
+                                                                    <p>Change rating?</p>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="offset-2 col-6 " id="rating-form-{{job}}" >
+                                                                <div class="row">
+                                                                    <input type="hidden" name="profile" value="{{profile.user.id}}" />
+                                                                    <span class="give-rating">
+                                                                            <input type="radio" id="star5-{{job}}" name="rate-{{job}}" class="rate" value="5"
+                                                                            {% if my_rating == 5 %} checked {% endif %}/>
+                                                                            <label for="star5-{{job}}" title="5 Star">5 stars</label>
+
+                                                                            <input type="radio" id="star4-{{job}}" name="rate-{{job}}" class="rate"  value="4"
+                                                                            {% if my_rating == 4 %} checked {% endif %}/>
+                                                                            <label for="star4-{{job}}" title="4 Star">4 stars</label>
+
+                                                                            <input type="radio" id="star3-{{job}}" name="rate-{{job}}" class="rate"  value="3"
+                                                                            {% if my_rating == 3 %} checked {% endif %}/>
+                                                                            <label for="star3-{{job}}" title="3 Star">3 stars</label>
+
+                                                                            <input type="radio" id="star2-{{job}}" name="rate-{{job}}" class="rate"  value="2"
+                                                                            {% if my_rating == 2 %} checked {% endif %}/>
+                                                                            <label for="star2-{{job}}" title="2 Star">2 stars</label>
+
+                                                                            <input type="radio" id="star1-{{job}}" name="rate-{{job}}" class="rate" value="1"
+                                                                            {% if my_rating == 1 %} checked {% endif %}/>
+                                                                            <label for="star1-{{job}}" title="1 Star">1 star</label>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Modal footer -->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-danger btn-sm submit-rating"
+                                            id="{{job}}">Submit</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm "
+                                            data-dismiss="modal">Cancel</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal End -->
                         </div>
                         <div class="col-2  mt-3">
                             Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
@@ -663,6 +732,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/user-rating.js' %}"></script>
 {% endblock %}
 
 

@@ -51,7 +51,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FeedbackView, ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView, RateCompanyAPI, GetCurrentUserRating
+                   TeamDeleteAPIView, RateCompanyAPI, GetProfileRatingNotificationAjaxView
 
 
 app_name = "hobo_user"
@@ -171,7 +171,6 @@ urlpatterns = [
          name='remove-friend-group-api'),
     path('feedback/', FeedbackView.as_view(), name='feedback'),
     path('rate-company-api/', RateCompanyAPI.as_view(), name='rate-company-api'),
-    path('get-my-rating/', GetCurrentUserRating.as_view(), name='get-my-rating'),
 
 
     # web-view endpoints
@@ -277,4 +276,7 @@ urlpatterns = [
          name='delete-team'),
     path('teams/update/<id>', TeamUpdateAPIView.as_view(),
          name='delete-project'),
+    path('get-profile-rating-notification-html/',
+         GetProfileRatingNotificationAjaxView.as_view(),
+         name='get-profile-rating-notification-html'),
 ]

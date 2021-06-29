@@ -4,7 +4,8 @@
   top: 4em;
   left: 31%;
   z-index:999;
-  width: 34em;
+  /* width: 34em; */
+  width: 35%;
 }
 .message-box
 {
@@ -25,6 +26,10 @@
   font-size:14px;
   color:Red;
 }
+.reason-error
+  {
+    color:Red;
+  }
 .errormsg
 {
   list-style-type:none;
@@ -367,4 +372,9 @@ input.pw {
 .give-rating > input:checked ~ label {
   color: #e88b22;    
 }
+
 /* end give star rating */
+.net-friend-req-name
+  {
+    font-family:Myraid Pro;
+  }

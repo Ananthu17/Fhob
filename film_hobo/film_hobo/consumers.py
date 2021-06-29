@@ -60,6 +60,15 @@ class NotificationConsumer(WebsocketConsumer):
                             'message': message,
                             "event": "FRIEND_REQUEST_ACCEPT"
                           })
+        if event == 'USER_RATING':
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                          self.room_group_name,
+                          {
+                            'type': 'send_profile_rating_notification',
+                            'message': message,
+                            "event": "USER_RATING"
+                          })
 
     def receive_json(self, content, **kwargs):
         print("Received event: {}".format(content))
@@ -93,4 +102,13 @@ class NotificationConsumer(WebsocketConsumer):
             'message': message,
             'user_id': id,
             'event': "FRIEND_REQUEST_ACCEPT"
+        }))
+
+    def send_profile_rating_notification(self, event):
+        message = event['message']
+        id = event['from']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'user_id': id,
+            'event': "USER_RATING"
         }))

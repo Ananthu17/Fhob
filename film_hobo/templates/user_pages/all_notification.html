@@ -2,7 +2,6 @@
 {% load notification_tag %}
 {% for obj in notifications %}
 
-
     <div class="row unread_notification">
         <div  class="col-2">
             <a href="{{ obj.from_user.get_profile_url }}"
@@ -26,7 +25,7 @@
             </div>
             {% elif obj.notification_type == 'friend_request' %}
             <div class="row">
-                <div class="col-10 friend-req-btns">
+                <div class="col-10 " id="friend-req-btns-{{obj.from_user.id}}">
                     {{ obj.from_user.get_full_name }} send you friend request.<br>
                     <b>{{ obj.from_user.get_membership_display }}</b><br>
                     <span class="btn-blue cursor-pointer accept_friend_request" id="{{obj.from_user.id}}">Accept</span>
@@ -37,8 +36,17 @@
             </div>
             {% elif obj.notification_type == 'accepted_friend_request' %}
             <div class="row">
-                <div class="col-10 friend-req-btns">
+                <div class="col-10 ">
                     {{ obj.from_user.get_full_name }} accepted your friend request.<br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'user_rating' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message}}<br>
                     <b>{{ obj.from_user.get_membership_display }}</b><br>
                     {% get_notifications_time obj.created_time as time %}
                     {{time}} ago.
