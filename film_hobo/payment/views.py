@@ -1,3 +1,4 @@
+import braintree
 import json
 import requests
 
@@ -22,7 +23,7 @@ from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-from paypal.standard.forms import PayPalPaymentsForm
+# from paypal.standard.forms import PayPalPaymentsForm
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest, \
     OrdersCaptureRequest, OrdersGetRequest
@@ -865,6 +866,8 @@ class SubscriptionDetails(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
+            # user_email = self.request.GET.get('email')
+            # logged_user = CustomUser.objects.get(email=user_email)
             logged_user = Token.objects.get(key=request.data['token']).user
             membership_type = logged_user.membership
         except ObjectDoesNotExist:
@@ -924,6 +927,18 @@ class PaypalPlanID(APIView):
             'Company_Payment_Yearly': settings.COMPANY_PAYMENT_YEARLY
         }
         return JsonResponse(paypal_plans)
+
+
+class InitialRequest(APIView):
+    def get(self, request, *args, **kwargs):
+        request.session['braintree_client_token'] = braintree.ClientToken.generate()
+        return render(request, '')
+
+    # def post(self, request, *args, **kwargs):
+    #     if not form.is_valid():
+    #         return render(render, '')
+    #     else:
+    #         pass
 
 # class ProcessSubscription(APIView):
 

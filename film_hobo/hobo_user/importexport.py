@@ -38,7 +38,3 @@ class LocationResource(ModelResource):
 
     class Meta:
         model = Location
-
-
-
-

@@ -317,13 +317,15 @@ class CustomUser(AbstractUser):
             if self.company_type == 'production':
                 return reverse('hobo_user:edit-production-company-profile')
             if self.company_type == 'agency_management':
-                return reverse('hobo_user:edit-agency-management-company-profile')
+                return reverse(
+                    'hobo_user:edit-agency-management-company-profile')
         return ""
 
     @property
     def group_name(self):
         """
-        Returns a group name based on the user's id to be used by Django Channels.
+        Returns a group name based on the user's id
+        to be used by Django Channels.
         """
         return "user_%s" % self.id
 
@@ -860,12 +862,12 @@ class CompanyProfile(models.Model):
     MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
     PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
     SAMR_CHOICES = [
-                        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
-                        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
-                        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
-                        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
-                        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
-                        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
+                    (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+                    (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+                    (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+                    (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+                    (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+                    (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
                     ]
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -970,7 +972,8 @@ class CompanyClient(models.Model):
 class Location(models.Model):
     city = models.CharField(max_length=1000, verbose_name='City', null=True)
     state = models.CharField(max_length=1000, verbose_name='State', null=True)
-    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+    country = models.CharField(
+        max_length=1000, verbose_name='Country', null=True)
 
     def __str__(self):
         location = self.city+","+self.state+","+self.country

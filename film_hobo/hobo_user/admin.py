@@ -5,21 +5,20 @@ from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
-                    AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, UserInterest, AthleticSkillInline, \
-                    Country, \
-                    IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
-                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
-                    HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
-                    FriendRequest, UserTacking, UserRatingCombined, UserRating, \
-                    UserAgentManager, Photo, UserNotification, CompanyProfile, \
+                    AthleticSkill, PromoCode, Team, UserInterest, \
+                    AthleticSkillInline, Country, IndiePaymentDetails, \
+                    ProPaymentDetails, GuildMembership, \
+                    CompanyPaymentDetails, DisabledAccount, \
+                    CustomUserSettings, HoboPaymentsDetails, JobType, \
+                    UserProfile, CoWorker, FriendRequest, UserTacking, \
+                    UserRatingCombined, UserRating, UserAgentManager, \
+                    Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
                     GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
 
-
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource, JobTypeResource, \
-                    LocationResource
+                    CountryResource, GuildMembershipResource, \
+                    JobTypeResource, LocationResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -110,6 +109,7 @@ admin.site.register(FriendGroup)
 admin.site.register(CompanyRating)
 admin.site.register(CompanyRatingCombined)
 
+
 @admin.register(EthnicAppearance)
 class EthnicAppearanceAdmin(ImportExportModelAdmin):
     resource_class = EthnicAppearanceResource
@@ -129,9 +129,11 @@ class CountryAdmin(ImportExportModelAdmin):
 class GuildMembershipAdmin(ImportExportModelAdmin):
     resource_class = GuildMembershipResource
 
+
 @admin.register(JobType)
 class JobTypeAdmin(ImportExportModelAdmin):
     resource_class = JobTypeResource
+
 
 @admin.register(Location)
 class LocationAdmin(ImportExportModelAdmin):

@@ -22,11 +22,9 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
-    UserProfile, CoWorker, UserInterest, \
-    UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
-    UserRating
+    UserAgentManager, UserNotification, UserProfile, CoWorker, \
+    UserInterest, UserRating, CompanyProfile, CompanyClient, FriendRequest, \
+    FriendGroup, Feedback, Project, Team
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -624,10 +622,11 @@ class CompanyPaymentSerializer(serializers.ModelSerializer):
 
 class PromoCodeSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(required=True)
+
     class Meta:
         model = PromoCode
         fields = ['promo_code', 'created_time', 'valid_from', 'valid_to',
-                  'life_span', 'amount_type', 'user_type','user_id']
+                  'life_span', 'amount_type', 'user_type', 'user_id']
 
 
 class DisableAccountSerializer(serializers.ModelSerializer):
@@ -638,14 +637,14 @@ class DisableAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DisabledAccount
-        fields = ['reason',]
+        fields = ['reason']
 
 
 class EnableAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUserSettings
-        fields = ['account_status',]
+        fields = ['account_status']
 
 
 class BlockMembersSerializer(serializers.Serializer):
@@ -715,8 +714,8 @@ class PasswordResetSerializer(PasswordResetSerializer):
 
     def get_email_options(self):
         return {
-                'subject_template_name': 'registration/password_reset_subject.txt',
-                'html_email_template_name': 'registration/'
+            'subject_template_name': 'registration/password_reset_subject.txt',
+            'html_email_template_name': 'registration/'
                                         'password_reset_email.html',
         }
 
@@ -823,7 +822,7 @@ class RemoveAgentManagerSerializer(serializers.Serializer):
 
 
 class TrackUserSerializer(serializers.Serializer):
-    track_id =  serializers.CharField(
+    track_id = serializers.CharField(
         max_length=150,
         required=True,
     )
@@ -1007,6 +1006,7 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
+
 class AddGroupSerializer(serializers.ModelSerializer):
     user = serializers.CharField(
         max_length=150,
@@ -1044,9 +1044,11 @@ class RemoveFriendGroupSerializer(serializers.Serializer):
         required=True,
     )
 
+
 class FeedbackSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     user_rating = serializers.FloatField(required=True)
+    user_feedback = serializers.CharField(required=True)
 
     class Meta:
         model = Feedback
@@ -1066,4 +1068,3 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['__all__']
-

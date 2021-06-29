@@ -5,7 +5,7 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, SubscriptionDetails, \
-     PaypalToken, PaypalPlanID
+     PaypalToken, PaypalPlanID, InitialRequest
 # from .paypal import CreateOrder, CaptureOrder
 
 from paypal.standard.ipn import views
@@ -50,5 +50,8 @@ urlpatterns = [
     path('paypal/<order_id>/capture/',
          CaptureUserOrder.as_view(), name="paypal-capture"),
     path('paypal/<order_id>/get_details/',
-         GetOrderDetails.as_view(), name="paypal-get-details")
+         GetOrderDetails.as_view(), name="paypal-get-details"),
+    # braintree endpoints
+    path('braintree/initial_request/',
+         InitialRequest.as_view(), name="braintree-initial-request"),
 ]
