@@ -3,30 +3,25 @@ import braintree
 import json
 from os import remove
 from django.contrib.auth.models import User
-from django.db.models.deletion import SET_NULL
 import requests
 import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
-from django.db.models import Sum
 from django.core.files import File
-from django.db.models import Q
+from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse
-from django.template import loader
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
@@ -47,8 +42,6 @@ from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
-from rest_framework.exceptions import ParseError
-from rest_framework.parsers import FileUploadParser
 from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView)
@@ -61,7 +54,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, FeedbackForm, CheckoutForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
@@ -101,7 +94,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
-
 
 
 class ExtendedLoginView(AuthLoginView):
