@@ -61,7 +61,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     PromoCode, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
-                    UserNotification, Friend, FriendGroup, \
+                    UserNotification, Friend, FriendGroup, Help, \
                     Project, Team, UserProfile, JobType, UserRating, Location, \
                     UserRatingCombined, UserTacking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined
@@ -86,7 +86,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
-    ProjectSerializer, TeamSerializer
+    ProjectSerializer, TeamSerializer, HelpSerializer, \
+    EditUserInterestSerializer
 
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -1210,6 +1211,9 @@ class SettingsAPI(APIView):
             if 'match_for_my_Interest' in data_dict:
                 user_settings.match_for_my_Interest = data_dict[
                                         'match_for_my_Interest']
+            if 'hide_ratings' in data_dict:
+                user_settings.hide_ratings = data_dict[
+                                        'hide_ratings']
             if 'who_can_track_me' in data_dict:
                 user_settings.who_can_track_me = data_dict['who_can_track_me']
             if 'profile_visibility' in data_dict:
@@ -1308,6 +1312,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
                             request.POST.get('friend_request', 'off'))
         match_for_my_Interest = CHECKBOX_MAPPING.get(
                             request.POST.get('match_for_my_Interest', 'off'))
+        hide_ratings = CHECKBOX_MAPPING.get(
+                            request.POST.get('hide_ratings', 'off'))
 
         if 'profile_visibility' in data_dict:
             profile_visibility = data_dict['profile_visibility']
@@ -1399,6 +1405,7 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         json_dict['new_project'] = new_project
         json_dict['friend_request'] = friend_request
         json_dict['match_for_my_Interest'] = match_for_my_Interest
+        json_dict['hide_ratings'] = hide_ratings
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         user_response = requests.post(
@@ -2089,8 +2096,6 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['coworkers'] = coworkers
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
-
-
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
@@ -2313,12 +2318,6 @@ class AddCoworkerAPI(APIView):
                     user = CustomUser.objects.get(email=data_dict['email'])
                     coworker.user = user
                     coworker.name = user.get_full_name()
-                    try:
-                        profile = UserProfile.objects.get(user=user)
-                        profile.update_job_type(position.id)
-                        profile.save()
-                    except UserProfile.DoesNotExist:
-                        pass
                 except CustomUser.DoesNotExist:
                     pass
             coworker.save()
@@ -2353,9 +2352,6 @@ class EditCoworkerAPI(APIView):
                         user = CustomUser.objects.get(id=user_id)
                         coworker.user = user
                         coworker.name = user.get_full_name()
-                        profile = UserProfile.objects.get(user=user)
-                        profile.update_job_type(position.id)
-                        profile.save()
                     if 'name' in data_dict and data_dict['name'] != "":
                         coworker.name = data_dict['name']
                     coworker.save()
@@ -2653,6 +2649,11 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                 job_dict[job.id]=job.title
         context['job_dict'] = job_dict
         context['rating_dict'] = rating_dict
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
+            pass
         return context
 
 
@@ -2704,6 +2705,11 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
         except CompanyRatingCombined.DoesNotExist:
             rating = 0
         context['rating'] = rating
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
+            pass
         return context
 
 
@@ -2776,6 +2782,11 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
         except CompanyRatingCombined.DoesNotExist:
             rating = 0
         context['rating'] = rating
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
+            pass
         return context
 
 
@@ -3172,7 +3183,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
             context['trackers_list_count'] = 0
         tracking_list = UserTacking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
-        paginator = Paginator(tracking_list, 1)
+        paginator = Paginator(tracking_list, 20)
         page = self.request.GET.get('page1')
         try:
             tracking_list = paginator.page(page)
@@ -3202,6 +3213,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         context['positions'] = JobType.objects.all()
         context['locations'] = Location.objects.all()
         context['format'] = UserInterest.FORMAT_CHOICES
+        context['budget'] = UserInterest.BUDGET_CHOICES
         return context
 
 
@@ -3335,6 +3347,36 @@ class AddUserInterestAPI(APIView):
             obj.save()
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditUserInterestAPI(APIView):
+    serializer_class = EditUserInterestSerializer
+    permission_classes = (IsAuthenticated,)
+
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                obj = UserInterest.objects.get(Q(pk=id) & Q(user=self.request.user))
+                obj.position = JobType.objects.get(pk=data_dict['position'])
+                obj.location = Location.objects.get(pk=data_dict['location'])
+                obj.format = data_dict['format']
+                obj.budget = data_dict['budget']
+                obj.save()
+                response = {'message': "User interest updated.",
+                           'status': status.HTTP_200_OK}
+            except UserInterest.DoesNotExist:
+                response = {'message': "Invalid ID, Object not found.",
+                           'status': status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -3613,13 +3655,6 @@ class CompanyClientAPI(APIView):
                     user = CustomUser.objects.get(email=data_dict['email'])
                     client.user = user
                     client.name = user.get_full_name()
-                    if 'position' in data_dict and data_dict['position'] != 'new_job':
-                        try:
-                            profile = UserProfile.objects.get(user=user)
-                            profile.update_job_type(position.id)
-                            profile.save()
-                        except UserProfile.DoesNotExist:
-                            pass
                 except CustomUser.DoesNotExist:
                     pass
             client.save()
@@ -4159,25 +4194,68 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-# class GetCurrentUserRating(APIView):
-#     permission_classes = (IsAuthenticated,)
+class HelpAPI(APIView):
+    serializer_class = HelpSerializer
+    permission_classes = (IsAuthenticated,)
 
-#     def post(self, request):
-#         response = {}
-#         current_user = self.request.user
-#         profile_id = self.request.POST.get('profile_id')
-#         print("profile_id", profile_id)
-#         rating = 0
-#         profile_user = CustomUser.objects.get(pk=profile_id)
-#         if profile_user.membership == CustomUser.PRODUCTION_COMPANY:
-#             try:
-#                 rating = CompanyRating.objects.get(
-#                         Q(rated_by=current_user.id) &
-#                         Q(company=profile_id)
-#                         ).rating
-#             except CompanyRating.DoesNotExist:
-#                 rating = 0
-#         else:
-#             pass
-#         response['rating'] = rating
-#         return Response(response)
+    def get(self, request):
+        response = {}
+        help_objects = Help.objects.filter(user=self.request.user)
+        for item in help_objects:
+            serializer = self.serializer_class(item).data
+            response[item.subject] = serializer
+        return Response(response)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            screenshot =  request.data['screenshot']
+            help_obj = Help()
+            help_obj.user = self.request.user
+            help_obj.subject = data_dict['subject']
+            help_obj.description = data_dict['description']
+            help_obj.screenshot = screenshot
+            help_obj.save()
+            response = {'message': "Problem reported",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+class HelpView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/help.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def post(self, request, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        json_dict = {}
+        json_dict['subject'] = self.request.POST.get('subject')
+        json_dict['description'] = self.request.POST.get('description')
+        json_dict['screenshot'] = self.request.POST.get('screenshot')
+        user_response = requests.post(
+                                'http://127.0.0.1:8000/hobo_user/help-api/',
+                                data=json.dumps(json_dict),
+                                headers={'Content-type': 'application/json',
+                                        'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] != 200:
+                if 'errors' in response:
+                    errors = response['errors']
+                    print(errors)
+                    messages.warning(
+                        self.request, "Failed to send message !!")
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Message received. Will get back to you soon.")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

@@ -362,3 +362,5 @@ class UserInterestForm(forms.ModelForm):
     class Meta:
         model = UserInterest
         fields = ('position', 'format', 'location', 'budget')
+
+

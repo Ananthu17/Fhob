@@ -14,7 +14,8 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
+                    Help
 
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
@@ -115,6 +116,7 @@ admin.site.register(NewJobType)
 admin.site.register(FriendGroup)
 admin.site.register(CompanyRating)
 admin.site.register(CompanyRatingCombined)
+admin.site.register(Help)
 
 @admin.register(EthnicAppearance)
 class EthnicAppearanceAdmin(ImportExportModelAdmin):
@@ -151,6 +153,7 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
                                 'who_can_track_me', 'who_can_contact_me',
                                 'account_status')}),
         ('Blocked Members', {'fields': ('blocked_members',)}),
+        ('Profile', {'fields': ('hide_ratings',)}),
         ('Notification', {'fields': ('someone_tracks_me',
                                      'change_in_my_or_project_rating',
                                      'review_for_my_work_or_project',

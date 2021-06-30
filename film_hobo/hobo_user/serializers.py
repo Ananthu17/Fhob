@@ -23,7 +23,7 @@ from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
-    UserProfile, CoWorker, UserInterest, \
+    UserProfile, CoWorker, UserInterest, Help, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
     CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
     UserRating
@@ -685,6 +685,7 @@ class SettingsSerializer(serializers.Serializer):
     new_project = serializers.BooleanField(required=False)
     friend_request = serializers.BooleanField(required=False)
     match_for_my_Interest = serializers.BooleanField(required=False)
+    hide_ratings = serializers.BooleanField(required=False)
 
 
 class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
@@ -959,6 +960,32 @@ class UserInterestSerializer(serializers.ModelSerializer):
         fields = ['position', 'format', 'location', 'budget']
 
 
+class EditUserInterestSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    format = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    location = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    budget = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = UserInterest
+        fields = ['id', 'position', 'format', 'location', 'budget']
+
+
 class CompanyClientSerializer(serializers.ModelSerializer):
     position = serializers.CharField(
         max_length=150,
@@ -1064,4 +1091,11 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['__all__']
+
+
+class HelpSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Help
+        fields = ['subject', 'description', 'screenshot']
 

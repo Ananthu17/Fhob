@@ -692,7 +692,7 @@
                                     <th>Position: <u>{{obj.position}}</u> </th>
                                     <th>Format: <u>{{obj.format}}</u> </th>
                                     <th>Location: <u>{{obj.location}}</u></th>
-                                    <th></th>
+                                    <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
                                     <th></th>
                                     <th></th>
                                     <th></th>
@@ -715,49 +715,114 @@
                                     <td class="int-grey">Attached</td>
                                     <td class="int-red">(on 08/05/21)</td>
                                 </tr>
+                                <!-- The Modal -->
+                                <div class="modal fade" id="edit-{{obj.id}}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h5 class="modal-title mem-setup-blu-f">Edit My Interests </h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="row ">
+                                                            <div class="col-12">
+                                                            <div class="row mb-2">
+                                                                <div class="offset-1 col-3">
+                                                                    <label class="intrest-lab">Position:</label>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <select class="inp-interest-2" id="position_{{obj.id}}"
+                                                                    name="position" required>
+                                                                        {% for position in positions %}
+                                                                             <option value="{{position.id}}"
+                                                                             {% if obj.position.id == position.id %} selected {% endif %}>
+                                                                             {{position}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Format:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="format" id = "format_{{obj.id}}" required>
+                                                                            {% for item in format %}
+                                                                                <option value="{{item.0}}"
+                                                                                    {% if obj.format == item.0 %} selected {% endif %}>
+                                                                                    {{item.1}}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Budget:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="budget" id ="budget_{{obj.id}}" required >
+                                                                        {% for item in budget %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.budget == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Location:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 modal-location form-control"
+                                                                        id ="location_{{obj.id}}"
+                                                                        name="location" required >
+                                                                        {% for location in locations %}
+                                                                                <option value="{{location.id}}"
+                                                                                {% if obj.location.id == location.id %} selected {% endif %}>
+                                                                                {{location}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                       </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm edit-my-interest"
+                                                    id="{{obj.id}}">Save</button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-dismiss="modal" >Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end of modal -->
                             {% endfor %}
                         </table>
-                        <!-- <hr class="mem-set-acc-hr-interest mt-2 mb-2"> -->
-                            <!-- <table class="table mem-table table-responsive-sm">
-                                <colgroup>
-                                    <col span="1" style="width: 20%;">
-                                    <col span="1" style="width: 20%;">
-                                    <col span="1" style="width: 25%;">
-                                    <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 7%;">
-                                    <col span="1" style="width: 7%;">
-                                    <col span="1" style="width: 7%;">
-                                    <col span="1" style="width: 10%;">
-                                 </colgroup>
-                                 <tr class="interest-font">
-                                    <th>Position: <u> Cinematographer</u> </th>
-                                    <th>Format: <u> pilot</u> </th>
-                                    <th>Location: <u>De Soto,Missouri,United States</u></th>
-                                </tr>
-                                <tr>
-                                    <td><a class="tbl-tag" href="">Project # 346 </a></td>
-                                    <td> Title: Girls</td>
-                                    <td>Team: <a class="tbl-tag" href=""># 7 </a></td>
-                                    <td>Posted on 07/30/21</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-green">Attached</td>
-                                    <td class="int-green">(on 08/05/21)</td>
-                                </tr>
-                                <tr>
-                                    <th><a class="tbl-tag" href="">Project # 233</a></th>
-                                    <td>Title: Ripples of Moonlight</td>
-                                    <td>Team:<a class="tbl-tag" href=""># 7 </a> </td>
-                                    <td>Posted on 07/23/21</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr>
-                            </table> -->
 
                         </div>
-                             
                         <!-- End My Interest Row -->
                     </div>
                     <hr class="mem-set-acc-hr-1">
@@ -839,6 +904,7 @@
 
     $(document).ready(function() {
         $('#location_1').select2();
+        $('.modal-location').select2();
 
 
         var getUrlParameter = function getUrlParameter(sParam) {
@@ -940,6 +1006,49 @@ $('body').on('click' , '#add-more-interests', function(){
                             $('.friend-group').html(data['groups_html']);
                         }
                 });
+            }
+        });
+    });
+</script>
+<script>
+    $('body').on('click' , '.edit-my-interest', function(){
+        id = $(this).attr('id');
+        var token = $("#token").val();
+        data_dict = {}
+        var position_id = "#position_"+id
+        var format_id = "#format_"+id
+        var budget_id = "#budget_"+id
+        var location_id = "#location_"+id
+        var position = $(position_id).val();
+        var format = $(format_id).val();
+        var budget = $(budget_id).val();
+        var location = $(location_id).val();
+
+        data_dict['id'] = id
+        if(position){
+            data_dict['position'] = position
+        }
+        if(format){
+            data_dict['format'] = format
+        }
+        if(budget){
+            data_dict['budget'] = budget
+        }
+        if(location){
+            data_dict['location'] = location
+        }
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/edit-user-interest-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
             }
         });
     });

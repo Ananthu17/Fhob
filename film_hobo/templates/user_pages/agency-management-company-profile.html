@@ -297,7 +297,8 @@
                                     <span class="">{{profile.user.get_membership_display}}</span>
                                 </div>
                                 <div class="col-4  mt-3">
-                                    <div class="containerdiv ratings" {% if profile.user.id != request.user.id %} data-toggle="modal" data-target="#rating-modal" {% endif %}>
+                                    {% if not settings.hide_ratings %}
+                                    <div class="containerdiv ratings" >
                                         <div>
                                         <img src="{% static 'images/stars_blank.png' %}"
                                         class="star-img" alt="img" />
@@ -307,75 +308,7 @@
                                         class="star-img" alt="" />
                                         </div>
                                     </div>
-                                    <!-- The Modal -->
-                                    <div class="modal fade" id="rating-modal">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-
-                                                <!-- Modal Header -->
-                                                <div class="modal-header">
-                                                    <h6 class="modal-title mem-setup-blu-f">Rate {{profile.user.company_name}}</h6>
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                </div>
-
-                                                <!-- Modal body -->
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="col-12 ">
-                                                            <form method="post" enctype="multipart/form-data"
-                                                            action="">
-                                                                    {% csrf_token %}
-                                                                    <div class="row" >
-                                                                    <div class="col-12" >
-                                                                        {% get_my_rating request.user.id profile.user.id as my_rating %}
-                                                                        {% if my_rating != 0 %}
-                                                                            <p>You have already rated {{profile.user.company_name}} as {{my_rating}} star.</p>
-                                                                            <p>Change rating?</p>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                    <div class="offset-2 col-6 rating-form" >
-                                                                        <div class="row">
-                                                                        <span class="give-rating">
-                                                                            <input type="radio" id="star5" name="rate" id="give-rating" value="5"
-                                                                            {% if my_rating == 5 %} checked {% endif %}/>
-                                                                            <label for="star5" title="5 Star">5 stars</label>
-
-                                                                            <input type="radio" id="star4" name="rate" id="give-rating" value="4"
-                                                                            {% if my_rating == 4 %} checked {% endif %}/>
-                                                                            <label for="star4" title="4 Star">4 stars</label>
-
-                                                                            <input type="radio" id="star3" name="rate" id="give-rating" value="3"
-                                                                            {% if my_rating == 3 %} checked {% endif %}/>
-                                                                            <label for="star3" title="3 Star">3 stars</label>
-
-                                                                            <input type="radio" id="star2" name="rate" id="give-rating" value="2"
-                                                                            {% if my_rating == 2 %} checked {% endif %}/>
-                                                                            <label for="star2" title="2 Star">2 stars</label>
-
-                                                                            <input type="radio" id="star1" name="rate" id="give-rating" value="1"
-                                                                            {% if my_rating == 1 %} checked {% endif %}/>
-                                                                            <label for="star1" title="1 Star">1 star</label>
-                                                                        </span>
-                                                                    </div>
-                                                                    </div>
-                                                                    </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Modal footer -->
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-outline-danger btn-sm submit-rating"
-                                                    id="{{profile.user.id}}">Submit</button>
-                                                    <button type="button" class="btn btn-outline-danger btn-sm "
-                                                    data-dismiss="modal">Cancel</button>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Modal End -->
+                                    {% endif %}
                                 </div>
                                 <div class="col-2  mt-3">
                                     Projects:<span class="mem-setup-blu-f underline ml-1">5</span>

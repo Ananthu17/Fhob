@@ -382,3 +382,11 @@ input.pw {
     border: 0;
     border-bottom: 1px solid#656565;
  }
+ .inp-interest-2 {
+  border:none;
+  border-bottom:1px solid#9c9c9c;
+  outline: none;
+  background: none;
+  width: 100%!important;
+  
+}
