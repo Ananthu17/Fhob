@@ -675,7 +675,7 @@
                         <br>
                         <!-- Table -->
                         <div class="card ml-3 mr-3">
-                            <label class=" my-interest-2 ml-2 mt-2">My Interests (2)</label>
+                            <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
                             <hr class="mem-set-acc-hr-interest">
                             <table class="table mem-table table-responsive-sm">
                                 <colgroup>
@@ -687,10 +687,15 @@
                                     <col span="1" style="width: 6%;">
                                     <col span="1" style="width: 8%;">
                                  </colgroup>
-                                <tr class="interest-font">
-                                    <th>Position: <u>Director</u> </th>
-                                    <th>Format: <u>Feature</u> </th>
-                                    <th>Location: <u>Schwarzenbach an der Saale,Bavaria,Germany</u></th>
+                            {% for obj in myinterests %}
+                                <tr class="interest-font my-interest-table-th" >
+                                    <th>Position: <u>{{obj.position}}</u> </th>
+                                    <th>Format: <u>{{obj.format}}</u> </th>
+                                    <th>Location: <u>{{obj.location}}</u></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                 </tr>
                                 <tr>
                                     <td><a class="tbl-tag" href="">Project # 233</a></td>
@@ -701,9 +706,19 @@
                                     <td class="int-grey">Attached</td>
                                     <td class="int-red">(on 08/05/21)</td>
                                 </tr>
-                            </table>
-                            <hr class="mem-set-acc-hr-interest mt-2 mb-2">
-                            <table class="table mem-table table-responsive-sm">
+                                <tr>
+                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
+                                    <td>Title: Ripples of Moonlight</td>
+                                    <td>Posted on 07/23/21</td>
+                                    <td class="int-applied">Applied</td>
+                                    <td class="int-red">Passed</td>
+                                    <td class="int-grey">Attached</td>
+                                    <td class="int-red">(on 08/05/21)</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <!-- <hr class="mem-set-acc-hr-interest mt-2 mb-2"> -->
+                            <!-- <table class="table mem-table table-responsive-sm">
                                 <colgroup>
                                     <col span="1" style="width: 20%;">
                                     <col span="1" style="width: 20%;">
@@ -739,7 +754,7 @@
                                     <td class="int-grey">Attached</td>
                                     <td class="int-red">(on 08/05/21)</td>
                                 </tr>
-                            </table>
+                            </table> -->
 
                         </div>
                              

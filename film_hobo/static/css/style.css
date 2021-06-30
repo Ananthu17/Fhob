@@ -378,3 +378,7 @@ input.pw {
   {
     font-family:Myraid Pro;
   }
+  .my-interest-table-th{
+    border: 0;
+    border-bottom: 1px solid#656565;
+ }
