@@ -818,8 +818,8 @@ class PaymentIndieView(FormView):
         address_dict = {
             "first_name": user.first_name,
             "last_name": user.middle_name + ' ' + user.last_name,
-            "address": user.address,
-            "country_name": user.country,
+            "extended_address": user.address,
+            "country_name": user.country.name,
         }
 
         result = braintree.Transaction.sale({

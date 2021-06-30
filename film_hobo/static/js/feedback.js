@@ -38,6 +38,10 @@ $(document).ready(function(){
       var ratingValue = parseInt($('#stars li.selected').last().data('value'), 10);
     });
 
+    $('#close-btn').click(function(event){
+      location.reload();
+    });
+
     $('#feedback-submit').click(function(event){
       event.preventDefault();
 
@@ -55,7 +59,12 @@ $(document).ready(function(){
 
       axios.post(feedback_url, feedback_url_args)
       .then((response) => {
-          console.log(response);
+          var modal = $("#notificationModal")
+          var modal_text = "Thanks for the feedback"
+          var title = "Feedback"
+          modal.find('.modal-title').text(title)
+          modal.find('.modal-body').text(modal_text)
+          $("#notificationModal").modal('show');
       }, (error) => {
         console.log(error.response.data.user_feedback);
         if (error.response.data.user_rating){

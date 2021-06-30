@@ -93,8 +93,13 @@
                                     <div id="paypal-div" class="mt-4"></div>
                                     <script src="https://js.braintreegateway.com/web/dropin/1.30.1/js/dropin.js"></script>
                                     <div align="center">or</div>
-                                    <button type="button" class="btn btn-secondary btn-lg btn-block btn-dark" data-toggle="collapse" data-target="#main-dropin-container">Debit or Credit Card</button>
-                                    <div id="main-dropin-container" class="collapse">
+                                    <input type="hidden" id="braintreeVar" name="variable" value="{{ braintree_client_token }}">
+                                    <!-- <button type="button" class="btn btn-secondary btn-lg btn-block btn-dark" data-toggle="collapse" data-target="#main-dropin-container">Debit or Credit Card</button> -->
+                                    <!-- <div id="main-dropin-container" class="collapse"> -->
+                                        <!-- <div class="braintree-notifications"></div>
+                                        <div id="braintree-dropin"></div>
+                                        <input class="btn btn-success btn-lg btn-block" type="submit" value="Pay now!" /> -->
+
                                         <div id="dropin-container"></div>
                                         <button id="submit-button" class="button button--small button--green">Purchase</button>
                                     </div>
@@ -141,6 +146,9 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="https://js.braintreegateway.com/web/dropin/1.30.1/js/dropin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.min.js"></script>
 <script src="{% static 'js/registration_payment.js' %}"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2&vault=true&intent=subscription"></script>
 <script src="{% static 'js/paypal_payment.js' %}"></script>

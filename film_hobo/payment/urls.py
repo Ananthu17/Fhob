@@ -8,8 +8,6 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      PaypalToken, PaypalPlanID, InitialRequest
 # from .paypal import CreateOrder, CaptureOrder
 
-from paypal.standard.ipn import views
-
 app_name = "payment"
 
 urlpatterns = [
