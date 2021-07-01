@@ -147,6 +147,7 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
                                 'who_can_track_me', 'who_can_contact_me',
                                 'account_status')}),
         ('Blocked Members', {'fields': ('blocked_members',)}),
+        ('Profile', {'fields': ('hide_ratings',)}),
         ('Notification', {'fields': ('someone_tracks_me',
                                      'change_in_my_or_project_rating',
                                      'review_for_my_work_or_project',

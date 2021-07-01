@@ -48,7 +48,7 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView)
 from rest_framework.decorators import api_view, renderer_classes
 from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework.filters import SearchFilter
+# from rest_framework import filters
 
 from authemail.views import SignupVerify
 
@@ -89,7 +89,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
-    ProjectSerializer, TeamSerializer, UserRatingSerializer
+    ProjectSerializer, TeamSerializer, UserRatingSerializer, \
+    EditUserInterestSerializer
 
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -1313,6 +1314,9 @@ class SettingsAPI(APIView):
             if 'match_for_my_Interest' in data_dict:
                 user_settings.match_for_my_Interest = data_dict[
                                         'match_for_my_Interest']
+            if 'hide_ratings' in data_dict:
+                user_settings.hide_ratings = data_dict[
+                                        'hide_ratings']
             if 'who_can_track_me' in data_dict:
                 user_settings.who_can_track_me = data_dict['who_can_track_me']
             if 'profile_visibility' in data_dict:
@@ -1411,6 +1415,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
                             request.POST.get('friend_request', 'off'))
         match_for_my_Interest = CHECKBOX_MAPPING.get(
                             request.POST.get('match_for_my_Interest', 'off'))
+        hide_ratings = CHECKBOX_MAPPING.get(
+                            request.POST.get('hide_ratings', 'off'))
 
         if 'profile_visibility' in data_dict:
             profile_visibility = data_dict['profile_visibility']
@@ -1502,6 +1508,7 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         json_dict['new_project'] = new_project
         json_dict['friend_request'] = friend_request
         json_dict['match_for_my_Interest'] = match_for_my_Interest
+        json_dict['hide_ratings'] = hide_ratings
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         user_response = requests.post(
@@ -2192,8 +2199,6 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['coworkers'] = coworkers
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
-
-
         try:
             track_obj = UserTacking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
@@ -2416,12 +2421,6 @@ class AddCoworkerAPI(APIView):
                     user = CustomUser.objects.get(email=data_dict['email'])
                     coworker.user = user
                     coworker.name = user.get_full_name()
-                    try:
-                        profile = UserProfile.objects.get(user=user)
-                        profile.update_job_type(position.id)
-                        profile.save()
-                    except UserProfile.DoesNotExist:
-                        pass
                 except CustomUser.DoesNotExist:
                     pass
             coworker.save()
@@ -2456,9 +2455,6 @@ class EditCoworkerAPI(APIView):
                         user = CustomUser.objects.get(id=user_id)
                         coworker.user = user
                         coworker.name = user.get_full_name()
-                        profile = UserProfile.objects.get(user=user)
-                        profile.update_job_type(position.id)
-                        profile.save()
                     if 'name' in data_dict and data_dict['name'] != "":
                         coworker.name = data_dict['name']
                     coworker.save()
@@ -2740,6 +2736,27 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
+
+        rating_dict = {}
+        job_dict = {}
+        for job in profile.job_types.all():
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                            Q(user=user) &
+                            Q(job_type=job))
+                rating = rating_obj.rating * 20
+                job_dict[job.id]=job.title
+                rating_dict[job.id]=rating
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[job.id]=0
+                job_dict[job.id]=job.title
+        context['job_dict'] = job_dict
+        context['rating_dict'] = rating_dict
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
+            pass
         return context
 
 
@@ -2784,6 +2801,17 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
             coworkers = CoWorker.objects.filter(company=user)
             context['staff'] = coworkers
         except CoWorker.DoesNotExist:
+            pass
+        try:
+            rating_obj = CompanyRatingCombined.objects.get(company=user)
+            rating = rating_obj.rating * 20
+        except CompanyRatingCombined.DoesNotExist:
+            rating = 0
+        context['rating'] = rating
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
             pass
         return context
 
@@ -2851,6 +2879,17 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['client_dict'] = client_dict
         except CompanyClient.DoesNotExist:
             pass
+        try:
+            rating_obj = CompanyRatingCombined.objects.get(company=user)
+            rating = rating_obj.rating * 20
+        except CompanyRatingCombined.DoesNotExist:
+            rating = 0
+        context['rating'] = rating
+        try:
+            settings = CustomUserSettings.objects.get(user=user)
+            context['settings'] = settings
+        except CustomUserSettings.DoesNotExist:
+            pass
         return context
 
 
@@ -2865,6 +2904,8 @@ class RateUserSkillsAPI(APIView):
             data_dict = serializer.data
             user_id = data_dict['user']
             job_id = data_dict['job_type']
+            reason = data_dict['reason']
+            rating = data_dict['rating']
             user = CustomUser.objects.get(id=user_id)
             job_type = JobType.objects.get(id=job_id)
             try:
@@ -2878,7 +2919,8 @@ class RateUserSkillsAPI(APIView):
                 user_rating.user = user
                 user_rating.rated_by = self.request.user
                 user_rating.job_type = job_type
-            user_rating.rating = data_dict['rating']
+            user_rating.rating = rating
+            user_rating.reason = reason
             user_rating.save()
 
             # update combined rating
@@ -2903,12 +2945,34 @@ class RateUserSkillsAPI(APIView):
                 user_rating_combined = UserRatingCombined()
                 user_rating_combined.user = user
                 user_rating_combined.job_type = job_type
-                user_rating_combined.rating = data_dict['rating']
+                user_rating_combined.rating = rating
                 user_rating_combined.save()
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = user
+            notification.notification_type = UserNotification.USER_RATING
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" rated your "+job_type.title+" skill as "+rating+" stars"
+            notification.save()
+            # send notification
+            room_name = "user_"+str(user.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(self.request.user.id),
+                    "event": "USER_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
 
             response = {'message': "User skill rated sucessfully",
                         'status': status.HTTP_200_OK,
                         'combined_rating': user_rating_combined.rating}
+            msg = "'"+job_type.title +"' skill rated "+rating+" stars !!"
+            messages.success(
+                    self.request, msg
+                    )
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -2921,22 +2985,26 @@ class RateCompanyAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        print("here----------------------")
         serializer = self.serializer_class(data=request.data)
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
             company_id = data_dict['company']
+            reason = data_dict['reason']
+            rating = int(data_dict['rating'])
             company = CustomUser.objects.get(id=company_id)
             try:
                 company_rating = CompanyRating.objects.get(
-                               Q(company=company) &
-                               Q(rated_by=self.request.user)
-                               )
+                            Q(company=company) &
+                            Q(rated_by=self.request.user)
+                            )
             except CompanyRating.DoesNotExist:
                 company_rating = CompanyRating()
                 company_rating.company = company
                 company_rating.rated_by = self.request.user
-            company_rating.rating = data_dict['rating']
+            company_rating.rating = rating
+            company_rating.reason = reason
             company_rating.save()
 
             # update combined rating
@@ -2957,9 +3025,31 @@ class RateCompanyAPI(APIView):
                 company_rating_combined.rating = data_dict['rating']
                 company_rating_combined.save()
 
+            #update notification table
+            notification = UserNotification()
+            notification.user = company
+            notification.notification_type = UserNotification.USER_RATING
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" rated you with "+str(rating)+" stars"
+            notification.save()
+            # send notification
+            room_name = "user_"+str(company.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(self.request.user.id),
+                    "event": "USER_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
+
             response = {'message': "Company rated sucessfully",
                         'status': status.HTTP_200_OK,
                         'combined_rating': company_rating_combined.rating}
+            msg = 'Rated '+data_dict['rating']+' stars !!'
+            messages.success(
+                    self.request, msg
+                    )
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -3196,7 +3286,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
             context['trackers_list_count'] = 0
         tracking_list = UserTacking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
-        paginator = Paginator(tracking_list, 1)
+        paginator = Paginator(tracking_list, 20)
         page = self.request.GET.get('page1')
         try:
             tracking_list = paginator.page(page)
@@ -3226,6 +3316,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         context['positions'] = JobType.objects.all()
         context['locations'] = Location.objects.all()
         context['format'] = UserInterest.FORMAT_CHOICES
+        context['budget'] = UserInterest.BUDGET_CHOICES
         return context
 
 
@@ -3355,9 +3446,40 @@ class AddUserInterestAPI(APIView):
             obj.position = JobType.objects.get(pk=data_dict['position'])
             obj.location = Location.objects.get(pk=data_dict['location'])
             obj.format = data_dict['format']
+            obj.budget = data_dict['budget']
             obj.save()
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class EditUserInterestAPI(APIView):
+    serializer_class = EditUserInterestSerializer
+    permission_classes = (IsAuthenticated,)
+
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                obj = UserInterest.objects.get(Q(pk=id) & Q(user=self.request.user))
+                obj.position = JobType.objects.get(pk=data_dict['position'])
+                obj.location = Location.objects.get(pk=data_dict['location'])
+                obj.format = data_dict['format']
+                obj.budget = data_dict['budget']
+                obj.save()
+                response = {'message': "User interest updated.",
+                           'status': status.HTTP_200_OK}
+            except UserInterest.DoesNotExist:
+                response = {'message': "Invalid ID, Object not found.",
+                           'status': status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -3376,6 +3498,7 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
         positions = self.request.POST.getlist('position')
         formats = self.request.POST.getlist('format')
         locations = self.request.POST.getlist('location')
+        budget = self.request.POST.getlist('budget')
         count = len(locations)
         json_dict = {}
         key = Token.objects.get(user=user).key
@@ -3385,6 +3508,7 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['position'] = positions[i]
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
+            json_dict['budget'] = budget[i]
             user_response = requests.post(
                                 'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
                                 data=json.dumps(json_dict),
@@ -3515,6 +3639,29 @@ class GetFriendRequestAcceptNotificationAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
+class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/get-profile-rating-notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'user_pages/get-profile-rating-notification.html',
+                                {'from_user': from_user,
+                                'message':message,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
 class GetAllNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'user_pages/all_notification.html'
 
@@ -3538,11 +3685,19 @@ class AddUserInterestAjaxView(View, JSONResponseMixin):
         context = dict()
         user = self.request.user
         count = self.request.GET.get('count')
-        add_my_interests_form_html = render_to_string(
-                                'user_pages/add-my-interest-form.html',
+        form = self.request.GET.get('form')
+        if form:
+             add_my_interests_form_html = render_to_string(
+                                'user_pages/add-my-interest-form2.html',
                                 {'my_interest_form': UserInterestForm,
                                  'count': count}
                                 )
+        else:
+            add_my_interests_form_html = render_to_string(
+                                    'user_pages/add-my-interest-form.html',
+                                    {'my_interest_form': UserInterestForm,
+                                    'count': count}
+                                    )
         context['add_my_interests_form_html'] = add_my_interests_form_html
         return self.render_json_response(context)
 
@@ -3603,13 +3758,6 @@ class CompanyClientAPI(APIView):
                     user = CustomUser.objects.get(email=data_dict['email'])
                     client.user = user
                     client.name = user.get_full_name()
-                    if 'position' in data_dict and data_dict['position'] != 'new_job':
-                        try:
-                            profile = UserProfile.objects.get(user=user)
-                            profile.update_job_type(position.id)
-                            profile.save()
-                        except UserProfile.DoesNotExist:
-                            pass
                 except CustomUser.DoesNotExist:
                     pass
             client.save()
@@ -4163,12 +4311,9 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-# # Search API for project
-# class ProjectSearchView(ListAPIView):
+
 #     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-#     permission_classes = (IsAuthenticated,)
-#     filter_backends = SearchFilter
+#     filter_backends = [filters.SearchFilter]
 #     search_fields = ["title"]
 
 # API to rate user associated the project

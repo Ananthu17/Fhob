@@ -1,5 +1,8 @@
+
 from django import template
-from hobo_user.models import CustomUser
+from django.db.models import Q
+from hobo_user.models import CustomUser, CompanyRating, UserRating, \
+    CompanyProfile
 
 register = template.Library()
 
@@ -27,3 +30,39 @@ def get_more_modal_id(position):
     pos = str(position).split(" ")
     position = '_'.join(pos)
     return position
+
+@register.simple_tag()
+def get_my_rating(current_user, profile_id):
+    rating = 0
+    # profile_user = CustomUser.objects.get(pk=profile_id)
+
+    try:
+        rating = CompanyRating.objects.get(
+                    Q(rated_by=current_user) &
+                    Q(company=profile_id)
+                    ).rating
+    except CompanyRating.DoesNotExist:
+        rating = 0
+
+    return rating
+
+
+@register.simple_tag()
+def get_my_skill_rating(current_user, profile_id, job):
+    rating = 0
+
+    try:
+        rating = UserRating.objects.get(
+                    Q(rated_by=current_user) &
+                    Q(user=profile_id) &
+                    Q(job_type=job)
+                    ).rating
+    except UserRating.DoesNotExist:
+        rating = 0
+
+    return rating
+
+
+@register.simple_tag()
+def get_dict_value(dict, key):
+    return dict[key]

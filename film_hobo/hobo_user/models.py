@@ -768,6 +768,10 @@ class CustomUserSettings(models.Model):
         default=True,
         verbose_name=_("If I’ve got a match for my Interest")
         )
+    hide_ratings = models.BooleanField(
+        default=False,
+        verbose_name=_("Hide ratings from my profile")
+        )
 
     class Meta:
         verbose_name = 'Custom User Settings'
@@ -989,11 +993,31 @@ class UserInterest(models.Model):
     SHORT = 'short'
     PILOT = 'pilot'
     FEATURE = 'feature'
+    No_PAYMENT = 'no_payment'
+    NEGOTIABLE = 'payment_is_negotiable'
+    ULB = 'SAG_ultra _low_budget'
+    MLB = 'SAG_moderate_low_budget'
+    LB = 'SAG_low_budget'
+    ThB = 'SAG_theatrical_budget'
+    ShB = 'SAG_short_film_budget'
+    MiB = 'SAG_micro_budget'
+    StB = 'SAG_studet_budget'
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
                     (SHORT, 'Short Film'),
                     (PILOT, 'Pilot'),
                     (FEATURE, 'Feature'),
+                    ]
+    BUDGET_CHOICES = [
+                    (No_PAYMENT, 'No Payment'),
+                    (NEGOTIABLE, 'Payment is Negotiable'),
+                    (ULB, 'SAG Ultra Low Budget'),
+                    (MLB, 'SAG Moderate Low Budget'),
+                    (LB, 'SAG Low Budget'),
+                    (ThB, 'SAG Theatrical Budget'),
+                    (ShB, 'SAG Short Film Budget'),
+                    (MiB, 'SAG Micro Budget'),
+                    (StB, 'SAG Studet Budget'),
                     ]
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -1009,6 +1033,10 @@ class UserInterest(models.Model):
                               choices=FORMAT_CHOICES,
                               max_length=150,
                               default=SCENE, null=True)
+    budget = models.CharField(_("Budget"),
+                              choices=BUDGET_CHOICES,
+                              max_length=150,
+                              default=No_PAYMENT, null=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
@@ -1070,6 +1098,7 @@ class UserRating(models.Model):
                                  verbose_name=_("Job Types")
                                  )
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1091,6 +1120,7 @@ class CompanyRating(models.Model):
                                  verbose_name=_("Rated by"),
                                  null=True)
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.company)
@@ -1236,6 +1266,7 @@ class UserNotification(models.Model):
     UNREAD = 'unread'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
+                                (USER_RATING, 'Rating'),
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
                                 (FRIEND_REQUEST_ACCEPT,
@@ -1263,6 +1294,7 @@ class UserNotification(models.Model):
                                    max_length=150, default=UNREAD)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
+    message = models.TextField(_("Message"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

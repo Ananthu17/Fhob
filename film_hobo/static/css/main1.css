@@ -20,9 +20,7 @@
    position: relative;
    left: 8%;
 }
-.tab-with{
-   width: 120%;
-}
+
 .blank-add-scene{
    min-height: 13%;
  }
@@ -198,8 +196,8 @@ span.user-group i{
 }
 
 .item-flow{
-   width: 266px;
-   height: 920%;
+   /* width: 266px; */
+   height: 350px;
    overflow-y: scroll;
 }
 .int-applied{
@@ -213,30 +211,6 @@ span.user-group i{
 }
 .int-grey{
    color:rgb(236 236 236)
-}
-.top-symb{
-   position: relative;
-   top: 9px;
-}
-.sub-drop{
-   position: relative;
-   top: 17px;
-   
-}
-.sub-name{
-   position: relative;
-   top: -16px;
-   font-size: 13px;
-   overflow: hidden;
-   white-space:nowrap;
-   text-overflow:ellipsis;
-   width: 87px;
-   display:inline-block;
-}
-.sub-btn {
-   position: relative;
-   top: -30px;
-   left: 22px;
 }
 .mem-set-net-img-main{
    padding-left: 12px;
@@ -253,16 +227,22 @@ span.user-group i{
    font-size: 10px;
    background-color: #0e62b5;
    border-color: #0e62b5;
+   height: 18px;
+   padding: 2px 5px;
+   margin-top: -13px;
 }
 .drop-btn{
    font-family: "Courier Bold";
    font-size: 11px;
+   height: 18px;
+   padding: 2px 5px;
+   margin-top: -13px;
 }
 .post-btn{
    width: 104%;
 }
 .intrest-lab{
-   font-size: 16px;
+   font-size: 13px;
 }
 .intrest-lab-tit{
    font-size: 12px;
@@ -274,7 +254,7 @@ span.user-group i{
    font-family: "Courier Bold";
 }
 .intrest-input > div{
-   padding: 0px 16px;
+   padding: 0px 14px;
 } 
 .format-space{
    margin: 0px 0px;
@@ -320,8 +300,15 @@ a.modal-tag{
 .net-user-grp:hover{
    color: #0e62b5 !important;
 }
+.mem-table{
+   table-layout:fixed;
+   width: 100%;
+   border-spacing: 25px;
+   
+}
 .mem-table td, .mem-table th {
    border: none;
+   column-width: auto;
 }
 .drop-all{
    font-family: "Courier Bold";
@@ -369,9 +356,7 @@ a.modal-tag{
 .modal-btn{
    font-size: 9px;
 }
-.modal-width{
-   width: 46%
-}
+
 .font-clr{
    color: #0e62b5;
 }
@@ -380,9 +365,9 @@ a.modal-tag{
    height: 52px;
    width: 52px;
 }
-.tracker-color{
+/* .tracker-color{
    color: #e88b24 !important;
-}
+} */
 .net-set-tracker-sec{
    border:1px solid #000;
    display: flow-root;
@@ -395,10 +380,19 @@ a.modal-tag{
    font-weight:600;
    text-decoration: none;
    font-size: 17px;
+   outline:none
 }
 a.net-tracker-text {
 
    text-decoration: none;
+}
+.net-tracker-text:focus {
+
+   color: #e88b24 !important;
+}
+.net-tracker-text-color {
+
+   color: #e88b24 !important;
 }
 .mem-set-acc-hr-interest {
    border: 0;
@@ -443,6 +437,34 @@ a.net-tracker-text {
    position: relative;
    left: 6%;
 }
+.net-friend-req{
+   display: flex;
+}
+.net-friend-req-pro{
+   display: flex;
+   margin-left: -8px
+}
+.net-friend-req-img{
+   margin-right: 4px;
+}
+.net-friend-req-name{
+   margin-bottom: 7px;
+   margin-left: 21px;
+   /* white-space: nowrap; */
+   width: 177px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+.net-friend-req-name-pro{
+   white-space: nowrap;
+   width: 58px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+.net-friend-req-name-btn{
+   padding-left: 6px
+}
+
 /* media query */
 @media (max-width: 1200px) {
   
@@ -521,7 +543,7 @@ a.net-tracker-text {
       
    }
    .format-space {
-      margin: 0px 19px;
+      margin: 0px 15px;
   }
 
    .post-hr{
@@ -529,9 +551,6 @@ a.net-tracker-text {
       border-top: 1px solid#656565;
       margin-top: 0rem;
       margin-bottom: 0rem;
-   }
-   .collapse-card{
-      width: 119%;
    }
    .drop-card{
       width: 132%;
@@ -638,6 +657,9 @@ padding: 0px;
 
 .blank-left-alg-hgt{
    height: 592px;
+}
+.blank-left-alg-hgt-project{
+   height: 427px;
 }
 .right-sec-height{
    height: 100%;
@@ -853,4 +875,23 @@ div.cnt-txt > span{
       text-align: center;
       margin-top: 0%;
    }
+}
+/* Home page End  */
+
+/* Project page  */
+
+.project-line{
+   padding: 0px 13px;
+}
+div.project-line > span{
+   padding: 1px 6px;
+   height: 20px;
+}
+.title-line{
+   padding: 0px 13px;
+}
+div.title-line > span{
+   padding: 1px 34px;
+   height: 20px;
+   margin-left: -28px;
 }

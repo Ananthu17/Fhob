@@ -3,7 +3,25 @@
 {% load friend_request_tag %}
 
 {% block extracss %}
-
+<style>
+.select2-container--default .select2-selection--single
+    {
+        border-radius: 0!important;
+        border:none!important;
+        border-bottom:1px solid#9c9c9c!important;
+    }
+.select2-container .select2-selection--single {
+    height:19px!important;
+    }
+.select2-container--default .select2-selection--single .select2-selection__rendered
+    {
+        line-height:19px;
+    }
+.select2-container--default .select2-selection--single .select2-selection__arrow
+    {
+        height:15px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -197,33 +215,45 @@
                                 </div>
                                 <div class="col-md-4 col-sm-12">
                                     <!-- drop-down-friend request -->
-                                    <button type="button" class="btn bg-transparent dropdown-toggle net-drop-btn font-weight-bold "
-                                    data-toggle="dropdown" data-flip="false" id="show-frnd-requests">
-                                        ({{friend_request_count}})Friend Requests
-                                    </button>
-                                    <div class="dropdown-menu border border-dark item-flow" id="Dropdown">
-                                        <div class="dropdown-item font-weight-bold "> {{friend_request_count}} Friend requests </div>
-                                        {% for request in friend_request%}
-                                        <div class="dropdown-item">
-                                            {% if request.requested_by.get_profile_photo %}
-                                            <img src="{{ request.requested_by.get_profile_photo }}" class="rounded-circle-img">
-                                            {% else %}
-                                            <img src="{% static 'images/default_profile_pic.png' %}" class="rounded-circle-img">
-                                            {% endif %}
-                                            <span class="pro-font sub-drop">{{request.requested_by.get_membership_display}}</span>
-                                            <span class="sub-name">{{request.requested_by.get_full_name}}</span>
-                                            <span class="sub-btn float-right">
-                                                <a class="btn btn-primary btn-sm drop-btn-1 rounded-0 accept_friend_request cursor-pointer"
-                                                id="{{request.requested_by.id}}">Confirm</a>
-                                                <a class="btn btn-light btn-sm drop-btn ml-2 delete_friend_request cursor-pointer"
-                                                id="{{request.requested_by.id}}">Delete</a>
-                                            </span>
-                                        </div>
-                                        {% endfor %}
-
+                                    <div class="dropdown keep-inside-clicks-open ">
+                                        <button type="button" class="btn  bg-transparent  dropdown-toggle  net-drop-btn font-weight-bold " data-toggle="dropdown" data-flip="false">
+                                            ({{friend_request_count}})Friend Requests
+                                        </button>
+                                        <!-- <div class="dropdown-menu border border-dark "> -->
+                                            <ul class=" dropdown-menu border border-dark item-flow">
+                                                <li class="ml-4 mb-4">
+                                                    {{friend_request_count}} Friend Requests
+                                                </li>
+                                                {% for request in friend_request%}
+                                                <li class="ml-2 mb-3">
+                                                    <div class="net-friend-req" >
+                                                        <div class="net-friend-req-img">
+                                                            {% if request.requested_by.get_profile_photo %}
+                                                            <img src="{{ request.requested_by.get_profile_photo }}" class="rounded-circle-img">
+                                                            {% else %}
+                                                            <img src="{% static 'images/default_profile_pic.png' %}" class="rounded-circle-img">
+                                                            {% endif %}
+                                                        </div>
+                                                        <div>
+                                                                <p class="net-friend-req-name " id="friend-request-{{request.requested_by.id}}">{{request.requested_by.get_full_name}}</p>
+                                                                <div class="net-friend-req-pro">
+                                                                    <span  class="pro-font net-friend-req-name-pro">{{request.requested_by.get_membership_display}}</span>
+                                                                    <span class="net-friend-req-name-btn " id="btns-{{request.requested_by.id}}">
+                                                                        <a class="btn btn-primary btn-sm drop-btn-1 rounded-0 accept_friend_request"
+                                                                        id="{{request.requested_by.id}}">Confirm</a>
+                                                                        <a class="btn btn-light btn-sm drop-btn ml-2 delete_friend_request"
+                                                                        id="{{request.requested_by.id}}">Delete</a>
+                                                                    </span>
+                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        <!-- </div> -->
                                     </div>
-
                                     <!-- drop-down-friend request End -->
+
                                 </div>
                             </div>
                             <!-- end dropdown bar     -->
@@ -283,7 +313,7 @@
                                          <!-- modal -->
                                          <div class="modal fade modal-font" id="add-to-group-{{friend.id}}" tabindex="-1" role="dialog"
                                          aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
                                               <div class="modal-content modal-width">
                                                 <div class="modal-header">
                                                   <h5 class="modal-title" id="exampleModalLongTitle">Groups</h5>
@@ -449,12 +479,12 @@
                     <div class="col">
                         <div class="container mt-5 ">
                             <div class="card">
-                                    <div class="row mb-1 mt-1">
+                                    <div class="row mb-1 mt-1" id="trackandtracking">
                                         <div class="col">
-                                            <a href="#?" class=" net-tracker-text float-left ml-2" onclick="toggleVisibility('Menu1');">(11)Tracking </a>
+                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu1');" >(11)Tracking </a>
                                         </div>
                                         <div class="col">
-                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color" onclick="toggleVisibility('Menu2');">(7)Trackers</a>
+                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu2');">(7)Trackers</a>
                                         </div>
                                     </div>
                                 <!-- end dropdown bar     -->
@@ -567,175 +597,304 @@
                     </div>
                 </div>
                 <!-- End Tracking and trackers -->
-                <hr class="mem-set-acc-hr-1">
-                <div class="row">
-
-                    <!-- My Interest Row -->
-                    <div class="col mt-3 ">
-                        <label class="my-interest">My Interests :<span class="intrest-lab-tit"> feature lets you set a
-                                search and notification for a desirable positions in sertain locations when it gets
-                                created.</span></label>
-                                <hr class="mt-1 hr-int-line">
-                    </div>
-
-                    <div class="container font-weight-bold interest-font">
-                        <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
-                            {% csrf_token %}
-                        <span class="my-interests-section"></span>
-                        <div class="row intrest-input ">
-                            <div class="sm-12">
-                                <label class="intrest-lab">position:</label>
-                                <select class="inp-interest"
-                                name="position" id="position_1" required>
-                                    <option></option>
-                                    {% for item in my_interest_form.position %}
-                                    {{item}}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="sm-12">
-                                <label class="intrest-lab">Format:</label>
-                                <select name="format" id = "format_1"
-                                    class="inp-interest format-space" required>
+                    <hr class="mem-set-acc-hr-1">
+                    <div class="row">
+                        
+                        <!-- My Interest Row -->
+                        <div class="col mt-3 ">
+                            <label class="my-interest">My Interests :<span class="intrest-lab-tit"> feature lets you set a
+                                    search and notification for a desirable positions in sertain locations when it gets
+                                    created.</span></label>
+                                    <hr class="mt-1 hr-int-line">
+                        </div>
+                        
+                        <div class="container font-weight-bold interest-font">
+                            <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
+                                {% csrf_token %}
+                            <span class="my-interests-section">
+                            <div class="row intrest-input ">
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Position:</label>
+                                    <select class="inp-interest" id="position_1"
+                                    name="position" required>
+                                        {% for position in my_interest_form.position %}
+                                            {{position}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Format:</label>
+                                    <select class="inp-interest format-space"
+                                    name="format" id = "format_1" required>
                                         {% for item in my_interest_form.format %}
                                         {{item}}
                                         {% endfor %}
                                     </select>
-                            </div>
-                            <div class="sm-12">
-                                <label class="intrest-lab">Location:</label>
-                                <select name="location" id ="location_1"
-                                    class="inp-interest" required>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Location:</label>
+                                    <select class="inp-interest" id ="location_1"
+                                    name="location" required >
                                         {% for item in my_interest_form.location %}
                                         {{item}}
                                         {% endfor %}
                                     </select>
-                            </div>
-                       </div>
-                       </span>
-                        <div class="row mt-2">
-                            <div class="col-md-6 col-sm-4">
-                                <button
-                                    class="btn btn-light btn-sm btn rounded-0 border border-dark font-weight-bold ad-or-save"
-                                    id="add-more-interests">Add More</button>
-                                <input type="submit"
-                                class="btn btn-light btn-sm  btn rounded-0 border border-dark font-weight-bold ad-or-save font-clr"
-                                value="save">
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Budget:</label>
+                                    <select class="inp-interest format-space"
+                                    name="budget" id ="budget_1" required >
+                                        {% for item in my_interest_form.budget %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                           </div>
+                           </span>
+                            <div class="row mt-2">
+                                <div class="col-md-6 col-sm-4">
+                                    <a class="btn btn-light btn-sm btn rounded-0 border border-dark font-weight-bold ad-or-save"
+                                        id="add-more-interests">Add
+                                        More</a>
+                                    <input type="submit" class="btn btn-light btn-sm  btn rounded-0 border border-dark font-weight-bold ad-or-save font-clr" value="save">
 
+                                </div>
+                            </div>
+                            </form>
+                            <div class="row mt-2">
+                                <div class="col-md-12 col-sm-4">
+                                    <span class="intrest-lab-md">
+                                        <label>
+                                        When someone post a project meeting your criteria you will
+                                        get a notification so you can apply for the position.
+                                    </label>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                        </form>
-                        <div class="row mt-2">
-                            <div class="col-md-12 col-sm-4">
-                                <span class="intrest-lab-md">
-                                    <label>
-                                    When someone post a project meeting your criteria you will
-                                    get a notification so you can apply for the position.
-                                </label>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="table-responsive-sm  ml-2">
-                        <div class="card tab-with">
-                            <label class="col-sm-3 my-interest-2">My Interests ({{myinterests.count}})</label>
+                        <br>
+                        <!-- Table -->
+                        <div class="card ml-3 mr-3">
+                            <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
                             <hr class="mem-set-acc-hr-interest">
-                            <div>
-                                {% for obj in myinterests %}
-                                <hr class="mem-set-acc-hr-1">
-                                <table class="table borderless table-responsive-sm font-weight-bold mem-table">
-                                        <tr class="interest-font">
-                                            <th scope="col">Position: <u>{{obj.position}}</u> </th>
-                                            <th scope="col">Format: <u>{{obj.format}}</u> </th>
-                                            <th scope="col">Location: <u>{{obj.location}}</u></th>
-                                        </tr>
-                                        <tr>
-                                            <th><a class="tbl-tag" href="">Project # 233</a></th>
-                                            <td>Title: Ripples of Moonlight</td>
-                                            <td>Posted on 07/23/21</td>
-                                            <td class="int-applied">Applied</td>
-                                            <td class="int-red">Passed</td>
-                                            <td class="int-grey">Attached</td>
-                                            <td class="int-red">(on 08/05/21)</td>
-                                        </tr>
-                                </table>
-                                 {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End My Interest Row -->
-                </div>
-                <hr class="mem-set-acc-hr-1">
-                <div class="row">
-                    <hr class="mem-set-acc-hr-1">
-                    <!-- Add your post -->
-                    <div class="container mt-5">
-                        <div class="card mb-12 collapse-dropdwn">
-                            <div class="row ml-2 mr-2">
-                                <div class="col-md-8 col-sm-12  mt-3 mb-2">
-                                    <button type="button" class="btn  text-secondary border btn-block" id="msg-drop"
-                                        class="inp-file" data-toggle="collapse" data-target="#post-ur-mind" >What’s on Your Mind</button>
-                                    <div class="collapse multi-collapse" id="post-ur-mind">
-                                        <div class="card card-body collapse-card mt-4">
-                                            <button type="button" class="close" aria-label="Close" data-target="#post-ur-mind" data-toggle="collapse">
-                                                <span class="float-right" aria-hidden="true">&times;</span>
-                                            </button>
-                                            <div class="row mb-4">
-                                                <div class="col-md-2 col-sm-2 dropdwn-img" >
-                                                    <img src="static/img/img1.PNG" class="rounded-circle-img">
-                                                </div>
-                                                <div class="col-md-4 col-sm-3">
-                                                    <span>Name Name</span>
-                                                    <hr class="post-hr">
-                                                    <span> This post is for:
-                                                        <select class="all-button dropdown-toggle" name="All" id="all-button">
-                                                            <option disabled selected hidden>Groups All</option>
-                                                            <option value="saab">Editor</option>
-                                                            <option value="opel">Actress</option>
-                                                            <option value="audi">Director</option>
-                                                        </select>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <textarea class="form-control dropdwn-txt" id="exampleFormControlTextarea1" rows="4"
-                                                    placeholder="Write your post here"></textarea>
-                                            </div>
-                                            <div class="col-md-6 col-sm ">
-                                                <label for="file-upload" class=" inp-file-msg"
-                                                    >Add to your post <i
-                                                        class="fa fa-picture-o dropdwn-file-img" aria-hidden="true"></i> <button
-                                                        class="emoji-btn btn-light" id="emoji-button"><i
-                                                            class="fa fa-smile-o"
-                                                            aria-hidden="true"></i></button></label>
-                                                <input type="file" id="file-upload" class="inp-file">
+                            <table class="table mem-table table-responsive-sm">
+                                <colgroup>
+                                    <col span="1" style="width: 15%;">
+                                    <col span="1" style="width: 15%;">
+                                    <col span="1" style="width: 40%;">
+                                    <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 6%;">
+                                    <col span="1" style="width: 8%;">
+                                 </colgroup>
+                            {% for obj in myinterests %}
+                                <tr class="interest-font my-interest-table-th" >
+                                    <th>Position: <u>{{obj.position}}</u> </th>
+                                    <th>Format: <u>{{obj.format}}</u> </th>
+                                    <th>Location: <u>{{obj.location}}</u></th>
+                                    <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
+                                    <td>Title: Ripples of Moonlight</td>
+                                    <td>Posted on 07/23/21</td>
+                                    <td class="int-applied">Applied</td>
+                                    <td class="int-red">Passed</td>
+                                    <td class="int-grey">Attached</td>
+                                    <td class="int-red">(on 08/05/21)</td>
+                                </tr>
+                                <tr>
+                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
+                                    <td>Title: Ripples of Moonlight</td>
+                                    <td>Posted on 07/23/21</td>
+                                    <td class="int-applied">Applied</td>
+                                    <td class="int-red">Passed</td>
+                                    <td class="int-grey">Attached</td>
+                                    <td class="int-red">(on 08/05/21)</td>
+                                </tr>
+                                <!-- The Modal -->
+                                <div class="modal fade" id="edit-{{obj.id}}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
 
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h5 class="modal-title mem-setup-blu-f">Edit My Interests </h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
                                             </div>
-                                            <div class="col-md-6 col-sm mt-2">
-                                                <input type="button" class="btn btn-post-mind" value="Post">
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="row ">
+                                                            <div class="col-12">
+                                                            <div class="row mb-2">
+                                                                <div class="offset-1 col-3">
+                                                                    <label class="intrest-lab">Position:</label>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <select class="inp-interest-2" id="position_{{obj.id}}"
+                                                                    name="position" required>
+                                                                        {% for position in positions %}
+                                                                             <option value="{{position.id}}"
+                                                                             {% if obj.position.id == position.id %} selected {% endif %}>
+                                                                             {{position}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Format:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="format" id = "format_{{obj.id}}" required>
+                                                                            {% for item in format %}
+                                                                                <option value="{{item.0}}"
+                                                                                    {% if obj.format == item.0 %} selected {% endif %}>
+                                                                                    {{item.1}}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Budget:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="budget" id ="budget_{{obj.id}}" required >
+                                                                        {% for item in budget %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.budget == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Location:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 modal-location form-control"
+                                                                        id ="location_{{obj.id}}"
+                                                                        name="location" required >
+                                                                        {% for location in locations %}
+                                                                                <option value="{{location.id}}"
+                                                                                {% if obj.location.id == location.id %} selected {% endif %}>
+                                                                                {{location}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                       </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm edit-my-interest"
+                                                    id="{{obj.id}}">Save</button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-dismiss="modal" >Close</button>
                                             </div>
                                         </div>
-                                     </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 col-sm-12 float-right mt-3 mb-1  ">
-                                    <!-- <input class="form-control text-center " name="myBrowser" placeholder="Messenger" /> -->
-                                    <button type="button" class="btn  text-secondary border btn-block" >Messenger</button>
+                                <!-- end of modal -->
+                            {% endfor %}
+                        </table>
+
+                        </div>
+                        <!-- End My Interest Row -->
+                    </div>
+                    <hr class="mem-set-acc-hr-1">
+                    <div class="row">
+                        <hr class="mem-set-acc-hr-1">
+                        <!-- Add your post -->
+                        <div class="container mt-5">
+                            <div class="card mb-12 collapse-dropdwn">
+                                <div class="row ml-2 mr-2">
+                                    <div class="col-md-8 col-sm-12  mt-3 mb-2">
+                                        <button type="button" class="btn  text-secondary border btn-block" id="msg-drop"
+                                            class="inp-file" data-toggle="collapse" data-target="#post-ur-mind" >What’s on Your Mind</button>
+                                        <div class="collapse multi-collapse" id="post-ur-mind">
+                                            <div class="card card-body collapse-card mt-4">
+                                                <button type="button" class="close" aria-label="Close" data-target="#post-ur-mind" data-toggle="collapse">
+                                                    <span class="float-right" aria-hidden="true">&times;</span>
+                                                </button>
+                                                <div class="row mb-4">
+                                                    <div class="col-md-2 col-sm-2 dropdwn-img" >
+                                                        <img src="static/img/img1.PNG" class="rounded-circle-img">
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-3">
+                                                        <span>Name Name</span>
+                                                        <hr class="post-hr">
+                                                        <span> This post is for:
+                                                            <select class="all-button dropdown-toggle" name="All" id="all-button">
+                                                                <option disabled selected hidden>Groups All</option>
+                                                                <option value="saab">Editor</option>
+                                                                <option value="opel">Actress</option>
+                                                                <option value="audi">Director</option>
+                                                            </select>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <textarea class="form-control dropdwn-txt" id="exampleFormControlTextarea1" rows="4"
+                                                        placeholder="Write your post here"></textarea>
+                                                </div>
+                                                <div class="col-md-6 col-sm ">
+                                                    <label for="file-upload" class=" inp-file-msg"
+                                                        >Add to your post <i
+                                                            class="fa fa-picture-o dropdwn-file-img" aria-hidden="true"></i> <button
+                                                            class="emoji-btn btn-light" id="emoji-button"><i
+                                                                class="fa fa-smile-o"
+                                                                aria-hidden="true"></i></button></label>
+                                                    <input type="file" id="file-upload" class="inp-file">
+    
+                                                </div>
+                                                <div class="col-md-6 col-sm mt-2">
+                                                    <input type="button" class="btn btn-post-mind" value="Post">
+                                                </div>        
+                                            </div>
+                                         </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 float-right mt-3 mb-1  ">
+                                        <!-- <input class="form-control text-center " name="myBrowser" placeholder="Messenger" /> -->
+                                        <button type="button" class="btn  text-secondary border btn-block" >Messenger</button>
+                                    </div>
                                 </div>
-                            </div>
-                         </div>
+                             </div>
 
+                        </div>
+                        
+                        <!-- End Add your post -->
                     </div>
-
-                    <!-- End Add your post -->
                 </div>
-                    </div>
 
-        <!-- End screen row -->
-                </div>
+            <!-- End screen row -->
             </div>
         </div>
-    </div>
+    </div>       
+</div>
 </div>
 
 {% endblock %}
@@ -745,8 +904,8 @@
 
     $(document).ready(function() {
         $('#location_1').select2();
-        $('#position_1').select2();
-        $('#format_1').select2();
+        $('.modal-location').select2();
+
 
         var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
@@ -781,7 +940,7 @@ $('body').on('click' , '#add-more-interests', function(){
     var position_id ="#position_"+count
     var format_id ="#format_"+count
     var data_dict = {}
-    data_dict = {'count':count}
+    data_dict = {'count':count, 'form':'form2'}
     // get add coworker form
     $.get('/hobo_user/add-user-interest-form/',data_dict)
     .done(function(data) {
@@ -789,8 +948,8 @@ $('body').on('click' , '#add-more-interests', function(){
         {
             $('.my-interests-section').append(data['add_my_interests_form_html']);
             $(location_id).select2();
-            $(position_id).select2();
-            $(format_id).select2();
+            // $(position_id).select2();
+            // $(format_id).select2();
         }
     });
 });
@@ -852,6 +1011,49 @@ $('body').on('click' , '#add-more-interests', function(){
     });
 </script>
 <script>
+    $('body').on('click' , '.edit-my-interest', function(){
+        id = $(this).attr('id');
+        var token = $("#token").val();
+        data_dict = {}
+        var position_id = "#position_"+id
+        var format_id = "#format_"+id
+        var budget_id = "#budget_"+id
+        var location_id = "#location_"+id
+        var position = $(position_id).val();
+        var format = $(format_id).val();
+        var budget = $(budget_id).val();
+        var location = $(location_id).val();
+
+        data_dict['id'] = id
+        if(position){
+            data_dict['position'] = position
+        }
+        if(format){
+            data_dict['format'] = format
+        }
+        if(budget){
+            data_dict['budget'] = budget
+        }
+        if(location){
+            data_dict['location'] = location
+        }
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/edit-user-interest-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+</script>
+<script>
     $('body').on('click' , '.add-friend-to-groups', function(){
         var friend = $(this).attr('id');
         var token = $("#token").val();
@@ -893,7 +1095,6 @@ $('body').on('click' , '#add-more-interests', function(){
 <script>
     $('body').on('change' , '#filter-friends', function(){
         var group = $(this).find("option:selected").val();
-        console.log("----group",group)
         data_dict = {'group':group}
         $.get('/hobo_user/filter-friend-by-groups/', data_dict)
         .done(function(data) {
@@ -1007,16 +1208,14 @@ $('body').on('click' , '.close-add-togroup-modal', function(){
     }
 
 </script>
-<!--
 <script>
-    document.getElementById("Dropdown").addEventListener('click', function (event) {
-    event.stopPropagation();
-});
-</script> -->
-<script>
-$(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
-    e.stopPropagation();
-    });
+ $(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
+        e.stopPropagation();
+        });
+        jQuery("#trackandtracking .net-tracker-text").click(function(){
+        jQuery("#trackandtracking .net-tracker-text").removeClass('net-tracker-text-color');
+        jQuery(this).toggleClass('net-tracker-text-color'); 
+        });
 </script>
 {% endblock %}
 

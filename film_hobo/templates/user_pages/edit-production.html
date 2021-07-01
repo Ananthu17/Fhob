@@ -467,7 +467,7 @@
                         {% csrf_token %}
                     <div class="my-interests-section">
                     <div class="row ">
-                            <div class="col-md-4 col-sm-4 form-group">Position
+                            <div class="col-md-3 col-sm-3 form-group">Position
                                 <select name="position" id="position_1"
                                 class="form-control form-control-input mt-2" required>
                                     {% for position in my_interest_form.position %}
@@ -475,7 +475,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-4 form-group">Format
+                            <div class="col-md-3 col-sm-3 form-group">Format
                                 <select name="format" id = "format_1"
                                 class="form-control form-control-input mt-2 " required>
                                     {% for item in my_interest_form.format %}
@@ -483,10 +483,18 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-4 col-sm-4 form-group">Location
+                            <div class="col-md-3 col-sm-3 form-group">Location
                                 <select name="location" id ="location_1"
                                 class="form-control form-control-input mt-2 " required>
                                     {% for item in my_interest_form.location %}
+                                    {{item}}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-sm-3 form-group">Budget
+                                <select name="budget" id ="budget_1"
+                                class="form-control form-control-input mt-2 " required>
+                                    {% for item in my_interest_form.budget %}
                                     {{item}}
                                     {% endfor %}
                                 </select>

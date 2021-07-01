@@ -92,6 +92,9 @@ $('body').on('click' , '.delete_friend_request', function(){
     if(id){
         data_dict['requested_by'] = id;
     }
+    var notification_id = "#friend-req-btns-"+id
+    var notification_id_2 = "#friend-request-"+id
+    var req_btns = "#btns-"+id
     $.ajax
         ({
             type: "POST",
@@ -103,8 +106,11 @@ $('body').on('click' , '.delete_friend_request', function(){
                 xhr.setRequestHeader ("Authorization", token);
             },
             success: function (response){
-                $(".friend-req-btns").html(" ")
-                $(".friend-req-btns").html("Friend request removed.")
+                $(notification_id).html(" ");
+                $(notification_id).html("Friend request removed.");
+                $(notification_id_2).html(" ");
+                $(notification_id_2).html("Friend request removed.");
+                $(req_btns).hide();
             }
         });
 });
@@ -112,9 +118,11 @@ $('body').on('click' , '.delete_friend_request', function(){
 // Accept friend request
 $('body').on('click' , '.accept_friend_request', function(){
     var token = $("#token").val();
-    console.log("here=---------")
     var id = $(this).attr('id');
     var data_dict = {}
+    var notification_id = "#friend-req-btns-"+id
+    var notification_id_2 = "#friend-request-"+id
+    var req_btns = "#btns-"+id
     if(id){
         data_dict['requested_by'] = id;
     }
@@ -130,16 +138,11 @@ $('body').on('click' , '.accept_friend_request', function(){
             },
             success: function (response){
               var msg = "You and "+response['name']+" are now friends."
-              $(".friend-req-btns").html(" ")
-              $(".friend-req-btns").html(msg)
-            //   $.get('/hobo_user/update-friend-status/',{'profile_id':id})
-            //   .done(function(data) {
-            //       if(data.results!='')
-            //           {
-            //               $('.friend-status').html("")
-            //               $('.friend-status').html(data['friend_status_html'])
-            //           }
-            //   });
+              $(notification_id).html(" ");
+              $(notification_id).html(msg)
+              $(notification_id_2).html("");
+              $(notification_id_2).append(msg);
+              $(req_btns).hide();
             }
         });
 });

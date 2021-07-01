@@ -24,7 +24,9 @@ from .models import CustomUser, Country, GuildMembership, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     UserAgentManager, UserNotification, UserProfile, CoWorker, \
     UserInterest, UserRating, CompanyProfile, CompanyClient, FriendRequest, \
-    FriendGroup, Feedback, Project, Team
+    FriendGroup, Feedback, Project, Team, \
+    EthnicAppearance, AthleticSkill
+
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -683,6 +685,7 @@ class SettingsSerializer(serializers.Serializer):
     new_project = serializers.BooleanField(required=False)
     friend_request = serializers.BooleanField(required=False)
     match_for_my_Interest = serializers.BooleanField(required=False)
+    hide_ratings = serializers.BooleanField(required=False)
 
 
 class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
@@ -843,7 +846,7 @@ class RateUserSkillsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['user', 'job_type', 'rating']
+        fields = ['user', 'job_type', 'rating', 'reason']
 
 
 class RateCompanySerializer(serializers.ModelSerializer):
@@ -858,7 +861,7 @@ class RateCompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['company', 'rating']
+        fields = ['company', 'rating', 'reason']
 
 
 class AgentManagerSerializer(serializers.ModelSerializer):
@@ -954,7 +957,33 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location']
+        fields = ['position', 'format', 'location', 'budget']
+
+
+class EditUserInterestSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    format = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    location = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    budget = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = UserInterest
+        fields = ['id', 'position', 'format', 'location', 'budget']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):
@@ -1066,7 +1095,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ['__all__']
 
 
 class UserRatingSerializer(serializers.ModelSerializer):

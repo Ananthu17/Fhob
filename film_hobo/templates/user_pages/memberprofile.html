@@ -334,7 +334,7 @@
                         </div>
                     </div>
                     {% if profile.job_types %}
-                    {% for obj in profile.job_types.all %}
+                    {% for job,rating in rating_dict.items %}
                     <div class="row">
                         <div class="col-3">
                             {% if forloop.first %}
@@ -342,25 +342,24 @@
                             {% endif %}
                         </div>
                         <div class="col-2  mt-3">
-                            <span class="">{{obj.title}}</span>
+                            <span class="">
+                                {% get_dict_value job_dict job  as job_title %}
+                                {{job_title}}
+                            </span>
                         </div>
                         <div class="col-3  mt-3">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <span class="rate">
-                                        <input type="radio" id="star25" name="rate" value="5" />
-                                        <label for="star25" title="text">5 stars</label>
-                                        <input type="radio" id="star24" name="rate" value="4" />
-                                        <label for="star24" title="text">4 stars</label>
-                                        <input type="radio" id="star23" name="rate" value="3" />
-                                        <label for="star23" title="text">3 stars</label>
-                                        <input type="radio" id="star22" name="rate" value="2" />
-                                        <label for="star22" title="text">2 stars</label>
-                                        <input type="radio" id="star21" name="rate" value="1" />
-                                        <label for="star21" title="text">1 star</label>
-                                    </span>
-                                </label>
+                            {% if not settings.hide_ratings %}
+                            <div class="containerdiv ratings">
+                                <div>
+                                <img src="{% static 'images/stars_blank.png' %}"
+                                class="star-img" alt="img" />
+                                </div>
+                                <div class="cornerimage" style="width:{{rating}}%;">
+                                <img src="{% static 'images/stars_full.png' %}"
+                                class="star-img" alt="" />
+                                </div>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="col-2  mt-3">
                             Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
@@ -669,6 +668,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/user-rating.js' %}"></script>
 {% endblock %}
 
 

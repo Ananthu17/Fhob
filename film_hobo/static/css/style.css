@@ -3,8 +3,9 @@
   position:fixed;
   top: 4em;
   left: 31%;
-  z-index:999999;
-  width: 34em;
+  z-index:999;
+  /* width: 34em; */
+  width: 35%;
 }
 .message-box
 {
@@ -25,6 +26,10 @@
   font-size:14px;
   color:Red;
 }
+.reason-error
+  {
+    color:Red;
+  }
 .errormsg
 {
   list-style-type:none;
@@ -327,34 +332,61 @@ input.pw {
   }
 
 /* star rating */
-
-
-
-// Method 1) Pure CSS
-/* .star-ratings-css {
-  unicode-bidi: bidi-override;
-  color: #c5c5c5;
-  font-size: 25px;
-  height: 25px;
-  width: 100px;
-  margin: 0 auto;
+.containerdiv {
+  border: 0;
+  float: left;
   position: relative;
-  padding: 0;
-  text-shadow: 0px 1px 0 #a2a2a2;
-}
-.star-ratings-css-top {
-  color: #e7711b;
-  padding: 0;
+  width: 80px;
+} 
+.cornerimage {
+  border: 0;
   position: absolute;
-  z-index: 1;
-  display: block;
   top: 0;
   left: 0;
   overflow: hidden;
-}
-.star-ratings-css-bottom {
-  padding: 0;
-  display: block;
-  z-index: 0;
-} */
+ } 
+ .star-img{
+   max-width: 80px;
+ }
 /* end star rating */
+/* give star rating */
+
+.give-rating:not(:checked) > input {
+  position:absolute;
+  top:-9999px;
+}
+.give-rating:not(:checked) > label {
+  float:right;
+  width: .80em;
+  overflow:hidden;
+  white-space:nowrap;
+  cursor:pointer;
+  font-size: 40px;
+  color: #ccc;
+  position: relative;
+  top: -3px;
+}
+.give-rating:not(:checked) > label:before {
+  content: "\2605";
+}
+.give-rating > input:checked ~ label {
+  color: #e88b22;    
+}
+
+/* end give star rating */
+.net-friend-req-name
+  {
+    font-family:Myraid Pro;
+  }
+  .my-interest-table-th{
+    border: 0;
+    border-bottom: 1px solid#656565;
+ }
+ .inp-interest-2 {
+  border:none;
+  border-bottom:1px solid#9c9c9c;
+  outline: none;
+  background: none;
+  width: 100%!important;
+  
+}

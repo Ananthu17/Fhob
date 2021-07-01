@@ -297,10 +297,18 @@
                                     <span class="">{{profile.user.get_membership_display}}</span>
                                 </div>
                                 <div class="col-4  mt-3">
-                                    <!-- <div class="star-ratings-css">
-                                        <div class="star-ratings-css-top" style="width: 32%"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                                        <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                                      </div> -->
+                                    {% if not settings.hide_ratings %}
+                                    <div class="containerdiv ratings" >
+                                        <div>
+                                        <img src="{% static 'images/stars_blank.png' %}"
+                                        class="star-img" alt="img" />
+                                        </div>
+                                        <div class="cornerimage" style="width:{{rating}}%;">
+                                        <img src="{% static 'images/stars_full.png' %}"
+                                        class="star-img" alt="" />
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="col-2  mt-3">
                                     Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
@@ -619,7 +627,7 @@
 {% endblock %}
 
 {% block extrajs %}
-
+<script src="{% static 'js/company-rating.js' %}"></script>
 {% endblock %}
 
 
