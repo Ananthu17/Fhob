@@ -1,0 +1,30 @@
+<div class="row intrest-input ">
+    <div class="sm-12">
+        <label class="intrest-lab">position:</label>
+        <select class="inp-interest"
+        name="position" id="position_{{count}}" required>
+            <option></option>
+            {% for item in my_interest_form.position %}
+            {{item}}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="sm-12">
+        <label class="intrest-lab">Format:</label>
+        <select name="format" id = "format_{{count}}"
+            class="inp-interest format-space" required>
+                {% for item in my_interest_form.format %}
+                {{item}}
+                {% endfor %}
+            </select>
+    </div>
+    <div class="sm-12">
+        <label class="intrest-lab">Location:</label>
+        <select name="location" id ="location_{{count}}"
+            class="inp-interest" required>
+                {% for item in my_interest_form.location %}
+                {{item}}
+                {% endfor %}
+            </select>
+    </div>
+</div>

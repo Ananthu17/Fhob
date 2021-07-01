@@ -2,12 +2,13 @@
 import datetime
 
 from phonenumber_field.modelfields import PhoneNumberField
-
+from django.urls import reverse
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from solo.models import SingletonModel
 
@@ -46,17 +47,32 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    PRODUCTION = 'production'
+    AGENCY_MANGEMENT = 'agency_management'
+    AGENCY = 'agency'
+    MANGEMENT = 'management'
+    NA = ''
     ADMIN = 'ADMIN'
     HOBO = 'HOB'
     INDIE = 'IND'
     PRO = 'PRO'
     PRODUCTION_COMPANY = 'COM'
+    COMPANY_TYPE_CHOICES = [
+        (PRODUCTION, 'Production'),
+        (AGENCY_MANGEMENT, 'Agency/Management'),
+        (NA, 'NA'),
+    ]
+    AGENCY_MANGEMENT_TYPE_CHOICES = [
+        (AGENCY, 'Agency'),
+        (MANGEMENT, 'Management'),
+        (NA, 'NA'),
+    ]
     MEMBERSHIP_CHOICES = [
         (ADMIN, 'Admin'),
         (HOBO, 'Hobo'),
         (INDIE, 'Indie'),
         (PRO, 'Pro'),
-        (PRODUCTION_COMPANY, 'Production Company')
+        (PRODUCTION_COMPANY, 'Company')
     ]
     MONTHLY = 'monthly'
     ANNUALLY = 'annually'
@@ -138,12 +154,21 @@ class CustomUser(AbstractUser):
                                  max_length=150, null=True, blank=True)
     email = models.EmailField(_('Email'), unique=True)
     # bio = models.TextField(_("Bio"), null=True, blank=True)
-    imdb_url = models.URLField(_("IMDB URL"),
-                               null=True,
-                               blank=True)
+    # imdb_url = models.URLField(_("IMDB URL"),
+    #                            null=True,
+    #                            blank=True)
     membership = models.CharField(_("Membership Type"),
                                   choices=MEMBERSHIP_CHOICES,
                                   max_length=150, default=HOBO)
+    company_type = models.CharField(_("Company Type"),
+                                    choices=COMPANY_TYPE_CHOICES,
+                                    max_length=150, default=NA,
+                                    null=True, blank=True)
+    agency_management_type = models.CharField(
+                            _("Agency/Management Type"),
+                            choices=AGENCY_MANGEMENT_TYPE_CHOICES,
+                            max_length=150, default=NA,
+                            null=True, blank=True)
     i_agree = models.BooleanField(
         _('I Agree'),
         default=True,
@@ -162,9 +187,10 @@ class CustomUser(AbstractUser):
     company_address = models.CharField(_("Company Address"),
                                        max_length=250,
                                        null=True, blank=True)
-    company_website = models.URLField(_("Company Website"),
-                                      null=True,
-                                      blank=True,)
+    company_website = models.CharField(_("Company Website"),
+                                       max_length=250,
+                                       null=True,
+                                       blank=True,)
     company_phone = PhoneNumberField(_("Phone Number"), null=True,
                                      unique=True)
     title = models.CharField(_('Title'),
@@ -265,6 +291,42 @@ class CustomUser(AbstractUser):
             in_feet = feet+inch
             in_meter = round(float(in_feet/3.281), 2)
         return in_meter
+
+    def get_profile_photo(self):
+        photo_obj = Photo.objects.filter(user=self).order_by('position').first()
+        if photo_obj:
+            image = photo_obj.image.url
+            return image
+        return ""
+
+    def get_profile_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:profile', kwargs={'id': self.id})
+        else:
+            if self.company_type == 'production':
+                return reverse('hobo_user:production-company-profile',
+                               kwargs={'id': self.id})
+            if self.company_type == 'agency_management':
+                return reverse('hobo_user:agency-management-company-profile',
+                               kwargs={'id': self.id})
+        return ""
+
+    def get_edit_profile_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:edit-profile')
+        else:
+            if self.company_type == 'production':
+                return reverse('hobo_user:edit-production-company-profile')
+            if self.company_type == 'agency_management':
+                return reverse('hobo_user:edit-agency-management-company-profile')
+        return ""
+
+    @property
+    def group_name(self):
+        """
+        Returns a group name based on the user's id to be used by Django Channels.
+        """
+        return "user_%s" % self.id
 
 
 class EthnicAppearance(models.Model):
@@ -405,23 +467,10 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
-    actor = models.ForeignKey('hobo_user.Actor', verbose_name=_("Actor"),
-                              on_delete=models.CASCADE)
-    writer = models.ForeignKey('hobo_user.Writer', verbose_name=_("Writer"),
-                               on_delete=models.CASCADE)
-    producer = models.ForeignKey('hobo_user.Producer',
-                                 verbose_name=_("Producer"),
-                                 on_delete=models.CASCADE)
-    director = models.ForeignKey('hobo_user.Director',
-                                 verbose_name=_("Director"),
-                                 on_delete=models.CASCADE)
-    editor = models.ForeignKey('hobo_user.Editor', verbose_name=_("Editor"),
-                               on_delete=models.CASCADE)
-    makeup = models.ForeignKey('hobo_user.Makeup', verbose_name=_("Makeup"),
-                               on_delete=models.CASCADE)
+
     def __str__(self):
         return self.title
-    
+
 
 class ProjectReaction(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
@@ -479,41 +528,6 @@ class Team(models.Model):
     def __str__(self):
         return self.team
 
-
-class Actor(models.Model):
-    actor = models.CharField(max_length=1000)
-    
-    def __str__(self):
-        return self.actor
-
-class Writer(models.Model):
-    writer = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.writer
-
-class Producer(models.Model):
-    producer = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.producer
-class Director(models.Model):
-    director = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.director
-
-class Editor(models.Model):
-    editor = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.editor
-
-class Makeup(models.Model):
-    makeup = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.makeup
 
 class Country(models.Model):
     name = models.CharField(max_length=1000)
@@ -773,6 +787,17 @@ class JobType(models.Model):
         verbose_name_plural = 'Job Types'
 
 
+class NewJobType(models.Model):
+    title = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'New Job Type'
+        verbose_name_plural = 'New Job Types'
+
+
 class UserProfile(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -827,9 +852,44 @@ class UserProfile(models.Model):
             self.job_types.set(job_types)
         return str(self.user.email)
 
+
+class CompanyProfile(models.Model):
+    MEMBERS_WITH_RATING_1_STAR = 'members_with_rating_1_star'
+    MEMBERS_WITH_RATING_2_STAR = 'members_with_rating_2_star'
+    MEMBERS_WITH_RATING_3_STAR = 'members_with_rating_3_star'
+    MEMBERS_WITH_RATING_4_STAR = 'members_with_rating_4_star'
+    MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
+    PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
+    SAMR_CHOICES = [
+                        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+                        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+                        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+                        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+                        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+                        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='company_profile',
+                             verbose_name=_("User"),
+                             null=True)
+    imdb = models.CharField(_("IMDB"),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    bio = models.TextField(_("Bio/Info"), null=True, blank=True)
+    submission_policy_SAMR = models.CharField(_("SAMR"),
+                                              choices=SAMR_CHOICES,
+                                              max_length=150,
+                                              default=PROS_AND_COMPANIES_ONLY)
+
+    def __str__(self):
+        return str(self.user.email)
+
     class Meta:
-        verbose_name = 'User Profile'
-        verbose_name_plural = 'User Profiles'
+        verbose_name = 'Company Profile'
+        verbose_name_plural = 'Company Profiles'
 
 
 class CoWorker(models.Model):
@@ -848,17 +908,116 @@ class CoWorker(models.Model):
                             null=True,
                             blank=True
                             )
+    email = models.EmailField(_("Staff's email address"),
+                              null=True,
+                              blank=True)
     position = models.ForeignKey("hobo_user.JobType",
                                  on_delete=models.CASCADE,
                                  related_name='coworker',
                                  verbose_name=_("Position"),
                                  null=True)
 
+    def __str__(self):
+        return str(self.company.company_name)
+
+    class Meta:
+        verbose_name = 'Coworker'
+        verbose_name_plural = 'Coworkers'
+
+
+class CompanyClient(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='client_user',
+                             verbose_name=_("User"),
+                             null=True, blank=True)
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_agency_management_client',
+                                verbose_name=_("Company"),
+                                null=True)
+    name = models.CharField(_('Name'),
+                            max_length=150,
+                            null=True,
+                            blank=True
+                            )
+    email = models.EmailField(_("Staff's email address"),
+                              null=True,
+                              blank=True)
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.SET_NULL,
+                                 related_name='client_position',
+                                 verbose_name=_("Position"),
+                                 null=True)
+    # new_position = models.ForeignKey("hobo_user.NewJobType",
+    #                                  on_delete=models.SET_NULL,
+    #                                  related_name='client_new_position',
+    #                                  verbose_name=_("New Position"),
+    #                                  null=True)
+    new_position = models.CharField(_('New Position'),
+                                    max_length=150,
+                                    null=True,
+                                    blank=True
+                                    )
+
+    def __str__(self):
+        return str(self.company.company_name)
+
+    class Meta:
+        verbose_name = 'Company Client'
+        verbose_name_plural = 'Company Clients'
+
+
+class Location(models.Model):
+    city = models.CharField(max_length=1000, verbose_name='City', null=True)
+    state = models.CharField(max_length=1000, verbose_name='State', null=True)
+    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+
+    def __str__(self):
+        location = self.city+","+self.state+","+self.country
+        return str(location)
+
+    class Meta:
+        verbose_name = 'Location'
+        verbose_name_plural = 'Locations'
+
+
+class UserInterest(models.Model):
+    SCENE = 'scene'
+    SHORT = 'short'
+    PILOT = 'pilot'
+    FEATURE = 'feature'
+    FORMAT_CHOICES = [
+                    (SCENE, 'Scene'),
+                    (SHORT, 'Short Film'),
+                    (PILOT, 'Pilot'),
+                    (FEATURE, 'Feature'),
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_interest',
+                             verbose_name=_("User"),
+                             null=True)
+    position = models.ForeignKey("hobo_user.JobType",
+                                 on_delete=models.SET_NULL,
+                                 related_name='user_interest_position',
+                                 verbose_name=_("Position"),
+                                 null=True)
+    format = models.CharField(_("Format"),
+                              choices=FORMAT_CHOICES,
+                              max_length=150,
+                              default=SCENE, null=True)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='user_interest_location',
+                                 verbose_name=_("Location"),
+                                 null=True)
+
 
 class UserRatingCombined(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating',
+                             related_name='user_rating_combined',
                              verbose_name=_("User"),
                              null=True)
     job_type = models.ForeignKey('hobo_user.JobType',
@@ -866,7 +1025,7 @@ class UserRatingCombined(models.Model):
                                  related_name="user_job_type_rating_combined",
                                  verbose_name=_("Job Types")
                                  )
-    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -876,10 +1035,26 @@ class UserRatingCombined(models.Model):
         verbose_name_plural = 'User Rating Combined'
 
 
+class CompanyRatingCombined(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating_combined',
+                                verbose_name=_("Company"),
+                                null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating Combined'
+        verbose_name_plural = 'Company Rating Combined'
+
+
 class UserRating(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
-                             related_name='user_rating_combined',
+                             related_name='user_rating',
                              verbose_name=_("User"),
                              null=True)
     rated_by = models.ForeignKey("hobo_user.CustomUser",
@@ -899,7 +1074,58 @@ class UserRating(models.Model):
 
     class Meta:
         verbose_name = 'User Rating'
-        verbose_name_plural = 'User Rating'
+        verbose_name_plural = 'User Ratings'
+
+class Video(models.Model):
+    name = models.CharField(max_length=1000)
+    videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name + ": " + str(self.videofile)
+    
+    class Meta:
+        verbose_name = 'Video'
+        verbose_name_plural = 'Video Ratings'
+
+class VideoRating(models.Model):
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='Video_rated_by_user',
+                                 verbose_name=_("User"),
+                                 null=True)
+    video = models.ForeignKey("hobo_user.Video",
+                                on_delete=models.CASCADE,
+                                null=True)
+    rating = models.IntegerField(_("Rating"),validators=[MinValueValidator(0), MaxValueValidator(10)], null=True)
+
+    def __str__(self):
+        return str(self.rated_by)
+
+    class Meta:
+        verbose_name = 'Video Rating'
+        verbose_name_plural = 'Video Ratings'
+
+class CompanyRating(models.Model):
+    company = models.ForeignKey("hobo_user.CustomUser",
+                                on_delete=models.CASCADE,
+                                related_name='company_rating',
+                                verbose_name=_("Company"),
+                                null=True)
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='company_rated_by_user',
+                                 verbose_name=_("Rated by"),
+                                 null=True)
+    rating = models.IntegerField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.company)
+
+    class Meta:
+        verbose_name = 'Company Rating'
+        verbose_name_plural = 'Company Ratings'
 
 
 class UserTacking(models.Model):
@@ -922,11 +1148,29 @@ class UserTacking(models.Model):
         verbose_name_plural = 'User Tracking'
 
 
+class Friend(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='friend_user',
+                             verbose_name=_("User"),
+                             null=True)
+    friends = models.ManyToManyField('hobo_user.CustomUser',
+                                     blank=True,
+                                     related_name="friend",
+                                     verbose_name=_("Friends")
+                                     )
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Friend'
+        verbose_name_plural = 'Friends'
+
+
 class FriendRequest(models.Model):
-    ACCEPTED = 'accepted'
     REQUEST_SEND = 'request_send'
     STATUS_CHOICES = [
-        (ACCEPTED, 'Accepted'),
         (REQUEST_SEND, 'Request Send'),
     ]
     status = models.CharField(_("Account Status"),
@@ -1015,34 +1259,36 @@ class UserNotification(models.Model):
     TRACKING = 'tracking'
     FRIEND_REQUEST = 'friend_request'
     USER_RATING = 'user_rating'
+    FRIEND_REQUEST_ACCEPT = 'accepted_friend_request'
+    READ = 'read'
+    UNREAD = 'unread'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
+                                (FRIEND_REQUEST_ACCEPT,
+                                 'Accepted Friend Request'),
                                ]
+    STATUS_CHOICES = [
+                    (READ, 'Read'),
+                    (UNREAD, 'Unread'),
+                    ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='notification_to',
+                             verbose_name=_("User"),
+                             null=True)
     notification_type = models.CharField(_("Notification Type"),
                                          choices=NOTIFICATION_TYPE_CHOICES,
                                          max_length=150, default=TRACKING)
-    user = models.ForeignKey("hobo_user.CustomUser",
-                             on_delete=models.CASCADE,
-                             related_name='user_notification',
-                             verbose_name=_("User"),
-                             null=True)
-    tracked_by = models.ForeignKey("hobo_user.CustomUser",
-                                   on_delete=models.CASCADE,
-                                   related_name='tacked_by_user',
-                                   verbose_name=_("User"),
-                                   null=True)
-    friend_request_from = models.ForeignKey("hobo_user.CustomUser",
-                                            on_delete=models.CASCADE,
-                                            related_name='friend_request_from',
-                                            verbose_name=_("User"),
-                                            null=True)
-    user_rated_by = models.ForeignKey("hobo_user.CustomUser",
-                                      on_delete=models.CASCADE,
-                                      related_name='user_rated_by',
-                                      verbose_name=_("User"),
-                                      null=True)
+    from_user = models.ForeignKey("hobo_user.CustomUser",
+                                  on_delete=models.CASCADE,
+                                  related_name='notification_from',
+                                  verbose_name=_("Notifications from"),
+                                  null=True)
+    status_type = models.CharField(_("Status Type"),
+                                   choices=STATUS_CHOICES,
+                                   max_length=150, default=UNREAD)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
 
@@ -1052,3 +1298,60 @@ class UserNotification(models.Model):
     class Meta:
         verbose_name = 'User Notification'
         verbose_name_plural = 'User Notifications'
+
+
+class FriendGroup(models.Model):
+    title = models.CharField(max_length=1000)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='friend_group_user',
+                             verbose_name=_("User"),
+                             null=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        verbose_name = 'Friend Group'
+        verbose_name_plural = 'Friend Groups'
+
+
+class GroupUsers(models.Model):
+    group = models.ForeignKey("hobo_user.FriendGroup",
+                              on_delete=models.CASCADE,
+                              related_name='group',
+                              verbose_name=_("Group"),
+                              null=True)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='group_user',
+                             verbose_name=_("User"),
+                             null=True)
+    friends = models.ManyToManyField('hobo_user.CustomUser',
+                                     blank=True,
+                                     related_name="group_members",
+                                     verbose_name=_("Friends")
+                                     )
+
+    def __str__(self):
+        title = str(self.user.get_full_name())+"-"+str(self.group)
+        return str(title)
+
+    class Meta:
+        verbose_name = 'Group User'
+        verbose_name_plural = 'Groups Users'
+
+
+class Feedback(models.Model):
+    email = models.EmailField(_('Email'))
+    name = models.CharField(_('Name'),
+                            max_length=150, null=True, blank=True)
+    user_rating = models.FloatField(_("Rating"), null=True, blank=True)
+    user_feedback = models.TextField(_("Feedback"), blank=True, null=True)
+    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        verbose_name = 'Feedback'
+        verbose_name_plural = 'Feedbacks'
+

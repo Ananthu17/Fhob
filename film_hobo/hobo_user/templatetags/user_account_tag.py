@@ -7,7 +7,23 @@ register = template.Library()
 def user_has_account(email):
     try:
         user = CustomUser.objects.get(email=email)
-        id = user.id
-        return id
+        return user
     except CustomUser.DoesNotExist:
         pass
+
+@register.simple_tag()
+def get_url(url):
+    if url.startswith('http'):
+        hyperlink = url
+    elif url.startswith('www'):
+        hyperlink = "http://"+url
+    else:
+        hyperlink = "http://www."+url
+    return hyperlink
+
+@register.simple_tag()
+def get_more_modal_id(position):
+    pos = []
+    pos = str(position).split(" ")
+    position = '_'.join(pos)
+    return position

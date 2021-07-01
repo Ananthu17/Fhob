@@ -76,7 +76,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_s3_storage',
     'zappa_django_utils',
-    'paypal.standard.ipn'
+    'channels',
+    'paypal.standard.ipn',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -113,7 +114,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'film_hobo.wsgi.application'
-
+# Channels
+ASGI_APPLICATION = "film_hobo.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -249,6 +251,28 @@ SITE_URL = os.environ.get('SITE_URL', '')
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # }
+        # 'ROUTING': 'notification_channels.routing.channel_routing',
+    }
+}
 # PAYPAL SETTINGS
 PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
 PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET_ID = env("PAYPAL_SECRET_ID")
+
+PRODUCT_ID = env("PRODUCT_ID")
+INDIE_PAYMENT_MONTHLY = env("INDIE_PAYMENT_MONTHLY")
+INDIE_PAYMENT_YEARLY = env("INDIE_PAYMENT_YEARLY")
+
+PRO_PAYMENT_MONTHLY = env("PRO_PAYMENT_MONTHLY")
+PRO_PAYMENT_YEARLY = env("PRO_PAYMENT_YEARLY")
+
+COMPANY_PAYMENT_MONTHLY = env("COMPANY_PAYMENT_MONTHLY")
+COMPANY_PAYMENT_YEARLY = env("COMPANY_PAYMENT_YEARLY")

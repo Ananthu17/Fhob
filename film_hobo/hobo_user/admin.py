@@ -6,16 +6,21 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, Actor, Writer, AthleticSkillInline, \
-                    Producer, Director, Editor, Makeup, Country, \
+                    PromoCode, Team, UserInterest, AthleticSkillInline, \
+                    Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
-                    UserAgentManager, Photo, UserNotification
+                    UserAgentManager, Photo, UserNotification, CompanyProfile, \
+                    Location, CompanyClient, NewJobType, Friend, FriendGroup, \
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
+                    VideoRating,Video
+
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource, JobTypeResource
+                    CountryResource, GuildMembershipResource, JobTypeResource, \
+                    LocationResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -43,7 +48,8 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
                               'phone_number', 'address', 'country')}),
         ('Company Details', {'fields': ('company_name', 'title',
                                         'company_address', 'company_website',
-                                        'company_phone',)}),
+                                        'company_phone', 'company_type',
+                                        'agency_management_type')}),
         ('Height', {'fields': ('feet', 'inch')}),
         ('Weight', {'fields': ('lbs',)}),
         ('Age-Playing Range', {'fields': ('start_age', 'stop_age')}),
@@ -77,35 +83,35 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-admin.site.site_header = "Film Hobo Admin"
-admin.site.site_title = "Film Hobo Admin Portal"
-admin.site.index_title = "Welcome to Film Hobo Admin Portal"
+admin.site.site_header = "Filmhobo Admin"
+admin.site.site_title = "Filmhobo Admin Portal"
+admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
 admin.site.register(Team)
-admin.site.register(Actor)
-admin.site.register(Writer)
-admin.site.register(Producer)
-admin.site.register(Director)
-admin.site.register(Editor)
-admin.site.register(Makeup)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
-admin.site.register(UserProfile)
 admin.site.register(CoWorker)
 admin.site.register(UserRating)
 admin.site.register(UserRatingCombined)
+admin.site.register(Video)
+admin.site.register(VideoRating)
 admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)
 admin.site.register(UserNotification)
-
+admin.site.register(UserInterest)
+admin.site.register(CompanyClient)
+admin.site.register(NewJobType)
+admin.site.register(FriendGroup)
+admin.site.register(CompanyRating)
+admin.site.register(CompanyRatingCombined)
 
 @admin.register(EthnicAppearance)
 class EthnicAppearanceAdmin(ImportExportModelAdmin):
@@ -130,6 +136,10 @@ class GuildMembershipAdmin(ImportExportModelAdmin):
 class JobTypeAdmin(ImportExportModelAdmin):
     resource_class = JobTypeResource
 
+@admin.register(Location)
+class LocationAdmin(ImportExportModelAdmin):
+    resource_class = LocationResource
+
 
 class CustomUserSettingsAdmin(admin.ModelAdmin):
     model = CustomUserSettings
@@ -150,9 +160,48 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
 
+
 class UserTackingAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
 
+
 admin.site.register(UserTacking, UserTackingAdmin)
+
+
+class FriendAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(Friend, FriendAdmin)
+
+
+class GroupUsersAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(GroupUsers, GroupUsersAdmin)
+admin.site.register(Feedback)
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
+
+
+class CompanyProfileAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+admin.site.register(CompanyProfile, CompanyProfileAdmin)

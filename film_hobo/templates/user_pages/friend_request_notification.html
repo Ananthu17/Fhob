@@ -1,0 +1,23 @@
+
+{% load static %}
+
+<div class="row unread_notification">
+    <div  class="col-2">
+        <a href="{{ from_user.get_profile_url }}"
+         target="_blank" id ="{{notification_id}}" class="notification_link">
+            {% if from_user.get_profile_photo %}
+            <img src="{{ from_user.get_profile_photo }}" class="notification_img"/>
+            {% else %}
+            <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+            {% endif %}</a>
+    </div>
+    <div class="col-10 ">
+        {{ from_user.get_full_name }} send you friend request.<br>
+        <b>{{ from_user.get_membership_display }}</b><br>
+        <span class="btn-blue cursor-pointer accept_friend_request" id="{{from_user.id}}">Accept</span>
+        <span class="btn-grey  cursor-pointer delete_friend_request" id="{{from_user.id}}">Delete</span>
+
+    </div>
+</div>
+
+

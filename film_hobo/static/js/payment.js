@@ -306,6 +306,13 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
     }, (error) => {
         console.log(error);
     });
+
+    // /*
+    // axios code to call to update paypal code
+    // */
+    // paypal_base_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
+    //  = "https://api-m.sandbox.paypal.com/v1/billing/plans/P-7GL4271244454362WXNWU5NQ"
+    // axios.patch()
 });
 /*
 toggle the text in amount (Add active class to the current button (highlight it))

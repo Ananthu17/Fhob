@@ -4,6 +4,7 @@ Django==3.1
 django-bootstrap-datepicker-plus==3.0.5
 django-braces==1.14.0
 django-environ==0.4.5
+django-filter==2.4.0
 django-npm==1.0.0
 django-paypal==1.1.1
 django-pipeline==2.0.6
@@ -23,6 +24,7 @@ phonenumbers==8.12.21
 Pillow==8.2.0
 psycopg2-binary==2.8.6
 setuptools==56.0.0
+validators==0.18.2
 whitenoise==5.2.0
 zappa==0.52.0
 zappa-django-utils==0.4.1

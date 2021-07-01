@@ -559,19 +559,19 @@
                                     <label class="billing-label">Description</label>
                                 </div>
                                 <div class="col-12">
-                                    Pro Membership
+                                    <span id="membership_type">{{ user.membership }}</span> Membership
                                 </div>
                                 <div class="col-12 text-muted">
-                                    Annual: $100
+                                    Annual: $<span id="membership_annual_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Monthly: $15.00
+                                    Monthly: $<span id="membership_monthly_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Taxes: $0.00
+                                    Taxes: $<span id="membership_tax_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Total Amount: $15.00
+                                    Total Amount: $<span id="membership_total_fee">0.00</span>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">

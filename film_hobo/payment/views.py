@@ -1,28 +1,31 @@
-import sys
-import environ
+import json
+import requests
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.generic.base import View
 
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from datetimerange import DateTimeRange
-from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
-from paypalcheckoutsdk.orders import OrdersCreateRequest
 
+from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
-    ProPaymentDetails, CompanyPaymentDetails, PromoCode
-from .models import PaymentOptions
-from .serializers import DiscountsSerializer
+    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser
+from .models import PaymentOptions, Transaction
+from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-env = environ.Env()
-environ.Env.read_env()
+from paypal.standard.forms import PayPalPaymentsForm
+from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
+from paypalcheckoutsdk.orders import OrdersCreateRequest, \
+    OrdersCaptureRequest, OrdersGetRequest
 
 
 class IsSuperUser(IsAdminUser):
@@ -97,7 +100,8 @@ class GetMembershipFeeDetailsAPI(APIView):
             final_result['annual_pro_with_tax'] = ""
 
         try:
-            company_details_dict = CompanyPaymentDetails.objects.first().__dict__
+            company_details_dict = \
+                CompanyPaymentDetails.objects.first().__dict__
             final_result['monthly_company'] = company_details_dict[
                 'monthly_amount']
             final_result['monthly_company_with_tax'] = company_details_dict[
@@ -194,7 +198,8 @@ class GetMembershipFeeDetailsPublicAPI(APIView):
             final_result['annual_pro_with_tax'] = ""
 
         try:
-            company_details_dict = CompanyPaymentDetails.objects.first().__dict__
+            company_details_dict = \
+                CompanyPaymentDetails.objects.first().__dict__
             final_result['monthly_company'] = company_details_dict[
                 'monthly_amount']
             final_result['monthly_company_with_tax'] = company_details_dict[
@@ -253,7 +258,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     HoboPaymentsDetails.objects.all().update(
                         monthly_amount=float(data['monthly_hobo']))
-                    final_result['monthly_hobo'] = HoboPaymentsDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_hobo'] = \
+                        HoboPaymentsDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -266,7 +273,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     HoboPaymentsDetails.objects.all().update(
                         annual_amount=float(data['annual_hobo']))
-                    final_result['annual_hobo'] = HoboPaymentsDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_hobo'] = \
+                        HoboPaymentsDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -286,7 +295,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     IndiePaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_indie']))
-                    final_result['monthly_indie'] = IndiePaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_indie'] = \
+                        IndiePaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -299,7 +310,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     IndiePaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_indie']))
-                    final_result['annual_indie'] = IndiePaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_indie'] = \
+                        IndiePaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -319,7 +332,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     ProPaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_pro']))
-                    final_result['monthly_pro'] = ProPaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_pro'] = \
+                        ProPaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -331,7 +346,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     ProPaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_pro']))
-                    final_result['annual_pro'] = ProPaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_pro'] = \
+                        ProPaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -351,7 +368,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     CompanyPaymentDetails.objects.all().update(
                         monthly_amount=float(data['monthly_company']))
-                    final_result['monthly_company'] = CompanyPaymentDetails.objects.first().__dict__['monthly_amount']
+                    final_result['monthly_company'] = \
+                        CompanyPaymentDetails.objects.first().__dict__[
+                            'monthly_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -363,7 +382,9 @@ class UpdateMembershipFeeAPI(APIView):
                 try:
                     CompanyPaymentDetails.objects.all().update(
                         annual_amount=float(data['annual_company']))
-                    final_result['annual_company'] = CompanyPaymentDetails.objects.first().__dict__['annual_amount']
+                    final_result['annual_company'] = \
+                        CompanyPaymentDetails.objects.first().__dict__[
+                            'annual_amount']
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -381,30 +402,47 @@ class UpdateMembershipFeeAPI(APIView):
             try:
                 float(data['tax'])
                 if data['tax'] == "":
-                    final_result['tax'] = PaymentOptions.objects.first().__dict__['tax']
+                    final_result['tax'] = \
+                        PaymentOptions.objects.first().__dict__['tax']
                 elif (float(data['tax']) < 0.0) or (float(data['tax']) > 100.0):
                     return Response(
-                            {"status": "failure",
-                             "tax": "please enter a valid number between 0 and 100"
-                             }, status=status.HTTP_400_BAD_REQUEST)
+                        {"status": "failure",
+                         "tax": "please enter a valid number between 0 and 100"
+                         }, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     final_result['tax'] = float(data['tax'])
-                    final_result['monthly_hobo_with_tax'] = final_result['monthly_hobo'] + \
-                        (final_result['monthly_hobo'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_indie_with_tax'] = final_result['monthly_indie'] + \
-                        (final_result['monthly_indie'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_pro_with_tax'] = final_result['monthly_pro'] + \
-                        (final_result['monthly_pro'] * (float(data['tax']) / 100.0))
-                    final_result['monthly_company_with_tax'] = final_result['monthly_company'] + \
-                        (final_result['monthly_company'] * (float(data['tax']) / 100.0))
-                    final_result['annual_hobo_with_tax'] = final_result['annual_hobo'] + \
-                        (final_result['annual_hobo'] * (float(data['tax']) / 100.0))
-                    final_result['annual_indie_with_tax'] = final_result['annual_indie'] + \
-                        (final_result['annual_indie'] * (float(data['tax']) / 100.0))
-                    final_result['annual_pro_with_tax'] = final_result['annual_pro'] + \
-                        (final_result['annual_pro'] * (float(data['tax']) / 100.0))
-                    final_result['annual_company_with_tax'] = final_result['annual_company'] + \
-                        (final_result['annual_company'] * (float(data['tax']) / 100.0))
+                    final_result['monthly_hobo_with_tax'] = \
+                        final_result['monthly_hobo'] + \
+                        (final_result['monthly_hobo'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_indie_with_tax'] = \
+                        final_result['monthly_indie'] + \
+                        (final_result['monthly_indie'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_pro_with_tax'] = \
+                        final_result['monthly_pro'] + \
+                        (final_result['monthly_pro'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['monthly_company_with_tax'] = \
+                        final_result['monthly_company'] + \
+                        (final_result['monthly_company'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_hobo_with_tax'] = \
+                        final_result['annual_hobo'] + \
+                        (final_result['annual_hobo'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_indie_with_tax'] = \
+                        final_result['annual_indie'] + \
+                        (final_result['annual_indie'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_pro_with_tax'] = \
+                        final_result['annual_pro'] + \
+                        (final_result['annual_pro'] *
+                         (float(data['tax']) / 100.0))
+                    final_result['annual_company_with_tax'] = \
+                        final_result['annual_company'] + \
+                        (final_result['annual_company'] *
+                         (float(data['tax']) / 100.0))
             except ValueError:
                 return Response(
                         {"status": "failure",
@@ -414,11 +452,14 @@ class UpdateMembershipFeeAPI(APIView):
             try:
                 int(data['free_evaluation_time'])
                 if data['free_evaluation_time'] == "":
-                    final_result['free_evaluation_time'] = PaymentOptions.objects.first().__dict__['free_evaluation_time']
+                    final_result['free_evaluation_time'] = \
+                        PaymentOptions.objects.first().__dict__[
+                            'free_evaluation_time']
                 elif int(data['free_evaluation_time']) == 0:
                     final_result['free_evaluation_time'] = '0'
                 else:
-                    final_result['free_evaluation_time'] = data['free_evaluation_time']
+                    final_result['free_evaluation_time'] = \
+                        data['free_evaluation_time']
             except ValueError:
                 return Response(
                     {"status": "failure",
@@ -426,7 +467,8 @@ class UpdateMembershipFeeAPI(APIView):
                      }, status=status.HTTP_400_BAD_REQUEST)
 
             if data['auto_renew'] == "":
-                final_result['auto_renew'] = PaymentOptions.objects.first().__dict__['auto_renew']
+                final_result['auto_renew'] = \
+                    PaymentOptions.objects.first().__dict__['auto_renew']
             elif data['auto_renew'].lower().replace(" ", "") == "on":
                 final_result['auto_renew'] = "on"
             elif data['auto_renew'].lower().replace(" ", "") == "off":
@@ -556,8 +598,9 @@ class EditDiscountDetailAPI(APIView):
             if serializer.is_valid():
                 serializer.update(PromoCode.objects.get(id=unique_id),
                                   request.data)
-                return Response({"status": "success",
-                                "message": "promocode record updated successfully"})
+                return Response(
+                    {"status": "success",
+                     "message": "promocode record updated successfully"})
             else:
                 return Response(serializer.errors)
         except ObjectDoesNotExist:
@@ -608,14 +651,23 @@ class CalculateDiscountAPI(APIView):
                     if promocode_obj.amount_type == 'flat_amount':
                         initial_amount = float(data['amount'])
                         promotion_amount = float(promocode_obj.amount)
-                        final_amount = initial_amount - promotion_amount
+                        temp_amount = initial_amount - promotion_amount
+                        if temp_amount < 0:
+                            final_amount = 0
+                        else:
+                            final_amount = temp_amount
                     else:
                         initial_amount = float(data['amount'])
                         promotion_amount = float(data['amount']) * \
                             (float(promocode_obj.amount) / 100.0)
-                        final_amount = initial_amount - promotion_amount
+                        temp_amount = initial_amount - promotion_amount
+                        if temp_amount < 0:
+                            final_amount = 0
+                        else:
+                            final_amount = temp_amount
                     return Response(
                         {"status": "success",
+                         "promocode": data['promocode'],
                          "initial_amount": round(initial_amount, 2),
                          "promotion_amount": round(promotion_amount, 2),
                          "final_amount": round(final_amount, 2)},
@@ -630,177 +682,282 @@ class CalculateDiscountAPI(APIView):
                 status=status.HTTP_404_NOT_FOUND)
 
 
-class PayPalClient:
-    def __init__(self):
-        self.client_id = env("PAYPAL-SANDBOX-CLIENT-ID")
-        self.client_secret = env("PAYPAL-SANDBOX-CLIENT-SECRET")
+class TransactionSave(APIView):
+    """
+    API for saveing transaction details
+    """
 
-        """Set up and return PayPal Python SDK environment with PayPal access
-           credentials. This sample uses SandboxEnvironment. In production,
-           use LiveEnvironment."""
-
-        self.environment = SandboxEnvironment(
-            client_id=self.client_id, client_secret=self.client_secret)
-
-        """ Returns PayPal HTTP client instance with environment that has access
-            credentials context. Use this instance to invoke PayPal APIs,
-            provided the credentials have access. """
-        self.client = PayPalHttpClient(self.environment)
-
-    def object_to_json(self, json_data):
-        """
-        Function to print all json data in an organized readable manner
-        """
-        result = {}
-        if sys.version_info[0] < 3:
-            itr = json_data.__dict__.iteritems()
+    def post(self, request, format=None):
+        logged_user = CustomUser.objects.get(id=request.user.id)
+        membership_type = logged_user.membership
+        payment_plan = request.data['payment_plan']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        if request.data['promocodes_applied'] == "":
+            promocodes_applied = None
         else:
-            itr = json_data.__dict__.items()
-        for key, value in itr:
-            # Skip internal attributes.
-            if key.startswith("__"):
-                continue
-            result[key] = self.array_to_json_array(value) if isinstance(value, list) else \
-                self.object_to_json(value) if not self.is_primittive(value) else \
-                value
-        return result
+            promocodes_applied = PromoCode.objects.get(
+                promo_code=request.data['promocodes_applied'])
+        if request.data['promotion_amount'] == '':
+            promotion_amount = 0
+        else:
+            promotion_amount = float(request.data['promotion_amount'])
+        final_amount = request.data['final_amount']
+        transaction = Transaction.objects.create(
+                                   user=logged_user,
+                                   membership=membership_type,
+                                   payment_plan=payment_plan,
+                                   days_free=days_free,
+                                   initial_amount=initial_amount,
+                                   tax_applied=tax_applied,
+                                   promocodes_applied=promocodes_applied,
+                                   promotion_amount=promotion_amount,
+                                   final_amount=final_amount)
+        serializer = TransactionSerializer(transaction)
+        if transaction:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                        {"status": "transaction record failure"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
-    def array_to_json_array(self, json_array):
-        result = []
-        if isinstance(json_array, list):
-            for item in json_array:
-                result.append(
-                    self.object_to_json(item) if not self.is_primittive(item)
-                    else self.array_to_json_array(item) if isinstance(
-                        item, list) else item)
-        return result
 
-    def is_primittive(self, data):
-        return isinstance(data, str) or isinstance(data, unicode) or isinstance(data, int)
+class GetToken(APIView):
+    """
+    API for get token value
+    """
+
+    def post(self, request, format=None):
+        email = request.data['email']
+        try:
+            custom_user = CustomUser.objects.get(email=email)
+            user_token = Token.objects.get(user=custom_user.id)
+            return Response(
+                {"token": user_token.key}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "invalid user"},
+                status=status.HTTP_404_NOT_FOUND)
 
 
-class CreateOrder(PayPalClient):
-    """ This is the sample function to create an order. It uses the
-    JSON body returned by buildRequestBody() to create an order."""
+class CreateUserOrder(APIView):
 
-    def create_order(self, debug=False):
-        request = OrdersCreateRequest()
-        request.prefer('return=representation')
+    def post(self, request, *args, **kwargs):
+        try:
+            logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        if request.data['promocodes_applied'] == "":
+            promocodes_applied = None
+        else:
+            promocodes_applied = PromoCode.objects.get(
+                promo_code=request.data['promocodes_applied'])
+        if request.data['promotion_amount'] == '':
+            promotion_amount = 0
+        else:
+            promotion_amount = float(request.data['promotion_amount'])
+        final_amount = request.data['final_amount']
+        transaction = Transaction.objects.create(
+                                   user=logged_user,
+                                   membership=membership_type,
+                                   payment_plan=payment_plan,
+                                   days_free=days_free,
+                                   initial_amount=initial_amount,
+                                   tax_applied=tax_applied,
+                                   promocodes_applied=promocodes_applied,
+                                   promotion_amount=promotion_amount,
+                                   final_amount=final_amount)
+        if transaction:
+            environment = SandboxEnvironment(
+                client_id=settings.PAYPAL_CLIENT_ID,
+                client_secret=settings.PAYPAL_SECRET_ID)
+            client = PayPalHttpClient(environment)
+            create_order = OrdersCreateRequest()
 
-        request.request_body(self.build_request_body())
-        response = self.client.execute(request)
-        if debug:
-            print('Status Code: ', response.status_code)
-            print('Status: ', response.result.status)
-            print('Order ID: ', response.result.id)
-            print('Intent: ', response.result.intent)
-            print('Links:')
-        for link in response.result.links:
-            print('\t{}: {}\tCall Type: {}'.format(link.rel, link.href, link.method))
-        print('Total Amount: {} {}'.format(response.result.purchase_units[0].amount.currency_code,
-                                           response.result.purchase_units[0].amount.value))
-
-        return response
-
-    """Setting up the JSON request body for creating the order. Set the intent in the
-    request body to "CAPTURE" for capture intent flow."""
-    @staticmethod
-    def build_request_body():
-        """Method to create body with CAPTURE intent"""
-        return \
-        {
-            "intent": "CAPTURE",
-            "application_context": {
-            "brand_name": "EXAMPLE INC",
-            "landing_page": "BILLING",
-            "shipping_preference": "SET_PROVIDED_ADDRESS",
-            "user_action": "CONTINUE"
-            },
-            "purchase_units": [
-            {
-                "reference_id": "PUHF",
-                "description": "Sporting Goods",
-
-                "custom_id": "CUST-HighFashions",
-                "soft_descriptor": "HighFashions",
-                "amount": {
-                "currency_code": "USD",
-                "value": "230.00",
-                "breakdown": {
-                    "item_total": {
-                    "currency_code": "USD",
-                    "value": "180.00"
-                    },
-                    "shipping": {
-                    "currency_code": "USD",
-                    "value": "30.00"
-                    },
-                    "handling": {
-                    "currency_code": "USD",
-                    "value": "10.00"
-                    },
-                    "tax_total": {
-                    "currency_code": "USD",
-                    "value": "20.00"
-                    },
-                    "shipping_discount": {
-                    "currency_code": "USD",
-                    "value": "10"
-                    }
-                }
-                },
-                "items": [
+            # order
+            create_order.request_body(
                 {
-                    "name": "T-Shirt",
-                    "description": "Green XL",
-                    "sku": "sku01",
-                    "unit_amount": {
-                    "currency_code": "USD",
-                    "value": "90.00"
+                    "intent": "CAPTURE",
+                    "application_context": {
+                        "brand_name": "FILMHOBO INC",
+                        "shipping_preference": "NO_SHIPPING"
                     },
-                    "tax": {
-                    "currency_code": "USD",
-                    "value": "10.00"
-                    },
-                    "quantity": "1",
-                    "category": "PHYSICAL_GOODS"
-                },
-                {
-                    "name": "Shoes",
-                    "description": "Running, Size 10.5",
-                    "sku": "sku02",
-                    "unit_amount": {
-                    "currency_code": "USD",
-                    "value": "45.00"
-                    },
-                    "tax": {
-                    "currency_code": "USD",
-                    "value": "5.00"
-                    },
-                    "quantity": "2",
-                    "category": "PHYSICAL_GOODS"
+                    "purchase_units": [
+                        {
+                            "days_free": transaction.days_free,
+                            "payment_plan": transaction.payment_plan,
+                            "initial_amount": transaction.initial_amount,
+                            "amount": {
+                                "currency_code": "USD",
+                                "value": transaction.final_amount,
+                                "breakdown": {
+                                    "item_total": {
+                                        "currency_code": "USD",
+                                        "value": transaction.final_amount
+                                    }
+                                    },
+                                },
+                        }
+                    ],
                 }
-                ],
-                "shipping": {
-                "method": "United States Postal Service",
-                "address": {
-                    "name": {
-                    "full_name":"John",
-                    "surname":"Doe"
-                    },
-                    "address_line_1": "123 Townsend St",
-                    "address_line_2": "Floor 6",
-                    "admin_area_2": "San Francisco",
-                    "admin_area_1": "CA",
-                    "postal_code": "94107",
-                    "country_code": "US"
-                }
-                }
-            }
-            ]
+            )
+
+            response = client.execute(create_order)
+            data = response.result.__dict__['_dict']
+            Transaction.objects.filter(id=transaction.id).update(
+                paypal_order_id=data['id'])
+            # return JsonResponse(data)
+            return Response(data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                        {"status": "transaction record failure"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class CaptureUserOrder(APIView):
+
+    def post(self, request, *args, **kwargs):
+        capture_order = OrdersCaptureRequest(kwargs['order_id'])
+        environment = SandboxEnvironment(
+            client_id=settings.PAYPAL_CLIENT_ID,
+            client_secret=settings.PAYPAL_SECRET_ID)
+        client = PayPalHttpClient(environment)
+
+        response = client.execute(capture_order)
+        data = response.result.__dict__['_dict']
+        if response.result.__dict__['_dict']['status'] == 'COMPLETED':
+            transaction_obj = Transaction.objects.get(
+                paypal_order_id=response.result.__dict__['_dict']['id']
+                )
+            Transaction.objects.filter(
+                paypal_order_id=response.result.__dict__['_dict']['id']
+                ).update(paid=True)
+            CustomUser.objects.filter(
+                email=transaction_obj.user.email
+                ).update(registration_complete=True)
+        return JsonResponse(data)
+
+
+class GetOrderDetails(APIView):
+
+    def get(self, request, *args, **kwargs):
+        capture_order = OrdersGetRequest(kwargs['order_id'])
+        environment = SandboxEnvironment(
+            client_id=settings.PAYPAL_CLIENT_ID,
+            client_secret=settings.PAYPAL_SECRET_ID)
+        client = PayPalHttpClient(environment)
+
+        response = client.execute(capture_order)
+        data = response.result.__dict__['_dict']
+
+        return JsonResponse(data)
+
+
+class SubscriptionDetails(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        if membership_type == 'IND':
+            if payment_plan == 'monthly':
+                plan_id = settings.INDIE_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.INDIE_PAYMENT_YEARLY
+        elif membership_type == 'PRO':
+            if payment_plan == 'monthly':
+                plan_id = settings.PRO_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.PRO_PAYMENT_YEARLY
+        elif membership_type == 'COM':
+            if payment_plan == 'monthly':
+                plan_id = settings.COMPANY_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.COMPANY_PAYMENT_YEARLY
+        else:
+            pass
+        return Response(
+                {"plan_id": plan_id}, status=status.HTTP_200_OK)
+
+
+class PaypalToken(APIView):
+
+    def post(self, request, *args, **kwargs):
+        paypal_client_id = settings.PAYPAL_CLIENT_ID
+        paypal_secret = settings.PAYPAL_SECRET_ID
+        data = {'grant_type': 'client_credentials'}
+        user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                            data=data,
+                            auth=(paypal_client_id, paypal_secret),
+                            headers={'Accept': 'application/json',
+                                     'Accept-Language': 'en_US'})
+        if user_response.status_code == 200:
+            access_token = json.loads(user_response.content)['access_token']
+            return Response(
+                {"access_token": access_token}, status=status.HTTP_200_OK)
+        else:
+            return HttpResponse('Could not save data')
+
+
+class PaypalPlanID(APIView):
+    def get(self, request, *args, **kwargs):
+        paypal_plans = {
+            'Indie_Payment_Monthly': settings.INDIE_PAYMENT_MONTHLY,
+            'Indie_Payment_Yearly': settings.INDIE_PAYMENT_YEARLY,
+            'Prp_Payment_Monthly': settings.PRO_PAYMENT_MONTHLY,
+            'Pro_Payment_Yearly': settings.PRO_PAYMENT_YEARLY,
+            'Company_Payment_Monthly': settings.COMPANY_PAYMENT_MONTHLY,
+            'Company_Payment_Yearly': settings.COMPANY_PAYMENT_YEARLY
         }
+        return JsonResponse(paypal_plans)
 
-"""This is the driver function that invokes the createOrder function to create
-   a sample order."""
-if __name__ == "__main__":
-  CreateOrder().create_order(debug=True)
+# class ProcessSubscription(APIView):
+
+#     def post(self, request, *args, **kwargs):
+#         subscription_plan = request.data['subscription_plan']
+#         host = request.get_host()
+
+#         if subscription_plan == 'monthly':
+#             price = request.data['price']
+#             billing_cycle = 1
+#             billing_cycle_unit = "M"
+#         else:
+#             price = request.data['price']
+#             billing_cycle = 1
+#             billing_cycle_unit = "Y"
+#         paypal_dict = {
+#             "cmd": "_xclick-subscriptions",
+#             'business': settings.PAYPAL_RECEIVER_EMAIL,
+#             "a3": price,  # monthly price
+#             "p3": billing_cycle,  # duration of each unit (depends on unit)
+#             "t3": billing_cycle_unit,  # duration unit ("M for Month")
+#             "src": "1",  # make payments recur
+#             "sra": "1",  # reattempt payment on payment error
+#             "no_note": "1",  # remove extra notes (optional)
+#             'item_name': 'Content subscription',
+#             'custom': 1,     # custom data, pass something meaningful here
+#             'currency_code': 'USD',
+#             'notify_url': 'http://{}{}'.format(
+#                 host, reverse('payment:paypal-ipn')),
+#             'return_url': 'http://{}{}'.format(
+#                 host, reverse('payment:done')),
+#             'cancel_return': 'http://{}{}'.format(host,
+#                                                   reverse('payment:canceled')),
+#         }
+
+#         form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
+#         return render(request, 'payment/process_subscription.html', locals())

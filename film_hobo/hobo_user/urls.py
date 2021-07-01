@@ -4,35 +4,58 @@ from rest_auth.views import LoginView
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
-                   CustomUserSignupIndieView, CustomUserSignupCompany, \
+                   ExtendedLogoutView, \
+                   ChooseMembershipPage, CustomUserSignupIndieView, \
+                   CustomUserSignupCompany, \
                    ExtendedRegisterIndieView, SendEmailVerificationView, \
                    EmailVerificationStatusView, CustomUserSignupProView, \
                    ExtendedRegisterProView, SelectPaymentPlanIndieView, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
-                   SettingsView, CustomUserLogout, ExtendedRegisterCompanyView, \
+                   SettingsView, CustomUserLogout, \
+                   ExtendedRegisterCompanyView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
-                   ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
+                   ForgotPasswordAPI, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, HowTo, \
-                   PersonalDetailsView, UserProfileAPI, UserProfileView, \
-                   AddCoworkerAPI, AddCoworkersView, AddCoworkerFormAjaxView, \
-                   AddNewCoworkerFormAjaxView, RemoveCoworkerAPI, \
+                   UserProfileAPI, UserProfileView, \
+                   AddCoworkerAPI, RemoveCoworkerAPI, \
                    MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
                    UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
-                   UploadImageView, UploadImageAPI, ProjectAPIView, \
-                   ProjectCreateAPIView, ProjectUpdateAPIView, ProjectDeleteAPIView, \
+                   UploadImageView, UploadImageAPI, GetNotificationAPI, \
+                   GetTrackingNotificationAjaxView, \
+                   GetAllNotificationAjaxView, \
+                   ChangeNotificationStatusAPI, ProductionCompanyProfileView, \
+                   ProductionCompanyProfileAPI, EditProductionCompanyView, \
+                   AttachCoworkerAjaxView, AddUserInterestAjaxView, \
+                   AddUserInterestView, AddUserInterestAPI, \
+                   EditAgencyManagementCompanyView, CompanyClientAPI, \
+                   AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
+                   AgencyManagementCompanyProfileView, SendFriendRequestAPI, \
+                   AcceptFriendRequestAPI, ListFriendRequestAPI, \
+                   ListAllFriendsAPI, DeleteFriendRequestAPI, \
+                   UnFriendUserAPI, \
+                   GetFriendRequestNotificationAjaxView, \
+                   CancelFriendRequestAPI, \
+                   GetFriendRequestAcceptNotificationAjaxView, \
+                   FeedbackAPIView, FeedbackWebView, \
+                   AddGroupAPI, RemoveFriendGroupAPI, \
+                   AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
+                   FilterFriendByGroupAjaxView, \
+                   ProjectAPIView, ProjectCreateAPIView, \
+                   ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView,ProjectSearchView,UserRatingAPI
+                   TeamDeleteAPIView, ProjectSearchView, VideoRatingView, \
+                   FindVideoRatingAPI, VideoListAPI
+
 
 app_name = "hobo_user"
 
@@ -86,6 +109,12 @@ urlpatterns = [
          name='personal-details-api'),
     path('profile-api/', UserProfileAPI.as_view(),
          name='profile-api'),
+    path('production-company-profile-api/',
+         ProductionCompanyProfileAPI.as_view(),
+         name='production-company-profile-api'),
+    path('agency-management-company-profile-api/',
+         AgencyManagementCompanyProfileAPI.as_view(),
+         name='agency-management-company-profile-api'),
     path('add-coworker-api/', AddCoworkerAPI.as_view(),
          name='add-coworker-api'),
     path('edit-coworker-api/', EditCoworkerAPI.as_view(),
@@ -94,6 +123,8 @@ urlpatterns = [
          name='add-agent-manager-api'),
     path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
          name='remove-coworker-api'),
+    path('remove-client-api/', RemoveClientAPI.as_view(),
+         name='remove-client-api'),
     path('rate-user-api/', RateUserSkillsAPI.as_view(),
          name='rate-user-api'),
     path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
@@ -112,6 +143,36 @@ urlpatterns = [
          name='change-photo-position-api'),
     path('upload-image-api/', UploadImageAPI.as_view(),
          name='upload-image-api'),
+    path('get-notification-api/', GetNotificationAPI.as_view(),
+         name='get-notification-api'),
+    path('change-notification-status-api/',
+         ChangeNotificationStatusAPI.as_view(),
+         name='change-notification-status-api'),
+    path('add-user-interest-api/', AddUserInterestAPI.as_view(),
+         name='add-user-interest-api'),
+    path('company-client-api/', CompanyClientAPI.as_view(),
+         name='company-client-api'),
+    path('send-friend-request-api/', SendFriendRequestAPI.as_view(),
+         name='send-friend-request-api'),
+    path('accept-friend-request-api/', AcceptFriendRequestAPI.as_view(),
+         name='accept-friend-request-api'),
+    path('list-friend-requests-api/', ListFriendRequestAPI.as_view(),
+         name='list-friend-requests-api'),
+    path('list-all-friend-api/', ListAllFriendsAPI.as_view(),
+         name='list-all-friend-api'),
+    path('cancel-friend-request-api/', CancelFriendRequestAPI.as_view(),
+         name='cancel-friend-request-api'),
+    path('delete-friend-request-api/', DeleteFriendRequestAPI.as_view(),
+         name='delete-friend-request-api'),
+    path('unfriend-user-api/', UnFriendUserAPI.as_view(),
+         name='unfriend-user-api'),
+    path('add-group-api/', AddGroupAPI.as_view(),
+         name='add-group-api'),
+    path('add-friend-to-group-api/', AddFriendToGroupAPI.as_view(),
+         name='add-friend-to-group-api'),
+    path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
+         name='remove-friend-group-api'),
+    path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
 
 
     # web-view endpoints
@@ -156,22 +217,54 @@ urlpatterns = [
          name='personal-details'),
     path('edit-profile/', UserProfileView.as_view(),
          name='edit-profile'),
-    path('add-coworkers/', AddCoworkersView.as_view(),
-         name='add-coworkers'),
-    path('add-coworker-form/', AddCoworkerFormAjaxView.as_view(),
-         name='add-coworker-form'),
-    path('add-new-coworker-form/', AddNewCoworkerFormAjaxView.as_view(),
-         name='add-new-coworker-form'),
+    path('edit-production-company-profile/',
+         EditProductionCompanyView.as_view(),
+         name='edit-production-company-profile'),
     path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
          name='add-new-agent-form'),
     path('profile/<int:id>/', MemberProfileView.as_view(),
          name='profile'),
+    path('production-company-profile/<int:id>/',
+         ProductionCompanyProfileView.as_view(),
+         name='production-company-profile'),
+    path('agency-management-company-profile/<int:id>/',
+         AgencyManagementCompanyProfileView.as_view(),
+         name='agency-management-company-profile'),
     path('friends-and-followers/', FriendsAndFollowersView.as_view(),
          name='friends-and-followers'),
     path('swap-image-position/', SwapImageAjaxView.as_view(),
          name='swap-image-position'),
     path('upload-image/', UploadImageView.as_view(),
          name='upload-image'),
+    path('get-tracking-notification-html/',
+         GetTrackingNotificationAjaxView.as_view(),
+         name='get-tracking-notification-html'),
+    path('get-friendrequest-notification-html/',
+         GetFriendRequestNotificationAjaxView.as_view(),
+         name='get-friendrequest-notification-html'),
+    path('get-friendrequest-accept-notification-html/',
+         GetFriendRequestAcceptNotificationAjaxView.as_view(),
+         name='get-friendrequest-accept-notification-html'),
+    path('get-all-notification-html/', GetAllNotificationAjaxView.as_view(),
+         name='get-all-notification-html'),
+    path('attach-coworker/', AttachCoworkerAjaxView.as_view(),
+         name='attach-coworker'),
+    path('add-user-interest-form/', AddUserInterestAjaxView.as_view(),
+         name='add-user-interest-form'),
+    path('add-user-interest/', AddUserInterestView.as_view(),
+         name='add-user-interest'),
+    path('edit-agency-management-company-profile/',
+         EditAgencyManagementCompanyView.as_view(),
+         name='edit-agency-management-company-profile'),
+    path('update-friend-groups/',
+         UpdateFriendGroupAjaxView.as_view(),
+         name='update-friend-groups'),
+    path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
+         name='filter-friend-by-groups'),
+    path('feedback/',
+         FeedbackWebView.as_view(),
+         name='feedback-web'),
+
     path('projects/', ProjectAPIView.as_view(),
          name='project-list'),
     path('projects/create/', ProjectCreateAPIView.as_view(),
@@ -188,8 +281,12 @@ urlpatterns = [
          name='delete-team'),
     path('teams/update/<id>', TeamUpdateAPIView.as_view(),
          name='delete-project'),
-    path('projects/search/',ProjectSearchView.as_view(),
+    path('projects/search/',  ProjectSearchView.as_view(),
          name="project-search"),
-    path('projects/rating',UserRatingAPI.as_view(),
-         name="rate-api")
+    path('video/rate',  VideoRatingView.as_view(),
+         name="videorate-api"),
+    path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
+          name="find-videorating"),
+    path('video/top-rated',  VideoListAPI.as_view(),
+          name="top-rated-videos")
 ]

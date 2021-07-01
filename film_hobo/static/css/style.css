@@ -25,6 +25,13 @@
   font-size:14px;
   color:Red;
 }
+.errormsg
+{
+  list-style-type:none;
+  font-family:Myraid Pro;
+  font-size:14px;
+  color:Red;
+}
 .submit_btn
   {
     border: none;
@@ -162,24 +169,192 @@ input.pw {
       cursor: pointer;
     }
 
-  .select2-results__options
+  .select2-results__options, .select2-search__field
     {
     font-family: "Myraid Pro";
     font-size: 13px;
     }
-
+.txtbox-font-style
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+    }
+.custom-save-btn
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+      padding:0;
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn:focus
+    {
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn-2
+    {
+      font-family: "Myraid Pro";
+      font-size: 13px;
+      padding:0;
+      outline:none;
+      box-shadow:none;
+    }
+.custom-save-btn-2:focus
+    {
+      outline:none;
+      box-shadow:none;
+    }
 .save_btn:focus
     {
       outline:none;
       box-shadow: none;
     }
-.img-btn
+.img-btn label
     {
-      border:1px solid blue;
-      padding:2px ;
+      background-color: rgb(223, 193, 193);
       cursor:pointer;
+      color:red;
     }
   .pos
     {
       cursor:pointer;
     }
+.unread_notification
+    {
+      font-family: "Myraid Pro";
+      font-size: 14px;
+      /* background-color:#e7e7e7; */
+      padding:1em
+    }
+.notification_count_span
+    {
+      background-color:red;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:50px;
+    }
+.notification_img
+    {
+      width:100%;
+    }
+.notification_link
+    {
+      text-decoration: none!important;
+      color:#000;
+    }
+.warning-modal-title
+{
+  color:red;
+}
+.client-img
+  {
+    width:100%;
+  }
+.cursor-pointer
+{
+  cursor:pointer;
+}
+.custom-msg-box-success
+  {
+    display:none;
+    position:fixed;
+    top: 4em;
+    left: 31%;
+    z-index:999999;
+    width: 34em;
+    font-size:12px;
+    font-family:Myraid Pro;
+    padding:1em 3em;
+    border:1px solid #c3e6cb;
+    border-radius: 5px;
+    color: #155724;
+    background-color: #d4edda;
+  }
+.custom-msg-box-warning
+  {
+    display:none;
+    position:fixed;
+    top: 4em;
+    left: 31%;
+    z-index:999999;
+    width: 34em;
+    font-size:12px;
+    font-family:Myraid Pro;
+    padding:1em 3em;
+    border:1px solid #ffeeba;
+    border-radius: 5px;
+    color: #856404;
+    background-color: #fff3cd;
+  }
+  .btn-blue
+    {
+      color: #fff;
+      background-color: #2265b9;
+      padding:5px 10px;
+    }
+  .btn-grey
+    {
+      color: #000;
+      background-color: rgb(197, 189, 189);
+      padding:5px 10px;
+    }
+  .selected-mode
+    {
+      background-color:#cccccc;
+    }
+  .pcb-radio-toolbar input[type="radio"]:checked + label {
+      color :#ff0f0f;
+      background-color: rgb(223, 193, 193);
+   }
+   .clickable-mode:focus
+    {
+      outline:none;
+      box-shadow:none;
+    }
+
+.radio-toolbar input[type="radio"]:checked + label {
+  background-color: rgb(223, 193, 193);
+  color :#ff0f0f;
+}
+.page-nav
+  {
+    font-size:18px;
+  }
+.current-page
+  {
+    font-size:14px;
+  }
+
+/* star rating */
+
+
+
+// Method 1) Pure CSS
+/* .star-ratings-css {
+  unicode-bidi: bidi-override;
+  color: #c5c5c5;
+  font-size: 25px;
+  height: 25px;
+  width: 100px;
+  margin: 0 auto;
+  position: relative;
+  padding: 0;
+  text-shadow: 0px 1px 0 #a2a2a2;
+}
+.star-ratings-css-top {
+  color: #e7711b;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+  display: block;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+.star-ratings-css-bottom {
+  padding: 0;
+  display: block;
+  z-index: 0;
+} */
+/* end star rating */
