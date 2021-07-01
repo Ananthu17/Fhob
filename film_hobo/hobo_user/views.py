@@ -46,6 +46,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
 from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework import filters
 
 from authemail.views import SignupVerify
 
@@ -61,7 +62,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     PromoCode, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
-                    UserNotification, Friend, FriendGroup, Help, \
+                    UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, UserRating, Location, \
                     UserRatingCombined, UserTacking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined
@@ -86,8 +87,12 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
-    ProjectSerializer, TeamSerializer, HelpSerializer, \
-    EditUserInterestSerializer
+    ProjectSerializer, TeamSerializer, \
+    EditUserInterestSerializer, \
+    RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
+    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, ProjectSerializer, \
+    TeamSerializer, UserRatingSerializer
 
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -4179,7 +4184,7 @@ class TeamAPIView(ListAPIView):
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
   serializer_class = TeamSerializer
-  permission_classes = (IsAuthenticated,)
+ 
 
 class TeamUpdateAPIView(UpdateAPIView):
     queryset = Team.objects.all()
@@ -4194,68 +4199,51 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class HelpAPI(APIView):
-    serializer_class = HelpSerializer
+# Search API for project
+# class ProjectSearchView(ListAPIView):
+#     queryset = Project.objects.all()
+#     serializer_class = ProjectSerializer
+#     permission_classes = (IsAuthenticated,)
+#     filter_backends = [filters.SearchFilter]
+#     search_fields = ["title"]
+
+# API to rate user associated the project
+class UserRatingAPI(CreateAPIView):
+    queryset = UserRating.objects.all()
+    serializer_class = UserRatingSerializer
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        response = {}
-        help_objects = Help.objects.filter(user=self.request.user)
-        for item in help_objects:
-            serializer = self.serializer_class(item).data
-            response[item.subject] = serializer
-        return Response(response)
+# class UserRatingAPI(CreateAPIView):
+#     queryset = UserRating.objects.all()
+#     serializer_class = UserRatingSerializer
+#     # permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        response = {}
-        if serializer.is_valid():
-            data_dict = serializer.data
-            screenshot =  request.data['screenshot']
-            help_obj = Help()
-            help_obj.user = self.request.user
-            help_obj.subject = data_dict['subject']
-            help_obj.description = data_dict['description']
-            help_obj.screenshot = screenshot
-            help_obj.save()
-            response = {'message': "Problem reported",
-                        'status': status.HTTP_200_OK}
-        else:
-            print(serializer.errors)
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-        return Response(response)
+    # def post(self,request):
+    #     serializer = self.serializer_class(data=request.data)
+    #     response = {}
+    #     if serializer.is_valid():
+    #         data_dict = serializer.data
+    #         print("Data kittiyath:",data_dict)
 
-class HelpView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/help.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
 
-    def post(self, request, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        json_dict = {}
-        json_dict['subject'] = self.request.POST.get('subject')
-        json_dict['description'] = self.request.POST.get('description')
-        json_dict['screenshot'] = self.request.POST.get('screenshot')
-        user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/help-api/',
-                                data=json.dumps(json_dict),
-                                headers={'Content-type': 'application/json',
-                                        'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] != 200:
-                if 'errors' in response:
-                    errors = response['errors']
-                    print(errors)
-                    messages.warning(
-                        self.request, "Failed to send message !!")
-                    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Message received. Will get back to you soon.")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+#  Combined Video rating 
+
+# def combined_rating(user):
+#     ratings = UserRating.objects.filter(user=user)
+#     combined_rating = 0
+#     for item in ratings:
+#         combined_rating + int(item.rating)
+#     return combined_rating % len(ratings)
+
+# UserRatingCombined(user=user,rating=combined_rating(user))
+
+# project=Project.objects.get(pk=1)
+# team = project.team.all()
+# rating= 0
+# for member in team:
+#     rating + find_rating(member)
+# video_rating = rating % len(team)
+
+# def find_rating(user):
+#     obj=UserRatingCombined.objects.get(user=user)
+#     return obj.rating

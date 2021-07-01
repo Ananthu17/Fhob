@@ -14,8 +14,7 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
-                    Help
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
 
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
@@ -116,7 +115,6 @@ admin.site.register(NewJobType)
 admin.site.register(FriendGroup)
 admin.site.register(CompanyRating)
 admin.site.register(CompanyRatingCombined)
-admin.site.register(Help)
 
 @admin.register(EthnicAppearance)
 class EthnicAppearanceAdmin(ImportExportModelAdmin):
