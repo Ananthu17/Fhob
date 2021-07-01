@@ -26,6 +26,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+# from django_filters import rest_framework as filters
 from rest_framework import serializers
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -47,6 +48,7 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView)
 from rest_framework.decorators import api_view, renderer_classes
 from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework.filters import SearchFilter
 
 from authemail.views import SignupVerify
 
@@ -87,9 +89,9 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
-    ProjectSerializer, TeamSerializer
+    ProjectSerializer, TeamSerializer, UserRatingSerializer
 
-from .utils import notify, get_notifications_time
+from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
@@ -4147,7 +4149,7 @@ class TeamAPIView(ListAPIView):
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
   serializer_class = TeamSerializer
-  permission_classes = (IsAuthenticated,)
+
 
 class TeamUpdateAPIView(UpdateAPIView):
     queryset = Team.objects.all()
@@ -4160,6 +4162,20 @@ class TeamDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
+
+# # Search API for project
+# class ProjectSearchView(ListAPIView):
+#     queryset = Project.objects.all()
+#     serializer_class = ProjectSerializer
+#     permission_classes = (IsAuthenticated,)
+#     filter_backends = SearchFilter
+#     search_fields = ["title"]
+
+# API to rate user associated the project
+class UserRatingAPI(CreateAPIView):
+    queryset = UserRating.objects.all()
+    serializer_class = UserRatingSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 # class CompanyRatingView(LoginRequiredMixin, TemplateView):
@@ -4177,5 +4193,40 @@ class TeamDeleteAPIView(DestroyAPIView):
 #         if 'image' in self.request.FILES:
 #             file = self.request.FILES['image']
 #         if position and file:
+#             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-#         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+# class UserRatingAPI(CreateAPIView):
+#     queryset = UserRating.objects.all()
+#     serializer_class = UserRatingSerializer
+#     # permission_classes = (IsAuthenticated,)
+
+    # def post(self,request):
+    #     serializer = self.serializer_class(data=request.data)
+    #     response = {}
+    #     if serializer.is_valid():
+    #         data_dict = serializer.data
+    #         print("Data kittiyath:",data_dict)
+
+
+#  Combined Video rating
+
+# def combined_rating(user):
+#     ratings = UserRating.objects.filter(user=user)
+#     combined_rating = 0
+#     for item in ratings:
+#         combined_rating + int(item.rating)
+#     return combined_rating % len(ratings)
+
+# UserRatingCombined(user=user,rating=combined_rating(user))
+
+# project=Project.objects.get(pk=1)
+# team = project.team.all()
+# rating= 0
+# for member in team:
+#     rating + find_rating(member)
+# video_rating = rating % len(team)
+
+# def find_rating(user):
+#     obj=UserRatingCombined.objects.get(user=user)
+#     return obj.rating
