@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper flex-grow-1">
+    <div class="container mt-3 mb-3">
+        <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <b>Submit Help Request</b>
+            </div>
+            <form method="post" enctype="multipart/form-data"
+            action="{% url 'general:help' %}">
+            {% csrf_token %}
+            <div class="row mb-2">
+                <div class="offset-3 col-2">Subject</div>
+                <div class="col-4">
+                    <input name="subject" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="offset-3 col-2">Description</div>
+                <div class="col-4">
+                    <textarea name="description" rows="4" class="form-control" required></textarea>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="offset-3 col-2">Screenshot</div>
+                <div class="col-4">
+                    <input type="file" id="file" name="screenshot" class=""/>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col text-center">
+                    <input type="submit"
+                            class="btn mem-setup-blu-f  cursor-pointer "
+                            value="Submit">
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script src="{% static 'js/base.js' %}"></script>
+{% endblock %}

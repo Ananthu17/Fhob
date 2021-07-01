@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'hobo_user',
     'payment',
     'general',
+    'project',
 
     'bootstrap_datepicker_plus',
     'django_select2',
