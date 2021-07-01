@@ -981,6 +981,7 @@ class EditUserInterestSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+
     class Meta:
         model = UserInterest
         fields = ['id', 'position', 'format', 'location', 'budget']
@@ -1095,7 +1096,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ['__all__']
+        fields = '__all__'
 
 
 class UserRatingSerializer(serializers.ModelSerializer):
