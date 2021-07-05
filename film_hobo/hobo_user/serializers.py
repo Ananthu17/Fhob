@@ -1067,17 +1067,15 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = '__all__'
 
+
 class VideoSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = Video
         fields = '__all__'
+
 
 class VideoRatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VideoRating
-        fields = ['rated_by','video','rating']
-
-
-    
+        fields = ['rated_by', 'video', 'rating']

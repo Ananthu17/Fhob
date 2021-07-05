@@ -4045,7 +4045,7 @@ class TeamAPIView(ListAPIView):
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
   serializer_class = TeamSerializer
- 
+
 
 class TeamUpdateAPIView(UpdateAPIView):
     queryset = Team.objects.all()
@@ -4067,7 +4067,7 @@ class ProjectSearchView(ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ["title"]
 
-# Api to add rating to project video 
+# Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
@@ -4100,7 +4100,7 @@ class VideoRatingView(APIView):
             except:
                 response = {'errors': 'Invalid Video', 'status':
                             status.HTTP_400_BAD_REQUEST}
-        else:       
+        else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
@@ -4115,7 +4115,7 @@ class VideoRatingView(APIView):
         ratings = VideoRating.objects.filter(video=video)
         combined_rating = 0
         for item in ratings:
-            combined_rating += item.rating 
+            combined_rating += item.rating
         combined_rating = combined_rating / len(ratings)
         print("Number of rating :",len(ratings))
         print("Combined Rating :",combined_rating)

@@ -1076,6 +1076,7 @@ class UserRating(models.Model):
         verbose_name = 'User Rating'
         verbose_name_plural = 'User Ratings'
 
+
 class Video(models.Model):
     name = models.CharField(max_length=1000)
     videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
@@ -1084,10 +1085,11 @@ class Video(models.Model):
 
     def __str__(self):
         return self.name + ": " + str(self.videofile)
-    
+
     class Meta:
         verbose_name = 'Video'
         verbose_name_plural = 'Video Ratings'
+
 
 class VideoRating(models.Model):
     rated_by = models.ForeignKey("hobo_user.CustomUser",
@@ -1096,9 +1098,11 @@ class VideoRating(models.Model):
                                  verbose_name=_("User"),
                                  null=True)
     video = models.ForeignKey("hobo_user.Video",
-                                on_delete=models.CASCADE,
-                                null=True)
-    rating = models.IntegerField(_("Rating"),validators=[MinValueValidator(0), MaxValueValidator(10)], null=True)
+                              on_delete=models.CASCADE,
+                              null=True)
+    rating = models.IntegerField(_("Rating"),
+                                 validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True)
 
     def __str__(self):
         return str(self.rated_by)
@@ -1106,6 +1110,7 @@ class VideoRating(models.Model):
     class Meta:
         verbose_name = 'Video Rating'
         verbose_name_plural = 'Video Ratings'
+
 
 class CompanyRating(models.Model):
     company = models.ForeignKey("hobo_user.CustomUser",

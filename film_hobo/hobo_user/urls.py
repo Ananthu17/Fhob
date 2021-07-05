@@ -286,7 +286,7 @@ urlpatterns = [
     path('video/rate',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
-          name="find-videorating"),
+         name="find-videorating"),
     path('video/top-rated',  VideoListAPI.as_view(),
-          name="top-rated-videos")
+         name="top-rated-videos")
 ]
