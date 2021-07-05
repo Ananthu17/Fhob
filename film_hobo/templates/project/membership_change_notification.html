@@ -1,0 +1,14 @@
+
+{% load static %}
+<a class="notification_link">
+<div class="row unread_notification">
+    <div  class="col-2">
+            <img src="{% static 'images/FH_Logo.png' %}" class="notification_img"/>
+    </div>
+    <div class="col-10">
+        <b>{{ message }}</b><br>
+        Now
+    </div>
+</div>
+</a>
+

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% load user_account_tag %}
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper flex-grow-1">
+    <div class="container mt-3 mb-3">
+        <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <b>Video Player Page</b>
+            </div>
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-6">
+                    <img src="{% static 'images/default_video_image.jpg' %}" class="img-fluid">
+                </div>
+                <div class="col-sm-5 pt-2">
+                    {% for member in team_members %}
+                    <div class="row">
+                        <div class="col-6 all-p">
+                            <p><b>{{member.job_type}}: </b>{{member.user}}</p>
+                        </div>
+                        <div class="col-6">
+                            <div class="containerdiv ratings" data-toggle="modal"
+                            data-target="#rating-modal-{{member.id}}">
+                                <div>
+                                <img src="{% static 'images/stars_blank.png' %}"
+                                class="star-img" alt="img" />
+                                </div>
+                                {% if member.id in rating_dict %}
+                                {% get_dict_value rating_dict member.id as rating %}
+                                <div class="cornerimage" style="width:{{rating}}%;">
+                                <img src="{% static 'images/stars_full.png' %}"
+                                class="star-img" alt="" />
+                                </div>
+                                {% else %}
+                                <div class="cornerimage" style="width:0%;">
+                                <img src="{% static 'images/stars_full.png' %}"
+                                class="star-img" alt="" />
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- The Modal -->
+                    <div class="modal fade" id="rating-modal-{{member.id}}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h6 class="modal-title mem-setup-blu-f">Rate {{member.job_type}} - {{member.user.get_full_name}}</h6>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 ">
+                                                <div class="row" >
+                                                    {% get_my_skill_rating request.user.id member as my_rating %}
+                                                    {% if my_rating != 0 %}
+                                                    <div class="col-12" >
+                                                        <p clss="all-p">You have already given {{my_rating}} star rating for {{member.job_type}} - {{member.user.get_full_name}}.</p>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="offset-2 col-6 " id="rating-form-{{member.id}}" >
+                                                        <div class="row">
+                                                            <span class="give-rating">
+                                                                    <input type="radio" id="star5-{{member.id}}" name="rate-{{member.id}}" class="rate" value="5"/>
+                                                                    <label for="star5-{{member.id}}" title="5 Star">5 stars</label>
+
+                                                                    <input type="radio" id="star4-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="4"/>
+                                                                    <label for="star4-{{member.id}}" title="4 Star">4 stars</label>
+
+                                                                    <input type="radio" id="star3-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="3"/>
+                                                                    <label for="star3-{{member.id}}" title="3 Star">3 stars</label>
+
+                                                                    <input type="radio" id="star2-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="2"/>
+                                                                    <label for="star2-{{member.id}}" title="2 Star">2 stars</label>
+
+                                                                    <input type="radio" id="star1-{{member.id}}" name="rate-{{member.id}}" class="rate" value="1"/>
+                                                                    <label for="star1-{{member.id}}" title="1 Star">1 star</label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                    {% if my_rating == 0 %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm submit-rating"
+                                    id="{{member.id}}">Submit</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Cancel</button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Close</button>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal End -->
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script src="{% static 'js/user-rating.js' %}"></script>
+{% endblock %}

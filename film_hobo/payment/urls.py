@@ -5,7 +5,7 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, SubscriptionDetails, \
-     PaypalToken
+     PaypalToken, PaypalPlanID
 # from .paypal import CreateOrder, CaptureOrder
 
 from paypal.standard.ipn import views
@@ -39,6 +39,8 @@ urlpatterns = [
          name='subscription_details'),
     path('get_paypal_token', PaypalToken.as_view(),
          name='get_paypal_token'),
+    path('get_paypal_plan_id', PaypalPlanID.as_view(),
+         name='get_paypal_plan_id'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
          name='payment_admin'),

@@ -19,14 +19,14 @@
       $(".rate").change(function(){
           var rate = $(this).val();
           var id = $(this).attr('id');
-          var job = id.split("-")[1];
-          var div_id = "#reason-div-"+job;
-          var form_id = "#rating-form-"+job;
+          var member_id = id.split("-")[1];
+          var div_id = "#reason-div-"+member_id;
+          var form_id = "#rating-form-"+member_id;
           console.log(form_id)
           console.log(div_id)
           if(rate<='2'){
               $('.reason-div').html(" ");
-              var field = "<div class='row reason-div'>Reason<textarea id='reason-"+job+"' class='reason form-control' rows='4' name='reason'></textarea><div class='reason-error'></div></div>";
+              var field = "<div class='row reason-div'>Reason<textarea id='reason-"+member_id+"' class='reason form-control' rows='4' name='reason'></textarea><div class='reason-error'></div></div>";
               $(form_id).append(field);
           }else{
               $('.reason-div').html(" ");
@@ -34,34 +34,29 @@
       });
 
       $('body').on('click' , '.submit-rating', function(){
-        var job = $(this).attr("id");
+        var member_id = $(this).attr("id");
         var token = $("#token").val();
-        var reason_id = "#reason-"+job;
+        var reason_id = "#reason-"+member_id;
         var reason = $(reason_id).val();
-        var profile = $("input[name='profile']").val();
-        var rate_id = 'input[name="rate-'+job+'"]:checked'
+        var rate_id = 'input[name="rate-'+member_id+'"]:checked'
         var rate = $(rate_id).val();
         data_dict = {};
-        if(profile){
-          data_dict['user']=profile;
-        }
+
         if(rate){
           data_dict['rating']=rate;
         }
         if(reason){
           data_dict['reason']=reason;
         }
-        if(job){
-            data_dict['job_type']=job;
+        if(member_id){
+            data_dict['project_member_id']=member_id;
           }
-        console.log("reason_id", reason_id);
-        console.log("reason", reason);
         console.log("data_dict", data_dict);
         if((rate>2)|((rate<=2)&(reason!=""))){
           $.ajax
           ({
               type: "POST",
-              url: "/hobo_user/rate-user-api/",
+              url: "/project/rate-user-api/",
               dataType: 'json',
               async: false,
               data: data_dict,

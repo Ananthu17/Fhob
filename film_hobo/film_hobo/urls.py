@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from django.conf.urls import handler404, handler500
+from django.conf.urls import handler404
 from django.conf import settings
 from hobo_user.views import ExtendedSignupVerify, \
     PasswordResetConfirmView
@@ -33,6 +33,7 @@ urlpatterns = [
     path('payment/', include('payment.urls')),
     path('hobo_user/', include('hobo_user.urls')),
     path('general/', include(('general.urls', 'general'), namespace='general')),
+    path('project/', include(('project.urls', 'project'), namespace='project')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(),

@@ -7,9 +7,7 @@ from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
     CustomUserSettings, AthleticSkill, UserInterest, UserProfile, CoWorker, \
-    CompanyProfile
-
-from .models import GuildMembership, Country, Photo
+    CompanyProfile, Country, Photo, Feedback
 
 
 class SignUpForm(UserCreationForm):
@@ -363,4 +361,11 @@ class UserInterestForm(forms.ModelForm):
         model = UserInterest
         fields = ('position', 'format', 'location', 'budget')
 
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        user_feedback = forms.CharField(widget=forms.Textarea)
+
+        model = Feedback
+        fields = '__all__'
 

@@ -27,7 +27,9 @@ from .models import CustomUser, Country, GuildMembership, \
     UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
     CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
     UserRating, EthnicAppearance, AthleticSkill, UserAgentManager, UserProfile, CoWorker, \
-    UserRating, UserAgentManager, Photo, Project, Team, UserRating
+    UserRating, UserAgentManager, Photo, Project, Team, UserRating, \
+    Video, VideoRating
+
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -830,26 +832,6 @@ class TrackUserSerializer(serializers.Serializer):
         required=True,
     )
 
-
-class RateUserSkillsSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    job_type = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    rating = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-
-    class Meta:
-        model = UserRating
-        fields = ['user', 'job_type', 'rating', 'reason']
-
-
 class RateCompanySerializer(serializers.ModelSerializer):
     company = serializers.CharField(
         max_length=150,
@@ -1074,10 +1056,13 @@ class RemoveFriendGroupSerializer(serializers.Serializer):
     )
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=True)
+    user_rating = serializers.FloatField(required=True)
 
     class Meta:
         model = Feedback
-        fields = '__all__'
+        fields = ['email', 'name', 'user_rating', 'user_feedback',
+                  'timestamp']
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -1094,9 +1079,16 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ['__all__']
 
 
-class UserRatingSerializer(serializers.ModelSerializer):
+class VideoSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UserRating
+        model = Video
         fields = '__all__'
+
+
+class VideoRatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = VideoRating
+        fields = ['rated_by','video','rating']
 

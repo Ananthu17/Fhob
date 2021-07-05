@@ -6,15 +6,16 @@ from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, Actor, UserInterest, Writer, AthleticSkillInline, \
-                    Producer, Director, Editor, Makeup, Country, \
+                    PromoCode, Team, UserInterest, AthleticSkillInline, \
+                    Country, \
                     IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
                     CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
                     HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
                     FriendRequest, UserTacking, UserRatingCombined, UserRating, \
                     UserAgentManager, Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
+                    VideoRating,Video, ProjectMemberRating
 
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
@@ -90,25 +91,17 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
-admin.site.register(Team)
-admin.site.register(Actor)
-admin.site.register(Writer)
-admin.site.register(Producer)
-admin.site.register(Director)
-admin.site.register(Editor)
-admin.site.register(Makeup)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
 admin.site.register(CoWorker)
-admin.site.register(UserRating)
-admin.site.register(UserRatingCombined)
+admin.site.register(Video)
+admin.site.register(VideoRating)
 admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)
-admin.site.register(UserNotification)
 admin.site.register(UserInterest)
 admin.site.register(CompanyClient)
 admin.site.register(NewJobType)
@@ -209,3 +202,37 @@ class CompanyProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
+
+
+class ProjectMemberRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'project', 'rating')
+
+
+admin.site.register(ProjectMemberRating, ProjectMemberRatingAdmin)
+
+
+class UserRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'project', 'rating', 'rated_by')
+
+
+admin.site.register(UserRating, UserRatingAdmin)
+
+
+class UserNotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'notification_type', 'from_user', 'status_type', 'message', 'created_time')
+
+
+admin.site.register(UserNotification, UserNotificationAdmin)
+
+
+class UserRatingCombinedAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'rating')
+
+
+admin.site.register(UserRatingCombined, UserRatingCombinedAdmin)
+
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ('project', 'user', 'job_type')
+
+
+admin.site.register(Team, TeamAdmin)

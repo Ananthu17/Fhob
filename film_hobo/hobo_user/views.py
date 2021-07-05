@@ -44,7 +44,9 @@ from rest_auth.views import PasswordResetView as AuthPasswordResetView
 from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
 from rest_framework.exceptions import ParseError
 from rest_framework.parsers import FileUploadParser
-from rest_framework.generics import (ListAPIView,RetrieveAPIView,CreateAPIView,DestroyAPIView,UpdateAPIView)
+from rest_framework.generics import (ListAPIView,
+                                     CreateAPIView, DestroyAPIView, UpdateAPIView, \
+                                     RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
 
@@ -54,11 +56,11 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm
+    EditAgencyManagementCompanyProfileForm, FeedbackForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, VideoRating, \
                     PromoCode, DisabledAccount, CustomUserSettings, \
                     CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
@@ -76,7 +78,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
-    RemoveCoWorkerSerializer, RateUserSkillsSerializer, \
+    RemoveCoWorkerSerializer, \
     AgentManagerSerializer, RemoveAgentManagerSerializer, \
     TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
@@ -89,10 +91,12 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    RemoveCoWorkerSerializer, RateUserSkillsSerializer, AgentManagerSerializer, \
+    RemoveCoWorkerSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, ProjectSerializer, \
-    TeamSerializer, UserRatingSerializer
+    TeamSerializer, \
+    VideoRatingSerializer, VideoSerializer
+
 
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -2795,93 +2799,6 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class RateUserSkillsAPI(APIView):
-    serializer_class = RateUserSkillsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        response = {}
-        if serializer.is_valid():
-            data_dict = serializer.data
-            user_id = data_dict['user']
-            job_id = data_dict['job_type']
-            reason = data_dict['reason']
-            rating = data_dict['rating']
-            user = CustomUser.objects.get(id=user_id)
-            job_type = JobType.objects.get(id=job_id)
-            try:
-                user_rating = UserRating.objects.get(
-                               Q(user=user) &
-                               Q(rated_by=self.request.user) &
-                               Q(job_type=job_type)
-                               )
-            except UserRating.DoesNotExist:
-                user_rating = UserRating()
-                user_rating.user = user
-                user_rating.rated_by = self.request.user
-                user_rating.job_type = job_type
-            user_rating.rating = rating
-            user_rating.reason = reason
-            user_rating.save()
-
-            # update combined rating
-            try:
-                user_rating_combined = UserRatingCombined.objects.get(
-                                        Q(user=user) &
-                                        Q(job_type=job_type)
-                                        )
-                count = UserRating.objects.filter(
-                        Q(user=user) &
-                        Q(job_type=job_type)
-                        ).count()
-                aggregate_rating = UserRating.objects.filter(
-                        Q(user=user) &
-                        Q(job_type=job_type)
-                        ).aggregate(Sum('rating'))
-                rating_sum = aggregate_rating['rating__sum']
-                new_rating = rating_sum/count
-                user_rating_combined.rating = new_rating
-                user_rating_combined.save()
-            except UserRatingCombined.DoesNotExist:
-                user_rating_combined = UserRatingCombined()
-                user_rating_combined.user = user
-                user_rating_combined.job_type = job_type
-                user_rating_combined.rating = rating
-                user_rating_combined.save()
-
-            #update notification table
-            notification = UserNotification()
-            notification.user = user
-            notification.notification_type = UserNotification.USER_RATING
-            notification.from_user = self.request.user
-            notification.message = self.request.user.get_full_name()+" rated your "+job_type.title+" skill as "+rating+" stars"
-            notification.save()
-            # send notification
-            room_name = "user_"+str(user.id)
-            notification_msg = {
-                    'type': 'send_profile_rating_notification',
-                    'message': str(notification.message),
-                    'from': str(self.request.user.id),
-                    "event": "USER_RATING"
-                }
-            notify(room_name, notification_msg)
-            # end notification section
-
-            response = {'message': "User skill rated sucessfully",
-                        'status': status.HTTP_200_OK,
-                        'combined_rating': user_rating_combined.rating}
-            msg = "'"+job_type.title +"' skill rated "+rating+" stars !!"
-            messages.success(
-                    self.request, msg
-                    )
-        else:
-            print(serializer.errors)
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-        return Response(response)
-
-
 class RateCompanyAPI(APIView):
     serializer_class = RateCompanySerializer
     permission_classes = (IsAuthenticated,)
@@ -4132,7 +4049,7 @@ class FilterFriendByGroupAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
-class FeedbackView(APIView):
+class FeedbackAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         email = request.data['email']
@@ -4147,6 +4064,16 @@ class FeedbackView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FeedbackWebView(View):
+    """
+    Web View to load the feedback page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'user_pages/feedback.html')
+
+
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
@@ -4207,43 +4134,71 @@ class TeamDeleteAPIView(DestroyAPIView):
 #     filter_backends = [filters.SearchFilter]
 #     search_fields = ["title"]
 
-# API to rate user associated the project
-class UserRatingAPI(CreateAPIView):
-    queryset = UserRating.objects.all()
-    serializer_class = UserRatingSerializer
+# Api to add rating to project video 
+class VideoRatingView(APIView):
+    serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
 
-# class UserRatingAPI(CreateAPIView):
-#     queryset = UserRating.objects.all()
-#     serializer_class = UserRatingSerializer
-#     # permission_classes = (IsAuthenticated,)
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        allowed_members = ['IND','PRO','COM']
+        if serializer.is_valid():
+            try:
+                user = serializer.validated_data.get('rated_by')
+                video = serializer.validated_data.get('video')
+                rating = serializer.validated_data.get('rating')
+                existing_review = VideoRating.objects.filter(rated_by=user,video=video)
 
-    # def post(self,request):
-    #     serializer = self.serializer_class(data=request.data)
-    #     response = {}
-    #     if serializer.is_valid():
-    #         data_dict = serializer.data
-    #         print("Data kittiyath:",data_dict)
+                if user.membership in allowed_members:
+                    if existing_review:
+                        existing_review[0].rating = rating
+                        existing_review[0].save()
+                        self.refresh_rating(video)
+                        response = {'message': "Rating Updated",
+                                'status': status.HTTP_200_OK}
+                    else:
+                        serializer.save()
+                        self.refresh_rating(video)
+                        response = {'message': "Rating scuccess",
+                                    'status': status.HTTP_201_CREATED}
+                else:
+                    response = {'errors': "Unautharized access", 'status':
+                                status.HTTP_401_UNAUTHORIZED}
+            except:
+                response = {'errors': 'Invalid Video', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
 
+    """
+    Ratings are combined to a single rating
+    and written to project everytime when user make a rating.
+    """
 
-#  Combined Video rating 
+    def refresh_rating(self,video):
+        ratings = VideoRating.objects.filter(video=video)
+        combined_rating = 0
+        for item in ratings:
+            combined_rating += item.rating 
+        combined_rating = combined_rating / len(ratings)
+        print("Number of rating :",len(ratings))
+        print("Combined Rating :",combined_rating)
+        video.rating = combined_rating
+        video.save()
 
-# def combined_rating(user):
-#     ratings = UserRating.objects.filter(user=user)
-#     combined_rating = 0
-#     for item in ratings:
-#         combined_rating + int(item.rating)
-#     return combined_rating % len(ratings)
+# API to find rating of a video
+class FindVideoRatingAPI(RetrieveAPIView):
+    serializer_class = VideoSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Video.objects.all()
+    lookup_field = 'id'
 
-# UserRatingCombined(user=user,rating=combined_rating(user))
+# Api to list Video based on rating
+class VideoListAPI(ListAPIView):
+    serializer_class = VideoSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Video.objects.all().order_by('-rating','-created')
 
-# project=Project.objects.get(pk=1)
-# team = project.team.all()
-# rating= 0
-# for member in team:
-#     rating + find_rating(member)
-# video_rating = rating % len(team)
-
-# def find_rating(user):
-#     obj=UserRatingCombined.objects.get(user=user)
-#     return obj.rating

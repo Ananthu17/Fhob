@@ -4,7 +4,7 @@ from rest_auth.views import LoginView
 
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView, \
+                   ExtendedLogoutView, \
                    ChooseMembershipPage, CustomUserSignupIndieView, \
                    CustomUserSignupCompany, \
                    ExtendedRegisterIndieView, SendEmailVerificationView, \
@@ -19,13 +19,13 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
-                   ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
+                   ForgotPasswordAPI, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
                    PersonalDetailsView, HowTo, \
                    UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, RemoveCoworkerAPI, \
-                   MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
+                   MemberProfileView, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
@@ -44,18 +44,23 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ListAllFriendsAPI, DeleteFriendRequestAPI, \
                    UnFriendUserAPI, \
                    GetFriendRequestNotificationAjaxView, \
-                   CancelFriendRequestAPI, AddGroupAPI, RemoveFriendGroupAPI, \
+                   CancelFriendRequestAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
+                   FeedbackAPIView, FeedbackWebView, \
+                   AddGroupAPI, RemoveFriendGroupAPI, \
                    AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
                    FilterFriendByGroupAjaxView, \
-                   FeedbackView, ProjectAPIView, ProjectCreateAPIView, \
+                   ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, RateCompanyAPI, \
                    GetProfileRatingNotificationAjaxView, \
                    EditUserInterestAPI, TeamDeleteAPIView, \
-                   UserRatingAPI
+                   TeamDeleteAPIView, VideoRatingView, \
+                   FindVideoRatingAPI, VideoListAPI
                #     ProjectSearchView
+                   
+
 
 
 app_name = "hobo_user"
@@ -126,8 +131,6 @@ urlpatterns = [
          name='remove-coworker-api'),
     path('remove-client-api/', RemoveClientAPI.as_view(),
          name='remove-client-api'),
-    path('rate-user-api/', RateUserSkillsAPI.as_view(),
-         name='rate-user-api'),
     path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
          name='remove-agent-api'),
     path('track-user-api/', TrackUserAPI.as_view(),
@@ -175,8 +178,7 @@ urlpatterns = [
          name='add-friend-to-group-api'),
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
-    path('feedback/', FeedbackView.as_view(), name='feedback'),
-    path('rate-company-api/', RateCompanyAPI.as_view(), name='rate-company-api'),
+    path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
 
 
     # web-view endpoints
@@ -265,6 +267,9 @@ urlpatterns = [
          name='update-friend-groups'),
     path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
          name='filter-friend-by-groups'),
+    path('feedback/',
+         FeedbackWebView.as_view(),
+         name='feedback-web'),
 
     path('projects/', ProjectAPIView.as_view(),
          name='project-list'),
@@ -287,7 +292,11 @@ urlpatterns = [
          name='get-profile-rating-notification-html'),
 #     path('projects/search/',ProjectSearchView.as_view(),
 #          name="project-search"),
-    path('projects/rating',UserRatingAPI.as_view(),
-         name="rate-api")
+    path('video/rate',  VideoRatingView.as_view(),
+         name="videorate-api"),
+    path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
+          name="find-videorating"),
+    path('video/top-rated',  VideoListAPI.as_view(),
+          name="top-rated-videos")
 
 ]
