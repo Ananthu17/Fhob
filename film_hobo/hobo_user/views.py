@@ -739,18 +739,30 @@ class PaymentIndieView(FormView):
         user_email = request.GET.get('email')
         self.user = CustomUser.objects.get(email=user_email)
 
-        if settings.BRAINTREE_PRODUCTION:
-            braintree_env = braintree.Environment.Production
-        else:
-            braintree_env = braintree.Environment.Sandbox
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
 
-        braintree.Configuration.configure(
-            braintree_env,
-            merchant_id=settings.BRAINTREE_MERCHANT_ID,
-            public_key=settings.BRAINTREE_PUBLIC_KEY,
-            private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
         )
-        self.braintree_client_token = braintree.ClientToken.generate({})
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
         return super(PaymentIndieView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -781,80 +793,80 @@ class PaymentIndieView(FormView):
         })
         return context
 
-    def form_valid(self, form):
-        # Braintree customer info
-        email = self.request.GET.get('email')
-        user = CustomUser.objects.get(email=email)
+    # def form_valid(self, form):
+    #     # Braintree customer info
+    #     email = self.request.GET.get('email')
+    #     user = CustomUser.objects.get(email=email)
 
-        customer_kwargs = {
-            "first_name": user.first_name,
-            "last_name": user.middle_name + ' ' + user.last_name,
-            "email": email,
-        }
+    #     customer_kwargs = {
+    #         "first_name": user.first_name,
+    #         "last_name": user.middle_name + ' ' + user.last_name,
+    #         "email": email,
+    #     }
 
-        # Create a new Braintree customer
-        # In this example we always create new Braintree users
-        # You can store and re-use Braintree's customer IDs, if you want to
-        result = braintree.Customer.create(customer_kwargs)
-        if not result.is_success:
-            context = self.get_context_data()
+    #     # Create a new Braintree customer
+    #     # In this example we always create new Braintree users
+    #     # You can store and re-use Braintree's customer IDs, if you want to
+    #     result = braintree.Customer.create(customer_kwargs)
+    #     if not result.is_success:
+    #         context = self.get_context_data()
 
-            # We re-generate the form and display the relevant braintree error
-            context.update({
-                'form': self.get_form(self.get_form_class()),
-                'braintree_error': u'{} {}'.format(
-                    result.message, _('Please get in contact.'))
-            })
-            return self.render_to_response(context)
+    #         # We re-generate the form and display the relevant braintree error
+    #         context.update({
+    #             'form': self.get_form(self.get_form_class()),
+    #             'braintree_error': u'{} {}'.format(
+    #                 result.message, _('Please get in contact.'))
+    #         })
+    #         return self.render_to_response(context)
 
-        # If the customer creation was successful you might want to also
-        # add the customer id to your user profile
-        customer_id = result.customer.id
+    #     # If the customer creation was successful you might want to also
+    #     # add the customer id to your user profile
+    #     customer_id = result.customer.id
 
-        """
-        Create a new transaction and submit it.
-        I don't gather the whole address in this example, but I can
-        highly recommend to do that. It will help you to avoid any
-        fraud issues, since some providers require matching addresses
+    #     """
+    #     Create a new transaction and submit it.
+    #     I don't gather the whole address in this example, but I can
+    #     highly recommend to do that. It will help you to avoid any
+    #     fraud issues, since some providers require matching addresses
 
-        """
-        address_dict = {
-            "first_name": user.first_name,
-            "last_name": user.middle_name + ' ' + user.last_name,
-            "extended_address": user.address,
-            "country_name": user.country.name,
-        }
+    #     """
+    #     address_dict = {
+    #         "first_name": user.first_name,
+    #         "last_name": user.middle_name + ' ' + user.last_name,
+    #         "extended_address": user.address,
+    #         "country_name": user.country.name,
+    #     }
 
-        result = braintree.Transaction.sale({
-            "customer_id": customer_id,
-            "amount": 100,
-            "payment_method_nonce": form.cleaned_data['payment_method_nonce'],
-            "descriptor": {
-                "name": "Filmhobo.*test",
-            },
-            "billing": address_dict,
-            "shipping": address_dict,
-            "options": {
-                'store_in_vault_on_success': True,
-                'submit_for_settlement': True,
-            },
-        })
-        if not result.is_success:
-            context = self.get_context_data()
-            context.update({
-                'form': self.get_form(self.get_form_class()),
-                'braintree_error': _(
-                    'Your payment could not be processed. Please check your'
-                    ' input or use another payment method and try again.')
-            })
-            return self.render_to_response(context)
+    #     result = braintree.Transaction.sale({
+    #         "customer_id": customer_id,
+    #         "amount": 100,
+    #         "payment_method_nonce": form.cleaned_data['payment_method_nonce'],
+    #         "descriptor": {
+    #             "name": "Filmhobo.*test",
+    #         },
+    #         "billing": address_dict,
+    #         "shipping": address_dict,
+    #         "options": {
+    #             'store_in_vault_on_success': True,
+    #             'submit_for_settlement': True,
+    #         },
+    #     })
+    #     if not result.is_success:
+    #         context = self.get_context_data()
+    #         context.update({
+    #             'form': self.get_form(self.get_form_class()),
+    #             'braintree_error': _(
+    #                 'Your payment could not be processed. Please check your'
+    #                 ' input or use another payment method and try again.')
+    #         })
+    #         return self.render_to_response(context)
 
-        # Finally there's the transaction ID
-        # You definitely want to send it to your database
-        transaction_id = result.transaction.id
-        # Now you can send out confirmation emails or update your metrics
-        # or do whatever makes you and your customers happy :)
-        return super(PaymentIndieView, self).form_valid(form)
+    #     # Finally there's the transaction ID
+    #     # You definitely want to send it to your database
+    #     transaction_id = result.transaction.id
+    #     # Now you can send out confirmation emails or update your metrics
+    #     # or do whatever makes you and your customers happy :)
+    #     return super(PaymentIndieView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('hobo_user:user_home')

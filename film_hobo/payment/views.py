@@ -3,6 +3,7 @@ import json
 import requests
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -23,7 +24,7 @@ from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-# from paypal.standard.forms import PayPalPaymentsForm
+from paypal.standard.forms import PayPalPaymentsForm
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest, \
     OrdersCaptureRequest, OrdersGetRequest
@@ -930,49 +931,74 @@ class PaypalPlanID(APIView):
 
 
 class InitialRequest(APIView):
-    def get(self, request, *args, **kwargs):
-        request.session['braintree_client_token'] = braintree.ClientToken.generate()
-        return render(request, '')
 
-    # def post(self, request, *args, **kwargs):
-    #     if not form.is_valid():
-    #         return render(render, '')
-    #     else:
-    #         pass
+    def post(self, request, *args, **kwargs):
+        amount = request.data['amount']
+        payment_method_nonce = request.data['payment_method_nonce']
+        submit_for_settlement = request.data['submit_for_settlement']
+        email = request.data['email']
 
-# class ProcessSubscription(APIView):
+        user = CustomUser.objects.get(email=email)
 
-#     def post(self, request, *args, **kwargs):
-#         subscription_plan = request.data['subscription_plan']
-#         host = request.get_host()
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        result = gateway.transaction.sale({
+            'amount': amount,
+            'payment_method_nonce': payment_method_nonce,
+            "device_data": '',
+            'options': {
+                'submit_for_settlement': submit_for_settlement
+            }
+        })
 
-#         if subscription_plan == 'monthly':
-#             price = request.data['price']
-#             billing_cycle = 1
-#             billing_cycle_unit = "M"
-#         else:
-#             price = request.data['price']
-#             billing_cycle = 1
-#             billing_cycle_unit = "Y"
-#         paypal_dict = {
-#             "cmd": "_xclick-subscriptions",
-#             'business': settings.PAYPAL_RECEIVER_EMAIL,
-#             "a3": price,  # monthly price
-#             "p3": billing_cycle,  # duration of each unit (depends on unit)
-#             "t3": billing_cycle_unit,  # duration unit ("M for Month")
-#             "src": "1",  # make payments recur
-#             "sra": "1",  # reattempt payment on payment error
-#             "no_note": "1",  # remove extra notes (optional)
-#             'item_name': 'Content subscription',
-#             'custom': 1,     # custom data, pass something meaningful here
-#             'currency_code': 'USD',
-#             'notify_url': 'http://{}{}'.format(
-#                 host, reverse('payment:paypal-ipn')),
-#             'return_url': 'http://{}{}'.format(
-#                 host, reverse('payment:done')),
-#             'cancel_return': 'http://{}{}'.format(host,
-#                                                   reverse('payment:canceled')),
-#         }
+        temp_result = result
+        import pdb;pdb.set_trace()
+        if not temp_result.is_success:
+            pass
 
-#         form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
-#         return render(request, 'payment/process_subscription.html', locals())
+        transaction_details = temp_result.transaction
+        return super(InitialRequest, self).form_valid(form)
+
+
+class ProcessSubscription(APIView):
+
+    def post(self, request, *args, **kwargs):
+        subscription_plan = request.data['subscription_plan']
+        host = request.get_host()
+
+        if subscription_plan == 'monthly':
+            price = request.data['price']
+            billing_cycle = 1
+            billing_cycle_unit = "M"
+        else:
+            price = request.data['price']
+            billing_cycle = 1
+            billing_cycle_unit = "Y"
+        paypal_dict = {
+            "cmd": "_xclick-subscriptions",
+            'business': settings.PAYPAL_RECEIVER_EMAIL,
+            "a3": price,  # monthly price
+            "p3": billing_cycle,  # duration of each unit (depends on unit)
+            "t3": billing_cycle_unit,  # duration unit ("M for Month")
+            "src": "1",  # make payments recur
+            "sra": "1",  # reattempt payment on payment error
+            "no_note": "1",  # remove extra notes (optional)
+            'item_name': 'Content subscription',
+            'custom': 1,     # custom data, pass something meaningful here
+            'currency_code': 'USD',
+            'notify_url': 'http://{}{}'.format(
+                host, reverse('payment:paypal-ipn')),
+            'return_url': 'http://{}{}'.format(
+                host, reverse('payment:done')),
+            'cancel_return': 'http://{}{}'.format(host,
+                                                  reverse('payment:canceled')),
+        }
+
+        form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
+        return render(request, 'payment/process_subscription.html', locals())

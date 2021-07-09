@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'zappa_django_utils',
     'channels',
     'paypal.standard.ipn',
+    'corsheaders',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -89,6 +90,7 @@ MIDDLEWARE = [
     # 'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -288,3 +290,12 @@ BRAINTREE_PUBLIC_KEY = env("BRAINTREE_PUBLIC_KEY")
 BRAINTREE_PRIVATE_KEY = env("BRAINTREE_PRIVATE_KEY")
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# development
+CORS_ORIGIN_ALLOW_ALL = True
+
+# production
+# CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:8000',
+# )
