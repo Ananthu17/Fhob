@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from solo.models import SingletonModel
 
@@ -1106,6 +1107,41 @@ class UserRating(models.Model):
     class Meta:
         verbose_name = 'User Rating'
         verbose_name_plural = 'User Ratings'
+
+
+class Video(models.Model):
+    name = models.CharField(max_length=1000)
+    videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name + ": " + str(self.videofile)
+
+    class Meta:
+        verbose_name = 'Video'
+        verbose_name_plural = 'Video Ratings'
+
+
+class VideoRating(models.Model):
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='Video_rated_by_user',
+                                 verbose_name=_("User"),
+                                 null=True)
+    video = models.ForeignKey("hobo_user.Video",
+                              on_delete=models.CASCADE,
+                              null=True)
+    rating = models.IntegerField(_("Rating"),
+                                 validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True)
+
+    def __str__(self):
+        return str(self.rated_by)
+
+    class Meta:
+        verbose_name = 'Video Rating'
+        verbose_name_plural = 'Video Ratings'
 
 
 class CompanyRating(models.Model):

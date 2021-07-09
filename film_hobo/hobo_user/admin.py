@@ -14,7 +14,8 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     UserRatingCombined, UserRating, UserAgentManager, \
                     Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined
+                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
+                    VideoRating, Video
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
@@ -98,6 +99,8 @@ admin.site.register(DisabledAccount)
 admin.site.register(CoWorker)
 admin.site.register(UserRating)
 admin.site.register(UserRatingCombined)
+admin.site.register(Video)
+admin.site.register(VideoRating)
 admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)

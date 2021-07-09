@@ -42,11 +42,11 @@ from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from rest_auth.views import PasswordResetView as AuthPasswordResetView
-from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
+from rest_auth.views import PasswordResetConfirmView as \
+    AuthPasswordResetConfirmView
 from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
-                                     UpdateAPIView)
-from rest_framework.decorators import api_view, renderer_classes
+                                     UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
 
@@ -60,13 +60,15 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, \
-                    PromoCode, DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, \
+                    VideoRating, PromoCode, DisabledAccount, \
+                    CustomUserSettings, CompanyPaymentDetails, \
+                    AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
-                    Project, Team, UserProfile, JobType, UserRating, Location, \
-                    UserRatingCombined, UserTacking, CompanyProfile, \
+                    Project, Team, UserProfile, JobType, \
+                    UserRating, Location, UserRatingCombined, \
+                    UserTacking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -89,8 +91,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
-    ProjectSerializer, TeamSerializer, UserRatingSerializer, \
-    EditUserInterestSerializer
+    ProjectSerializer, TeamSerializer, \
+    EditUserInterestSerializer, VideoRatingSerializer, VideoSerializer
 
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -4323,67 +4325,78 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-
+# Api to search in project
+# class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
+#     serializer_class = ProjectSerializer
+#     permission_classes = (IsAuthenticated,)
 #     filter_backends = [filters.SearchFilter]
 #     search_fields = ["title"]
 
-# API to rate user associated the project
-class UserRatingAPI(CreateAPIView):
-    queryset = UserRating.objects.all()
-    serializer_class = UserRatingSerializer
+# Api to add rating to project video
+class VideoRatingView(APIView):
+    serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
 
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        allowed_members = ['IND','PRO','COM']
+        if serializer.is_valid():
+            try:
+                user = serializer.validated_data.get('rated_by')
+                video = serializer.validated_data.get('video')
+                rating = serializer.validated_data.get('rating')
+                existing_review = VideoRating.objects.filter(rated_by=user,video=video)
 
-# class CompanyRatingView(LoginRequiredMixin, TemplateView):
-#     template_name = 'user_pages/friends-and-followers.html'
-#     login_url = '/hobo_user/user_login/'
-#     redirect_field_name = 'login_url'
+                if user.membership in allowed_members:
+                    if existing_review:
+                        existing_review[0].rating = rating
+                        existing_review[0].save()
+                        self.refresh_rating(video)
+                        response = {'message': "Rating Updated",
+                                'status': status.HTTP_200_OK}
+                    else:
+                        serializer.save()
+                        self.refresh_rating(video)
+                        response = {'message': "Rating scuccess",
+                                    'status': status.HTTP_201_CREATED}
+                else:
+                    response = {'errors': "Unautharized access", 'status':
+                                status.HTTP_401_UNAUTHORIZED}
+            except:
+                response = {'errors': 'Invalid Video', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
 
-#     def post(self, request, *args, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user
-#         position = ""
-#         file = ""
-#         if 'position' in self.request.POST:
-#             position = self.request.POST.get('position')
-#         if 'image' in self.request.FILES:
-#             file = self.request.FILES['image']
-#         if position and file:
-#             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    """
+    Ratings are combined to a single rating
+    and written to project everytime when user make a rating.
+    """
 
+    def refresh_rating(self,video):
+        ratings = VideoRating.objects.filter(video=video)
+        combined_rating = 0
+        for item in ratings:
+            combined_rating += item.rating
+        combined_rating = combined_rating / len(ratings)
+        print("Number of rating :",len(ratings))
+        print("Combined Rating :",combined_rating)
+        video.rating = combined_rating
+        video.save()
 
-# class UserRatingAPI(CreateAPIView):
-#     queryset = UserRating.objects.all()
-#     serializer_class = UserRatingSerializer
-#     # permission_classes = (IsAuthenticated,)
+# API to find rating of a video
+class FindVideoRatingAPI(RetrieveAPIView):
+    serializer_class = VideoSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Video.objects.all()
+    lookup_field = 'id'
 
-    # def post(self,request):
-    #     serializer = self.serializer_class(data=request.data)
-    #     response = {}
-    #     if serializer.is_valid():
-    #         data_dict = serializer.data
-    #         print("Data kittiyath:",data_dict)
-
-
-#  Combined Video rating
-
-# def combined_rating(user):
-#     ratings = UserRating.objects.filter(user=user)
-#     combined_rating = 0
-#     for item in ratings:
-#         combined_rating + int(item.rating)
-#     return combined_rating % len(ratings)
-
-# UserRatingCombined(user=user,rating=combined_rating(user))
-
-# project=Project.objects.get(pk=1)
-# team = project.team.all()
-# rating= 0
-# for member in team:
-#     rating + find_rating(member)
-# video_rating = rating % len(team)
-
-# def find_rating(user):
-#     obj=UserRatingCombined.objects.get(user=user)
-#     return obj.rating
+# Api to list Video based on rating
+class VideoListAPI(ListAPIView):
+    serializer_class = VideoSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Video.objects.all().order_by('-rating','-created')
