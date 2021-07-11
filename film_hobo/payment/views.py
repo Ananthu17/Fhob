@@ -754,6 +754,7 @@ class CreateUserOrder(APIView):
                         {"status": "invalid user token"},
                         status=status.HTTP_400_BAD_REQUEST)
         payment_plan = request.data['payment_plan']
+        payment_method = request.data['payment_method']
         days_free = request.data['days_free']
         initial_amount = request.data['initial_amount']
         tax_applied = request.data['tax_applied']
@@ -771,6 +772,7 @@ class CreateUserOrder(APIView):
                                    user=logged_user,
                                    membership=membership_type,
                                    payment_plan=payment_plan,
+                                   payment_method=payment_method,
                                    days_free=days_free,
                                    initial_amount=initial_amount,
                                    tax_applied=tax_applied,
@@ -897,6 +899,40 @@ class SubscriptionDetails(APIView):
                 {"plan_id": plan_id}, status=status.HTTP_200_OK)
 
 
+class BraintreeSubscriptionDetails(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # user_email = self.request.GET.get('email')
+            # logged_user = CustomUser.objects.get(email=user_email)
+            logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        if membership_type == 'IND':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY
+        elif membership_type == 'PRO':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY
+        elif membership_type == 'COM':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY
+        else:
+            pass
+        return Response(
+                {"plan_id": plan_id}, status=status.HTTP_200_OK)
+
+
 class PaypalToken(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -935,10 +971,18 @@ class InitialRequest(APIView):
     def post(self, request, *args, **kwargs):
         amount = request.data['amount']
         payment_method_nonce = request.data['payment_method_nonce']
-        submit_for_settlement = request.data['submit_for_settlement']
+        # submit_for_settlement = request.data['submit_for_settlement']
+        braintree_plan_id = request.data['braintree_plan_id']
         email = request.data['email']
-
         user = CustomUser.objects.get(email=email)
+        membership_type = 'card_payment'
+        payment_plan = request.data['payment_plan']
+        payment_method = request.data['payment_method']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        promocodes_applied = request.data['promocodes_applied']
+        promotion_amount = request.data['promotion_amount']
 
         gateway = braintree.BraintreeGateway(
             braintree.Configuration(
@@ -948,22 +992,59 @@ class InitialRequest(APIView):
                 private_key=settings.BRAINTREE_PRIVATE_KEY
             )
         )
-        result = gateway.transaction.sale({
-            'amount': amount,
-            'payment_method_nonce': payment_method_nonce,
-            "device_data": '',
-            'options': {
-                'submit_for_settlement': submit_for_settlement
-            }
+
+        customer_create_result = gateway.customer.create({
+            "first_name": user.first_name,
+            "last_name": user.middle_name + '' + user.last_name,
+            "payment_method_nonce": payment_method_nonce
         })
 
-        temp_result = result
-        import pdb;pdb.set_trace()
-        if not temp_result.is_success:
-            pass
+        customer_create_temp_result = customer_create_result
+        if not customer_create_temp_result.is_success:
+            return Response(
+                {"status": "braintree customer creation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
 
-        transaction_details = temp_result.transaction
-        return super(InitialRequest, self).form_valid(form)
+        subscription_create_result = gateway.subscription.create({
+            "payment_method_token":
+            customer_create_result.customer.payment_methods[0].token,
+            "plan_id": braintree_plan_id
+        })
+        subscription_create_temp_result = subscription_create_result
+        if not subscription_create_temp_result.is_success:
+            return Response(
+                {"status": "braintree subscription creation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Transaction.objects.create(
+                user=user,
+                membership=membership_type,
+                payment_plan=payment_plan,
+                payment_method=payment_method,
+                days_free=days_free,
+                initial_amount=initial_amount,
+                tax_applied=tax_applied,
+                promocodes_applied=promocodes_applied,
+                promotion_amount=promotion_amount,
+                final_amount=amount)
+
+        # transaction_create_result = gateway.transaction.sale({
+        #     "amount": amount,
+        #     "payment_method_nonce": payment_method_nonce,
+        #     "device_data": "",
+        #     "options": {
+        #         "submit_for_settlement": submit_for_settlement
+        #     }
+        # })
+        # transaction_create_temp_result = transaction_create_result
+        # if not transaction_create_temp_result.is_success:
+        #     return Response(
+        #         {"status": "braintree transaction creation unsuccsessful "},
+        #         status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"status": "braintree transaction succsessful "},
+            status=status.HTTP_200_OK)
 
 
 class ProcessSubscription(APIView):

@@ -5,7 +5,7 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, SubscriptionDetails, \
-     PaypalToken, PaypalPlanID, InitialRequest
+     PaypalToken, PaypalPlanID, InitialRequest, BraintreeSubscriptionDetails
 # from .paypal import CreateOrder, CaptureOrder
 
 app_name = "payment"
@@ -35,6 +35,9 @@ urlpatterns = [
          name='get_user_token'),
     path('subscription_details', SubscriptionDetails.as_view(),
          name='subscription_details'),
+    path('braintree_subscription_details',
+         BraintreeSubscriptionDetails.as_view(),
+         name='braintree_subscription_details'),
     path('get_paypal_token', PaypalToken.as_view(),
          name='get_paypal_token'),
     path('get_paypal_plan_id', PaypalPlanID.as_view(),

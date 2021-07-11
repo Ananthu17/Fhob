@@ -1,3 +1,7 @@
+$(document).ready(function() {
+    $('#payment-success-div').hide();
+});
+
 origin_url = window.location.origin
 create_url = origin_url + '/payment/paypal/create/'
 var token = localStorage.getItem("token");
@@ -69,6 +73,7 @@ onApprove: function(data, actions) {
         "token": localStorage.getItem("token"),
         "days_free": $("#days_free").text(),
         "payment_plan": $("#payment_plan").text(),
+        "payment_method": "paypal_account",
         "initial_amount": $("#initial_amount_val").text(),
         "tax_applied": $("#tax_percentage").text(),
         "promocodes_applied": applied_promo,
