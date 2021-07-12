@@ -59,7 +59,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamDeleteAPIView, VideoRatingView, \
                    FindVideoRatingAPI, VideoListAPI
                #     ProjectSearchView
-                   
+
 
 
 

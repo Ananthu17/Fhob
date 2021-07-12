@@ -60,7 +60,7 @@ class GuildMembershipSerializer(serializers.ModelSerializer):
 #     )
 #     password = serializers.CharField(
 #         max_length=100,
-#         style={'input_type': 'password', 'placeholder': 'Password'}
+#         style={'input_type': 'password', 'pliaceholder': 'Password'}
 #     )
 #     remember_me = serializers.BooleanField()
 
@@ -319,6 +319,7 @@ class LoginSerializer(serializers.Serializer):
             if username:
                 user = self._validate_username_email(username, '', password)
 
+
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -328,7 +329,6 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Unable to log in with provided credentials.')
             raise exceptions.ValidationError(msg)
 
-        # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:

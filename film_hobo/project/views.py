@@ -1,6 +1,11 @@
 # from django.shortcuts import render
+import os
+import json
+import requests
+import boto3
 from braces.views import JSONResponseMixin
 
+from django.conf import settings
 from django.db.models import Count, Sum
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -17,9 +22,16 @@ from rest_framework.permissions import IsAuthenticated
 
 
 from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification
-from .serializers import RateUserSkillsSerializer
+     UserRating, JobType, UserRatingCombined, UserNotification, Project
+from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer
 from hobo_user.utils import notify, get_notifications_time
+
+s3_client = boto3.client(
+                "s3",
+                region_name="us-east-2",
+                aws_access_key_id=settings.AWS_CLIENT_ID,
+                aws_secret_access_key=settings.AWS_CLIENT_SECRET
+            )
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -30,6 +42,7 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
+        project = Project.objects.get(id=project_id)
         rating_dict = {}
         team_members = Team.objects.filter(project=project_id)
         project_members_rating = ProjectMemberRating.objects.filter(
@@ -44,6 +57,13 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
             rating_dict[key] = obj.rating*20
         context["rating_dict"] = rating_dict
         context["team_members"] = team_members
+        context["project"] = project
+
+        bucket_prefix = ""
+        bucket_name = settings.S3_BUCKET_NAME
+        path = f"{bucket_prefix}{self.request.user.id}/{project.title}/{project_id}.mp4"
+        s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
+        context['s3_url'] = s3_url
         return context
 
 
@@ -67,7 +87,6 @@ class RateUserSkillsAPI(APIView):
                 if item.rating >= 4:
                     count = count+1
                     project_ids.append(item.project.id)
-            # print("projects having rating more than or equal to 4 ", count)
             # if for 5 projects user has got rating more than or equal to 4
             if count >= 5:
                 # check if these 5 projects have atleast 10 ratings each
@@ -77,11 +96,9 @@ class RateUserSkillsAPI(APIView):
                                     Q(project__id__in=project_ids)
                                 )
                 rating_count = user_rating.values('project').annotate(count=Count('project'))
-                # print("rating_count", rating_count)
                 for item in rating_count:
                     if item['count'] >= 10:
                         user_rating_count += 1
-                # print("No of Projects with more than 10 rating and aggregate rating above 4: ", user_rating_count)
                 # if for those 5 projects he has got atleast 10 ratings each
                 if user_rating_count >= 5:
                     user.membership = CustomUser.PRO
@@ -238,9 +255,71 @@ class GetMembershipChangeNotificationAjaxView(View, JSONResponseMixin):
     def get(self, *args, **kwargs):
         context = dict()
         message = self.request.GET.get('message')
-        print("message----", message)
         notification_html = render_to_string(
                                 'project/membership_change_notification.html',
                                 {'message': message})
         context['notification_html'] = notification_html
         return self.render_json_response(context)
+
+
+class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/single_film_project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    UPLOAD_FOLDER = "uploads"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = Project.objects.get(id=project_id)
+        context['project'] = project
+        context['video_types'] = Project.VIDEO_TYPE_CHOICES
+        return context
+
+    # def post(self, request, *args, **kwargs):
+    #     bucket_prefix = ""
+    #     project_id = self.kwargs.get('id')
+    #     project = Project.objects.get(id=project_id)
+    #     video = self.request.FILES['video']
+    #     bucket_name = settings.S3_BUCKET_NAME
+    #     path = f"{bucket_prefix}{self.request.user.id}/{project.title}/{project.id}.mp4"
+    #     response = s3_client.put_object(
+    #                     Bucket=bucket_name,
+    #                     Body=video,
+    #                     Key=path,
+    #                     ServerSideEncryption="AES256",
+    #                 )
+    #     print("response", response)
+    #     messages.success(self.request, "Video Uploaded")
+    #     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class SaveProjectVideoUrlAPI(APIView):
+    serializer_class = ProjectVideoURLSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            id = data_dict['id']
+            video_url = data_dict['video_url']
+            video_type = data_dict['video_type']
+            try:
+                project = Project.objects.get(pk=id)
+                project.video_type = video_type
+                project.video_url = video_url
+                project.save()
+                response = {'message': "Video URL Saved",
+                            'status': status.HTTP_200_OK}
+                messages.success(self.request, "Video URL saved")
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

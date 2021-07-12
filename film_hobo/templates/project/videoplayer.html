@@ -3,6 +3,19 @@
 {% load static %}
 {% load user_account_tag %}
 {% block extracss %}
+<style>
+    .player.vp-title
+    {
+        visibility:hidden!important;
+        display:none!important;
+    }
+
+    .player .vp-sidedock
+    {
+        visibility:hidden!important;
+        display:none!important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,14 +25,46 @@
         <div class="row">
         <div class="col-12">
             <div class="text-center mb-5">
-                <b>Video Player Page</b>
+                <b>Video Player Page-{{project}}</b>
             </div>
             <div class="row">
                 <div class="col-sm-1"></div>
                 <div class="col-sm-6">
-                    <img src="{% static 'images/default_video_image.jpg' %}" class="img-fluid">
+                    {% if project.video_type == 'vimeo' %}
+                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}" width="600" height="250"
+                        data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>
+
+                    {% elif project.video_type == 'youtube' %}
+                        <iframe
+                        src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0" width="450" height="250"
+                        data-show-text="false"></iframe>
+
+                    {% elif project.video_type == 'facebook' %}
+                        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
+                        <div class="fb-video"
+                            data-href="{{ project.video_url }}"
+                            data-width="450" height="240"
+                            data-allowfullscreen="true"></div>
+
+                    {% elif project.video_type == 'upload_video' %}
+                        <video width="320" height="240" controls>
+                            <source src="{{ s3_url }}" type="video/mp4">
+                            <source src="movie.ogg" type="video/ogg">
+                            Your browser does not support the video tag.
+                      </video>
+                    {% endif %}
+
+
+                      <!-- <iframe 
+                      src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2F5min.crafts%2Fvideos%2F254702892563274%2F&show_text=false&width=476&t=0"
+                      width="476" height="476" style="border:none;overflow:hidden" scrolling="no" frameborder="0"
+                      allowfullscreen="true" ></iframe>
+                      <iframe 
+                      src="https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fwww.facebook.com%2F5min.crafts%2Fvideos%2F254702892563274%2F&show_text=false&width=476&t=0"
+                      width="320" height="240" data-show-text="false" class="fb-video"></iframe> -->
+                    <!-- <img src="{% static 'images/default_video_image.jpg' %}" class="img-fluid"> -->
                 </div>
-                <div class="col-sm-5 pt-2">
+                <div class="col-sm-4 pt-2">
                     {% for member in team_members %}
                     <div class="row">
                         <div class="col-6 all-p">
@@ -123,4 +168,5 @@
 {% endblock %}
 {% block extrajs %}
 <script src="{% static 'js/user-rating.js' %}"></script>
+
 {% endblock %}

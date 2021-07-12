@@ -402,6 +402,16 @@ class Project(models.Model):
         (SCENE, 'Scene'),
         (SHORTS, 'Shorts'),
     ]
+    YOUTUBE = 'youtube'
+    VIMEO = 'vimeo'
+    FACEBOOK = 'facebook'
+    UPLOAD_VIDEO = 'upload_video'
+    VIDEO_TYPE_CHOICES = [
+        (YOUTUBE, 'Youtube'),
+        (VIMEO, 'Vimeo'),
+        (FACEBOOK, 'Facebook'),
+        (UPLOAD_VIDEO, 'Upload Video'),
+    ]
 
     ACTION = 'ACT'
     ADVENTURE = 'ADV'
@@ -467,9 +477,25 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    video_url = models.CharField(max_length=1000,
+                                 null=True, blank=True)
+    video_type = models.CharField(_("Video Type"),
+                                  choices=VIDEO_TYPE_CHOICES,
+                                  max_length=150, null=True, blank=True,
+                                  default=UPLOAD_VIDEO)
 
     def __str__(self):
         return self.title
+
+    def generate_s3_signed_url(self, s3_client, path, bucket_name):
+        url = s3_client.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': path
+            }
+        )
+        return url
 
 
 class ProjectReaction(models.Model):
