@@ -300,15 +300,29 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
     token_str = "Token "
     token_val = String(token)
     var authorization_str = token_str.concat(token_val);
-    debugger
-    product_id_url =  origin_url + 'paypal/get_product_id/'
-    axios.put(product_id_url, {headers: {'Authorization': authorization_str}})
+
+    product_id_url =  origin_url + '/payment/paypal/get_product_id/'
+
+    var paypal_product_id = ""
+    axios.get(product_id_url, {headers: { "Authorization": authorization_str}})
     .then((response) => {
-        var paypal_product_id = response
-    }, (error) => {
-        console.log(error);
+        if (response.status == 200){
+            var paypal_product_id = response.data.paypal_product_id
+        }
+    }).catch(function(error)
+    {
+        console.log(error.response);
     });
 
+    // patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + paypal_product_id
+
+    // patch_url_args = [
+    //     {
+    //       "op": "replace",
+    //       "path": "/billing_cycles/pricing_scheme/fixed_price/value",
+    //       "value": 11
+    //     }
+    // ]
     axios.put(put_url, extra_args, {headers: {'Authorization': authorization_str}})
     .then((response) => {
         location.reload();

@@ -866,7 +866,7 @@ class GetOrderDetails(APIView):
 
 
 class GetProductID(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
 
     def get(self, request, *args, **kwargs):
         data = {'paypal_product_id': settings.PRODUCT_ID}
@@ -1023,11 +1023,12 @@ class InitialRequest(APIView):
         })
 
         customer_create_temp_result = customer_create_result
+
         if not customer_create_temp_result.is_success:
             return Response(
                 {"status": "braintree customer creation unsuccsessful "},
                 status=status.HTTP_400_BAD_REQUEST)
-
+        import pdb;pdb.set_trace()
         subscription_create_result = gateway.subscription.create({
             "payment_method_token":
             customer_create_result.customer.payment_methods[0].token,

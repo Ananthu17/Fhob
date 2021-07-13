@@ -877,6 +877,36 @@ class PaymentIndieView(FormView):
 class PaymentProView(TemplateView):
     template_name = 'user_pages/payment.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        user_email = request.GET.get('email')
+        self.user = CustomUser.objects.get(email=user_email)
+
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
+
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
+        return super(PaymentProView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         email = self.request.GET.get('email')
@@ -898,11 +928,46 @@ class PaymentProView(TemplateView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
+        context['braintree_client_token'] = ''
+        context.update({
+            'braintree_client_token': self.braintree_client_token,
+        })
         return context
 
 
 class PaymentCompanyView(TemplateView):
     template_name = 'user_pages/payment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        user_email = request.GET.get('email')
+        self.user = CustomUser.objects.get(email=user_email)
+
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
+
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
+        return super(PaymentCompanyView, self).dispatch(
+            request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -925,6 +990,10 @@ class PaymentCompanyView(TemplateView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
+        context['braintree_client_token'] = ''
+        context.update({
+            'braintree_client_token': self.braintree_client_token,
+        })
         return context
 
 
@@ -2332,7 +2401,6 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
         context['client_dict'] = client_dict
-
 
         try:
             track_obj = UserTacking.objects.get(user=user)
