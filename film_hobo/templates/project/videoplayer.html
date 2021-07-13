@@ -4,16 +4,16 @@
 {% load user_account_tag %}
 {% block extracss %}
 <style>
-    .player.vp-title
+    #player.vp-title
     {
         visibility:hidden!important;
         display:none!important;
     }
 
-    .player .vp-sidedock
+    .vp-title-header
     {
-        visibility:hidden!important;
-        display:none!important;
+    visibility:hidden!important;
+    display:none!important;
     }
 </style>
 {% endblock %}
@@ -31,7 +31,7 @@
                 <div class="col-sm-1"></div>
                 <div class="col-sm-6">
                     {% if project.video_type == 'vimeo' %}
-                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}" width="600" height="250"
+                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false" width="600" height="250"
                         data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>
 
                     {% elif project.video_type == 'youtube' %}

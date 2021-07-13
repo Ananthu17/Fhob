@@ -323,3 +323,19 @@ class SaveProjectVideoUrlAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class SaveVideoUploadTypeAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/swap-images.html'
+
+    def get(self, *args, **kwargs):
+        response = {}
+        id = self.request.GET.get('project_id')
+        try:
+            project = Project.objects.get(id=id)
+            project.video_type = Project.UPLOAD_VIDEO
+            project.video_url = ""
+            project.save()
+        except Project.DoesNotExist:
+            response = {"message": "Invalid project id"}
+        return self.render_json_response(response)
