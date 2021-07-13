@@ -300,6 +300,15 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
     token_str = "Token "
     token_val = String(token)
     var authorization_str = token_str.concat(token_val);
+    debugger
+    product_id_url =  origin_url + 'paypal/get_product_id/'
+    axios.put(product_id_url, {headers: {'Authorization': authorization_str}})
+    .then((response) => {
+        var paypal_product_id = response
+    }, (error) => {
+        console.log(error);
+    });
+
     axios.put(put_url, extra_args, {headers: {'Authorization': authorization_str}})
     .then((response) => {
         location.reload();

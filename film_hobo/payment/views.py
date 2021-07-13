@@ -11,7 +11,7 @@ from django.views.generic.base import View
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -865,6 +865,14 @@ class GetOrderDetails(APIView):
         return JsonResponse(data)
 
 
+class GetProductID(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        data = {'paypal_product_id': settings.PRODUCT_ID}
+        return JsonResponse(data)
+
+
 class SubscriptionDetails(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -981,7 +989,10 @@ class InitialRequest(APIView):
         days_free = request.data['days_free']
         initial_amount = request.data['initial_amount']
         tax_applied = request.data['tax_applied']
-        promocodes_applied = request.data['promocodes_applied']
+        if request.data['promocodes_applied'] == '':
+            promocodes_applied = None
+        else:
+            promocodes_applied = request.data['promocodes_applied']
         promotion_amount = request.data['promotion_amount']
 
         gateway = braintree.BraintreeGateway(
@@ -993,9 +1004,21 @@ class InitialRequest(APIView):
             )
         )
 
+        if user.middle_name is None:
+            middle_name = ''
+        else:
+            middle_name = user.middle_name
+
+        if user.last_name is None:
+            last_name = ''
+        else:
+            last_name = user.last_name
+
+        middle_n_last = middle_name + ' ' + last_name
+
         customer_create_result = gateway.customer.create({
             "first_name": user.first_name,
-            "last_name": user.middle_name + '' + user.last_name,
+            "last_name": middle_n_last,
             "payment_method_nonce": payment_method_nonce
         })
 
@@ -1027,6 +1050,9 @@ class InitialRequest(APIView):
                 promocodes_applied=promocodes_applied,
                 promotion_amount=promotion_amount,
                 final_amount=amount)
+            CustomUser.objects.filter(
+                email=user.email
+            ).update(registration_complete=True)
 
         # transaction_create_result = gateway.transaction.sale({
         #     "amount": amount,
@@ -1047,39 +1073,29 @@ class InitialRequest(APIView):
             status=status.HTTP_200_OK)
 
 
-class ProcessSubscription(APIView):
+class ManageSubscription(APIView):
 
     def post(self, request, *args, **kwargs):
-        subscription_plan = request.data['subscription_plan']
-        host = request.get_host()
+        new_price = request.data['new_price']
 
-        if subscription_plan == 'monthly':
-            price = request.data['price']
-            billing_cycle = 1
-            billing_cycle_unit = "M"
-        else:
-            price = request.data['price']
-            billing_cycle = 1
-            billing_cycle_unit = "Y"
-        paypal_dict = {
-            "cmd": "_xclick-subscriptions",
-            'business': settings.PAYPAL_RECEIVER_EMAIL,
-            "a3": price,  # monthly price
-            "p3": billing_cycle,  # duration of each unit (depends on unit)
-            "t3": billing_cycle_unit,  # duration unit ("M for Month")
-            "src": "1",  # make payments recur
-            "sra": "1",  # reattempt payment on payment error
-            "no_note": "1",  # remove extra notes (optional)
-            'item_name': 'Content subscription',
-            'custom': 1,     # custom data, pass something meaningful here
-            'currency_code': 'USD',
-            'notify_url': 'http://{}{}'.format(
-                host, reverse('payment:paypal-ipn')),
-            'return_url': 'http://{}{}'.format(
-                host, reverse('payment:done')),
-            'cancel_return': 'http://{}{}'.format(host,
-                                                  reverse('payment:canceled')),
-        }
-
-        form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
-        return render(request, 'payment/process_subscription.html', locals())
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        result = gateway.subscription.update("a_subscription_id", {
+            "id": "new_id",
+            "payment_method_token": "new_payment_method_token",
+            "price": new_price,
+            "plan_id": "new_plan",
+        })
+        if not result.is_success:
+            return Response(
+                {"status": "braintree subscription updation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"status": "braintree subscription updation succsessful "},
+            status=status.HTTP_200_OK)
