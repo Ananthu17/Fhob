@@ -4346,7 +4346,7 @@ class FeedbackWebView(View):
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
 
@@ -4397,9 +4397,9 @@ class TeamDeleteAPIView(DestroyAPIView):
 # class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
-#     permission_classes = (IsAuthenticated,)
+#     # permission_classes = (IsAuthenticated,)
 #     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title"]
+#     search_fields = ["title","format"]
 
 # Api to add rating to project video
 class VideoRatingView(APIView):
@@ -4468,3 +4468,17 @@ class VideoListAPI(ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = (IsAuthenticated,)
     queryset = Video.objects.all().order_by('-rating','-created')
+
+
+class ProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/projects-page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(format="SCH").order_by('-id')
+        context["toprated_scenes"] = Project.objects.filter(format="SCH").order_by('-rating')
+        context["filims"] = Project.objects.filter(format="SHO").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
+        return context

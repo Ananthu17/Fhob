@@ -55,9 +55,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, \
                    GetProfileRatingNotificationAjaxView, \
-                   EditUserInterestAPI, \
-                   VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI
+                   EditUserInterestAPI, VideoRatingView, \
+                   FindVideoRatingAPI, VideoListAPI, \
+                   ProjectView
 
 
 app_name = "hobo_user"
@@ -298,5 +298,7 @@ urlpatterns = [
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
          name="find-videorating"),
     path('video/top-rated',  VideoListAPI.as_view(),
-         name="top-rated-videos")
+         name="top-rated-videos"),
+    path('projectview/', ProjectView.as_view(),
+         name='projects')
 ]
