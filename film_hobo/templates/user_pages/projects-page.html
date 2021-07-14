@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-
     <div class="wrapper flex-grow-1">
         <div class="container-fluid">
             <div class="row">
@@ -165,7 +164,8 @@
                         </div>
                         <!-- owl-carousel  -->
 
-                        <div class="owl-carousel owl-theme owl-algin">
+                        <div class="owl-carousel owl-theme owl-algin" id="scene">
+                            {% for project in scenes %}
                             <!-- carousel column  -->
                             <div class="item pro-item">
                                 <div class="card proj-card">
@@ -177,7 +177,7 @@
                                             $<a href="">0</a>
                                         </span>
                                         <span class="proj-gener-align">
-                                            <a href="">Drama</a>
+                                            <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span class="proj-symb">
                                             <span class="fa fa-star checked "></span>
@@ -190,7 +190,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
+                                            Title:<a href="">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
                                             Page:<a href="">4</a>
@@ -207,7 +207,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-format">
-                                            Format:<a href="">Scene</a>
+                                            Format:<a href="">{{project.get_format_display}}</a>
                                         </span>
                                     </div>
                                     <div class="project-line mt-1 ml-1">
@@ -228,318 +228,7 @@
                                 </div>
                             </div>
                             <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#224</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Tom Smith</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Scene</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New York,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#224</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Tom Smith</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Scene</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New York,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#224</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Tom Smith</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Scene</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New York,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#224</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Tom Smith</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Scene</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New York,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#224</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Olympian</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Tom Smith</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Scene</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New York,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-
-
+                            {% endfor %}
                         </div>
                         <!-- owl-carousel End -->
 
@@ -572,6 +261,7 @@
 
                         <div class="owl-carousel owl-theme owl-algin">
                             <!-- carousel column  -->
+                            {% for project in toprated_scenes %}
                             <div class="item pro-item">
                                 <div class="card proj-card">
                                     <div class="project-line mt-1 ml-1">
@@ -582,7 +272,7 @@
                                             $<a href="">N</a>
                                         </span>
                                         <span class="proj-gener-align">
-                                            <a href="">Romance</a>
+                                            <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span class="proj-symb">
                                             <span class="fa fa-star checked "></span>
@@ -595,7 +285,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-title">
-                                            Title:<a href="">Love</a>
+                                            Title:<a href="">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
                                             Page:<a href="">16</a>
@@ -612,7 +302,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-format">
-                                            Format:<a href="">Short</a>
+                                            Format:<a href="">{{project.get_format_display}}</a>
                                         </span>
                                     </div>
                                     <div class="project-line mt-1 ml-1">
@@ -633,317 +323,7 @@
                                 </div>
                             </div>
                             <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#226</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">N</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Romance</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Love</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">16</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Short</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Dallas,TX</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#226</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">N</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Romance</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Love</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">16</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Short</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Dallas,TX</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#226</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">N</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Romance</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Love</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">16</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Short</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Dallas,TX</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#226</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">N</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Romance</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Love</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">16</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Short</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Dallas,TX</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#226</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">N</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Romance</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Love</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">16</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Short</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Dallas,TX</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-
+                            {% endfor %}
 
                         </div>
                         <!-- owl-carousel End -->
@@ -977,6 +357,7 @@
 
                         <div class="owl-carousel owl-theme owl-algin">
                             <!-- carousel column  -->
+                            {% for project in filims %}
                             <div class="item pro-item">
                                 <div class="card proj-card">
                                     <div class="project-line mt-1 ml-1">
@@ -987,7 +368,7 @@
                                             $<a href="">MLB</a>
                                         </span>
                                         <span class="proj-gener-align">
-                                            <a href="">Drama</a>
+                                            <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span class="proj-symb">
                                             <span class="fa fa-star checked "></span>
@@ -1000,7 +381,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
+                                            Title:<a href="">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
                                             Page:<a href="">105</a>
@@ -1017,7 +398,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-format">
-                                            Format:<a href="">Feature</a>
+                                            Format:<a href="">{{project.get_format_display}}</a>
                                         </span>
                                     </div>
                                     <div class="project-line mt-1 ml-1">
@@ -1038,316 +419,7 @@
                                 </div>
                             </div>
                             <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#189</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">MLB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Selivan Media</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Male(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Boston,MA</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#189</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">MLB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Selivan Media</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Male(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Boston,MA</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#189</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">MLB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Selivan Media</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Male(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Boston,MA</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#189</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">MLB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Selivan Media</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Male(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Boston,MA</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#189</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">MLB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Selivan Media</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Male(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">Boston,MA</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
+                            {% endfor %}
                         </div>
                         <!-- owl-carousel End -->
 
@@ -1379,6 +451,7 @@
                         <!-- owl-carousel  -->
 
                         <div class="owl-carousel owl-theme owl-algin">
+                            {% for project in toprated_filims %}
                             <!-- carousel column  -->
                             <div class="item pro-item">
                                 <div class="card proj-card">
@@ -1390,7 +463,7 @@
                                             $<a href="">ThB</a>
                                         </span>
                                         <span class="proj-gener-align">
-                                            <a href="">Drama</a>
+                                            <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span class="proj-symb">
                                             <span class="fa fa-star checked "></span>
@@ -1403,7 +476,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
+                                            Title:<a href="">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
                                             Page:<a href="">105</a>
@@ -1420,7 +493,7 @@
                                     </div>
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-format">
-                                            Format:<a href="">Feature</a>
+                                            Format:<a href="">{{project.get_format_display}}</a>
                                         </span>
                                     </div>
                                     <div class="project-line mt-1 ml-1">
@@ -1441,253 +514,7 @@
                                 </div>
                             </div>
                             <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#182</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">ThB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(50),Male(60)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New Tork,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#182</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">ThB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(50),Male(60)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New Tork,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#182</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">ThB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(50),Male(60)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New Tork,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href="">#182</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">ThB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">Drama</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">Sahara</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">Karen O'Tool</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">Feature</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(50),Male(60)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">New Tork,NY</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- carousel column End -->
+                            {% endfor %}
                         </div>
                         <!-- owl-carousel End -->
 
@@ -1757,10 +584,6 @@
     </div>
 
 
-
-
-
-
     <script>
         $('.owl-carousel').owlCarousel({
             loop: true,
@@ -1792,20 +615,5 @@
             }
         })
     </script>
-    <script>
-        $( document ).ready(function() {
-            origin_url = window.location.origin
-            post_url = origin_url + '/hobo_user/projects/'
-            axios.get(post_url, {
-                params: {
-                }
-            })
-            .then(function (response) {
-                console.log("ananthu")
-                console.log(response);
-            })
-        });
-    </script>
-
 {% endblock %}
 
