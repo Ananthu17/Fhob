@@ -1028,7 +1028,7 @@ class InitialRequest(APIView):
             return Response(
                 {"status": "braintree customer creation unsuccsessful "},
                 status=status.HTTP_400_BAD_REQUEST)
-        import pdb;pdb.set_trace()
+
         subscription_create_result = gateway.subscription.create({
             "payment_method_token":
             customer_create_result.customer.payment_methods[0].token,
