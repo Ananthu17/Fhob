@@ -964,12 +964,12 @@ class PaypalToken(APIView):
 class PaypalPlanID(APIView):
     def get(self, request, *args, **kwargs):
         paypal_plans = {
-            'Indie_Payment_Monthly': settings.INDIE_PAYMENT_MONTHLY,
-            'Indie_Payment_Yearly': settings.INDIE_PAYMENT_YEARLY,
-            'Prp_Payment_Monthly': settings.PRO_PAYMENT_MONTHLY,
-            'Pro_Payment_Yearly': settings.PRO_PAYMENT_YEARLY,
-            'Company_Payment_Monthly': settings.COMPANY_PAYMENT_MONTHLY,
-            'Company_Payment_Yearly': settings.COMPANY_PAYMENT_YEARLY
+            'indie_payment_monthly': settings.INDIE_PAYMENT_MONTHLY,
+            'indie_payment_yearly': settings.INDIE_PAYMENT_YEARLY,
+            'pro_payment_monthly': settings.PRO_PAYMENT_MONTHLY,
+            'pro_payment_yearly': settings.PRO_PAYMENT_YEARLY,
+            'company_payment_monthly': settings.COMPANY_PAYMENT_MONTHLY,
+            'company_payment_yearly': settings.COMPANY_PAYMENT_YEARLY
         }
         return JsonResponse(paypal_plans)
 
