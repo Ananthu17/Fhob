@@ -59,11 +59,12 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["team_members"] = team_members
         context["project"] = project
 
-        bucket_prefix = ""
-        bucket_name = settings.S3_BUCKET_NAME
-        path = f"{bucket_prefix}{self.request.user.id}/{project.title}/{project_id}.mp4"
-        s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
-        context['s3_url'] = s3_url
+        if project.video_type == Project.UPLOAD_VIDEO:
+            bucket_prefix = ""
+            bucket_name = settings.S3_BUCKET_NAME
+            path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
+            s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
+            context['s3_url'] = s3_url
         return context
 
 

@@ -52,7 +52,7 @@ $( document ).ready(function() {
                         setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
                     }
                 }).send(function(err, data) {
-                    // $('#upFile').val(null);
+                    console.log(err);
                     $("#showMessage").html(err);
                 });
             }catch(error) {

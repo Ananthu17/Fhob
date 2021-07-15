@@ -10,7 +10,7 @@ urlpatterns = [
      path('get-membership-change-notification-html/',
           GetMembershipChangeNotificationAjaxView.as_view(),
           name='get-membership-change-notification-html'),
-     path('single-film-project/<int:id>', SingleFilmProjectView.as_view(),
+     path('single-film-project/<int:id>/', SingleFilmProjectView.as_view(),
           name='single-film-project'),
      path('save-project-video-url-api/', SaveProjectVideoUrlAPI.as_view(),
           name='save-project-video-url-api'),
