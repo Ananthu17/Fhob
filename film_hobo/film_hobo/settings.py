@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 import environ
 from pathlib import Path
+from corsheaders.defaults import default_headers
 
 env = environ.Env()
 environ.Env.read_env()
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     'hobo_user',
     'payment',
     'general',
+    'project',
 
     'bootstrap_datepicker_plus',
     'django_select2',
@@ -87,6 +89,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     # 'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -280,6 +283,22 @@ PRO_PAYMENT_YEARLY = env("PRO_PAYMENT_YEARLY")
 COMPANY_PAYMENT_MONTHLY = env("COMPANY_PAYMENT_MONTHLY")
 COMPANY_PAYMENT_YEARLY = env("COMPANY_PAYMENT_YEARLY")
 
+
+AWS_CLIENT_ID = env("AWS_CLIENT_ID")
+AWS_CLIENT_SECRET = env("AWS_CLIENT_SECRET")
+S3_BUCKET_NAME = "filmhobo-videos"
+
+CORS_ORIGIN_ALLOW = True
+CORS_ALLOWED_ORIGINS = (
+    'http://localhost:8000',
+    "http://127.0.0.1:8000",
+)
+
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
+
 if DEBUG:
     BRAINTREE_PRODUCTION = False
 else:
@@ -312,3 +331,4 @@ BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY = \
     env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY")
 BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY = \
     env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY")
+

@@ -3,6 +3,7 @@
 {% load user_account_tag %}
 {% load user_tracking_tag %}
 {% load friend_request_tag %}
+{% load check_profile_visibility_tag %}
 {% load token %}
 
 
@@ -172,6 +173,8 @@
                     </div>
                 </div>
                 <div class="left-mode-sec mt-3 pc-mem-left-2">
+                    {% can_view_profile request.user profile.user as can_visit %}
+                    {% if can_visit == True %}
                     <div class="mem-set-network-sec mt-3">
                         <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
                         <div class="float-right">
@@ -203,7 +206,6 @@
                         {% endif %}
                         {% endfor%}
                     </div>
-
                     <div class="mem-set-network-sec mt-3 mb-4">
                         <div class="mb-1 float-left">
                             <a {% if profile.user.id == request.user.id %} href="{% url 'hobo_user:friends-and-followers' %}" {% endif %}
@@ -270,187 +272,195 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
-                {% if profile %}
-                <div class="left-mode-sec pl-2 pb-2">
-                    <div class="row">
-                        <div class="col-md-7 col-lg-7 col-sm-12">
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-title"><span class="mem-setup-blu-f">{{user.company_name}}</span>
-                                        (production)</label>
-                                </div>
-                                <div class="col-1">
-                                    <i class="fa fa-envelope mail-bx" aria-hidden="true"></i>
-                                </div>
-                                <!-- <div class="col-1">
-                                    <label class="form-title mem-setup-blu-f">Bio</label>
-                                </div> -->
-                                <div class="col-1">
-                                    {% if profile.imdb %}
-                                    {% get_url profile.imdb as imdb %}
-                                    <label class="form-title">
-                                        <a href="{{imdb}}" class="mem-setup-blu-f">IMDB</a>
-                                    </label>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3">
-                                    <label class="form-title mem-setup-blu-f">Status:</label>
-                                </div>
-                                <div class="col-2  mt-3">
-                                    <span class="">{{user.get_membership_display}}</span>
-                                </div>
-                                <div class="col-4  mt-3">
-                                    {% if not settings.hide_ratings %}
-                                    <div class="containerdiv ratings">
-                                        <div>
-                                        <img src="{% static 'images/stars_blank.png' %}"
-                                        class="star-img" alt="img" />
-                                        </div>
-                                        <div class="cornerimage" style="width:{{rating}}%;">
-                                        <img src="{% static 'images/stars_full.png' %}"
-                                        class="star-img" alt="" />
-                                        </div>
+                {% can_view_profile request.user profile.user as can_visit %}
+                {% if can_visit == True %}
+                    {% if profile %}
+                    <div class="left-mode-sec pl-2 pb-2">
+                        <div class="row">
+                            <div class="col-md-7 col-lg-7 col-sm-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-title"><span class="mem-setup-blu-f">{{user.company_name}}</span>
+                                            (production)</label>
                                     </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-2  mt-3">
-                                    Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
-                                </div>
-                            </div>
-                            {% if staff %}
-                            {% for item in staff %}
-                            <div class="row">
-                                <div class="col-3">
-                                    {% if forloop.first %}
-                                    <label class="form-title mem-setup-blu-f">Staff:</label>
-                                    {% endif %}
-                                </div>
-                                <div class="col-8 ">
-                                    {% if item.user %}
-                                    <a href="{{ item.user.get_profile_url }}">
-                                        <label class="form-title ">{{ item.name }}({{item.position}})</label>
-                                    </a>
-                                    {% else %}
-                                        <label class="form-title ">{{ item.name }}({{item.position}})</label>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            {% endfor %}
-                            {% endif %}
-                            {% if user.company_website %}
-                            <div class="row">
-                                <div class="col-3">
-                                    <label class="form-title mem-setup-blu-f">Website:</label>
-                                </div>
-                                <div class="col-8  mt-3">
-                                    <span class="underline orng-f">{{user.company_website}}</span>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if profile.submission_policy_SAMR %}
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
-                                </div>
-                                <div class="col-6 ">
-                                    <label class="form-title bold">
-                                        {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
-                                        <span class="rate">PRO/COMPANY</span>
-                                        {% else %}
-                                        <span class="rate">Members with rating<br>
-                                            {% if profile.submission_policy_SAMR == 'members_with_rating_1_star' %}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_2_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_3_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_4_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_5_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            {% endif %}
-                                        </span><span class="bold ml-1 t-0"></span> </label>
+                                    <div class="col-1">
+                                        <i class="fa fa-envelope mail-bx" aria-hidden="true"></i>
+                                    </div>
+                                    <!-- <div class="col-1">
+                                        <label class="form-title mem-setup-blu-f">Bio</label>
+                                    </div> -->
+                                    <div class="col-1">
+                                        {% if profile.imdb %}
+                                        {% get_url profile.imdb as imdb %}
+                                        <label class="form-title">
+                                            <a href="{{imdb}}" class="mem-setup-blu-f">IMDB</a>
+                                        </label>
                                         {% endif %}
+                                    </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="form-title mem-setup-blu-f">Status:</label>
+                                    </div>
+                                    <div class="col-2  mt-3">
+                                        <span class="">{{user.get_membership_display}}</span>
+                                    </div>
+                                    <div class="col-4  mt-3">
+                                        <!-- {% if not settings.hide_ratings %}
+                                        <div class="containerdiv ratings">
+                                            <div>
+                                            <img src="{% static 'images/stars_blank.png' %}"
+                                            class="star-img" alt="img" />
+                                            </div>
+                                            <div class="cornerimage" style="width:{{rating}}%;">
+                                            <img src="{% static 'images/stars_full.png' %}"
+                                            class="star-img" alt="" />
+                                            </div>
+                                        </div>
+                                        {% endif %} -->
+                                    </div>
+                                    <div class="col-2  mt-3">
+                                        Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
+                                    </div>
+                                </div>
+                                {% if staff %}
+                                {% for item in staff %}
+                                <div class="row">
+                                    <div class="col-3">
+                                        {% if forloop.first %}
+                                        <label class="form-title mem-setup-blu-f">Staff:</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-8 ">
+                                        {% if item.user %}
+                                        <a href="{{ item.user.get_profile_url }}">
+                                            <label class="form-title ">{{ item.name }}({{item.position}})</label>
+                                        </a>
+                                        {% else %}
+                                            <label class="form-title ">{{ item.name }}({{item.position}})</label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                                {% if user.company_website %}
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="form-title mem-setup-blu-f">Website:</label>
+                                    </div>
+                                    <div class="col-8  mt-3">
+                                        <span class="underline orng-f">{{user.company_website}}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if profile.submission_policy_SAMR %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
+                                    </div>
+                                    <div class="col-6 ">
+                                        <label class="form-title bold">
+                                            {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
+                                            <span class="rate">PRO/COMPANY</span>
+                                            {% else %}
+                                            <span class="rate">Members with rating<br>
+                                                {% if profile.submission_policy_SAMR == 'members_with_rating_1_star' %}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_2_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_3_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_4_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_5_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </span><span class="bold ml-1 t-0"></span> </label>
+                                            {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-5 col-lg-5 col-sm-12">
-                            {% if profile.bio %}
-                            <div class="bio-sec mt-3 mr-2">
-                                <div class="text-center bold">Bio/About</div>
-                                <div>{{profile.bio}}</div>
+                            <div class="col-md-5 col-lg-5 col-sm-12">
+                                {% if profile.bio %}
+                                <div class="bio-sec mt-3 mr-2">
+                                    <div class="text-center bold">Bio/About</div>
+                                    <div>{{profile.bio}}</div>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endif %}
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                                <div class="pc-img-title">Project......</div>
+                            </div>
+                            <div class="col">
+                                <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                                <div class="pc-img-title">Project......</div>
+                            </div>
+                            <div class="col">
+                                <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                                <div class="pc-img-title">Project......</div>
+                            </div>
+                            <div class="col">
+                                <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                                <div class="pc-img-title">Project......</div>
+                            </div>
+                            <div class="col">
+                                <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
+                                <div class="pc-img-title">Project......</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
-                            <div class="pc-img-title">Project......</div>
-                        </div>
-                        <div class="col">
-                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
-                            <div class="pc-img-title">Project......</div>
-                        </div>
-                        <div class="col">
-                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
-                            <div class="pc-img-title">Project......</div>
-                        </div>
-                        <div class="col">
-                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
-                            <div class="pc-img-title">Project......</div>
-                        </div>
-                        <div class="col">
-                            <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
-                            <div class="pc-img-title">Project......</div>
+                    <div class="left-mode-sec p-2 mt-3">
+                        <div class="row pc-mem-white-bg">
+                            <div class="col-5 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="What’s on Your Mind">
+                            </div>
+                            <div class="col-4 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="Post Photo/Video">
+                            </div>
+                            <div class="col-3 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="Messenger">
+                            </div>
                         </div>
                     </div>
+                    {% else %}
+                        <p>{{message}}</p>
+                    {% endif %}
+                {% else %}
+                <div class="left-mode-sec pl-2 pb-2 pt-3">
+                    <p>Sorry!! You don't have the permission to view {{profile.user.get_full_name}}'s profile</p>
                 </div>
-                <div class="left-mode-sec p-2 mt-3">
-                    <div class="row pc-mem-white-bg">
-                        <div class="col-5 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="What’s on Your Mind">
-                        </div>
-                        <div class="col-4 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="Post Photo/Video">
-                        </div>
-                        <div class="col-3 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="Messenger">
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <p>{{message}}</p>
-            {% endif %}
+                {% endif %}
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
                 <div class="left-mode-sec">

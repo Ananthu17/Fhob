@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+
+<div class="wrapper flex-grow-1">
+        <b>{{project.title}}</b>
+    <div class="container">
+        {% if project.creator == request.user %}
+        <div class="row">
+            <div class="col-sm-2">
+                <select class="form-control"
+                name="video_type" id = "video_type" required>
+                <option disabled selected hidden>Choose file type</option>
+                    {% for item in video_types %}
+                        <option value="{{item.0}}"
+                            {% if obj.format == item.0 %} selected {% endif %}>
+                            {{item.1}}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-4">
+                {% comment %}
+                <form method="post" enctype="multipart/form-data"
+                action="{% url 'project:single-film-project' project.id %}"
+                id="uploadForm">
+                    {% csrf_token %}
+                    <input type="file" accept=".jpg,.jpeg.,.gif,.png,.mov,.mp4"
+                    name="video" id="upFile" required/>
+                    <input type="submit"
+                            class="btn mem-setup-blu-f  cursor-pointer "
+                            value="Submit">
+                </form>
+                {% endcomment %}
+
+                    <input type="hidden" name="user_id" id="user_id" value="{{request.user.id}}">
+                    <input type="hidden" name="project_name" id="project_name"  value="{{project.title}}">
+                    <input type="hidden" name="project_id" id="project_id"  value="{{project.id}}">
+                    <span class="video_url_section"></span>
+                    <br>
+                    <div id="showMessage"></div>
+                    <progress max="100" value="0" id="progress-bar"></progress>
+                    <!-- <a class="" id="upload_video">Upload Video</a> -->
+                    <p class="all-error-msg" id="err-msg"></p>
+
+            </div>
+            <div class="col-sm-8">
+                 <!-- <iframe width="100%" height="550"
+                 src="https://player.vimeo.com/video/571525330"
+                 frameborder="0" allow="autoplay; encrypted-media"
+                 allowfullscreen="">
+                </iframe> -->
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.24.min.js"></script>
+<script src="{% static 'js/s3_video_upload.js' %}"></script>
+<script type="text/javascript">
+
+$('body').on('change' , '#video_type', function(){
+    var choice = $(this).find("option:selected").val();
+    var field1 = "<input name='video_url' id='video_url' class='form-control video_url' placeholder='Video url' autocomplete='off'/>"
+    var field2 = "<input type='file' class='form-control' name='upFile' id='upFile' required/><a id='upload_video' class='btn mem-setup-blu-f  cursor-pointer custom-save-btn-2'>Upload</a>"
+    if(choice=='upload_video'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append(field2);
+    }else if(choice=='vimeo'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append(field1);
+        $('.video_url_section').append("<p style='color:#797e82;font-size: 12px;'>Eg:https://vimeo.com/123456789</p>");
+        $('.video_url_section').append("<a id='save_url' class='btn mem-setup-blu-f  cursor-pointer '>Save</a>");
+    }else if(choice=='youtube'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append(field1);
+        $('.video_url_section').append("<p style='color:#797e82;font-size: 12px;'>Eg:https://www.youtube.com/watch?v=ZABcDEfgHIJK</p>");
+        $('.video_url_section').append("<a id='save_url' class='btn mem-setup-blu-f  cursor-pointer '>Save</a>");
+    }else if(choice=='facebook'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append(field1);
+        $('.video_url_section').append("<p style='color:#797e82;font-size: 12px;'>Eg:https://fb.watch/v/1kcFv1QXk/</p>");
+        $('.video_url_section').append("<a id='save_url' class='btn mem-setup-blu-f  cursor-pointer '>Save</a>");
+    }
+});
+
+$('body').on('click' , '#save_url', function(){
+    var video_type = $("#video_type").find("option:selected").val();
+    var video_url = $("#video_url").val();
+    var token = $("#token").val();
+    var project_id = $("#project_id").val();
+    var data_dict = {};
+    if(video_url){
+        if(video_type=='youtube')
+        {
+            var video_id = video_url.split('v=')[1];
+            var ampersandPosition = video_id.indexOf('&');
+            if(ampersandPosition != -1) {
+                video_id = video_id.substring(0, ampersandPosition);
+                }
+            data_dict['video_url']=video_id;
+        }
+        else if(video_type=='vimeo')
+        {
+            var video_id = video_url.split('https://vimeo.com/')[1];
+            console.log(video_id);
+            data_dict['video_url']=video_id;
+        }
+        else if(video_type=='facebook')
+            {
+            data_dict['video_url']=video_url;
+            }
+    }
+    if(video_type){
+        data_dict['video_type']=video_type
+    }
+    if(project_id){
+        data_dict['id']=project_id
+    }
+    if(project_id!="" & video_type!="" & video_url!=""){
+        console.log(data_dict);
+        $.ajax
+            ({
+                type: "POST",
+                url: "/project/save-project-video-url-api/",
+                dataType: 'json',
+                // async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                }
+            });
+    }else{
+        $("#err-msg").html("This field is required.")
+    }
+});
+</script>
+
+{% endblock %}
+
+

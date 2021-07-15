@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load user_account_tag %}
 {% load user_tracking_tag %}
+{% load check_profile_visibility_tag %}
 {% load friend_request_tag %}
 {% load token static %}
 
@@ -172,6 +173,8 @@
                         {% endfor %}
                     </div>
                 </div>
+                {% can_view_profile request.user profile.user as can_visit %}
+                {% if can_visit == True %}
                 <div class="left-mode-sec mt-3 mem-left-2">
                     <div class="mem-set-network-sec mt-3">
                         <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
@@ -271,8 +274,11 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
+                {% can_view_profile request.user profile.user as can_visit %}
+                {% if can_visit == True %}
                 <div class="left-mode-sec pl-2 pb-2">
                     <div class="row">
                         <div class="col-3">
@@ -603,6 +609,11 @@
                                 </div>
                     </div>
                     </div>
+                {% else %}
+                <div class="left-mode-sec pl-2 pb-2 pt-3">
+                    <p>Sorry!! You don't have the permission to view {{profile.user.get_full_name}}'s profile</p>
+                </div>
+                {% endif %}
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
                 <div class="left-mode-sec">

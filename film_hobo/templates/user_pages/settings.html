@@ -38,9 +38,11 @@
                     <li class="mt-3">
                         <a class="fh-link-blck" data-toggle="pill" href="#blocking" id="block-user-tab">Blocking</a>
                     </li>
+                    {% if request.user.membership != 'COM' %}
                     <li class="mt-3">
                         <a class="fh-link-blck" data-toggle="pill" href="#profile" id="block-user-tab">Profile</a>
                     </li>
+                    {% endif %}
                     <li class="mt-3 mb-3">
                         <a class="fh-link-blck" data-toggle="pill" href="#notification">Notification</a>
                     </li>
@@ -458,6 +460,7 @@
                                 <ul class="list-unstyled noti-checkbx-f w-100">
                                     <li>
                                         <div class="form-check">
+                                            {% if request.user.membership != 'COM' %}
                                             <label class="form-check-label">Hide ratings from my profile
                                                 <input type="checkbox"
                                                 name="hide_ratings"
@@ -465,6 +468,7 @@
                                                 style="margin-left: 1rem;"
                                                 {% if user_settings.hide_ratings == True %}checked{% endif %}>
                                             </label>
+                                            {% endif %}
                                         </div>
                                     </li>
                                 </ul>

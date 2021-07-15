@@ -404,6 +404,16 @@ class Project(models.Model):
         (SCENE, 'Scene'),
         (SHORTS, 'Shorts'),
     ]
+    YOUTUBE = 'youtube'
+    VIMEO = 'vimeo'
+    FACEBOOK = 'facebook'
+    UPLOAD_VIDEO = 'upload_video'
+    VIDEO_TYPE_CHOICES = [
+        (YOUTUBE, 'Youtube'),
+        (VIMEO, 'Vimeo'),
+        (FACEBOOK, 'Facebook'),
+        (UPLOAD_VIDEO, 'Upload Video'),
+    ]
 
     ACTION = 'ACT'
     ADVENTURE = 'ADV'
@@ -469,9 +479,25 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    video_url = models.CharField(max_length=1000,
+                                 null=True, blank=True)
+    video_type = models.CharField(_("Video Type"),
+                                  choices=VIDEO_TYPE_CHOICES,
+                                  max_length=150, null=True, blank=True,
+                                  default=UPLOAD_VIDEO)
 
     def __str__(self):
         return self.title
+
+    def generate_s3_signed_url(self, s3_client, path, bucket_name):
+        url = s3_client.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': path
+            }
+        )
+        return url
 
 
 class ProjectReaction(models.Model):
@@ -526,9 +552,19 @@ class PromoCode(models.Model):
 
 class Team(models.Model):
     team = models.CharField(max_length=1000)
+    project = models.ForeignKey('hobo_user.Project',
+                                verbose_name=_("Project"),
+                                on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey('hobo_user.CustomUser',
+                             verbose_name=_("User"),
+                             related_name='team_user',
+                             on_delete=models.SET_NULL, null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 verbose_name=_("Job Type"),
+                                 on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.team
+        return self.project.title +" - "+ self.job_type.title
 
 
 class Country(models.Model):
@@ -1066,6 +1102,32 @@ class UserRatingCombined(models.Model):
         verbose_name_plural = 'User Rating Combined'
 
 
+class ProjectMemberRating(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='project_member_rating_combined',
+                             verbose_name=_("User"),
+                             null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="project_member_job_type",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project',
+                                verbose_name=_("Project"),
+                                null=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Project Member Rating'
+        verbose_name_plural = 'Project Member Ratings'
+
+
 class CompanyRatingCombined(models.Model):
     company = models.ForeignKey("hobo_user.CustomUser",
                                 on_delete=models.CASCADE,
@@ -1100,6 +1162,11 @@ class UserRating(models.Model):
                                  )
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
     reason = models.TextField(_("Reason"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_rating',
+                                verbose_name=_("Project"),
+                                null=True)
 
     def __str__(self):
         return str(self.user)
@@ -1300,6 +1367,7 @@ class UserNotification(models.Model):
     FRIEND_REQUEST_ACCEPT = 'accepted_friend_request'
     READ = 'read'
     UNREAD = 'unread'
+    MEMBERSHIP_CHANGE = 'membership_change'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1307,6 +1375,8 @@ class UserNotification(models.Model):
                                 (USER_RATING, 'User Rating'),
                                 (FRIEND_REQUEST_ACCEPT,
                                  'Accepted Friend Request'),
+                                (MEMBERSHIP_CHANGE,
+                                 'Membership Change'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),

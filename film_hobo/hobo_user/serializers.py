@@ -22,11 +22,11 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    UserAgentManager, UserNotification, UserProfile, CoWorker, \
-    UserInterest, UserRating, CompanyProfile, CompanyClient, FriendRequest, \
-    FriendGroup, Feedback, Project, Team, \
-    EthnicAppearance, AthleticSkill, \
-    Video, VideoRating
+    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
+    UserProfile, CoWorker, UserInterest, \
+    UserRating, Photo, CompanyProfile, \
+    CompanyClient, FriendRequest, FriendGroup, Feedback, \
+    Photo, Project, Team, Video, VideoRating
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -57,7 +57,7 @@ class GuildMembershipSerializer(serializers.ModelSerializer):
 #     )
 #     password = serializers.CharField(
 #         max_length=100,
-#         style={'input_type': 'password', 'placeholder': 'Password'}
+#         style={'input_type': 'password', 'pliaceholder': 'Password'}
 #     )
 #     remember_me = serializers.BooleanField()
 
@@ -316,6 +316,7 @@ class LoginSerializer(serializers.Serializer):
             if username:
                 user = self._validate_username_email(username, '', password)
 
+
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -325,7 +326,6 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Unable to log in with provided credentials.')
             raise exceptions.ValidationError(msg)
 
-        # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
@@ -830,26 +830,6 @@ class TrackUserSerializer(serializers.Serializer):
         required=True,
     )
 
-
-class RateUserSkillsSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    job_type = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    rating = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-
-    class Meta:
-        model = UserRating
-        fields = ['user', 'job_type', 'rating', 'reason']
-
-
 class RateCompanySerializer(serializers.ModelSerializer):
     company = serializers.CharField(
         max_length=150,
@@ -1097,8 +1077,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = '__all__'
-
+        fields = ['__all__']
 
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1111,3 +1090,4 @@ class VideoRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoRating
         fields = ['rated_by', 'video', 'rating']
+

@@ -80,7 +80,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     CompanyPaymentSerializer, SettingsSerializer, \
     BlockedMembersQuerysetSerializer, PersonalDetailsSerializer, \
     PasswordResetSerializer, UserProfileSerializer, CoWorkerSerializer, \
-    RemoveCoWorkerSerializer, RateUserSkillsSerializer, \
+    RemoveCoWorkerSerializer, \
     AgentManagerSerializer, RemoveAgentManagerSerializer, \
     TrackUserSerializer, UserSerializer, \
     GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
@@ -92,9 +92,15 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
-    EditUserInterestSerializer, VideoRatingSerializer, VideoSerializer
+    EditUserInterestSerializer, \
+    RemoveCoWorkerSerializer, AgentManagerSerializer, \
+    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
+    TeamSerializer, VideoRatingSerializer, VideoSerializer, \
+    EditUserInterestSerializer
 
-from .utils import notify
+
+from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
@@ -2975,93 +2981,6 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class RateUserSkillsAPI(APIView):
-    serializer_class = RateUserSkillsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        response = {}
-        if serializer.is_valid():
-            data_dict = serializer.data
-            user_id = data_dict['user']
-            job_id = data_dict['job_type']
-            reason = data_dict['reason']
-            rating = data_dict['rating']
-            user = CustomUser.objects.get(id=user_id)
-            job_type = JobType.objects.get(id=job_id)
-            try:
-                user_rating = UserRating.objects.get(
-                               Q(user=user) &
-                               Q(rated_by=self.request.user) &
-                               Q(job_type=job_type)
-                               )
-            except UserRating.DoesNotExist:
-                user_rating = UserRating()
-                user_rating.user = user
-                user_rating.rated_by = self.request.user
-                user_rating.job_type = job_type
-            user_rating.rating = rating
-            user_rating.reason = reason
-            user_rating.save()
-
-            # update combined rating
-            try:
-                user_rating_combined = UserRatingCombined.objects.get(
-                                        Q(user=user) &
-                                        Q(job_type=job_type)
-                                        )
-                count = UserRating.objects.filter(
-                        Q(user=user) &
-                        Q(job_type=job_type)
-                        ).count()
-                aggregate_rating = UserRating.objects.filter(
-                        Q(user=user) &
-                        Q(job_type=job_type)
-                        ).aggregate(Sum('rating'))
-                rating_sum = aggregate_rating['rating__sum']
-                new_rating = rating_sum/count
-                user_rating_combined.rating = new_rating
-                user_rating_combined.save()
-            except UserRatingCombined.DoesNotExist:
-                user_rating_combined = UserRatingCombined()
-                user_rating_combined.user = user
-                user_rating_combined.job_type = job_type
-                user_rating_combined.rating = rating
-                user_rating_combined.save()
-
-            #update notification table
-            notification = UserNotification()
-            notification.user = user
-            notification.notification_type = UserNotification.USER_RATING
-            notification.from_user = self.request.user
-            notification.message = self.request.user.get_full_name()+" rated your "+job_type.title+" skill as "+rating+" stars"
-            notification.save()
-            # send notification
-            room_name = "user_"+str(user.id)
-            notification_msg = {
-                    'type': 'send_profile_rating_notification',
-                    'message': str(notification.message),
-                    'from': str(self.request.user.id),
-                    "event": "USER_RATING"
-                }
-            notify(room_name, notification_msg)
-            # end notification section
-
-            response = {'message': "User skill rated sucessfully",
-                        'status': status.HTTP_200_OK,
-                        'combined_rating': user_rating_combined.rating}
-            msg = "'"+job_type.title +"' skill rated "+rating+" stars !!"
-            messages.success(
-                    self.request, msg
-                    )
-        else:
-            print(serializer.errors)
-            response = {'errors': serializer.errors, 'status':
-                        status.HTTP_400_BAD_REQUEST}
-        return Response(response)
-
-
 class RateCompanyAPI(APIView):
     serializer_class = RateCompanySerializer
     permission_classes = (IsAuthenticated,)
@@ -4393,6 +4312,7 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
+# Search API for project
 # Api to search in project
 # class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
@@ -4482,3 +4402,4 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context["filims"] = Project.objects.filter(format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
         return context
+

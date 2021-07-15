@@ -25,7 +25,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PersonalDetailsView, HowTo, \
                    UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, RemoveCoworkerAPI, \
-                   MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
+                   MemberProfileView, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
@@ -53,11 +53,14 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView, \
+                   TeamDeleteAPIView, RateCompanyAPI, \
                    GetProfileRatingNotificationAjaxView, \
-                   EditUserInterestAPI, VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI, \
-                   ProjectView
+                   EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, \
+                   FindVideoRatingAPI, VideoListAPI
+               #     ProjectSearchView
+
+
 
 
 app_name = "hobo_user"
@@ -128,8 +131,6 @@ urlpatterns = [
          name='remove-coworker-api'),
     path('remove-client-api/', RemoveClientAPI.as_view(),
          name='remove-client-api'),
-    path('rate-user-api/', RateUserSkillsAPI.as_view(),
-         name='rate-user-api'),
     path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
          name='remove-agent-api'),
     path('track-user-api/', TrackUserAPI.as_view(),
@@ -301,4 +302,5 @@ urlpatterns = [
          name="top-rated-videos"),
     path('projectview/', ProjectView.as_view(),
          name='projects')
+
 ]

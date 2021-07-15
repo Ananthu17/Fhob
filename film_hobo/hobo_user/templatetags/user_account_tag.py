@@ -48,18 +48,17 @@ def get_my_rating(current_user, profile_id):
 
 
 @register.simple_tag()
-def get_my_skill_rating(current_user, profile_id, job):
+def get_my_skill_rating(current_user, team_obj):
     rating = 0
-
     try:
         rating = UserRating.objects.get(
                     Q(rated_by=current_user) &
-                    Q(user=profile_id) &
-                    Q(job_type=job)
+                    Q(user=team_obj.user) &
+                    Q(job_type=team_obj.job_type) &
+                    Q(project=team_obj.project)
                     ).rating
     except UserRating.DoesNotExist:
         rating = 0
-
     return rating
 
 

@@ -370,7 +370,6 @@ class FeedbackForm(forms.ModelForm):
         model = Feedback
         fields = '__all__'
 
-
 class CheckoutForm(forms.Form):
     payment_method_nonce = forms.CharField(
         max_length=1000,

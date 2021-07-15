@@ -112,3 +112,10 @@ class NotificationConsumer(WebsocketConsumer):
             'user_id': id,
             'event': "USER_RATING"
         }))
+
+    def send_membership_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "MEMBERSHIP_CHANGE"
+        }))
