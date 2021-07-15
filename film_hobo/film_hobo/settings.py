@@ -93,6 +93,7 @@ MIDDLEWARE = [
     # 'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -282,6 +283,7 @@ PRO_PAYMENT_YEARLY = env("PRO_PAYMENT_YEARLY")
 COMPANY_PAYMENT_MONTHLY = env("COMPANY_PAYMENT_MONTHLY")
 COMPANY_PAYMENT_YEARLY = env("COMPANY_PAYMENT_YEARLY")
 
+
 AWS_CLIENT_ID = env("AWS_CLIENT_ID")
 AWS_CLIENT_SECRET = env("AWS_CLIENT_SECRET")
 S3_BUCKET_NAME = "filmhobo-videos"
@@ -296,3 +298,37 @@ CORS_ALLOWED_ORIGINS = (
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
 )
+
+if DEBUG:
+    BRAINTREE_PRODUCTION = False
+else:
+    BRAINTREE_PRODUCTION = True
+
+BRAINTREE_MERCHANT_ID = env("BRAINTREE_MERCHANT_ID")
+BRAINTREE_PUBLIC_KEY = env("BRAINTREE_PUBLIC_KEY")
+BRAINTREE_PRIVATE_KEY = env("BRAINTREE_PRIVATE_KEY")
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# development
+CORS_ORIGIN_ALLOW_ALL = True
+
+# production
+# CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:8000',
+# )
+
+BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY")
+BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY")
+BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY")
+

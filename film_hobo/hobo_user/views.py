@@ -1,16 +1,15 @@
 import ast
+import braintree
 import json
 from os import remove
 from django.contrib.auth.models import User
-from django.db.models.deletion import SET_NULL
 import requests
 import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
-from django.db.models import Sum
 from django.core.files import File
-from django.db.models import Q
+from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -23,15 +22,17 @@ from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+# from django_filters import rest_framework as filters
 from rest_framework import serializers
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
@@ -41,12 +42,11 @@ from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
 from rest_auth.views import PasswordResetView as AuthPasswordResetView
-from rest_auth.views import PasswordResetConfirmView as AuthPasswordResetConfirmView
-from rest_framework.exceptions import ParseError
-from rest_framework.parsers import FileUploadParser
+from rest_auth.views import PasswordResetConfirmView as \
+    AuthPasswordResetConfirmView
 from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView, DestroyAPIView, UpdateAPIView, \
-                                     RetrieveAPIView)
+                                     CreateAPIView, DestroyAPIView,
+                                     UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
 
@@ -56,17 +56,19 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, FeedbackForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, VideoRating, \
-                    PromoCode, DisabledAccount, CustomUserSettings, \
-                    CompanyPaymentDetails, AthleticSkill, AthleticSkillInline, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, \
+                    VideoRating, PromoCode, DisabledAccount, \
+                    CustomUserSettings, CompanyPaymentDetails, \
+                    AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
-                    Project, Team, UserProfile, JobType, UserRating, Location, \
-                    UserRatingCombined, UserTacking, CompanyProfile, \
+                    Project, Team, UserProfile, JobType, \
+                    UserRating, Location, UserRatingCombined, \
+                    UserTacking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -93,9 +95,9 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     EditUserInterestSerializer, \
     RemoveCoWorkerSerializer, AgentManagerSerializer, \
     RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, ProjectSerializer, \
-    TeamSerializer, \
-    VideoRatingSerializer, VideoSerializer
+    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
+    TeamSerializer, VideoRatingSerializer, VideoSerializer, \
+    EditUserInterestSerializer
 
 
 from .utils import notify, get_notifications_time
@@ -103,7 +105,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
-
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -738,8 +739,39 @@ class SelectPaymentPlanCompanyView(TemplateView):
         return HttpResponseRedirect("/hobo_user/payment_company?email="+email)
 
 
-class PaymentIndieView(TemplateView):
+class PaymentIndieView(FormView):
+    form_class = CheckoutForm
     template_name = 'user_pages/payment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        user_email = request.GET.get('email')
+        self.user = CustomUser.objects.get(email=user_email)
+
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
+
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
+        return super(PaymentIndieView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -763,11 +795,123 @@ class PaymentIndieView(TemplateView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
+        context['braintree_client_token'] = ''
+        context.update({
+            'braintree_client_token': self.braintree_client_token,
+        })
         return context
+
+    # def form_valid(self, form):
+    #     # Braintree customer info
+    #     email = self.request.GET.get('email')
+    #     user = CustomUser.objects.get(email=email)
+
+    #     customer_kwargs = {
+    #         "first_name": user.first_name,
+    #         "last_name": user.middle_name + ' ' + user.last_name,
+    #         "email": email,
+    #     }
+
+    #     # Create a new Braintree customer
+    #     # In this example we always create new Braintree users
+    #     # You can store and re-use Braintree's customer IDs, if you want to
+    #     result = braintree.Customer.create(customer_kwargs)
+    #     if not result.is_success:
+    #         context = self.get_context_data()
+
+    #         # We re-generate the form and display the relevant braintree error
+    #         context.update({
+    #             'form': self.get_form(self.get_form_class()),
+    #             'braintree_error': u'{} {}'.format(
+    #                 result.message, _('Please get in contact.'))
+    #         })
+    #         return self.render_to_response(context)
+
+    #     # If the customer creation was successful you might want to also
+    #     # add the customer id to your user profile
+    #     customer_id = result.customer.id
+
+    #     """
+    #     Create a new transaction and submit it.
+    #     I don't gather the whole address in this example, but I can
+    #     highly recommend to do that. It will help you to avoid any
+    #     fraud issues, since some providers require matching addresses
+
+    #     """
+    #     address_dict = {
+    #         "first_name": user.first_name,
+    #         "last_name": user.middle_name + ' ' + user.last_name,
+    #         "extended_address": user.address,
+    #         "country_name": user.country.name,
+    #     }
+
+    #     result = braintree.Transaction.sale({
+    #         "customer_id": customer_id,
+    #         "amount": 100,
+    #         "payment_method_nonce": form.cleaned_data['payment_method_nonce'],
+    #         "descriptor": {
+    #             "name": "Filmhobo.*test",
+    #         },
+    #         "billing": address_dict,
+    #         "shipping": address_dict,
+    #         "options": {
+    #             'store_in_vault_on_success': True,
+    #             'submit_for_settlement': True,
+    #         },
+    #     })
+    #     if not result.is_success:
+    #         context = self.get_context_data()
+    #         context.update({
+    #             'form': self.get_form(self.get_form_class()),
+    #             'braintree_error': _(
+    #                 'Your payment could not be processed. Please check your'
+    #                 ' input or use another payment method and try again.')
+    #         })
+    #         return self.render_to_response(context)
+
+    #     # Finally there's the transaction ID
+    #     # You definitely want to send it to your database
+    #     transaction_id = result.transaction.id
+    #     # Now you can send out confirmation emails or update your metrics
+    #     # or do whatever makes you and your customers happy :)
+    #     return super(PaymentIndieView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('hobo_user:user_home')
 
 
 class PaymentProView(TemplateView):
     template_name = 'user_pages/payment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        user_email = request.GET.get('email')
+        self.user = CustomUser.objects.get(email=user_email)
+
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
+
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
+        return super(PaymentProView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -790,11 +934,46 @@ class PaymentProView(TemplateView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
+        context['braintree_client_token'] = ''
+        context.update({
+            'braintree_client_token': self.braintree_client_token,
+        })
         return context
 
 
 class PaymentCompanyView(TemplateView):
     template_name = 'user_pages/payment.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        user_email = request.GET.get('email')
+        self.user = CustomUser.objects.get(email=user_email)
+
+        # if settings.BRAINTREE_PRODUCTION:
+        #     braintree_env = braintree.Environment.Production
+        # else:
+        #     braintree_env = braintree.Environment.Sandbox
+
+        # braintree.Configuration.configure(
+        #     braintree_env,
+        #     merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #     public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #     private_key=settings.BRAINTREE_PRIVATE_KEY,
+        # )
+        # self.braintree_client_token = braintree.ClientToken.generate({})
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        self.braintree_client_token = \
+            gateway.client_token.generate()
+
+        return super(PaymentCompanyView, self).dispatch(
+            request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -817,6 +996,10 @@ class PaymentCompanyView(TemplateView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
+        context['braintree_client_token'] = ''
+        context.update({
+            'braintree_client_token': self.braintree_client_token,
+        })
         return context
 
 
@@ -2224,7 +2407,6 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
         context['client_dict'] = client_dict
-
 
         try:
             track_obj = UserTacking.objects.get(user=user)
@@ -4052,12 +4234,6 @@ class FilterFriendByGroupAjaxView(View, JSONResponseMixin):
 class FeedbackAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
-        email = request.data['email']
-        name = request.data['name']
-        user_rating = request.data['user_rating']
-        feedback = request.data['feedback']
-        feedback_obj = Feedback.objects.create(email=email,
-            name=name, user_rating=user_rating, user_feedback=feedback)
         serializer = FeedbackSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -4067,18 +4243,29 @@ class FeedbackAPIView(APIView):
 
 
 class FeedbackWebView(View):
+    # renderer_classes = [TemplateHTMLRenderer]
+    # template_name = 'user_pages/feedback.html'
     """
     Web View to load the feedback page
     """
-    def get(self, request, *args, **kwargs):
-        return render(request, 'user_pages/feedback.html')
 
+    def get(self, request, *args, **kwargs):
+        template = loader.get_template("user_pages/feedback.html")
+        return HttpResponse(template.render())
+
+    def post(self, request, *args, **kwargs):
+        serializer = FeedbackSerializer(data=json.dumps(request.POST))
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
 
@@ -4111,7 +4298,7 @@ class TeamAPIView(ListAPIView):
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
   serializer_class = TeamSerializer
- 
+
 
 class TeamUpdateAPIView(UpdateAPIView):
     queryset = Team.objects.all()
@@ -4125,16 +4312,16 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-
 # Search API for project
+# Api to search in project
 # class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
-#     permission_classes = (IsAuthenticated,)
+#     # permission_classes = (IsAuthenticated,)
 #     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title"]
+#     search_fields = ["title","format"]
 
-# Api to add rating to project video 
+# Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
@@ -4182,7 +4369,7 @@ class VideoRatingView(APIView):
         ratings = VideoRating.objects.filter(video=video)
         combined_rating = 0
         for item in ratings:
-            combined_rating += item.rating 
+            combined_rating += item.rating
         combined_rating = combined_rating / len(ratings)
         print("Number of rating :",len(ratings))
         print("Combined Rating :",combined_rating)
@@ -4201,4 +4388,18 @@ class VideoListAPI(ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = (IsAuthenticated,)
     queryset = Video.objects.all().order_by('-rating','-created')
+
+
+class ProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/projects-page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(format="SCH").order_by('-id')
+        context["toprated_scenes"] = Project.objects.filter(format="SCH").order_by('-rating')
+        context["filims"] = Project.objects.filter(format="SHO").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
+        return context
 

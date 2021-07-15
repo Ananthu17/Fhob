@@ -300,19 +300,74 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
     token_str = "Token "
     token_val = String(token)
     var authorization_str = token_str.concat(token_val);
+
+    plan_id_url =  origin_url + '/payment/get_paypal_plan_id'
+
+    // var paypal_product_id = ""
+    axios.get(plan_id_url, {headers: { "Authorization": authorization_str}})
+    .then((response) => {
+        if (response.status == 200){
+
+            var plan_id_indie_payment_monthly = response.data.indie_payment_monthly
+            var plan_id_indie_payment_yearly = response.data.indie_payment_yearly
+            var plan_id_pro_payment_monthly = response.data.pro_payment_monthly
+            var plan_id_pro_payment_yearly = response.data.pro_payment_yearly
+            var plan_id_company_payment_monthly = response.data.company_payment_monthly
+            var plan_id_company_payment_yearly = response.data.company_payment_yearly
+
+            indie_payment_monthly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_indie_payment_monthly + "/update-pricing-schemes"
+            indie_payment_yearly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_indie_payment_yearly + "/update-pricing-schemes"
+            pro_payment_monthly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_pro_payment_monthly + "/update-pricing-schemes"
+            pro_payment_yearly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_pro_payment_yearly + "/update-pricing-schemes"
+            company_payment_monthly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_company_payment_monthly + "/update-pricing-schemes"
+            company_payment_yearly_patch_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/" + plan_id_company_payment_yearly + "/update-pricing-schemes"
+
+            var indie_payment_monthly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": extra_args.monthly_indie.trim(),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            get_access_token_url = origin_url + '/payment/get_paypal_token'
+            axios.post(get_access_token_url)
+            .then((response) => {
+                debugger
+                var paypal_access_token = response.data.access_token
+
+                axios.post(indie_payment_monthly_patch_url, indie_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                    debugger
+                    console.log(response.data);
+                }, (error) => {
+                    debugger
+                    console.log(error);
+                });
+
+            }, (error) => {
+                debugger
+                console.log(error);
+            });
+
+        }
+    }).catch(function(error)
+    {
+        console.log(error.response);
+    });
+
     axios.put(put_url, extra_args, {headers: {'Authorization': authorization_str}})
     .then((response) => {
-        location.reload();
+        // location.reload();
     }, (error) => {
         console.log(error);
     });
 
-    // /*
-    // axios code to call to update paypal code
-    // */
-    // paypal_base_url = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
-    //  = "https://api-m.sandbox.paypal.com/v1/billing/plans/P-7GL4271244454362WXNWU5NQ"
-    // axios.patch()
 });
 /*
 toggle the text in amount (Add active class to the current button (highlight it))

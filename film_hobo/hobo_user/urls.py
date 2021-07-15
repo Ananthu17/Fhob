@@ -55,8 +55,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, RateCompanyAPI, \
                    GetProfileRatingNotificationAjaxView, \
-                   EditUserInterestAPI, TeamDeleteAPIView, \
-                   TeamDeleteAPIView, VideoRatingView, \
+                   EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI
                #     ProjectSearchView
 
@@ -290,13 +290,17 @@ urlpatterns = [
     path('get-profile-rating-notification-html/',
          GetProfileRatingNotificationAjaxView.as_view(),
          name='get-profile-rating-notification-html'),
-#     path('projects/search/',ProjectSearchView.as_view(),
+#     path('projects/rating', UserRatingAPI.as_view(),
+#          name="rate-api"),
+#     path('projects/search/',  ProjectSearchView.as_view(),
 #          name="project-search"),
     path('video/rate',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
-          name="find-videorating"),
+         name="find-videorating"),
     path('video/top-rated',  VideoListAPI.as_view(),
-          name="top-rated-videos")
+         name="top-rated-videos"),
+    path('projectview/', ProjectView.as_view(),
+         name='projects')
 
 ]
