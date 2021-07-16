@@ -485,6 +485,8 @@ class Project(models.Model):
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True, blank=True,
                                   default=UPLOAD_VIDEO)
+    last_date = models.DateField(_("Last date for submitting video"),
+                                 null=True, blank=True,)
 
     def __str__(self):
         return self.title

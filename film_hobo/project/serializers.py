@@ -1,4 +1,5 @@
 from hobo_user.models import UserRating, Project
+from project.models import Character, Sides
 from rest_framework import serializers
 
 
@@ -38,3 +39,35 @@ class ProjectVideoURLSerializer(serializers.Serializer):
     class Meta:
         model = Project
         fields = ['id', 'video_url', 'video_type']
+
+
+class CharacterSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    password = serializers.CharField(
+        max_length=150,
+        required=False, allow_null=True
+    )
+
+    class Meta:
+        model = Character
+        fields = ['name', 'description', 'project', 'password']
+
+
+class UpdateCharacterSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Character
+        fields = ['name', 'description', 'project', 'password']
+
+
+class ProjectLastDateSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    class Meta:
+        model = Project
+        fields = ['id', 'last_date']

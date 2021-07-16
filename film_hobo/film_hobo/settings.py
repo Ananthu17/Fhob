@@ -308,7 +308,7 @@ BRAINTREE_MERCHANT_ID = env("BRAINTREE_MERCHANT_ID")
 BRAINTREE_PUBLIC_KEY = env("BRAINTREE_PUBLIC_KEY")
 BRAINTREE_PRIVATE_KEY = env("BRAINTREE_PRIVATE_KEY")
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 # development
 CORS_ORIGIN_ALLOW_ALL = True

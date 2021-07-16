@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                {% if request.user == project.creator %}
+                <!-- project menu  -->
+                
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <ul class="sds-menu sds-menu-padding">
+                            <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                            <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="sgl-menu-blue">{{project.format}}</span></li>
+                            <li><span>Genre: </span><span class="sgl-menu-blue">{{project.genre}}</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue">LOS ANGELES, AMAZON JUNGLE</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- project menu  End-->
+                <!-- Cast menu  -->
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <form>
+                            <ul class="sds-side-setup-menu sds-menu-padding">
+                                <li><span class="video-menu-head">SIDES SETUP</span></li>
+                                <li><span class="sds-blue-name">CHARACTER: </span><span class="video-menu-head">{{character.name}}</span></li>
+                                <li>
+                                    <span class="sds-side-menu-btn">
+                                        <a href="" class="cas-cast-menu-save">SAVE</a>
+                                        <a href="" class="cas-cast-menu-edit">EDIT</a>
+                                    </span>
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cast menu End -->
+                <!-- side input area  -->
+
+                <div class="sds-input-bg">
+                    <div class="sds-input-padding">
+                        <form>
+                            <div class="row">
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-input-right-info">
+                                        Copy each Scene and Paste to the right
+                                    </div>
+                                    <div>
+                                        <div class="card sds-script-card">
+                                            <div class="sds-card-inneralign">
+                                                <div class="sds-card-inner-txt">
+                                                    <div class="sgl-left-box-lg-txt"><a href="">ROCA</a></div>
+                                                    <div>Written by</div>
+                                                    <div> Tom Smith</div>   
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-side-input-align-mob">
+                                        <div class="sds-scene-head-1">
+                                            <span class="sds-side-txt"><a href="">SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                        </div>
+                                        <div>
+                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="sds-textarea-padding">
+                                        <div class="sds-scene-head">
+                                            <span class="sds-scene-txt">SCENE TWO</span>
+                                        </div>
+                                        <div>
+                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="sds-textarea-padding">
+                                        <div class="sds-scene-head">
+                                            <span class="sds-scene-txt">SCENE THREE</span>
+                                        </div>
+                                        <div>
+                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="sds-card-btn-align">
+                                    <span class="sds-input-card-btn">
+                                        <a href="" class="cas-cast-menu-save">SAVE</a>
+                                        <a href="" class="cas-cast-menu-edit">EDIT</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- side input area  End-->
+            {% else %}
+            <p class="all-p">Invalid page</p>
+            {% endif %}
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="left-mode-sec right-sec-height">
+                    <div class="mem-list-head">Top Actors</div>
+                    <ol class="mem-list-cont mb-0 ">
+                        <li class="mt-1">John Smith</li>
+                        <li class="mt-1">John Dow</li>
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Aaron McCarty</li>
+                        <li class="mt-1">Toli Chew</li>
+                    </ol>
+                    <div class="mem-list-head">Top Writers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Tom Saint</li>
+                        <li class="mt-1">Lola Carola</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Jamal Smith</li>
+                        <li class="mt-1">Nikita Selivan</li>
+                    </ol>
+                    <div class="mem-list-head">Top Directors</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Ivan Drago</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Kendra Shulman</li>
+                        <li class="mt-1">Sandra O’brian</li>
+                    </ol>
+                    <div class="mem-list-head">Top Producers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top DPs</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top Sound Designers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head underline">TopTalent/Crew</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

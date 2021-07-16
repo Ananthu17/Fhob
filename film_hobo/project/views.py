@@ -1,4 +1,4 @@
-# from django.shortcuts import render
+import ast
 import os
 import json
 import requests
@@ -14,17 +14,24 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.db.models import Sum
 from django.template.loader import render_to_string
+from django.urls import reverse
 
+from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.generics import (ListAPIView,
+                                     CreateAPIView, DestroyAPIView,
+                                     UpdateAPIView)
 
 from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project
-from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer
+from .models import Character
+from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
+      CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer
 from hobo_user.utils import notify, get_notifications_time
+from .forms import VideoSubmissionLastDateForm
 
 s3_client = boto3.client(
                 "s3",
@@ -277,6 +284,7 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
         return context
 
+    # DON'T DELETE
     # def post(self, request, *args, **kwargs):
     #     bucket_prefix = ""
     #     project_id = self.kwargs.get('id')
@@ -340,3 +348,223 @@ class SaveVideoUploadTypeAjaxView(View, JSONResponseMixin):
         except Project.DoesNotExist:
             response = {"message": "Invalid project id"}
         return self.render_json_response(response)
+
+
+class CharacterCreateAPIView(APIView):
+    serializer_class = CharacterSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                project = Project.objects.get(pk=data_dict['project'])
+                character_obj = Character()
+                character_obj.name = data_dict['name']
+                character_obj.description = data_dict['description']
+                character_obj.project = project
+                character_obj.password = data_dict['password']
+                character_obj.save()
+                response = {'message': "Character added",
+                            'status': status.HTTP_200_OK}
+            except Project.DoesNotExist:
+                response = {'errors': "Invalid Project ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CharacterUpdateAPIView(UpdateAPIView):
+    queryset = Character.objects.all()
+    permission_classes = (IsAuthenticated,)
+    lookup_field = 'id'
+    serializer_class = UpdateCharacterSerializer
+
+
+class EditCharactersView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/edit-characters.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = Project.objects.get(pk=project_id)
+        context['project'] = project
+        characters = Character.objects.filter(project=project.id)
+        context['characters'] = characters
+        return context
+
+    def post(self, request, *args, **kwargs):
+        json_dict = {}
+        project_id = self.kwargs.get('id')
+        user = self.request.user
+        character_ids = self.request.POST.getlist('character_id')
+        names = self.request.POST.getlist('name')
+        descriptions = self.request.POST.getlist('description')
+        passwords = self.request.POST.getlist('password')
+        count = len(names)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+
+        json_dict['project'] = str(project_id)
+        for i in range(count):
+            json_dict['name'] = names[i]
+            json_dict['description'] = descriptions[i]
+            if passwords[i] != "":
+                json_dict['password'] = passwords[i]
+            else:
+                json_dict['password'] = ""
+            print(json_dict)
+            user_response = requests.put(
+                                'http://127.0.0.1:8000/project/charater/update/'+character_ids[i]+'/',
+                                data=json.dumps(json_dict),
+                                headers={'Content-type': 'application/json',
+                                        'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        errors = response['errors']
+                        print(errors)
+                        messages.warning(
+                            self.request, "Failed to update cast !!")
+                        return HttpResponseRedirect(
+                            request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Cast updated successfully")
+        return HttpResponseRedirect("/project/add-characters/%s/" % (project_id))
+
+
+class AddCharactersView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/add-characters.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        try:
+            project = Project.objects.get(pk=project_id)
+            context['project'] = project
+            characters = Character.objects.filter(project=project.id)
+            context['characters'] = characters
+            last_date_form = VideoSubmissionLastDateForm
+            context['last_date_form'] = last_date_form
+        except Project.DoesNotExist:
+            context["message"] = "Project not found !!"
+        return context
+
+    def post(self, request, *args, **kwargs):
+        json_dict = {}
+        project_id = self.kwargs.get('id')
+        user = self.request.user
+        names = self.request.POST.getlist('name')
+        descriptions = self.request.POST.getlist('description')
+        passwords = self.request.POST.getlist('password')
+        count = len(names)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+
+        for i in range(count):
+            json_dict['name'] = names[i]
+            json_dict['description'] = descriptions[i]
+            if passwords[i] != "":
+                json_dict['password'] = passwords[i]
+            else:
+                json_dict['password'] = None
+            json_dict['project'] = project_id
+            user_response = requests.post(
+                                'http://127.0.0.1:8000/project/charater/create/',
+                                data=json.dumps(json_dict),
+                                headers={'Content-type': 'application/json',
+                                        'Authorization': token})
+            byte_str = user_response.content
+            dict_str = byte_str.decode("UTF-8")
+            response = ast.literal_eval(dict_str)
+            response = dict(response)
+            if 'status' in response:
+                if response['status'] != 200:
+                    if 'errors' in response:
+                        errors = response['errors']
+                        print(errors)
+                        messages.warning(
+                            self.request, "Failed to update cast !!")
+                        return HttpResponseRedirect(
+                            request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Cast updated successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class AddSidesAjaxView(View, JSONResponseMixin):
+    template_name = 'project/add-sides-form.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        count = self.request.GET.get('count')
+        form_html = render_to_string(
+                                'project/add-sides-form.html',
+                                {'count': count})
+        context['form_html'] = form_html
+        return self.render_json_response(context)
+
+
+class AddProjectSidesLastDateAPIView(APIView):
+    serializer_class = ProjectLastDateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            try:
+                project = Project.objects.get(pk=data_dict['id'])
+                print(project)
+                project.last_date = data_dict['last_date']
+                project.save()
+                response = {'message': "Laste date added.",
+                            'status': status.HTTP_200_OK}
+            except Project.DoesNotExist:
+                response = {'errors': "Invalid Project ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddSidesView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/add-sides.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.GET.get('character_id')
+        try:
+            project = Project.objects.get(pk=project_id)
+            context['project'] = project
+            try:
+                character = Character.objects.get(
+                            Q(pk=character_id) &
+                            Q(project=project_id)
+                            )
+                context['character'] = character
+            except Character.DoesNotExist:
+                pass
+        except Project.DoesNotExist:
+            context["message"] = "Project not found !!"
+        return context
+
+    # def post(self, request, *args, **kwargs):

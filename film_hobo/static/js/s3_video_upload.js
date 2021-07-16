@@ -33,7 +33,7 @@ $( document ).ready(function() {
             const options = {
                 partSize: 5 * 1024 * 1024,
                 // how many concurrent uploads
-                queueSize: 5
+                queueSize: 20
             };
             document.getElementById("progress-bar").style.display = "block";
 			var uploadParams = {Key: path, ContentType: upFile.type, Body: upFile};
