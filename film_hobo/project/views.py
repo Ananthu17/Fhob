@@ -23,13 +23,14 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
-                                     UpdateAPIView)
+                                     UpdateAPIView, get_object_or_404)
 
 from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project
-from .models import Character
+from .models import Character, Sides
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
-      CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer
+      CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
+      SidesSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm
 
@@ -543,6 +544,49 @@ class AddProjectSidesLastDateAPIView(APIView):
         return Response(response)
 
 
+class SidesCreateAPIView(APIView):
+    serializer_class = SidesSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project']
+            character_id = data_dict['character']
+            project = get_object_or_404(Project, pk=project_id)
+            character = get_object_or_404(Character, pk=character_id)
+            try:
+                sides_obj = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                if data_dict['scene_1'] is not None:
+                    sides_obj.scene_1 = data_dict['scene_1']
+                if data_dict['scene_2'] is not None:
+                    sides_obj.scene_2 = data_dict['scene_2']
+                if data_dict['scene_3'] is not None:
+                    sides_obj.scene_3 = data_dict['scene_3']
+                sides_obj.save()
+            except Sides.DoesNotExist:
+                sides_obj = Sides()
+                sides_obj.project = project
+                sides_obj.character = character
+                sides_obj.scene_1 = data_dict['scene_1']
+                sides_obj.scene_2 = data_dict['scene_2']
+                sides_obj.scene_3 = data_dict['scene_3']
+                sides_obj.save()
+
+            response = {'message': "Scenes added",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
 class AddSidesView(LoginRequiredMixin, TemplateView):
     template_name = 'project/add-sides.html'
     login_url = '/hobo_user/user_login/'
@@ -552,19 +596,48 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         character_id = self.request.GET.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        character = get_object_or_404(Character, pk=character_id)
+        context['character'] = character
         try:
-            project = Project.objects.get(pk=project_id)
-            context['project'] = project
-            try:
-                character = Character.objects.get(
-                            Q(pk=character_id) &
-                            Q(project=project_id)
-                            )
-                context['character'] = character
-            except Character.DoesNotExist:
-                pass
-        except Project.DoesNotExist:
-            context["message"] = "Project not found !!"
+            sides = Sides.objects.get(
+                        Q(project=project) &
+                        Q(character=character)
+                        )
+            context['sides'] = sides
+        except Sides.DoesNotExist:
+            pass
         return context
 
-    # def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.POST.get('character_id')
+        data_dict['project'] = project_id
+        data_dict['character'] = character_id
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                    'http://127.0.0.1:8000/project/add-sides-api/',
+                    data=json.dumps(data_dict),
+                    headers={'Content-type': 'application/json',
+                             'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] != 200:
+                if 'errors' in response:
+                    errors = response['errors']
+                    print(errors)
+                    messages.warning(
+                        self.request, "Failed to update scenes !!")
+                    return HttpResponseRedirect(
+                        request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Sides updated successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

@@ -25,11 +25,15 @@ class Sides(models.Model):
     character = models.ForeignKey(Character,
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
-    scene_description = models.TextField(_("Scene Description"),
-                                         null=True, blank=True)
+    scene_1 = models.TextField(_("Scene Description"),
+                               null=True, blank=True)
+    scene_2 = models.TextField(_("Scene Description"),
+                               null=True, blank=True)
+    scene_3 = models.TextField(_("Scene Description"),
+                               null=True, blank=True)
 
     def __str__(self):
-        return self.project.title+" "+self.character.name+" sides"
+        return self.project.title+" - "+self.character.name+" - sides"
 
     class Meta:
         verbose_name = 'Sides'

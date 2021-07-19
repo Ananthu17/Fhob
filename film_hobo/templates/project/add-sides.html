@@ -12,7 +12,7 @@
             <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
                 {% if request.user == project.creator %}
                 <!-- project menu  -->
-                
+
                 <div class="sds-menu-bg">
                     <div class="sds-menu-align">
                         <ul class="sds-menu sds-menu-padding">
@@ -34,10 +34,10 @@
                                 <li><span class="video-menu-head">SIDES SETUP</span></li>
                                 <li><span class="sds-blue-name">CHARACTER: </span><span class="video-menu-head">{{character.name}}</span></li>
                                 <li>
-                                    <span class="sds-side-menu-btn">
+                                    <!-- <span class="sds-side-menu-btn">
                                         <a href="" class="cas-cast-menu-save">SAVE</a>
                                         <a href="" class="cas-cast-menu-edit">EDIT</a>
-                                    </span>
+                                    </span> -->
                                 </li>
                             </ul>
                         </form>
@@ -49,7 +49,11 @@
 
                 <div class="sds-input-bg">
                     <div class="sds-input-padding">
-                        <form>
+                        <form  method="post"
+                        action="{% url 'project:add-sides' project.id %}?{{character.id}}"
+                        id="sidesform">
+                            {% csrf_token %}
+                            <input type="hidden" name="character_id" value="{{character.id}}" />
                             <div class="row">
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-input-right-info">
@@ -61,7 +65,7 @@
                                                 <div class="sds-card-inner-txt">
                                                     <div class="sgl-left-box-lg-txt"><a href="">ROCA</a></div>
                                                     <div>Written by</div>
-                                                    <div> Tom Smith</div>   
+                                                    <div> Tom Smith</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -73,7 +77,9 @@
                                             <span class="sds-side-txt"><a href="">SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                         </div>
                                         <div>
-                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                            <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
+                                            name="scene_1" {% if sides.scene_1 %} disabled {% endif %}>
+                                            {{sides.scene_1}}</textarea>
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -81,7 +87,9 @@
                                             <span class="sds-scene-txt">SCENE TWO</span>
                                         </div>
                                         <div>
-                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                            <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
+                                            name="scene_2" {% if sides.scene_2 %} disabled {% endif %}>
+                                            {{sides.scene_2}}</textarea>
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -89,7 +97,9 @@
                                             <span class="sds-scene-txt">SCENE THREE</span>
                                         </div>
                                         <div>
-                                            <textarea class="sds-input-textarea" placeholder="Paste Here"></textarea>
+                                            <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
+                                            name="scene_3" {% if sides.scene_3 %} disabled {% endif %}>
+                                            {{sides.scene_3}}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -97,8 +107,8 @@
                             <div>
                                 <div class="sds-card-btn-align">
                                     <span class="sds-input-card-btn">
-                                        <a href="" class="cas-cast-menu-save">SAVE</a>
-                                        <a href="" class="cas-cast-menu-edit">EDIT</a>
+                                        <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/>
+                                        <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a>
                                     </span>
                                 </div>
                             </div>
@@ -171,6 +181,13 @@
 {% endblock %}
 
 {% block extrajs %}
+<script>
+    $(function(){
+        $('#sidesform').on('click','.edit-sides',function(){ 
+            $(".scenes").prop("disabled", false) 
+        });
+    });
+</script>
 {% endblock %}
 
 

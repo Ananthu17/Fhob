@@ -63,11 +63,19 @@ class UpdateCharacterSerializer(serializers.ModelSerializer):
         fields = ['name', 'description', 'project', 'password']
 
 
+class SidesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sides
+        fields = ['project', 'character', 'scene_1', 'scene_2', 'scene_3']
+
+
 class ProjectLastDateSerializer(serializers.ModelSerializer):
     id = serializers.CharField(
         max_length=150,
         required=True,
     )
+
     class Meta:
         model = Project
         fields = ['id', 'last_date']
