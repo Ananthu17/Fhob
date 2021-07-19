@@ -521,9 +521,8 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    team = models.ForeignKey('hobo_user.Team', verbose_name=_("Team"),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True)
+    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
+                                  null=True, blank=True)
 
     def __str__(self):
         return self.title
