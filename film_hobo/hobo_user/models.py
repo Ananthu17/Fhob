@@ -375,6 +375,41 @@ class AthleticSkill(models.Model):
         return str(self.athletic_skill)
 
 
+class CrewMember(models.Model):
+    name = models.CharField(_("Member_name"),
+                            max_length=150,
+                            null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class Team(models.Model):
+    ACTOR = 'ACT'
+    DIRECTOR = 'DIR'
+    SOUND = 'SOU'
+    PRODUCTION = 'PRO'
+    CINEMATOGRAPHY = 'CINE'
+    WRITER = 'WRI'
+    ROLE_CHOICES = [
+        (ACTOR, 'Actor'),
+        (DIRECTOR, 'Director'),
+        (SOUND, 'Sound'),
+        (PRODUCTION, 'Production'),
+        (CINEMATOGRAPHY, 'Videographer'),
+        (WRITER, 'Writer')
+    ]
+
+    team = models.CharField(max_length=1000, choices=ROLE_CHOICES, null=True,
+                            blank=True)
+    members = models.ManyToManyField('hobo_user.CrewMember',
+                                     verbose_name=_("Member"),
+                                     related_name="team_member")
+
+    def __str__(self):
+        return self.team
+
+
 class AthleticSkillInline(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
                                 verbose_name=_("Creator"),
@@ -390,6 +425,20 @@ class AthleticSkillInline(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class Location(models.Model):
+    city = models.CharField(max_length=1000, verbose_name='City', null=True)
+    state = models.CharField(max_length=1000, verbose_name='State', null=True)
+    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+
+    def __str__(self):
+        location = self.city+","+self.state+","+self.country
+        return str(location)
+
+    class Meta:
+        verbose_name = 'Location'
+        verbose_name_plural = 'Locations'
 
 
 class Project(models.Model):
@@ -467,6 +516,14 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='project_location',
+                                 verbose_name=_("Location"),
+                                 null=True, blank=True)
+    team = models.ForeignKey('hobo_user.Team', verbose_name=_("Team"),
+                             on_delete=models.CASCADE,
+                             null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -520,13 +577,6 @@ class PromoCode(models.Model):
 
     def __str__(self):
         return str(self.promo_code)
-
-
-class Team(models.Model):
-    team = models.CharField(max_length=1000)
-
-    def __str__(self):
-        return self.team
 
 
 class Country(models.Model):
@@ -966,20 +1016,6 @@ class CompanyClient(models.Model):
     class Meta:
         verbose_name = 'Company Client'
         verbose_name_plural = 'Company Clients'
-
-
-class Location(models.Model):
-    city = models.CharField(max_length=1000, verbose_name='City', null=True)
-    state = models.CharField(max_length=1000, verbose_name='State', null=True)
-    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
-
-    def __str__(self):
-        location = self.city+","+self.state+","+self.country
-        return str(location)
-
-    class Meta:
-        verbose_name = 'Location'
-        verbose_name_plural = 'Locations'
 
 
 class UserInterest(models.Model):
