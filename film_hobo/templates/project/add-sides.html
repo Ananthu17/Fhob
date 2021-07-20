@@ -20,7 +20,7 @@
                             <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
                             <li><span>Format: </span><span class="sgl-menu-blue">{{project.format}}</span></li>
                             <li><span>Genre: </span><span class="sgl-menu-blue">{{project.genre}}</span></li>
-                            <li><span>Location(s): </span><span class="sgl-menu-blue">LOS ANGELES, AMAZON JUNGLE</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
                         </ul>
                     </div>
                 </div>
@@ -62,10 +62,8 @@
                                     <div>
                                         <div class="card sds-script-card">
                                             <div class="sds-card-inneralign">
-                                                <div class="sds-card-inner-txt">
-                                                    <div class="sgl-left-box-lg-txt"><a href="">ROCA</a></div>
-                                                    <div>Written by</div>
-                                                    <div> Tom Smith</div>
+                                                <div class="sds-inner-pdf-align">
+                                                    <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,6 +107,7 @@
                                     <span class="sds-input-card-btn">
                                         <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/>
                                         <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a>
+                                        <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
                             </div>

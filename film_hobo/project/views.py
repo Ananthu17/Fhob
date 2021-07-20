@@ -1,10 +1,19 @@
 import ast
 import os
+import io
 import json
 import requests
 import boto3
-from braces.views import JSONResponseMixin
 
+from braces.views import JSONResponseMixin
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate
+from reportlab.platypus import Paragraph, Spacer, Table, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
+from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
 from django.db.models import Count, Sum
 from django.views.generic import TemplateView, View
@@ -15,6 +24,8 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import render
 
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
@@ -367,6 +378,7 @@ class CharacterCreateAPIView(APIView):
                 character_obj.description = data_dict['description']
                 character_obj.project = project
                 character_obj.password = data_dict['password']
+                # character_obj.password = make_password(data_dict['password'])
                 character_obj.save()
                 response = {'message': "Character added",
                             'status': status.HTTP_200_OK}
@@ -421,7 +433,6 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
                 json_dict['password'] = passwords[i]
             else:
                 json_dict['password'] = ""
-            print(json_dict)
             user_response = requests.put(
                                 'http://127.0.0.1:8000/project/charater/update/'+character_ids[i]+'/',
                                 data=json.dumps(json_dict),
@@ -452,6 +463,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
+        sites_dict = {}
         try:
             project = Project.objects.get(pk=project_id)
             context['project'] = project
@@ -459,6 +471,10 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             context['characters'] = characters
             last_date_form = VideoSubmissionLastDateForm
             context['last_date_form'] = last_date_form
+            sides = Sides.objects.filter(project=project)
+            for obj in sides:
+                sites_dict[obj.character.id] = "Scene 1: "+obj.scene_1+"Scene 2: "+obj.scene_2+"Scene 3: "+obj.scene_3
+            context['sites_dict'] = sites_dict
         except Project.DoesNotExist:
             context["message"] = "Project not found !!"
         return context
@@ -641,3 +657,102 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
                         request.META.get('HTTP_REFERER', '/'))
         messages.success(self.request, "Sides updated successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/cast-apply-audition.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.GET.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        character = get_object_or_404(Character, pk=character_id)
+        context['character'] = character
+        try:
+            sides = Sides.objects.get(
+                        Q(project=project) &
+                        Q(character=character)
+                        )
+            context['sides'] = sides
+        except Sides.DoesNotExist:
+            pass
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        # data_dict = {}
+        # json_response = json.dumps(request.POST)
+        # data_dict = ast.literal_eval(json_response)
+        # project_id = self.kwargs.get('id')
+        # character_id = self.request.POST.get('character_id')
+        # data_dict['project'] = project_id
+        # data_dict['character'] = character_id
+        # key = Token.objects.get(user=user).key
+        # token = 'Token '+key
+        # user_response = requests.post(
+        #             'http://127.0.0.1:8000/project/add-sides-api/',
+        #             data=json.dumps(data_dict),
+        #             headers={'Content-type': 'application/json',
+        #                      'Authorization': token})
+        # byte_str = user_response.content
+        # dict_str = byte_str.decode("UTF-8")
+        # response = ast.literal_eval(dict_str)
+        # response = dict(response)
+        # if 'status' in response:
+        #     if response['status'] != 200:
+        #         if 'errors' in response:
+        #             errors = response['errors']
+        #             print(errors)
+        #             messages.warning(
+        #                 self.request, "Failed to update scenes !!")
+        #             return HttpResponseRedirect(
+        #                 request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Sides updated successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def getpdf(request, **kwargs):
+    buff = io.BytesIO()
+    response = HttpResponse(content_type='application/pdf')
+    project_id = kwargs.get('id')
+    character_id = request.GET.get('character_id')
+    project = get_object_or_404(Project, pk=project_id)
+    character = get_object_or_404(Character, pk=character_id)
+    try:
+        sides = Sides.objects.get(
+                    Q(project=project) &
+                    Q(character=character)
+                    )
+        # generate pdf filename
+        filename = project.title+" "+character.name
+        list_string = []
+        list_string = filename.split(" ")
+        filename = '_'.join(list_string)
+        filename = filename+".pdf"
+        # create pdf
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        styles = getSampleStyleSheet()
+        report = SimpleDocTemplate(buff, rightMargin=72,
+                                   leftMargin=72, topMargin=72,
+                                   bottomMargin=18)
+        report_title = Paragraph("Sides", styles["h1"])
+        report.build([report_title])
+        scene_1 = Paragraph("Scene 1", styles["h3"])
+        scene_1_data = Paragraph(sides.scene_1)
+        scene_2 = Paragraph("Scene 2", styles["h3"])
+        scene_2_data = Paragraph(sides.scene_2)
+        scene_3 = Paragraph("Scene 3", styles["h3"])
+        scene_3_data = Paragraph(sides.scene_3)
+        report.build([report_title, scene_1, scene_1_data, scene_2,
+                      scene_2_data, scene_3, scene_3_data])
+        response.write(buff.getvalue())
+        buff.close()
+        return response
+    except Sides.DoesNotExist:
+        pass
+    return response

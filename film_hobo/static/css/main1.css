@@ -1409,28 +1409,10 @@ ul.sgl-menu li{
    margin-right: -15px;
    height: 100%;
 }
-.sgl-grey-tag{
-   font-size: 11px;
-}
-.sgl-grey-tag a{
-   color: #6a6a6a;
-}
-.sgl-password{
-   height: 16px;
-   width: 56px;
-   border-radius: 4px;
-   border: solid 1px;
-}
 .sgl-orange-txt{
    color:#e88b24;
    font-size: 13px;
    font-weight: 700;
-   padding-left: 6px;
-}
-.sgl-password::placeholder { 
-   text-align: center;
-   position: relative;
-   top:2px;
 }
 .sgl-cast-crew-align{
    margin-left: -15px;
@@ -1504,7 +1486,7 @@ ul.sgl-menu li{
 .sgl-logline-txt{
    font-size: 15px;
    font-weight: 500;
-   color: #858585;
+   color: #7e7e7e;
 }
 .sgl-info-align{
    padding-top: 20px;
@@ -1587,7 +1569,7 @@ ul.sgl-menu li{
    padding-left: 45px;
    padding-right: 45px;
    padding-top: 20px;
-   padding-bottom: 50px;
+   padding-bottom: 90px;
 }
 .sgl-left-box-lg-txt{
    font-size: 15px;
@@ -1625,6 +1607,26 @@ ul.sgl-menu li{
    top:2px;
    color: black;
 }
+.sgl-info-open-txt-align{
+   padding-left: 5px;
+   padding-right: 5px;
+}
+.sgl-info-open{  
+   font-size: 10px;
+   float: left;
+}
+.sgl-info-open a{
+   color: #0e62b5;
+   text-decoration: none;
+}
+.sgl-info-download{
+   font-size: 10px;
+   float:right;
+}
+.sgl-info-download a{
+   color: #0e62b5;
+   text-decoration: none;
+}
 
 /* Media query */
 
@@ -1639,11 +1641,17 @@ ul.sgl-menu li{
   }
   .sgl-upload-star {
    font-size: 12px;
-   padding-left: 18px;
+   padding-left: 8px;
    }  
   .sgl-upload-blue-txt-align {
    padding-left: 13px;
    }
+   .sgl-left-box-lg-align {
+      padding-left: 32px;
+      padding-right: 32px;
+      padding-top: 20px;
+      padding-bottom: 60px;
+  }
 }
 @media(max-width:1024px){
    .sgl-menu {
@@ -1665,7 +1673,7 @@ ul.sgl-menu li{
    }
    .sgl-upload-star {
       font-size: 12px;
-      padding-left: 7px;
+      padding-left: 6px;
    }
    .sgl-left-box-lg-align {
       padding-left: 22px;
@@ -2100,7 +2108,7 @@ ul.sds-side-setup-menu li{
 .sds-script-card{
    border: solid 1px black;
    border-radius: 1px;
-   height: 812px;
+   height: 817px;
 }
 .sds-card-inneralign{
    padding-left: 10px;
@@ -2108,11 +2116,13 @@ ul.sds-side-setup-menu li{
    padding-top: 10px;
    padding-bottom: 10px;
 }
-.sds-card-inner-txt{
-   text-align: center;
-   padding-top: 176px;
-   font-size: 13px;
-   font-weight: 500;
+.sds-inner-pdf-align{
+   width: 100%;
+   height: 788px;
+}
+.pdf-style{
+   width: 100%;
+   height: 100%;
 }
 .sds-input-card-btn {
    font-size: 14px;

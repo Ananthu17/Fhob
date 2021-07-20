@@ -2827,6 +2827,7 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
 
         rating_dict = {}
         job_dict = {}
+
         for job in profile.job_types.all():
             try:
                 rating_obj = UserRatingCombined.objects.get(

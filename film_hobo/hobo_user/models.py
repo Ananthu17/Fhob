@@ -377,6 +377,41 @@ class AthleticSkill(models.Model):
         return str(self.athletic_skill)
 
 
+class CrewMember(models.Model):
+    name = models.CharField(_("Member_name"),
+                            max_length=150,
+                            null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+# class Team(models.Model):
+#     ACTOR = 'ACT'
+#     DIRECTOR = 'DIR'
+#     SOUND = 'SOU'
+#     PRODUCTION = 'PRO'
+#     CINEMATOGRAPHY = 'CINE'
+#     WRITER = 'WRI'
+#     ROLE_CHOICES = [
+#         (ACTOR, 'Actor'),
+#         (DIRECTOR, 'Director'),
+#         (SOUND, 'Sound'),
+#         (PRODUCTION, 'Production'),
+#         (CINEMATOGRAPHY, 'Videographer'),
+#         (WRITER, 'Writer')
+#     ]
+
+#     team = models.CharField(max_length=1000, choices=ROLE_CHOICES, null=True,
+#                             blank=True)
+#     members = models.ManyToManyField('hobo_user.CrewMember',
+#                                      verbose_name=_("Member"),
+#                                      related_name="team_member")
+
+#     def __str__(self):
+#         return self.team
+
+
 class AthleticSkillInline(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
                                 verbose_name=_("Creator"),
@@ -394,10 +429,88 @@ class AthleticSkillInline(models.Model):
         return str(self.id)
 
 
+class Location(models.Model):
+    city = models.CharField(max_length=1000, verbose_name='City', null=True)
+    state = models.CharField(max_length=1000, verbose_name='State', null=True)
+    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+
+    def __str__(self):
+        location = self.city+","+self.state+","+self.country
+        return str(location)
+
+    class Meta:
+        verbose_name = 'Location'
+        verbose_name_plural = 'Locations'
+
+
 class Project(models.Model):
     """
     A model to store all project related details
     """
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+    VISIBILITY_CHOICES = [
+        (PUBLIC, 'Public'),
+        (PRIVATE, 'Private'),
+    ]
+    NATION_WIDE = 'nation_wide'
+    LOCAL_ONLY = 'local_only'
+    CAST_ATTACHMENT_CHOICES = [
+        (NATION_WIDE, 'Nation Wide'),
+        (LOCAL_ONLY, 'Local Only'),
+    ]
+    INDIE_WITH_RATING_1_STAR = 'indie_with_rating_1_star'
+    INDIE_WITH_RATING_2_STAR = 'indie_with_rating_2_star'
+    INDIE_WITH_RATING_3_STAR = 'indie_with_rating_3_star'
+    INDIE_WITH_RATING_4_STAR = 'indie_with_rating_4_star'
+    INDIE_WITH_RATING_5_STAR = 'indie_with_rating_5_star'
+    PRO_WITH_RATING_1_STAR = 'pro_with_rating_1_star'
+    PRO_WITH_RATING_2_STAR = 'pro_with_rating_2_star'
+    PRO_WITH_RATING_3_STAR = 'pro_with_rating_3_star'
+    PRO_WITH_RATING_4_STAR = 'pro_with_rating_4_star'
+    PRO_WITH_RATING_5_STAR = 'pro_with_rating_5_star'
+    INDIE_AND_PRO_WITH_RATING_1_STAR = 'indie_and_pro_with_rating_1_star'
+    INDIE_AND_PRO_WITH_RATING_2_STAR = 'indie_and_pro_with_rating_2_star'
+    INDIE_AND_PRO_WITH_RATING_3_STAR = 'indie_and_pro_with_rating_3_star'
+    INDIE_AND_PRO_WITH_RATING_4_STAR = 'indie_and_pro_with_rating_4_star'
+    INDIE_AND_PRO_WITH_RATING_5_STAR = 'indie_and_pro_with_rating_5_star'
+    CAST_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
+    ]
+    No_PAYMENT = 'no_payment'
+    NEGOTIABLE = 'payment_is_negotiable'
+    ULB = 'SAG_ultra _low_budget'
+    MLB = 'SAG_moderate_low_budget'
+    LB = 'SAG_low_budget'
+    ThB = 'SAG_theatrical_budget'
+    ShB = 'SAG_short_film_budget'
+    MiB = 'SAG_micro_budget'
+    StB = 'SAG_studet_budget'
+    CAST_PAY_RATE_CHOICES = [
+                    (No_PAYMENT, 'No Payment'),
+                    (NEGOTIABLE, 'Payment is Negotiable'),
+                    (ULB, 'SAG Ultra Low Budget'),
+                    (MLB, 'SAG Moderate Low Budget'),
+                    (LB, 'SAG Low Budget'),
+                    (ThB, 'SAG Theatrical Budget'),
+                    (ShB, 'SAG Short Film Budget'),
+                    (MiB, 'SAG Micro Budget'),
+                    (StB, 'SAG Studet Budget'),
+                    ]
     SCENE = 'SCH'
     SHORTS = 'SHO'
     FORMAT_CHOICES = [
@@ -487,6 +600,27 @@ class Project(models.Model):
                                   default=UPLOAD_VIDEO)
     last_date = models.DateField(_("Last date for submitting video"),
                                  null=True, blank=True,)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='project_location',
+                                 verbose_name=_("Location"),
+                                 null=True, blank=True)
+    script = models.FileField(upload_to='script/', null=True, blank=True)
+    visibility = models.CharField(_("Visibility"),
+                                  choices=VISIBILITY_CHOICES,
+                                  max_length=150, default=PRIVATE)
+    visibility_password = models.CharField(max_length=12, null=True,
+                                           blank=True)
+    cast_attachment = models.CharField(_("Cast Attachment"),
+                                       choices=CAST_ATTACHMENT_CHOICES,
+                                       max_length=150, default=NATION_WIDE)
+    cast_pay_rate = models.CharField(_("Cast Pay Rate"),
+                                     choices=CAST_PAY_RATE_CHOICES,
+                                     max_length=150, default=NEGOTIABLE)
+    cast_samr = models.CharField(_("Cast SAMR"),
+                                 choices=CAST_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
 
     def __str__(self):
         return self.title
@@ -1010,22 +1144,6 @@ class CompanyClient(models.Model):
     class Meta:
         verbose_name = 'Company Client'
         verbose_name_plural = 'Company Clients'
-
-
-class Location(models.Model):
-    city = models.CharField(max_length=1000, verbose_name='City', null=True)
-    state = models.CharField(max_length=1000, verbose_name='State', null=True)
-    country = models.CharField(
-        max_length=1000, verbose_name='Country', null=True)
-
-    def __str__(self):
-        location = self.city+","+self.state+","+self.country
-        return str(location)
-
-    class Meta:
-        verbose_name = 'Location'
-        verbose_name_plural = 'Locations'
-
 
 class UserInterest(models.Model):
     SCENE = 'scene'
