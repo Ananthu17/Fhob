@@ -3,7 +3,6 @@ import json
 import requests
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -11,7 +10,7 @@ from django.views.generic.base import View
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -24,7 +23,6 @@ from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-from paypal.standard.forms import PayPalPaymentsForm
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest, \
     OrdersCaptureRequest, OrdersGetRequest
@@ -406,7 +404,8 @@ class UpdateMembershipFeeAPI(APIView):
                 if data['tax'] == "":
                     final_result['tax'] = \
                         PaymentOptions.objects.first().__dict__['tax']
-                elif (float(data['tax']) < 0.0) or (float(data['tax']) > 100.0):
+                elif (float(data['tax']) < 0.0) or \
+                     (float(data['tax']) > 100.0):
                     return Response(
                         {"status": "failure",
                          "tax": "please enter a valid number between 0 and 100"
@@ -1100,3 +1099,102 @@ class ManageSubscription(APIView):
         return Response(
             {"status": "braintree subscription updation succsessful "},
             status=status.HTTP_200_OK)
+
+
+class GetBraintreeDiscountDetailListAPI(APIView):
+    """
+    API for superuser to get the braintree discount details
+    """
+
+    def get(self, request, *args, **kwargs):
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+
+        discounts = gateway.discount.all()
+        final_list = []
+        for discount in discounts:
+            data_dict = {
+                "braintree_id": "",
+                "promo_code": "",
+                "description": "",
+                "duration": "",
+                "billing_cycles": "",
+                "amount": ''
+            }
+            if discount.never_expires:
+                promocode, created = PromoCode.objects.update_or_create(
+                    braintree_id=discount.id, promo_code=discount.name,
+                    description=discount.description,
+                    duration='full_subscription',
+                    billing_cycles=discount.number_of_billing_cycles,
+                    amount=discount.amount
+                )
+                data_dict['braintree_id'] = discount.id
+                data_dict['promo_code'] = discount.name
+                data_dict['description'] = discount.description
+                data_dict['duration'] = 'full_subscription'
+                data_dict['billing_cycles'] = discount.number_of_billing_cycles
+                data_dict['amount'] = discount.amount
+                final_list.append(data_dict)
+            else:
+                promocode, created = PromoCode.objects.update_or_create(
+                    braintree_id=discount.id, promo_code=discount.name,
+                    description=discount.description,
+                    duration='billing_cycle_subscription',
+                    billing_cycles=discount.number_of_billing_cycles,
+                    amount=discount.amount
+                )
+                data_dict['braintree_id'] = discount.id
+                data_dict['promo_code'] = discount.name
+                data_dict['description'] = discount.description
+                data_dict['duration'] = 'billing_cycle_subscription'
+                data_dict['billing_cycles'] = discount.number_of_billing_cycles
+                data_dict['amount'] = discount.amount
+                final_list.append(data_dict)
+        if len(discounts) > 0:
+            return JsonResponse(final_list, safe=False)
+        else:
+            return Response({"status": "no content",
+                            "discounts": "no discounts associated with this \
+                            account"
+                             }, status=status.HTTP_204_NO_CONTENT)
+
+
+class BraintreeCalculateDiscountAPI(APIView):
+    """
+    API for calculateing the braintree discount
+    """
+    def post(self, request, format=None):
+        try:
+            data = request.data
+            if data['promocode'] == '':
+                return Response(
+                    {"status": "enter a valid promocode"},
+                    status=status.HTTP_404_NOT_FOUND)
+            else:
+                promocode_obj = PromoCode.objects.get(
+                    promo_code=data['promocode'])
+                initial_amount = float(data['amount'])
+                promotion_amount = float(promocode_obj.amount)
+                temp_amount = initial_amount - promotion_amount
+                if temp_amount < 0:
+                    final_amount = 0
+                else:
+                    final_amount = temp_amount
+                return Response(
+                    {"status": "success",
+                        "promocode": data['promocode'],
+                        "initial_amount": round(initial_amount, 2),
+                        "promotion_amount": round(promotion_amount, 2),
+                        "final_amount": round(final_amount, 2)},
+                    status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "promocode does not exist"},
+                status=status.HTTP_404_NOT_FOUND)

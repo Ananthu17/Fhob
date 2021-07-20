@@ -53,15 +53,11 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView, RateCompanyAPI, \
+                   TeamDeleteAPIView, \
                    GetProfileRatingNotificationAjaxView, \
                    EditUserInterestAPI, \
                    VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI
-               #     ProjectSearchView
-
-
-
 
 app_name = "hobo_user"
 
@@ -290,10 +286,10 @@ urlpatterns = [
     path('get-profile-rating-notification-html/',
          GetProfileRatingNotificationAjaxView.as_view(),
          name='get-profile-rating-notification-html'),
-#     path('projects/rating', UserRatingAPI.as_view(),
-#          name="rate-api"),
-#     path('projects/search/',  ProjectSearchView.as_view(),
-#          name="project-search"),
+    # path('projects/rating', UserRatingAPI.as_view(),
+    #      name="rate-api"),
+    # path('projects/search/',  ProjectSearchView.as_view(),
+    #      name="project-search"),
     path('video/rate',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),

@@ -513,6 +513,18 @@ class ProjectReaction(models.Model):
 
 
 class PromoCode(models.Model):
+    PAYPAL = 'paypal'
+    BRAINTREE = 'braintree'
+    SOURCE_TYPE = [
+        (PAYPAL, 'paypal'),
+        (BRAINTREE, 'braintree'),
+    ]
+    SUBSCRIPTION_DURATION = 'Duration of Subscription'
+    BILLING_CYCLE_DURATION = 'For n billing Cycles'
+    DURATION_TYPE = [
+        (SUBSCRIPTION_DURATION, 'full_subscription'),
+        (BILLING_CYCLE_DURATION, 'billing_cycle_subscription')
+    ]
     FLAT_AMOUNT = 'flat_amount'
     PERCENTAGE = 'percentage'
     AMOUNT_TYPE = [
@@ -531,7 +543,17 @@ class PromoCode(models.Model):
         (PRO, 'Pro'),
         (PRODUCTION_COMPANY, 'Production Company')
     ]
+    source = models.CharField(_("Source Type"),
+                              choices=SOURCE_TYPE,
+                              max_length=150, default=BRAINTREE)
+    braintree_id = models.CharField(_("Braintree ID"), max_length=150)
     promo_code = models.CharField(max_length=1000, unique=True)
+    description = models.TextField(_("Description"), null=True, blank=True)
+    duration = models.CharField(_("Duration Type"),
+                                choices=DURATION_TYPE,
+                                max_length=150, default=SUBSCRIPTION_DURATION)
+    billing_cycles = models.IntegerField(_('Billing Cycles'),
+                                         null=True, blank=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
@@ -1178,7 +1200,8 @@ class UserRating(models.Model):
 
 class Video(models.Model):
     name = models.CharField(max_length=1000)
-    videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    videofile = models.FileField(
+        upload_to='videos/', null=True, verbose_name="")
     rating = models.FloatField(_("Rating"), null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 

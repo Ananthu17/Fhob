@@ -175,29 +175,57 @@ $( document ).ready(function() {
         }
     });
     $('#datepicker').prop('readonly', true);
-    get_lust_url = origin_url + '/payment/get_discount_detail_list/'
 
-    axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
+    // data to load if the promo-code is added via client side
+    // get_lust_url = origin_url + '/payment/get_discount_detail_list/'
+
+    // axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
+    // .then((response) => {
+    //   discount_objs = response.data
+
+    //   let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
+    //     discount_objs.forEach(function(d){
+    //     obj_id = d.id
+    //     if (d.amount_type == "flat_amount"){
+    //         var amount_value = '$ ' + (d.amount).toString()
+    //     }
+    //     else{
+    //         var amount_value = (d.amount).toString() + ' %'
+    //     }
+    //     delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
+    //     table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_from+'" onchange="getVaildFrom(this);" readonly />to<input id="valid_to_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_to+'" onchange="getVaildTo(this);" readonly/> </td>';
+    //     table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
+    // })
+    //   table += '</tbody>';
+    //   $('#discount_table').empty().html(table);
+    // });
+
+    // data to load if the promo-code from the braintree
+    get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'
+
+    axios.get(get_braintree_discounts, {headers: {'Authorization': authorization_str}})
     .then((response) => {
       discount_objs = response.data
 
-      let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
+      let table = '<thead> <tr> <th>Braintree ID</th> <th>Promocode (Name)</th> <th>Description</th><th>Amount</th><th>Number of Billing Cycles</th></tr></thead><tbody></tbody>';
         discount_objs.forEach(function(d){
-        obj_id = d.id
-        if (d.amount_type == "flat_amount"){
-            var amount_value = '$ ' + (d.amount).toString()
+        obj_id = d.braintree_id
+        if (d.billing_cycles == null){
+            var billing_cycles_dur = 'For Duration of Subscription'
         }
         else{
-            var amount_value = (d.amount).toString() + ' %'
+            var billing_cycles_dur = d.billing_cycles
         }
-        delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
-        table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_from+'" onchange="getVaildFrom(this);" readonly />to<input id="valid_to_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_to+'" onchange="getVaildTo(this);" readonly/> </td>';
-        table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
+        table += '<tr><td contenteditable="false" class="edit'+d.braintree_id+'">'+d.braintree_id+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.promo_code+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.description+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.amount+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+billing_cycles_dur+'</td>';
     })
       table += '</tbody>';
-      $('#discount_table').empty().html(table);
+      $('#braintree_discount_table').empty().html(table);
     });
 });
 /*
@@ -303,7 +331,6 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
 
     plan_id_url =  origin_url + '/payment/get_paypal_plan_id'
 
-    // var paypal_product_id = ""
     axios.get(plan_id_url, {headers: { "Authorization": authorization_str}})
     .then((response) => {
         if (response.status == 200){
@@ -327,7 +354,72 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
                     "billing_cycle_sequence": 1,
                     "pricing_scheme": {
                     "fixed_price": {
-                        "value": extra_args.monthly_indie.trim(),
+                        "value": String(extra_args.monthly_indie.trim()),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            var indie_payment_yearly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": String(extra_args.annual_indie.trim()),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            var pro_payment_monthly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": String(extra_args.monthly_pro.trim()),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            var pro_payment_yearly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": String(extra_args.annual_pro.trim()),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            var company_payment_monthly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": String(extra_args.monthly_company.trim()),
+                        "currency_code": "USD"
+                        }
+                    }
+                    }
+                ]
+            }
+
+            var company_payment_yearly_args = {
+                "pricing_schemes": [{
+                    "billing_cycle_sequence": 1,
+                    "pricing_scheme": {
+                    "fixed_price": {
+                        "value": String(extra_args.annual_company.trim()),
                         "currency_code": "USD"
                         }
                     }
@@ -338,20 +430,63 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
             get_access_token_url = origin_url + '/payment/get_paypal_token'
             axios.post(get_access_token_url)
             .then((response) => {
-                debugger
-                var paypal_access_token = response.data.access_token
+                var paypal_access_token = "Bearer " + response.data.access_token
 
                 axios.post(indie_payment_monthly_patch_url, indie_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
                 .then((response) => {
-                    debugger
-                    console.log(response.data);
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
                 }, (error) => {
-                    debugger
+                    console.log(error);
+                });
+
+                axios.post(indie_payment_yearly_patch_url, indie_payment_yearly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
+                }, (error) => {
+                    console.log(error);
+                });
+
+                axios.post(pro_payment_monthly_patch_url, pro_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
+                }, (error) => {
+                    console.log(error);
+                });
+
+                axios.post(pro_payment_yearly_patch_url, pro_payment_yearly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
+                }, (error) => {
+                    console.log(error);
+                });
+
+                axios.post(company_payment_monthly_patch_url, company_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
+                }, (error) => {
+                    console.log(error);
+                });
+
+                axios.post(company_payment_yearly_patch_url, company_payment_yearly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                .then((response) => {
+                if ((response.status == 204) || (response.status == 422)) {
+                        console.log(response);
+                    }
+                }, (error) => {
                     console.log(error);
                 });
 
             }, (error) => {
-                debugger
                 console.log(error);
             });
 
