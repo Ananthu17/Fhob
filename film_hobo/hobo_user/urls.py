@@ -54,7 +54,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, ProjectSearchView, VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI, ProjectView
+                   FindVideoRatingAPI, VideoListAPI, ProjectView, \
+                   CreateProjectView
 
 
 app_name = "hobo_user"
@@ -290,5 +291,7 @@ urlpatterns = [
     path('video/top-rated',  VideoListAPI.as_view(),
          name="top-rated-videos"),
     path('projectview/', ProjectView.as_view(),
-         name='projects')
+         name='projects'),
+    path('projectview/create/', CreateProjectView.as_view(),
+         name='new_project')
 ]
