@@ -377,6 +377,41 @@ class AthleticSkill(models.Model):
         return str(self.athletic_skill)
 
 
+class CrewMember(models.Model):
+    name = models.CharField(_("Member_name"),
+                            max_length=150,
+                            null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+# class Team(models.Model):
+#     ACTOR = 'ACT'
+#     DIRECTOR = 'DIR'
+#     SOUND = 'SOU'
+#     PRODUCTION = 'PRO'
+#     CINEMATOGRAPHY = 'CINE'
+#     WRITER = 'WRI'
+#     ROLE_CHOICES = [
+#         (ACTOR, 'Actor'),
+#         (DIRECTOR, 'Director'),
+#         (SOUND, 'Sound'),
+#         (PRODUCTION, 'Production'),
+#         (CINEMATOGRAPHY, 'Videographer'),
+#         (WRITER, 'Writer')
+#     ]
+
+#     team = models.CharField(max_length=1000, choices=ROLE_CHOICES, null=True,
+#                             blank=True)
+#     members = models.ManyToManyField('hobo_user.CrewMember',
+#                                      verbose_name=_("Member"),
+#                                      related_name="team_member")
+
+#     def __str__(self):
+#         return self.team
+
+
 class AthleticSkillInline(models.Model):
     creator = models.ForeignKey('hobo_user.CustomUser',
                                 verbose_name=_("Creator"),
@@ -485,6 +520,14 @@ class Project(models.Model):
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True, blank=True,
                                   default=UPLOAD_VIDEO)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='project_location',
+                                 verbose_name=_("Location"),
+                                 null=True, blank=True)
+    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
+                                  related_name='project_team',
+                                  blank=True)
 
     def __str__(self):
         return self.title
@@ -576,6 +619,7 @@ class Team(models.Model):
     team = models.CharField(max_length=1000)
     project = models.ForeignKey('hobo_user.Project',
                                 verbose_name=_("Project"),
+                                related_name='team_project',
                                 on_delete=models.CASCADE, null=True)
     user = models.ForeignKey('hobo_user.CustomUser',
                              verbose_name=_("User"),
@@ -583,10 +627,11 @@ class Team(models.Model):
                              on_delete=models.SET_NULL, null=True)
     job_type = models.ForeignKey('hobo_user.JobType',
                                  verbose_name=_("Job Type"),
+                                 related_name='team_job_type',
                                  on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.project.title +" - "+ self.job_type.title
+        return self.project.title + " - " + self.job_type.title
 
 
 class Country(models.Model):
