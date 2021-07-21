@@ -1669,7 +1669,8 @@ class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
         already_blocked_users.append(self.request.user.id)
 
         # exclude super users
-        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        super_users = CustomUser.objects.filter(is_staff=True).values_list(
+            'id', flat=True)
         for id in super_users:
             already_blocked_users.append(id)
 

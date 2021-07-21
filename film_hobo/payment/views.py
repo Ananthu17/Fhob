@@ -1073,10 +1073,19 @@ class InitialRequest(APIView):
             status=status.HTTP_200_OK)
 
 
-class ManageSubscription(APIView):
+class UpdateSubscription(APIView):
+    """
+    API to update the braintree subscription
+    """
+    permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
-        new_price = request.data['new_price']
+        new_indie_monthly = request.data['indie_monthly']
+        new_indie_yearly = request.data['indie_yearly']
+        new_pro_monthly = request.data['pro_monthly']
+        new_pro_yearly = request.data['pro_yearly']
+        new_company_monthly = request.data['company_monthly']
+        new_company_yearly = request.data['company_yearly']
 
         gateway = braintree.BraintreeGateway(
             braintree.Configuration(
@@ -1089,7 +1098,7 @@ class ManageSubscription(APIView):
         result = gateway.subscription.update("a_subscription_id", {
             "id": "new_id",
             "payment_method_token": "new_payment_method_token",
-            "price": new_price,
+            "price": "new_price",
             "plan_id": "new_plan",
         })
         if not result.is_success:
