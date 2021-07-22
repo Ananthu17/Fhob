@@ -65,3 +65,4 @@ def get_my_skill_rating(current_user, team_obj):
 @register.simple_tag()
 def get_dict_value(dict, key):
     return dict[key]
+

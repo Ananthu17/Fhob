@@ -26,6 +26,7 @@ paypal-checkout-serversdk==1.0.1
 phonenumbers==8.12.21
 Pillow==8.2.0
 psycopg2-binary==2.8.6
+reportlab==3.5.68
 setuptools==56.0.0
 validators==0.18.2
 whitenoise==5.2.0
