@@ -24,9 +24,9 @@ from .models import CustomUser, Country, GuildMembership, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
     UserProfile, CoWorker, UserInterest, \
-    UserRating, UserAgentManager, Photo, UserNotification, CompanyProfile, \
-    CompanyClient, FriendRequest, FriendGroup, Feedback, Project, Team, \
-    UserRating, Video, VideoRating
+    UserRating, Photo, CompanyProfile, \
+    CompanyClient, FriendRequest, FriendGroup, Feedback, \
+    Photo, Project, Team, Video, VideoRating
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -57,7 +57,7 @@ class GuildMembershipSerializer(serializers.ModelSerializer):
 #     )
 #     password = serializers.CharField(
 #         max_length=100,
-#         style={'input_type': 'password', 'placeholder': 'Password'}
+#         style={'input_type': 'password', 'pliaceholder': 'Password'}
 #     )
 #     remember_me = serializers.BooleanField()
 
@@ -316,6 +316,7 @@ class LoginSerializer(serializers.Serializer):
             if username:
                 user = self._validate_username_email(username, '', password)
 
+
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -325,7 +326,6 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Unable to log in with provided credentials.')
             raise exceptions.ValidationError(msg)
 
-        # If required, is the email verified?
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
             if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
@@ -624,10 +624,11 @@ class CompanyPaymentSerializer(serializers.ModelSerializer):
 
 class PromoCodeSerializer(serializers.ModelSerializer):
     user_id = serializers.CharField(required=True)
+
     class Meta:
         model = PromoCode
         fields = ['promo_code', 'created_time', 'valid_from', 'valid_to',
-                  'life_span', 'amount_type', 'user_type','user_id']
+                  'life_span', 'amount_type', 'user_type', 'user_id']
 
 
 class DisableAccountSerializer(serializers.ModelSerializer):
@@ -638,14 +639,14 @@ class DisableAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DisabledAccount
-        fields = ['reason',]
+        fields = ['reason']
 
 
 class EnableAccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUserSettings
-        fields = ['account_status',]
+        fields = ['account_status']
 
 
 class BlockMembersSerializer(serializers.Serializer):
@@ -685,6 +686,7 @@ class SettingsSerializer(serializers.Serializer):
     new_project = serializers.BooleanField(required=False)
     friend_request = serializers.BooleanField(required=False)
     match_for_my_Interest = serializers.BooleanField(required=False)
+    hide_ratings = serializers.BooleanField(required=False)
 
 
 class BlockedMembersQuerysetSerializer(serializers.ModelSerializer):
@@ -715,8 +717,8 @@ class PasswordResetSerializer(PasswordResetSerializer):
 
     def get_email_options(self):
         return {
-                'subject_template_name': 'registration/password_reset_subject.txt',
-                'html_email_template_name': 'registration/'
+            'subject_template_name': 'registration/password_reset_subject.txt',
+            'html_email_template_name': 'registration/'
                                         'password_reset_email.html',
         }
 
@@ -823,30 +825,10 @@ class RemoveAgentManagerSerializer(serializers.Serializer):
 
 
 class TrackUserSerializer(serializers.Serializer):
-    track_id =  serializers.CharField(
+    track_id = serializers.CharField(
         max_length=150,
         required=True,
     )
-
-
-class RateUserSkillsSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    job_type = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-    rating = serializers.CharField(
-        max_length=150,
-        required=True,
-    )
-
-    class Meta:
-        model = UserRating
-        fields = ['user', 'job_type', 'rating']
-
 
 class RateCompanySerializer(serializers.ModelSerializer):
     company = serializers.CharField(
@@ -860,7 +842,7 @@ class RateCompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
-        fields = ['company', 'rating']
+        fields = ['company', 'rating', 'reason']
 
 
 class AgentManagerSerializer(serializers.ModelSerializer):
@@ -956,7 +938,34 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location']
+        fields = ['position', 'format', 'location', 'budget']
+
+
+class EditUserInterestSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    position = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    format = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    location = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    budget = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = UserInterest
+        fields = ['id', 'position', 'format', 'location', 'budget']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):
@@ -1007,6 +1016,7 @@ class AcceptFriendRequestSerializer(serializers.ModelSerializer):
         model = FriendRequest
         fields = ['user', 'requested_by']
 
+
 class AddGroupSerializer(serializers.ModelSerializer):
     user = serializers.CharField(
         max_length=150,
@@ -1044,9 +1054,11 @@ class RemoveFriendGroupSerializer(serializers.Serializer):
         required=True,
     )
 
+
 class FeedbackSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     user_rating = serializers.FloatField(required=True)
+    user_feedback = serializers.CharField(required=True)
 
     class Meta:
         model = Feedback
@@ -1065,7 +1077,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = '__all__'
+        fields = ['__all__']
 
 
 class VideoSerializer(serializers.ModelSerializer):

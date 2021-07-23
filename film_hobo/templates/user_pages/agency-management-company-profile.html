@@ -3,6 +3,7 @@
 {% load user_tracking_tag %}
 {% load friend_request_tag %}
 {% load token static%}
+{% load check_profile_visibility_tag %}
 
 
 {% block extracss %}
@@ -171,6 +172,8 @@
                     </div>
                 </div>
                 <div class="left-mode-sec mt-3 pc-mem-left-2">
+                    {% can_view_profile request.user profile.user as can_visit %}
+                    {% if can_visit == True %}
                     <div class="mem-set-network-sec mt-3">
                         <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
                         <div class="float-right">
@@ -267,297 +270,313 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
-                {% if profile %}
-                <div class="left-mode-sec pl-2 pb-2">
-                    <div class="row">
-                        <div class="col-md-7 col-lg-7 col-sm-12">
-                            <div class="row">
-                                <div class="col-9">
-                                    <label class="form-title"><span class="mem-setup-blu-f">{{user.company_name}}</span>
-                                        (
-                                            {% if user.agency_management_type %}
-                                                {{user.get_agency_management_type_display}}
-                                            {% else %}
-                                                {{user.get_company_type_display}}
-                                            {% endif %}
-                                        )</label>
-                                </div>
-                                <div class="col-2">
-                                    <i class="fa fa-envelope mail-bx" aria-hidden="true"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3">
-                                    <label class="form-title mem-setup-blu-f">Status:</label>
-                                </div>
-                                <div class="col-2  mt-3">
-                                    <span class="">{{profile.user.get_membership_display}}</span>
-                                </div>
-                                <div class="col-4  mt-3">
-                                    <!-- <div class="star-ratings-css">
-                                        <div class="star-ratings-css-top" style="width: 32%"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                                        <div class="star-ratings-css-bottom"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-                                      </div> -->
-                                </div>
-                                <div class="col-2  mt-3">
-                                    Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
-                                </div>
-                            </div>
-                            {% if staff %}
-                            {% for item in staff|slice:":3"  %}
-                            <div class="row">
-                                <div class="col-3">
-                                    {% if forloop.first %}
-                                    <label class="form-title mem-setup-blu-f">Staff:</label>
-                                    {% endif %}
-                                </div>
-                                <div class="col-8 ">
-                                    {% if item.user %}
-                                        <label class="{% if forloop.first %}form-title {% endif %}  {% if forloop.last %} mb-0{% endif %}">
-                                            <a href="{{item.user.get_profile_url}}"
-                                            target="_blank">
-                                            {{ item.name }}</a>({{item.position}})
-                                        </label>
-                                    {% else %}
-                                        <label class="{% if forloop.first %}form-title {% endif %}  {% if forloop.last %} mb-0{% endif %}">{{ item.name }}({{item.position}})</label>
-                                    {% endif %}
-                                </div>
-                                {% if forloop.counter == 3 %}
-                                <div class="col-1 d-flex justify-content-center align-items-center">
-                                    <a  class="mem-setup-blu-f underline cursor-pointer" data-toggle="modal"
-                                        data-target="#more_staff">more</a>
-                                </div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                             <!-- The Modal -->
-                            <div class="modal fade" id="more_staff">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-
-                                        <!-- Modal Header -->
-                                        <div class="modal-header">
-                                            <h5 class="modal-title mem-setup-blu-f">All Staff</h5>
-                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        </div>
-
-                                        <!-- Modal body -->
-                                        <div class="modal-body">
-                                            {% for item in staff %}
-                                                <div class="row">
-                                                    <div class="col-8 ">
-                                                        {% if item.user %}
-                                                            <label class="form-title">
-                                                                {{forloop.counter}}. 
-                                                                <a href="{{item.user.get_profile_url}}"
-                                                                target="_blank">
-                                                                {{ item.name }}</a>({{item.position}})
-                                                            </label>
-                                                        {% else %}
-                                                            <label class="form-title ">
-                                                                {{forloop.counter}}. {{ item.name }}({{item.position}})
-                                                            </label>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                                {% endfor %}
-                                        </div>
-
-                                        <!-- Modal footer -->
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-outline-danger btn-sm"
-                                                data-dismiss="modal">Close</button>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end of modal -->
-                            {% endif %}
- 
-                            <div class="row">
-                                <div class="col-3">
-                                    <label class="form-title mem-setup-blu-f">Website:</label>
-                                </div>
-                                <div class="col-8  mt-2">
-                                    <a href="{{user.company_website}}"><span class="underline orng-f">{{user.company_website}}</span></a>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
-                                </div>
-                                <div class="col-6 ">
-                                        {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
-                                        <label class="form-title bold">PRO/COMPANY</label>
-                                        {% else %}
-                                        <label class="form-title bold">Members with rating<br>
-                                            {% if profile.submission_policy_SAMR == 'members_with_rating_1_star' %}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_2_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_3_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_4_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star-o" aria-hidden="true"></i>
-                                            {% elif profile.submission_policy_SAMR == 'members_with_rating_5_star'%}
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            <i class="fa fa-star orng-icon" aria-hidden="true"></i>
-                                            {% endif %}
-                                        </label>
-                                        {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-5 col-lg-5 col-sm-12">
-                            <div class="bio-sec mt-3 mr-2">
-                                {% if profile.bio %}
-                                <div class="text-center bold">Bio/About</div>
-                                <div>{{profile.bio}}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% if client_dict %}
-                    <label class="form-title mem-setup-blu-f">Clients({{client_count}})</label>
-                    {% for position,clients in client_dict.items %}
-                    {% get_more_modal_id position as pos %}
-                    <div class="row">
-                        <div class="col-12">
-                            <label class="form-title mem-setup-blu-f">{{position}}</label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        {% for client in clients|slice:":6" %}
-                        {% if forloop.counter == 6 %}
-                        <div class="col-2 d-flex  align-items-center">
-                            <a href="#" class="mem-setup-blu-f underline" data-toggle="modal"
-                                data-target="#more_{{pos}}">more</a>
-                        </div>
-                        {% else %}
-                        <div class="col-2">
-                            {% if client.user %}
-                            <div class="tac-img">
-                                <a href="{{ client.user.get_profile_url }}"
-                                target="_blank">
-                                {% if client.user.get_profile_photo  %}
-                                <img src="{{ client.user.get_profile_photo }}" class="img-fluid h-100"
-                                title="{{client.name}}">
-                                {% else %}
-                                <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100"
-                                title="{{client.name}}">
-                                {% endif %}
-                                </a>
-                            </div>
-                            <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
-                            {% else %}
-                            <div class="tac-img">
-                                <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100"
-                                title="{{client.name}}">
-                            </div>
-                            <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                    <!-- The Modal -->
-                    <div class="modal fade" id="more_{{pos}}">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-
-                                <!-- Modal Header -->
-                                <div class="modal-header">
-                                    <h5 class="modal-title mem-setup-blu-f">{{position}}</h5>
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                </div>
-
-                                <!-- Modal body -->
-                                <div class="modal-body">
-                                    {% for client in clients %}
-                                    {% if forloop.first or forloop.counter0|divisibleby:6 %}
-                                    <div class="row">
-                                    {% endif %}
-                                        <div class="col-2">
-                                            {% if client.user %}
-                                            <div class="tac-img">
-                                                <a href="{{ client.user.get_profile_url }}"
-                                                target="_blank">
-                                                {% if client.user.get_profile_photo %}
-                                                <img src="{{ client.user.get_profile_photo }}" class="img-fluid h-100">
+                {% can_view_profile request.user profile.user as can_visit %}
+                {% if can_visit == True %}
+                    {% if profile %}
+                    <div class="left-mode-sec pl-2 pb-2">
+                        <div class="row">
+                            <div class="col-md-7 col-lg-7 col-sm-12">
+                                <div class="row">
+                                    <div class="col-9">
+                                        <label class="form-title"><span class="mem-setup-blu-f">{{user.company_name}}</span>
+                                            (
+                                                {% if user.agency_management_type %}
+                                                    {{user.get_agency_management_type_display}}
                                                 {% else %}
-                                                <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100">
+                                                    {{user.get_company_type_display}}
                                                 {% endif %}
-                                                </a>
+                                            )</label>
+                                    </div>
+                                    <div class="col-2">
+                                        <i class="fa fa-envelope mail-bx" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="form-title mem-setup-blu-f">Status:</label>
+                                    </div>
+                                    <div class="col-2  mt-3">
+                                        <span class="">{{profile.user.get_membership_display}}</span>
+                                    </div>
+                                    <div class="col-4  mt-3">
+                                        <!-- {% if not settings.hide_ratings %}
+                                        <div class="containerdiv ratings" >
+                                            <div>
+                                            <img src="{% static 'images/stars_blank.png' %}"
+                                            class="star-img" alt="img" />
                                             </div>
-                                            <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
-                                            {% else %}
-                                            <div class="tac-img">
-                                                <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100">
+                                            <div class="cornerimage" style="width:{{rating}}%;">
+                                            <img src="{% static 'images/stars_full.png' %}"
+                                            class="star-img" alt="" />
                                             </div>
-                                            <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
-                                            {% endif %}
                                         </div>
-                                    {% if forloop.last or forloop.counter|divisibleby:6 %}
+                                        {% endif %} -->
+                                    </div>
+                                    <div class="col-2  mt-3">
+                                        Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
+                                    </div>
+                                </div>
+                                {% if staff %}
+                                {% for item in staff|slice:":3"  %}
+                                <div class="row">
+                                    <div class="col-3">
+                                        {% if forloop.first %}
+                                        <label class="form-title mem-setup-blu-f">Staff:</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-8 ">
+                                        {% if item.user %}
+                                            <label class="{% if forloop.first %}form-title {% endif %}  {% if forloop.last %} mb-0{% endif %}">
+                                                <a href="{{item.user.get_profile_url}}"
+                                                target="_blank">
+                                                {{ item.name }}</a>({{item.position}})
+                                            </label>
+                                        {% else %}
+                                            <label class="{% if forloop.first %}form-title {% endif %}  {% if forloop.last %} mb-0{% endif %}">{{ item.name }}({{item.position}})</label>
+                                        {% endif %}
+                                    </div>
+                                    {% if forloop.counter == 3 %}
+                                    <div class="col-1 d-flex justify-content-center align-items-center">
+                                        <a  class="mem-setup-blu-f underline cursor-pointer" data-toggle="modal"
+                                            data-target="#more_staff">more</a>
                                     </div>
                                     {% endif %}
-                                    {% endfor %}
                                 </div>
+                                {% endfor %}
+                                <!-- The Modal -->
+                                <div class="modal fade" id="more_staff">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
 
-                                <!-- Modal footer -->
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-danger btn-sm"
-                                        data-dismiss="modal">Close</button>
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h5 class="modal-title mem-setup-blu-f">All Staff</h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                {% for item in staff %}
+                                                    <div class="row">
+                                                        <div class="col-8 ">
+                                                            {% if item.user %}
+                                                                <label class="form-title">
+                                                                    {{forloop.counter}}. 
+                                                                    <a href="{{item.user.get_profile_url}}"
+                                                                    target="_blank">
+                                                                    {{ item.name }}</a>({{item.position}})
+                                                                </label>
+                                                            {% else %}
+                                                                <label class="form-title ">
+                                                                    {{forloop.counter}}. {{ item.name }}({{item.position}})
+                                                                </label>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                            </div>
+
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
+                                <!-- end of modal -->
+                                {% endif %}
+    
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="form-title mem-setup-blu-f">Website:</label>
+                                    </div>
+                                    <div class="col-8  mt-2">
+                                        <a href="{{user.company_website}}"><span class="underline orng-f">{{user.company_website}}</span></a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>
+                                    </div>
+                                    <div class="col-6 ">
+                                            {% if profile.submission_policy_SAMR == 'pros_and_companies_only' %}
+                                            <label class="form-title bold">PRO/COMPANY</label>
+                                            {% else %}
+                                            <label class="form-title bold">Members with rating<br>
+                                                {% if profile.submission_policy_SAMR == 'members_with_rating_1_star' %}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_2_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_3_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_4_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                {% elif profile.submission_policy_SAMR == 'members_with_rating_5_star'%}
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </label>
+                                            {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-lg-5 col-sm-12">
+                                <div class="bio-sec mt-3 mr-2">
+                                    {% if profile.bio %}
+                                    <div class="text-center bold">Bio/About</div>
+                                    <div>{{profile.bio}}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if client_dict %}
+                        <label class="form-title mem-setup-blu-f">Clients({{client_count}})</label>
+                        {% for position,clients in client_dict.items %}
+                        {% get_more_modal_id position as pos %}
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-title mem-setup-blu-f">{{position}}</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for client in clients|slice:":6" %}
+                            {% if forloop.counter == 6 %}
+                            <div class="col-2 d-flex  align-items-center">
+                                <a href="#" class="mem-setup-blu-f underline" data-toggle="modal"
+                                    data-target="#more_{{pos}}">more</a>
+                            </div>
+                            {% else %}
+                            <div class="col-2">
+                                {% if client.user %}
+                                <div class="tac-img">
+                                    <a href="{{ client.user.get_profile_url }}"
+                                    target="_blank">
+                                    {% if client.user.get_profile_photo  %}
+                                    <img src="{{ client.user.get_profile_photo }}" class="img-fluid h-100"
+                                    title="{{client.name}}">
+                                    {% else %}
+                                    <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100"
+                                    title="{{client.name}}">
+                                    {% endif %}
+                                    </a>
+                                </div>
+                                <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
+                                {% else %}
+                                <div class="tac-img">
+                                    <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100"
+                                    title="{{client.name}}">
+                                </div>
+                                <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- The Modal -->
+                        <div class="modal fade" id="more_{{pos}}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
 
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h5 class="modal-title mem-setup-blu-f">{{position}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div class="modal-body">
+                                        {% for client in clients %}
+                                        {% if forloop.first or forloop.counter0|divisibleby:6 %}
+                                        <div class="row">
+                                        {% endif %}
+                                            <div class="col-2">
+                                                {% if client.user %}
+                                                <div class="tac-img">
+                                                    <a href="{{ client.user.get_profile_url }}"
+                                                    target="_blank">
+                                                    {% if client.user.get_profile_photo %}
+                                                    <img src="{{ client.user.get_profile_photo }}" class="img-fluid h-100">
+                                                    {% else %}
+                                                    <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100">
+                                                    {% endif %}
+                                                    </a>
+                                                </div>
+                                                <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
+                                                {% else %}
+                                                <div class="tac-img">
+                                                    <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid h-100">
+                                                </div>
+                                                <div class="tac-img-title" title="{{client.name}}">{{client.name|truncatechars:"9"}}</div>
+                                                {% endif %}
+                                            </div>
+                                        {% if forloop.last or forloop.counter|divisibleby:6 %}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                            data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- end of modal -->
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="left-mode-sec p-2 mt-3">
+                        <div class="row tac-mem-white-bg">
+                            <div class="col-5 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="What’s on Your Mind">
+                            </div>
+                            <div class="col-4 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="Post Photo/Video">
+                            </div>
+                            <div class="col-3 form-group">
+                                <input type="password" class="form-control form-control-input mem-b-placeholder"
+                                    placeholder="Messenger">
                             </div>
                         </div>
                     </div>
-                    <!-- end of modal -->
-                    {% endfor %}
+                    {% else %}
+                    <p>{{message}}</p>
                     {% endif %}
+                {% else %}
+                <div class="left-mode-sec pl-2 pb-2 pt-3">
+                    <p>Sorry!! You don't have the permission to view {{profile.user.get_full_name}}'s profile</p>
                 </div>
-                <div class="left-mode-sec p-2 mt-3">
-                    <div class="row tac-mem-white-bg">
-                        <div class="col-5 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="What’s on Your Mind">
-                        </div>
-                        <div class="col-4 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="Post Photo/Video">
-                        </div>
-                        <div class="col-3 form-group">
-                            <input type="password" class="form-control form-control-input mem-b-placeholder"
-                                placeholder="Messenger">
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-              <p>{{message}}</p>
-            {% endif %}
+                {% endif %}
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
                 <div class="left-mode-sec">
@@ -619,7 +638,7 @@
 {% endblock %}
 
 {% block extrajs %}
-
+<script src="{% static 'js/company-rating.js' %}"></script>
 {% endblock %}
 
 

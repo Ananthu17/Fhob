@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.utils.translation import ugettext_lazy as _
 from django_select2.forms import Select2Widget
 
 from bootstrap_datepicker_plus import DateTimePickerInput
@@ -359,7 +360,7 @@ class EditAgencyManagementCompanyProfileForm(forms.ModelForm):
 class UserInterestForm(forms.ModelForm):
     class Meta:
         model = UserInterest
-        fields = ('position', 'format', 'location')
+        fields = ('position', 'format', 'location', 'budget')
 
 
 class FeedbackForm(forms.ModelForm):
@@ -368,3 +369,17 @@ class FeedbackForm(forms.ModelForm):
 
         model = Feedback
         fields = '__all__'
+
+class CheckoutForm(forms.Form):
+    payment_method_nonce = forms.CharField(
+        max_length=1000,
+        widget=forms.widgets.HiddenInput,
+    )
+
+    def clean(self):
+        self.cleaned_data = super(CheckoutForm, self).clean()
+        # Braintree nonce is missing
+        if not self.cleaned_data.get('payment_method_nonce'):
+            raise forms.ValidationError(_(
+                'We couldn\'t verify your payment. Please try again.'))
+        return self.cleaned_data

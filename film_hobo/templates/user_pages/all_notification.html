@@ -2,16 +2,19 @@
 {% load notification_tag %}
 {% for obj in notifications %}
 
-
     <div class="row unread_notification">
         <div  class="col-2">
             <a href="{{ obj.from_user.get_profile_url }}"
             target="_blank" id ="{{obj.id}}" class="notification_link">
+            {% if obj.from_user %}
                 {% if obj.from_user.get_profile_photo %}
                 <img src="{{ obj.from_user.get_profile_photo }}" class="notification_img"/>
                 {% else %}
                 <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
                 {% endif %}
+            {% else %}
+             <img src="{% static 'images/FH_Logo.png' %}" class="notification_img"/>
+            {% endif %}
             </a>
         </div>
         <div class="col-10">
@@ -26,7 +29,7 @@
             </div>
             {% elif obj.notification_type == 'friend_request' %}
             <div class="row">
-                <div class="col-10 friend-req-btns">
+                <div class="col-10 " id="friend-req-btns-{{obj.from_user.id}}">
                     {{ obj.from_user.get_full_name }} send you friend request.<br>
                     <b>{{ obj.from_user.get_membership_display }}</b><br>
                     <span class="btn-blue cursor-pointer accept_friend_request" id="{{obj.from_user.id}}">Accept</span>
@@ -37,9 +40,27 @@
             </div>
             {% elif obj.notification_type == 'accepted_friend_request' %}
             <div class="row">
-                <div class="col-10 friend-req-btns">
+                <div class="col-10 ">
                     {{ obj.from_user.get_full_name }} accepted your friend request.<br>
                     <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'user_rating' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message}}<br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'membership_change' %}
+            <div class="row">
+                <div class="col-10 ">
+                    <b>{{obj.message}}</b><br>
+                    <b>FilmHobo</b><br>
                     {% get_notifications_time obj.created_time as time %}
                     {{time}} ago.
                 </div>

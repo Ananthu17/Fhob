@@ -1,30 +1,35 @@
-<div class="row intrest-input ">
-    <div class="sm-12">
-        <label class="intrest-lab">position:</label>
-        <select class="inp-interest"
-        name="position" id="position_{{count}}" required>
-            <option></option>
-            {% for item in my_interest_form.position %}
-            {{item}}
+
+<div class="row ">
+    <div class="col-md-3 col-sm-3 form-group">
+        <select name="position" id="position_{{count}}"
+        class="form-control form-control-input mt-2" required>
+            {% for position in my_interest_form.position %}
+                {{position}}
             {% endfor %}
         </select>
     </div>
-    <div class="sm-12">
-        <label class="intrest-lab">Format:</label>
+    <div class="col-md-3 col-sm-3 form-group">
         <select name="format" id = "format_{{count}}"
-            class="inp-interest format-space" required>
-                {% for item in my_interest_form.format %}
+            class="form-control form-control-input mt-2 " required>
+            {% for item in my_interest_form.format %}
                 {{item}}
-                {% endfor %}
-            </select>
+            {% endfor %}
+        </select>
     </div>
-    <div class="sm-12">
-        <label class="intrest-lab">Location:</label>
+    <div class="col-md-3 col-sm-3 form-group">
         <select name="location" id ="location_{{count}}"
-            class="inp-interest" required>
-                {% for item in my_interest_form.location %}
+            class="form-control form-control-input mt-2 " required>
+            {% for item in my_interest_form.location %}
                 {{item}}
-                {% endfor %}
-            </select>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-3 form-group">
+        <select name="budget" id ="budget_{{count}}"
+            class="form-control form-control-input mt-2 " required>
+            {% for item in my_interest_form.budget %}
+                {{item}}
+            {% endfor %}
+        </select>
     </div>
 </div>

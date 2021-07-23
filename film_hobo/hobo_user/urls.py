@@ -25,7 +25,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    PersonalDetailsView, HowTo, \
                    UserProfileAPI, UserProfileView, \
                    AddCoworkerAPI, RemoveCoworkerAPI, \
-                   MemberProfileView, RateUserSkillsAPI, AddAgentManagerAPI, \
+                   MemberProfileView, AddAgentManagerAPI, \
                    AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
                    FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
                    GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
@@ -55,8 +55,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, ProjectSearchView, VideoRatingView, \
                    FindVideoRatingAPI, VideoListAPI, ProjectView, \
-                   CreateProjectView
-
+                   CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
+                   GetProfileRatingNotificationAjaxView, EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, FindVideoRatingAPI, \
+                   VideoListAPI
 
 app_name = "hobo_user"
 
@@ -126,8 +128,6 @@ urlpatterns = [
          name='remove-coworker-api'),
     path('remove-client-api/', RemoveClientAPI.as_view(),
          name='remove-client-api'),
-    path('rate-user-api/', RateUserSkillsAPI.as_view(),
-         name='rate-user-api'),
     path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
          name='remove-agent-api'),
     path('track-user-api/', TrackUserAPI.as_view(),
@@ -151,6 +151,8 @@ urlpatterns = [
          name='change-notification-status-api'),
     path('add-user-interest-api/', AddUserInterestAPI.as_view(),
          name='add-user-interest-api'),
+    path('edit-user-interest-api/', EditUserInterestAPI.as_view(),
+         name='edit-user-interest-api'),
     path('company-client-api/', CompanyClientAPI.as_view(),
          name='company-client-api'),
     path('send-friend-request-api/', SendFriendRequestAPI.as_view(),
@@ -282,6 +284,9 @@ urlpatterns = [
          name='delete-team'),
     path('teams/update/<id>', TeamUpdateAPIView.as_view(),
          name='delete-project'),
+    path('get-profile-rating-notification-html/',
+         GetProfileRatingNotificationAjaxView.as_view(),
+         name='get-profile-rating-notification-html'),
     path('projects/search/',  ProjectSearchView.as_view(),
          name="project-search"),
     path('video/rate',  VideoRatingView.as_view(),

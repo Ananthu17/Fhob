@@ -1,7 +1,9 @@
+import braintree
 import json
 import requests
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -9,7 +11,7 @@ from django.views.generic.base import View
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -752,6 +754,7 @@ class CreateUserOrder(APIView):
                         {"status": "invalid user token"},
                         status=status.HTTP_400_BAD_REQUEST)
         payment_plan = request.data['payment_plan']
+        payment_method = request.data['payment_method']
         days_free = request.data['days_free']
         initial_amount = request.data['initial_amount']
         tax_applied = request.data['tax_applied']
@@ -769,6 +772,7 @@ class CreateUserOrder(APIView):
                                    user=logged_user,
                                    membership=membership_type,
                                    payment_plan=payment_plan,
+                                   payment_method=payment_method,
                                    days_free=days_free,
                                    initial_amount=initial_amount,
                                    tax_applied=tax_applied,
@@ -861,10 +865,20 @@ class GetOrderDetails(APIView):
         return JsonResponse(data)
 
 
+class GetProductID(APIView):
+    permission_classes = (IsAdminUser,)
+
+    def get(self, request, *args, **kwargs):
+        data = {'paypal_product_id': settings.PRODUCT_ID}
+        return JsonResponse(data)
+
+
 class SubscriptionDetails(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
+            # user_email = self.request.GET.get('email')
+            # logged_user = CustomUser.objects.get(email=user_email)
             logged_user = Token.objects.get(key=request.data['token']).user
             membership_type = logged_user.membership
         except ObjectDoesNotExist:
@@ -887,6 +901,40 @@ class SubscriptionDetails(APIView):
                 plan_id = settings.COMPANY_PAYMENT_MONTHLY
             else:
                 plan_id = settings.COMPANY_PAYMENT_YEARLY
+        else:
+            pass
+        return Response(
+                {"plan_id": plan_id}, status=status.HTTP_200_OK)
+
+
+class BraintreeSubscriptionDetails(APIView):
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # user_email = self.request.GET.get('email')
+            # logged_user = CustomUser.objects.get(email=user_email)
+            logged_user = Token.objects.get(key=request.data['token']).user
+            membership_type = logged_user.membership
+        except ObjectDoesNotExist:
+            return Response(
+                        {"status": "invalid user token"},
+                        status=status.HTTP_400_BAD_REQUEST)
+        payment_plan = request.data['payment_plan']
+        if membership_type == 'IND':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY
+        elif membership_type == 'PRO':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY
+        elif membership_type == 'COM':
+            if payment_plan == 'monthly':
+                plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY
+            else:
+                plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY
         else:
             pass
         return Response(
@@ -916,48 +964,139 @@ class PaypalToken(APIView):
 class PaypalPlanID(APIView):
     def get(self, request, *args, **kwargs):
         paypal_plans = {
-            'Indie_Payment_Monthly': settings.INDIE_PAYMENT_MONTHLY,
-            'Indie_Payment_Yearly': settings.INDIE_PAYMENT_YEARLY,
-            'Prp_Payment_Monthly': settings.PRO_PAYMENT_MONTHLY,
-            'Pro_Payment_Yearly': settings.PRO_PAYMENT_YEARLY,
-            'Company_Payment_Monthly': settings.COMPANY_PAYMENT_MONTHLY,
-            'Company_Payment_Yearly': settings.COMPANY_PAYMENT_YEARLY
+            'indie_payment_monthly': settings.INDIE_PAYMENT_MONTHLY,
+            'indie_payment_yearly': settings.INDIE_PAYMENT_YEARLY,
+            'pro_payment_monthly': settings.PRO_PAYMENT_MONTHLY,
+            'pro_payment_yearly': settings.PRO_PAYMENT_YEARLY,
+            'company_payment_monthly': settings.COMPANY_PAYMENT_MONTHLY,
+            'company_payment_yearly': settings.COMPANY_PAYMENT_YEARLY
         }
         return JsonResponse(paypal_plans)
 
-# class ProcessSubscription(APIView):
 
-#     def post(self, request, *args, **kwargs):
-#         subscription_plan = request.data['subscription_plan']
-#         host = request.get_host()
+class InitialRequest(APIView):
 
-#         if subscription_plan == 'monthly':
-#             price = request.data['price']
-#             billing_cycle = 1
-#             billing_cycle_unit = "M"
-#         else:
-#             price = request.data['price']
-#             billing_cycle = 1
-#             billing_cycle_unit = "Y"
-#         paypal_dict = {
-#             "cmd": "_xclick-subscriptions",
-#             'business': settings.PAYPAL_RECEIVER_EMAIL,
-#             "a3": price,  # monthly price
-#             "p3": billing_cycle,  # duration of each unit (depends on unit)
-#             "t3": billing_cycle_unit,  # duration unit ("M for Month")
-#             "src": "1",  # make payments recur
-#             "sra": "1",  # reattempt payment on payment error
-#             "no_note": "1",  # remove extra notes (optional)
-#             'item_name': 'Content subscription',
-#             'custom': 1,     # custom data, pass something meaningful here
-#             'currency_code': 'USD',
-#             'notify_url': 'http://{}{}'.format(
-#                 host, reverse('payment:paypal-ipn')),
-#             'return_url': 'http://{}{}'.format(
-#                 host, reverse('payment:done')),
-#             'cancel_return': 'http://{}{}'.format(host,
-#                                                   reverse('payment:canceled')),
-#         }
+    def post(self, request, *args, **kwargs):
+        amount = request.data['amount']
+        payment_method_nonce = request.data['payment_method_nonce']
+        # submit_for_settlement = request.data['submit_for_settlement']
+        braintree_plan_id = request.data['braintree_plan_id']
+        email = request.data['email']
+        user = CustomUser.objects.get(email=email)
+        membership_type = 'card_payment'
+        payment_plan = request.data['payment_plan']
+        payment_method = request.data['payment_method']
+        days_free = request.data['days_free']
+        initial_amount = request.data['initial_amount']
+        tax_applied = request.data['tax_applied']
+        if request.data['promocodes_applied'] == '':
+            promocodes_applied = None
+        else:
+            promocodes_applied = request.data['promocodes_applied']
+        promotion_amount = request.data['promotion_amount']
 
-#         form = PayPalPaymentsForm(initial=paypal_dict, button_type="subscribe")
-#         return render(request, 'payment/process_subscription.html', locals())
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+
+        if user.middle_name is None:
+            middle_name = ''
+        else:
+            middle_name = user.middle_name
+
+        if user.last_name is None:
+            last_name = ''
+        else:
+            last_name = user.last_name
+
+        middle_n_last = middle_name + ' ' + last_name
+
+        customer_create_result = gateway.customer.create({
+            "first_name": user.first_name,
+            "last_name": middle_n_last,
+            "payment_method_nonce": payment_method_nonce
+        })
+
+        customer_create_temp_result = customer_create_result
+
+        if not customer_create_temp_result.is_success:
+            return Response(
+                {"status": "braintree customer creation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        subscription_create_result = gateway.subscription.create({
+            "payment_method_token":
+            customer_create_result.customer.payment_methods[0].token,
+            "plan_id": braintree_plan_id
+        })
+        subscription_create_temp_result = subscription_create_result
+        if not subscription_create_temp_result.is_success:
+            return Response(
+                {"status": "braintree subscription creation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Transaction.objects.create(
+                user=user,
+                membership=membership_type,
+                payment_plan=payment_plan,
+                payment_method=payment_method,
+                days_free=days_free,
+                initial_amount=initial_amount,
+                tax_applied=tax_applied,
+                promocodes_applied=promocodes_applied,
+                promotion_amount=promotion_amount,
+                final_amount=amount)
+            CustomUser.objects.filter(
+                email=user.email
+            ).update(registration_complete=True)
+
+        # transaction_create_result = gateway.transaction.sale({
+        #     "amount": amount,
+        #     "payment_method_nonce": payment_method_nonce,
+        #     "device_data": "",
+        #     "options": {
+        #         "submit_for_settlement": submit_for_settlement
+        #     }
+        # })
+        # transaction_create_temp_result = transaction_create_result
+        # if not transaction_create_temp_result.is_success:
+        #     return Response(
+        #         {"status": "braintree transaction creation unsuccsessful "},
+        #         status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"status": "braintree transaction succsessful "},
+            status=status.HTTP_200_OK)
+
+
+class ManageSubscription(APIView):
+
+    def post(self, request, *args, **kwargs):
+        new_price = request.data['new_price']
+
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+        result = gateway.subscription.update("a_subscription_id", {
+            "id": "new_id",
+            "payment_method_token": "new_payment_method_token",
+            "price": new_price,
+            "plan_id": "new_plan",
+        })
+        if not result.is_success:
+            return Response(
+                {"status": "braintree subscription updation unsuccsessful "},
+                status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"status": "braintree subscription updation succsessful "},
+            status=status.HTTP_200_OK)

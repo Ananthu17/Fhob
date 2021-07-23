@@ -5,22 +5,21 @@ from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
 
 from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
-                    AthleticSkill, EthnicAppearanceInline, \
-                    PromoCode, Team, UserInterest, AthleticSkillInline, \
-                    Country, \
-                    IndiePaymentDetails, ProPaymentDetails, GuildMembership, \
-                    CompanyPaymentDetails, DisabledAccount, CustomUserSettings, \
-                    HoboPaymentsDetails, JobType, UserProfile, CoWorker, \
-                    FriendRequest, UserTacking, UserRatingCombined, UserRating, \
-                    UserAgentManager, Photo, UserNotification, CompanyProfile, \
+                    AthleticSkill, PromoCode, Team, UserInterest, \
+                    AthleticSkillInline, Country, IndiePaymentDetails, \
+                    ProPaymentDetails, GuildMembership, \
+                    CompanyPaymentDetails, DisabledAccount, \
+                    CustomUserSettings, HoboPaymentsDetails, JobType, \
+                    UserProfile, CoWorker, FriendRequest, UserTacking, \
+                    UserRatingCombined, UserRating, UserAgentManager, \
+                    Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
                     GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
-                    VideoRating, Video
-
+                    VideoRating,Video, ProjectMemberRating
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
-                    CountryResource, GuildMembershipResource, JobTypeResource, \
-                    LocationResource
+                    CountryResource, GuildMembershipResource, \
+                    JobTypeResource, LocationResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -91,21 +90,17 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
-admin.site.register(Team)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
 admin.site.register(CompanyPaymentDetails)
 admin.site.register(DisabledAccount)
 admin.site.register(CoWorker)
-admin.site.register(UserRating)
-admin.site.register(UserRatingCombined)
 admin.site.register(Video)
 admin.site.register(VideoRating)
 admin.site.register(FriendRequest)
 admin.site.register(UserAgentManager)
 admin.site.register(Photo)
-admin.site.register(UserNotification)
 admin.site.register(UserInterest)
 admin.site.register(CompanyClient)
 admin.site.register(NewJobType)
@@ -133,9 +128,11 @@ class CountryAdmin(ImportExportModelAdmin):
 class GuildMembershipAdmin(ImportExportModelAdmin):
     resource_class = GuildMembershipResource
 
+
 @admin.register(JobType)
 class JobTypeAdmin(ImportExportModelAdmin):
     resource_class = JobTypeResource
+
 
 @admin.register(Location)
 class LocationAdmin(ImportExportModelAdmin):
@@ -149,6 +146,7 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
                                 'who_can_track_me', 'who_can_contact_me',
                                 'account_status')}),
         ('Blocked Members', {'fields': ('blocked_members',)}),
+        ('Profile', {'fields': ('hide_ratings',)}),
         ('Notification', {'fields': ('someone_tracks_me',
                                      'change_in_my_or_project_rating',
                                      'review_for_my_work_or_project',
@@ -206,3 +204,37 @@ class CompanyProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
+
+
+class ProjectMemberRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'project', 'rating')
+
+
+admin.site.register(ProjectMemberRating, ProjectMemberRatingAdmin)
+
+
+class UserRatingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'project', 'rating', 'rated_by')
+
+
+admin.site.register(UserRating, UserRatingAdmin)
+
+
+class UserNotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'notification_type', 'from_user', 'status_type', 'message', 'created_time')
+
+
+admin.site.register(UserNotification, UserNotificationAdmin)
+
+
+class UserRatingCombinedAdmin(admin.ModelAdmin):
+    list_display = ('user', 'job_type', 'rating')
+
+
+admin.site.register(UserRatingCombined, UserRatingCombinedAdmin)
+
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ('project', 'user', 'job_type')
+
+
+admin.site.register(Team, TeamAdmin)

@@ -29,6 +29,12 @@ class PaymentOptions(SingletonModel):
 
 
 class Transaction(models.Model):
+    PAYPAL_ACCOUNT = 'paypal_account'
+    CARD_PAYMENT = 'card_payment'
+    PAYMENT_METHOD_CHOICES = [
+        (PAYPAL_ACCOUNT, 'PayPal Account'),
+        (CARD_PAYMENT, 'Card Payment')
+    ]
     MONTHLY = 'monthly'
     ANNUALLY = 'annually'
     PAYMENT_PLAN_CHOICES = [
@@ -51,6 +57,10 @@ class Transaction(models.Model):
     user = models.ForeignKey('hobo_user.CustomUser',
                              verbose_name=_("User"),
                              on_delete=models.CASCADE)
+    payment_method = models.CharField(_("Payment Method"),
+                                      choices=PAYMENT_METHOD_CHOICES,
+                                      max_length=150,
+                                      null=True)
     paypal_order_id = models.CharField(_("Paypal Order ID"),
                                        null=True, blank=True, max_length=150)
     date = models.DateTimeField(auto_now_add=True)

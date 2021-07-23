@@ -318,13 +318,15 @@ class CustomUser(AbstractUser):
             if self.company_type == 'production':
                 return reverse('hobo_user:edit-production-company-profile')
             if self.company_type == 'agency_management':
-                return reverse('hobo_user:edit-agency-management-company-profile')
+                return reverse(
+                    'hobo_user:edit-agency-management-company-profile')
         return ""
 
     @property
     def group_name(self):
         """
-        Returns a group name based on the user's id to be used by Django Channels.
+        Returns a group name based on the user's id
+        to be used by Django Channels.
         """
         return "user_%s" % self.id
 
@@ -384,30 +386,30 @@ class CrewMember(models.Model):
         return str(self.name)
 
 
-class Team(models.Model):
-    ACTOR = 'ACT'
-    DIRECTOR = 'DIR'
-    SOUND = 'SOU'
-    PRODUCTION = 'PRO'
-    CINEMATOGRAPHY = 'CINE'
-    WRITER = 'WRI'
-    ROLE_CHOICES = [
-        (ACTOR, 'Actor'),
-        (DIRECTOR, 'Director'),
-        (SOUND, 'Sound'),
-        (PRODUCTION, 'Production'),
-        (CINEMATOGRAPHY, 'Videographer'),
-        (WRITER, 'Writer')
-    ]
+# class Team(models.Model):
+#     ACTOR = 'ACT'
+#     DIRECTOR = 'DIR'
+#     SOUND = 'SOU'
+#     PRODUCTION = 'PRO'
+#     CINEMATOGRAPHY = 'CINE'
+#     WRITER = 'WRI'
+#     ROLE_CHOICES = [
+#         (ACTOR, 'Actor'),
+#         (DIRECTOR, 'Director'),
+#         (SOUND, 'Sound'),
+#         (PRODUCTION, 'Production'),
+#         (CINEMATOGRAPHY, 'Videographer'),
+#         (WRITER, 'Writer')
+#     ]
 
-    team = models.CharField(max_length=1000, choices=ROLE_CHOICES, null=True,
-                            blank=True)
-    members = models.ManyToManyField('hobo_user.CrewMember',
-                                     verbose_name=_("Member"),
-                                     related_name="team_member")
+#     team = models.CharField(max_length=1000, choices=ROLE_CHOICES, null=True,
+#                             blank=True)
+#     members = models.ManyToManyField('hobo_user.CrewMember',
+#                                      verbose_name=_("Member"),
+#                                      related_name="team_member")
 
-    def __str__(self):
-        return self.team
+#     def __str__(self):
+#         return self.team
 
 
 class AthleticSkillInline(models.Model):
@@ -451,11 +453,85 @@ class Project(models.Model):
     """
     A model to store all project related details
     """
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+    VISIBILITY_CHOICES = [
+        (PUBLIC, 'Public'),
+        (PRIVATE, 'Private'),
+    ]
+    NATION_WIDE = 'nation_wide'
+    LOCAL_ONLY = 'local_only'
+    CAST_ATTACHMENT_CHOICES = [
+        (NATION_WIDE, 'Nation Wide'),
+        (LOCAL_ONLY, 'Local Only'),
+    ]
+    INDIE_WITH_RATING_1_STAR = 'indie_with_rating_1_star'
+    INDIE_WITH_RATING_2_STAR = 'indie_with_rating_2_star'
+    INDIE_WITH_RATING_3_STAR = 'indie_with_rating_3_star'
+    INDIE_WITH_RATING_4_STAR = 'indie_with_rating_4_star'
+    INDIE_WITH_RATING_5_STAR = 'indie_with_rating_5_star'
+    PRO_WITH_RATING_1_STAR = 'pro_with_rating_1_star'
+    PRO_WITH_RATING_2_STAR = 'pro_with_rating_2_star'
+    PRO_WITH_RATING_3_STAR = 'pro_with_rating_3_star'
+    PRO_WITH_RATING_4_STAR = 'pro_with_rating_4_star'
+    PRO_WITH_RATING_5_STAR = 'pro_with_rating_5_star'
+    INDIE_AND_PRO_WITH_RATING_1_STAR = 'indie_and_pro_with_rating_1_star'
+    INDIE_AND_PRO_WITH_RATING_2_STAR = 'indie_and_pro_with_rating_2_star'
+    INDIE_AND_PRO_WITH_RATING_3_STAR = 'indie_and_pro_with_rating_3_star'
+    INDIE_AND_PRO_WITH_RATING_4_STAR = 'indie_and_pro_with_rating_4_star'
+    INDIE_AND_PRO_WITH_RATING_5_STAR = 'indie_and_pro_with_rating_5_star'
+    CAST_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
+    ]
+    No_PAYMENT = 'no_payment'
+    NEGOTIABLE = 'payment_is_negotiable'
+    ULB = 'SAG_ultra _low_budget'
+    MLB = 'SAG_moderate_low_budget'
+    LB = 'SAG_low_budget'
+    ThB = 'SAG_theatrical_budget'
+    ShB = 'SAG_short_film_budget'
+    MiB = 'SAG_micro_budget'
+    StB = 'SAG_studet_budget'
+    CAST_PAY_RATE_CHOICES = [
+                    (No_PAYMENT, 'No Payment'),
+                    (NEGOTIABLE, 'Payment is Negotiable'),
+                    (ULB, 'SAG Ultra Low Budget'),
+                    (MLB, 'SAG Moderate Low Budget'),
+                    (LB, 'SAG Low Budget'),
+                    (ThB, 'SAG Theatrical Budget'),
+                    (ShB, 'SAG Short Film Budget'),
+                    (MiB, 'SAG Micro Budget'),
+                    (StB, 'SAG Studet Budget'),
+                    ]
     SCENE = 'SCH'
     SHORTS = 'SHO'
     FORMAT_CHOICES = [
         (SCENE, 'Scene'),
         (SHORTS, 'Shorts'),
+    ]
+    YOUTUBE = 'youtube'
+    VIMEO = 'vimeo'
+    FACEBOOK = 'facebook'
+    UPLOAD_VIDEO = 'upload_video'
+    VIDEO_TYPE_CHOICES = [
+        (YOUTUBE, 'Youtube'),
+        (VIMEO, 'Vimeo'),
+        (FACEBOOK, 'Facebook'),
+        (UPLOAD_VIDEO, 'Upload Video'),
     ]
 
     ACTION = 'ACT'
@@ -522,16 +598,48 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    video_url = models.CharField(max_length=1000,
+                                 null=True, blank=True)
+    video_type = models.CharField(_("Video Type"),
+                                  choices=VIDEO_TYPE_CHOICES,
+                                  max_length=150, null=True, blank=True,
+                                  default=UPLOAD_VIDEO)
+    last_date = models.DateField(_("Last date for submitting video"),
+                                 null=True, blank=True,)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
-                                  null=True, blank=True)
+    script = models.FileField(upload_to='script/', null=True, blank=True)
+    visibility = models.CharField(_("Visibility"),
+                                  choices=VISIBILITY_CHOICES,
+                                  max_length=150, default=PRIVATE)
+    visibility_password = models.CharField(max_length=12, null=True,
+                                           blank=True)
+    cast_attachment = models.CharField(_("Cast Attachment"),
+                                       choices=CAST_ATTACHMENT_CHOICES,
+                                       max_length=150, default=NATION_WIDE)
+    cast_pay_rate = models.CharField(_("Cast Pay Rate"),
+                                     choices=CAST_PAY_RATE_CHOICES,
+                                     max_length=150, default=NEGOTIABLE)
+    cast_samr = models.CharField(_("Cast SAMR"),
+                                 choices=CAST_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
 
     def __str__(self):
         return self.title
+
+    def generate_s3_signed_url(self, s3_client, path, bucket_name):
+        url = s3_client.generate_presigned_url(
+            ClientMethod='get_object',
+            Params={
+                'Bucket': bucket_name,
+                'Key': path
+            }
+        )
+        return url
 
 
 class ProjectReaction(models.Model):
@@ -582,6 +690,23 @@ class PromoCode(models.Model):
 
     def __str__(self):
         return str(self.promo_code)
+
+
+class Team(models.Model):
+    team = models.CharField(max_length=1000)
+    project = models.ForeignKey('hobo_user.Project',
+                                verbose_name=_("Project"),
+                                on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey('hobo_user.CustomUser',
+                             verbose_name=_("User"),
+                             related_name='team_user',
+                             on_delete=models.SET_NULL, null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 verbose_name=_("Job Type"),
+                                 on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.project.title +" - "+ self.job_type.title
 
 
 class Country(models.Model):
@@ -822,6 +947,10 @@ class CustomUserSettings(models.Model):
         default=True,
         verbose_name=_("If I’ve got a match for my Interest")
         )
+    hide_ratings = models.BooleanField(
+        default=False,
+        verbose_name=_("Hide ratings from my profile")
+        )
 
     class Meta:
         verbose_name = 'Custom User Settings'
@@ -916,12 +1045,12 @@ class CompanyProfile(models.Model):
     MEMBERS_WITH_RATING_5_STAR = 'members_with_rating_5_star'
     PROS_AND_COMPANIES_ONLY = 'pros_and_companies_only'
     SAMR_CHOICES = [
-                        (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
-                        (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
-                        (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
-                        (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
-                        (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
-                        (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
+                    (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
+                    (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
+                    (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
+                    (MEMBERS_WITH_RATING_4_STAR, 'Members with rating 4 star'),
+                    (MEMBERS_WITH_RATING_5_STAR, 'Members with rating 5 star'),
+                    (PROS_AND_COMPANIES_ONLY, 'Pros and Companies Only')
                     ]
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -1022,17 +1151,36 @@ class CompanyClient(models.Model):
         verbose_name = 'Company Client'
         verbose_name_plural = 'Company Clients'
 
-
 class UserInterest(models.Model):
     SCENE = 'scene'
     SHORT = 'short'
     PILOT = 'pilot'
     FEATURE = 'feature'
+    No_PAYMENT = 'no_payment'
+    NEGOTIABLE = 'payment_is_negotiable'
+    ULB = 'SAG_ultra _low_budget'
+    MLB = 'SAG_moderate_low_budget'
+    LB = 'SAG_low_budget'
+    ThB = 'SAG_theatrical_budget'
+    ShB = 'SAG_short_film_budget'
+    MiB = 'SAG_micro_budget'
+    StB = 'SAG_studet_budget'
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
                     (SHORT, 'Short Film'),
                     (PILOT, 'Pilot'),
                     (FEATURE, 'Feature'),
+                    ]
+    BUDGET_CHOICES = [
+                    (No_PAYMENT, 'No Payment'),
+                    (NEGOTIABLE, 'Payment is Negotiable'),
+                    (ULB, 'SAG Ultra Low Budget'),
+                    (MLB, 'SAG Moderate Low Budget'),
+                    (LB, 'SAG Low Budget'),
+                    (ThB, 'SAG Theatrical Budget'),
+                    (ShB, 'SAG Short Film Budget'),
+                    (MiB, 'SAG Micro Budget'),
+                    (StB, 'SAG Studet Budget'),
                     ]
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
@@ -1048,6 +1196,10 @@ class UserInterest(models.Model):
                               choices=FORMAT_CHOICES,
                               max_length=150,
                               default=SCENE, null=True)
+    budget = models.CharField(_("Budget"),
+                              choices=BUDGET_CHOICES,
+                              max_length=150,
+                              default=No_PAYMENT, null=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
@@ -1074,6 +1226,32 @@ class UserRatingCombined(models.Model):
     class Meta:
         verbose_name = 'User Rating Combined'
         verbose_name_plural = 'User Rating Combined'
+
+
+class ProjectMemberRating(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='project_member_rating_combined',
+                             verbose_name=_("User"),
+                             null=True)
+    job_type = models.ForeignKey('hobo_user.JobType',
+                                 on_delete=models.CASCADE,
+                                 related_name="project_member_job_type",
+                                 verbose_name=_("Job Types")
+                                 )
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project',
+                                verbose_name=_("Project"),
+                                null=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'Project Member Rating'
+        verbose_name_plural = 'Project Member Ratings'
 
 
 class CompanyRatingCombined(models.Model):
@@ -1109,6 +1287,12 @@ class UserRating(models.Model):
                                  verbose_name=_("Job Types")
                                  )
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_rating',
+                                verbose_name=_("Project"),
+                                null=True)
 
     def __str__(self):
         return str(self.user)
@@ -1165,6 +1349,7 @@ class CompanyRating(models.Model):
                                  verbose_name=_("Rated by"),
                                  null=True)
     rating = models.IntegerField(_("Rating"), null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.company)
@@ -1308,12 +1493,16 @@ class UserNotification(models.Model):
     FRIEND_REQUEST_ACCEPT = 'accepted_friend_request'
     READ = 'read'
     UNREAD = 'unread'
+    MEMBERSHIP_CHANGE = 'membership_change'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
+                                (USER_RATING, 'Rating'),
                                 (FRIEND_REQUEST, 'Friend Request'),
                                 (USER_RATING, 'User Rating'),
                                 (FRIEND_REQUEST_ACCEPT,
                                  'Accepted Friend Request'),
+                                (MEMBERSHIP_CHANGE,
+                                 'Membership Change'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1337,6 +1526,7 @@ class UserNotification(models.Model):
                                    max_length=150, default=UNREAD)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
+    message = models.TextField(_("Message"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1400,4 +1590,3 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Feedback'
         verbose_name_plural = 'Feedbacks'
-
