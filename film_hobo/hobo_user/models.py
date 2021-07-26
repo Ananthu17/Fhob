@@ -431,9 +431,15 @@ class AthleticSkillInline(models.Model):
 
 
 class Location(models.Model):
-    city = models.CharField(max_length=1000, verbose_name='City', null=True)
-    state = models.CharField(max_length=1000, verbose_name='State', null=True)
-    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+    city = models.CharField(max_length=1000,
+                            verbose_name='City',
+                            null=True)
+    state = models.CharField(max_length=1000,
+                             verbose_name='State',
+                             null=True)
+    country = models.CharField(max_length=1000,
+                               verbose_name='Country',
+                               null=True)
 
     def __str__(self):
         location = self.city+","+self.state+","+self.country

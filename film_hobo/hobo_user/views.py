@@ -1374,7 +1374,8 @@ class PasswordResetTemplateView(TemplateView):
         return render(request, 'registration/password_reset_from_key.html',
                       {'response': response,
                        'form': form,
-                      })
+                      }
+                     )
 
 
 class SettingsAPI(APIView):
@@ -4313,7 +4314,7 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-# Search API for project
+
 # Api to search in project
 # class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
@@ -4404,3 +4405,12 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
         return context
 
+
+class CreateProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/new-project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

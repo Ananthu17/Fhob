@@ -1073,7 +1073,10 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['creator', 'title', 'format', 'genre', 'rating', 'video_url',
+                  'video_type', 'last_date', 'location', 'visibility',
+                  'visibility_password', 'cast_attachment', 'cast_pay_rate',
+                  'cast_samr']
 
 
 class TeamSerializer(serializers.ModelSerializer):
