@@ -22,7 +22,7 @@ from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
