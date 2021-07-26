@@ -1,0 +1,619 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="wrapper flex-grow-1">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                    <div class="left-mode-search lft-li">
+                        <div class="mt-2 search-txt">
+                            <label class="d-flex justify-content-center ">Search by:</label>
+                        </div>
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Year</label>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div>
+                                <a href=""><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
+                            </div>
+                            <div class="ml-2">
+                                <label class="d-flex justify-content-center year">2021</label>
+                            </div>
+                            <div class="ml-2">
+                                <a href=""><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Month</label>
+                        </div>
+
+                        <div class="d-flex justify-content-center left-mode-sec">
+                            <ul class="list-group home-month">
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">January</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">February</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">March</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">April</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">May</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">June</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">July</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">August</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">September</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">October</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">November</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">December</li>
+                                </a>
+                            </ul>
+                        </div>
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Day</label>
+                        </div>
+                        <!-- <div > -->
+                        <table class="table borderless d-flex justify-content-center home-date">
+
+                            <tbody>
+                                <tr>
+                                    <td><a class="text-dark " href="">1</a></td>
+                                    <td><a class="text-dark" href="">2</a></td>
+                                    <td><a class="text-dark" href="">3</a></td>
+                                    <td><a class="text-dark" href="">4</a></td>
+                                    <td><a class="text-dark" href="">5</a></td>
+                                    <td><a class="text-dark" href="">6</a></td>
+                                    <td><a class="text-dark" href="">7</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a class="text-dark " href="">8</a></td>
+                                    <td><a class="text-dark " href="">9</a></td>
+                                    <td><a class="text-dark " href="">10</a></td>
+                                    <td><a class="text-dark " href="">11</a></td>
+                                    <td><a class="text-dark " href="">12</a></td>
+                                    <td><a class="text-dark " href="">13</a></td>
+                                    <td><a class="text-dark " href="">14</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">15</a></td>
+                                    <td><a class="text-dark " href="">16</a></td>
+                                    <td><a class="text-dark " href="">17</a></td>
+                                    <td><a class="text-dark " href="">18</a></td>
+                                    <td><a class="text-dark " href="">19</a></td>
+                                    <td><a class="text-dark " href="">20</a></td>
+                                    <td><a class="text-dark " href="">21</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">22</a></td>
+                                    <td><a class="text-dark " href="">23</a></td>
+                                    <td><a class="text-dark " href="">24</a></td>
+                                    <td><a class="text-dark " href="">25</a></td>
+                                    <td><a class="text-dark " href="">26</a></td>
+                                    <td><a class="text-dark " href="">27</a></td>
+                                    <td><a class="text-dark " href="">28</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">29</a></td>
+                                    <td><a class="text-dark " href="">30</a></td>
+                                    <td><a class="text-dark " href="">31</a></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <!-- </div>    -->
+                    </div>
+                    <div class="left-mode-sec  p-2 mb-3 ">
+                        <div class="add-space d-flex justify-content-center">
+                            <a href="" class="create-a-project">Create a Project</a>
+                        </div>
+                    </div>
+                    <div class="left-mode-sec  p-2  blank-left-alg-hgt-project ">
+                        <div class="add-space d-flex justify-content-center add-space-align">
+                            Ad Space
+                        </div>
+                    </div>
+                </div>
+                <!-- center -->
+
+                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
+
+                    <!-- row 1 -->
+                    <div class="row left-mode-search p-2 text-center mt-2 left-mode-search-height">
+                        <div class="cnt-menu">
+                            <label class=" txt-red float-left top-head-align">New Scenes</label>
+                            <ul class="cnt-menu-li float-left ml-2">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- owl-carousel  -->
+
+                        <div class="owl-carousel owl-theme owl-algin" id="scene">
+                            {% for project in scenes %}
+                            <!-- carousel column  -->
+                            <div class="item pro-item">
+                                <div class="card proj-card">
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-no">
+                                            Project<a href=""> #{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">0</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span class="proj-symb">
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-title">
+                                            Title:<a href="">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a href="">4</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <a href="">Public</a>
+                                        </span>
+
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Creator:<a href="">Tom Smith</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Team:<a href="">Actor,Director +</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Cast:<a href="">Female(27),Female(35)</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1 mb-1">
+                                        <span class="proj-format">
+                                            Location:<a href="">New York,NY</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- carousel column End -->
+                            {% endfor %}
+                        </div>
+                        <!-- owl-carousel End -->
+
+                    </div>
+                    <!-- End row 1 -->
+                    <!-- row 2 -->
+
+                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
+                        <div class="cnt-menu">
+                            <label class=" txt-red float-left top-head-align">Top Rated</label>
+                            <ul class="cnt-menu-li float-left ml-4">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- owl-carousel  -->
+
+                        <div class="owl-carousel owl-theme owl-algin">
+                            <!-- carousel column  -->
+                            {% for project in toprated_scenes %}
+                            <div class="item pro-item">
+                                <div class="card proj-card">
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-no">
+                                            Project<a href=""> #{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">N</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span class="proj-symb">
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-title">
+                                            Title:<a href="">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a href="">16</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <a href="">Public</a>
+                                        </span>
+
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Creator:<a href="">Karen O'Tool</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Cast:<a href="">Female(27),Female(35)</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1 mb-1">
+                                        <span class="proj-format">
+                                            Location:<a href="">Dallas,TX</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- carousel column End -->
+                            {% endfor %}
+
+                        </div>
+                        <!-- owl-carousel End -->
+
+                    </div>
+                    <!-- End row 2 -->
+                    <!-- row 3 -->
+
+                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
+                        <div class="cnt-menu">
+                            <label class=" txt-red float-left top-head-align">New Films</label>
+                            <ul class="cnt-menu-li float-left ml-4">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- owl-carousel  -->
+
+                        <div class="owl-carousel owl-theme owl-algin">
+                            <!-- carousel column  -->
+                            {% for project in filims %}
+                            <div class="item pro-item">
+                                <div class="card proj-card">
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-no">
+                                            Project<a href=""> #{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">MLB</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span class="proj-symb">
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-title">
+                                            Title:<a href="">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a href="">105</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <a href="">Public</a>
+                                        </span>
+
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Creator:<a href="">Selivan Media</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Cast:<a href="">Female(27),Male(35)</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1 mb-1">
+                                        <span class="proj-format">
+                                            Location:<a href="">Boston,MA</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- carousel column End -->
+                            {% endfor %}
+                        </div>
+                        <!-- owl-carousel End -->
+
+                    </div>
+                    <!-- End row 3 -->
+                    <!-- row 4 -->
+
+                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
+                        <div class="cnt-menu">
+                            <label class=" txt-red float-left top-head-align">Top Rated</label>
+                            <ul class="cnt-menu-li float-left ml-4">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- owl-carousel  -->
+
+                        <div class="owl-carousel owl-theme owl-algin">
+                            {% for project in toprated_filims %}
+                            <!-- carousel column  -->
+                            <div class="item pro-item">
+                                <div class="card proj-card">
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-no">
+                                            Project<a href=""> #{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">ThB</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span class="proj-symb">
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-title">
+                                            Title:<a href="">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a href="">105</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <a href="">Public</a>
+                                        </span>
+
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Creator:<a href="">Karen O'Tool</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1">
+                                        <span class="proj-format">
+                                            Cast:<a href="">Female(50),Male(60)</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line mt-1 ml-1 mb-1">
+                                        <span class="proj-format">
+                                            Location:<a href="">New Tork,NY</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- carousel column End -->
+                            {% endfor %}
+                        </div>
+                        <!-- owl-carousel End -->
+
+                    </div>
+                    <!-- End row 4 -->
+                </div>
+                <!-- End center -->
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-4 mb-2">
+                    <div class="left-mode-sec right-sec-height">
+                        <div class="mem-list-head">Top Actors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">John Smith</li>
+                            <li class="mt-1">John Dow</li>
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Aaron McCarty</li>
+                            <li class="mt-1">Toli Chew</li>
+                        </ol>
+                        <div class="mem-list-head">Top Writers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Tom Saint</li>
+                            <li class="mt-1">Lola Carola</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Jamal Smith</li>
+                            <li class="mt-1">Nikita Selivan</li>
+                        </ol>
+                        <div class="mem-list-head">Top Directors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Ivan Drago</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Kendra Shulman</li>
+                            <li class="mt-1">Sandra O’brian</li>
+                        </ol>
+                        <div class="mem-list-head">Top Producers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top DPs</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top Sound Designers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head underline">TopTalent/Crew</div>
+                    </div>
+
+                </div>
+
+                <!-- End row div    -->
+            </div>
+            <!-- container div -->
+        </div>
+    </div>
+
+
+    <script>
+        $('.owl-carousel').owlCarousel({
+            loop: true,
+            margin: 10,
+            responsiveClass: true,
+            nav: true,
+            navText: [
+                "<i class='fa fa-caret-left'></i>",
+                "<i class='fa fa-caret-right'></i>"
+            ],
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: true
+                },
+                767: {
+                    items: 2,
+                    nav: true
+                },
+                991: {
+                    items: 2,
+                    nav: true
+                },
+                1320: {
+                    items: 3,
+                    nav: true,
+                    loop: false
+                }
+            }
+        })
+    </script>
+{% endblock %}
+
