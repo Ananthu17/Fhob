@@ -4,7 +4,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      SaveProjectVideoUrlAPI, SaveVideoUploadTypeAjaxView, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
-     AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf
+     AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
+     ScreeningProjectDeatilView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -39,4 +40,7 @@ urlpatterns = [
      path('cast-apply-audition/<int:id>/', CastApplyAuditionView.as_view(),
           name='cast-apply-audition'),
      path('pdf/<int:id>/', getpdf, name='pdf'),
+     path('screening_video_detail/<int:id>/',
+          ScreeningProjectDeatilView.as_view(),
+          name='projects_detail')
     ]

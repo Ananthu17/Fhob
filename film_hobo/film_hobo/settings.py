@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'authemail',
     'allauth.socialaccount',
     'django_filters',
+    'django_social_share',
 
     # project apps
     'initial_user',

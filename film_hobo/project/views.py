@@ -1,17 +1,14 @@
 import ast
-import os
 import io
 import json
 import requests
 import boto3
 
 from braces.views import JSONResponseMixin
-from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.platypus import Paragraph, Spacer, Table, Image
+from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
 
 from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
@@ -32,17 +29,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView, DestroyAPIView,
-                                     UpdateAPIView, get_object_or_404)
+from rest_framework.generics import (UpdateAPIView,
+                                     get_object_or_404)
 
 from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project
+     UserRating, UserRatingCombined, UserNotification, Project
 from .models import Character, Sides
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
-      CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
-      SidesSerializer
-from hobo_user.utils import notify, get_notifications_time
+      CharacterSerializer, UpdateCharacterSerializer, \
+      ProjectLastDateSerializer, SidesSerializer
+from hobo_user.utils import notify
 from .forms import VideoSubmissionLastDateForm
 
 s3_client = boto3.client(
@@ -82,7 +78,8 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
             bucket_prefix = ""
             bucket_name = settings.S3_BUCKET_NAME
             path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
-            s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
+            s3_url = project.generate_s3_signed_url(
+                s3_client, path, bucket_name)
             context['s3_url'] = s3_url
         return context
 
@@ -115,7 +112,8 @@ class RateUserSkillsAPI(APIView):
                                     Q(job_type=job_type) &
                                     Q(project__id__in=project_ids)
                                 )
-                rating_count = user_rating.values('project').annotate(count=Count('project'))
+                rating_count = user_rating.values('project').annotate(
+                    count=Count('project'))
                 for item in rating_count:
                     if item['count'] >= 10:
                         user_rating_count += 1
@@ -124,7 +122,7 @@ class RateUserSkillsAPI(APIView):
                     user.membership = CustomUser.PRO
                     user.save()
 
-                    #update notification table
+                    # update notification table
                     notification = UserNotification()
                     notification.user = user
                     notification.notification_type = UserNotification.MEMBERSHIP_CHANGE
@@ -502,7 +500,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
                                 'http://127.0.0.1:8000/project/charater/create/',
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
-                                        'Authorization': token})
+                                         'Authorization': token})
             byte_str = user_response.content
             dict_str = byte_str.decode("UTF-8")
             response = ast.literal_eval(dict_str)
@@ -682,7 +680,6 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             pass
         return context
 
-
     def post(self, request, *args, **kwargs):
         user = self.request.user
         # data_dict = {}
@@ -756,3 +753,16 @@ def getpdf(request, **kwargs):
     except Sides.DoesNotExist:
         pass
     return response
+
+
+class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/screening_video_page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project_obj = Project.objects.get(id=project_id)
+        context["project"] = project_obj
+        return context

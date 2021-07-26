@@ -37,6 +37,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('registration_complete', True)
         extra_fields.setdefault('membership', 'ADMIN')
 
         if extra_fields.get('is_staff') is not True:
@@ -608,7 +609,7 @@ class Project(models.Model):
     team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
                                   related_name='project_team',
                                   blank=True)
-    script = models.FileField(upload_to='script/', null=True, blank=True)
+    # script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
                                   max_length=150, default=PRIVATE)

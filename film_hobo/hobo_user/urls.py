@@ -298,5 +298,4 @@ urlpatterns = [
          name="top-rated-videos"),
     path('projectview/', ProjectView.as_view(),
          name='projects')
-
 ]

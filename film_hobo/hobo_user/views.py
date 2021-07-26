@@ -93,14 +93,10 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    RemoveCoWorkerSerializer, AgentManagerSerializer, \
-    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
-    TeamSerializer, VideoRatingSerializer, VideoSerializer, \
-    EditUserInterestSerializer
+    VideoRatingSerializer, VideoSerializer
 
 
-from .utils import notify, get_notifications_time
+from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
@@ -553,6 +549,9 @@ class ExtendedSignupVerify(SignupVerify):
                 signup_code.delete()
             except SignupCode.DoesNotExist:
                 pass
+            if user_membership == 'HOB':
+                CustomUser.objects.filter(email=email).update(
+                    registration_complete=True)
             content = {'message': 'Email address verified.', 'status':
                        status.HTTP_200_OK, 'email': email, 'user_membership':
                        user_membership}
