@@ -4263,18 +4263,24 @@ class FeedbackWebView(View):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr']
+
 
 class ProjectCreateAPIView(CreateAPIView):
-  permission_classes = (IsAuthenticated,)
-  queryset = Project.objects.all()
-  serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -4283,11 +4289,13 @@ class ProjectUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = ProjectSerializer
 
+
 class ProjectDeleteAPIView(DestroyAPIView):
     queryset = Project.objects.all()
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = ProjectSerializer
+
 
 # Team CRUD
 class TeamAPIView(ListAPIView):
@@ -4297,9 +4305,10 @@ class TeamAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
 
+
 class TeamCreateAPIView(CreateAPIView):
-  queryset = Team.objects.all()
-  serializer_class = TeamSerializer
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
 
 
 class TeamUpdateAPIView(UpdateAPIView):
@@ -4307,6 +4316,7 @@ class TeamUpdateAPIView(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
+
 
 class TeamDeleteAPIView(DestroyAPIView):
     queryset = Team.objects.all()
@@ -4321,22 +4331,24 @@ class ProjectSearchView(ListAPIView):
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter]
-    search_fields = ["title","format"]
+    search_fields = ["title", "format"]
+
 
 # Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
 
-    def post(self,request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        allowed_members = ['IND','PRO','COM']
+        allowed_members = ['IND', 'PRO', 'COM']
         if serializer.is_valid():
             try:
                 user = serializer.validated_data.get('rated_by')
                 video = serializer.validated_data.get('video')
                 rating = serializer.validated_data.get('rating')
-                existing_review = VideoRating.objects.filter(rated_by=user,video=video)
+                existing_review = VideoRating.objects.filter(rated_by=user,
+                                                             video=video)
 
                 if user.membership in allowed_members:
                     if existing_review:
@@ -4344,7 +4356,7 @@ class VideoRatingView(APIView):
                         existing_review[0].save()
                         self.refresh_rating(video)
                         response = {'message': "Rating Updated",
-                                'status': status.HTTP_200_OK}
+                                    'status': status.HTTP_200_OK}
                     else:
                         serializer.save()
                         self.refresh_rating(video)
@@ -4367,16 +4379,17 @@ class VideoRatingView(APIView):
     and written to project everytime when user make a rating.
     """
 
-    def refresh_rating(self,video):
+    def refresh_rating(self, video):
         ratings = VideoRating.objects.filter(video=video)
         combined_rating = 0
         for item in ratings:
             combined_rating += item.rating
         combined_rating = combined_rating / len(ratings)
-        print("Number of rating :",len(ratings))
-        print("Combined Rating :",combined_rating)
+        print("Number of rating :", len(ratings))
+        print("Combined Rating :", combined_rating)
         video.rating = combined_rating
         video.save()
+
 
 # API to find rating of a video
 class FindVideoRatingAPI(RetrieveAPIView):
@@ -4385,11 +4398,12 @@ class FindVideoRatingAPI(RetrieveAPIView):
     queryset = Video.objects.all()
     lookup_field = 'id'
 
+
 # Api to list Video based on rating
 class VideoListAPI(ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Video.objects.all().order_by('-rating','-created')
+    queryset = Video.objects.all().order_by('-rating', '-created')
 
 
 class ProjectView(LoginRequiredMixin, TemplateView):
