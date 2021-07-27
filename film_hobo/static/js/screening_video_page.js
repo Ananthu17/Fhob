@@ -19,3 +19,16 @@ $('#invite-link').click(function(event){
     modal.find('.modal-title').text(title)
     $("#inviteModal").modal('show');
 });
+
+$('#shareModalClose').click(function(event){
+    $("#shareModal").modal('hide');
+});
+
+
+$('#inviteModalClose').click(function(event){
+    $("#inviteModal").modal('hide');
+});
+
+$('#cancel_invite_btn').click(function(event){
+    $("#inviteModal").modal('hide');
+});

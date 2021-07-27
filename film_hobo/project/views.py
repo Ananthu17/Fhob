@@ -755,14 +755,4 @@ def getpdf(request, **kwargs):
     return response
 
 
-class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
-    template_name = 'user_pages/screening_video_page.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        project_id = self.kwargs.get('id')
-        project_obj = Project.objects.get(id=project_id)
-        context["project"] = project_obj
-        return context

@@ -5,6 +5,7 @@
 
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/share.css' %}">
+<link rel="stylesheet" href="{% static 'css/email_invite.css' %}">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 
 <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"> -->
@@ -324,7 +325,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content col-12">
                 <div class="modal-header">
-                    <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+                    <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
                 </div>
                 <div class="modal-body">
                     <div class="icon-container1 d-flex">
@@ -332,18 +333,18 @@
                             <p>{% post_to_twitter "" object_or_url "Post to Twitter" %}</p>
                         </div>
                         <div class="smd"> <i class="img-thumbnail fab fa-facebook fa-2x" style="color: #3b5998;background-color: #eceff5;"></i>
-                            <p>{% post_to_facebook %}</p>
+                            <p>{% post_to_facebook object_or_url %}</p>
                         </div>
                         <div class="smd"> <i class="img-thumbnail fab fa-reddit-alien fa-2x" style="color: #FF5700;background-color: #fdd9ce;"></i>
-                            <p>{% post_to_reddit "{{object.title}}" %}</p>
+                            <p>{% post_to_reddit "Filmhobo: {{project.title}}" object_or_url  %}</p>
                         </div>
                     </div>
                     <div class="icon-container2 d-flex">
-                        <div class="smd"> <i class="img-thumbnail fab fa-whatsapp fa-2x" style="color: #25D366;background-color: #cef5dc;"></i>
+                        <div class="smd"> <i class="img-thumbnail fab fa-whatsapp fa-2x" style="color: #25D366;background-color: #eceff5;"></i>
                             <p>{% post_to_whatsapp object_or_url "Post to WhatsApp" %}</p>
                         </div>
-                        <div class="smd"> <i class="img-thumbnail fab fa-telegram fa-2x" style="color: #4c6ef5;background-color: aliceblue"></i>
-                            <p>{% post_to_telegram "{{object.title}}" %}</p>
+                        <div class="smd"> <i class="img-thumbnail fab fa-linkedin fa-2x" style="color: #0e76a8;background-color: #cef5dc;"></i>
+                            <p>{% post_to_linkedin object_or_url "Post to Linkedin" %}</p>
                         </div>
                     </div>
                 </div>
@@ -356,9 +357,21 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content col-12">
                 <div class="modal-header">
-                    <h5 class="modal-title">Invite</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+                    <h5 class="modal-title">Invite</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="inviteModalClose" aria-hidden="true">&times;</span> </button>
                 </div>
                 <div class="modal-body">
+                    <div class="col-sm-12 email-id-row">
+                        <span class="to-input">To</span>
+                            <div class="all-mail">
+                            </div>
+                            <input type="text" name="email" class="enter-mail-id" placeholder="Enter the email id .." />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button id="invite_send_btn" type="button" style="font-size:15px;" class="btn btn-primary btn-lg modal-btn add-friend-to-groups"
+                  data-dismiss="modal">Invite</button>
+                  <button id="cancel_invite_btn" type="button" style="font-size:15px;" class="btn btn-secondary btn-lg modal-btn close-add-togroup-modal"
+                  data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -368,4 +381,5 @@
 
 {% block extrajs %}
 <script src="{% static 'js/screening_video_page.js' %}"></script>
+<script src="{% static 'js/email_invite.js' %}"></script>
 {% endblock %}
