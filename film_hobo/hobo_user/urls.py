@@ -57,7 +57,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetProfileRatingNotificationAjaxView, \
                    EditUserInterestAPI, VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
-                   CreateProjectView, ScreeningProjectDeatilView
+                   CreateProjectView, ScreeningProjectDeatilView, \
+                   UserHomeProjectInvite
 
 app_name = "hobo_user"
 
@@ -183,6 +184,9 @@ urlpatterns = [
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),
          name='projects_detail'),
+    path('user_home/project_invite/<int:id>/',
+         UserHomeProjectInvite.as_view(),
+         name='user_home_project_invite'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),
          name="signup_company"),
