@@ -18,7 +18,8 @@ from datetimerange import DateTimeRange
 
 from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
-    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser
+    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
+    BraintreePromoCode
 from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
@@ -1137,7 +1138,7 @@ class GetBraintreeDiscountDetailListAPI(APIView):
                 "amount": ''
             }
             if discount.never_expires:
-                promocode, created = PromoCode.objects.update_or_create(
+                promocode, created = BraintreePromoCode.objects.update_or_create(
                     braintree_id=discount.id, promo_code=discount.name,
                     description=discount.description,
                     duration='full_subscription',
@@ -1152,7 +1153,7 @@ class GetBraintreeDiscountDetailListAPI(APIView):
                 data_dict['amount'] = discount.amount
                 final_list.append(data_dict)
             else:
-                promocode, created = PromoCode.objects.update_or_create(
+                promocode, created = BraintreePromoCode.objects.update_or_create(
                     braintree_id=discount.id, promo_code=discount.name,
                     description=discount.description,
                     duration='billing_cycle_subscription',

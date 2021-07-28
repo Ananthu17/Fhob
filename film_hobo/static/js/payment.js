@@ -177,30 +177,30 @@ $( document ).ready(function() {
     $('#datepicker').prop('readonly', true);
 
     // data to load if the promo-code is added via client side
-    // get_lust_url = origin_url + '/payment/get_discount_detail_list/'
+    get_lust_url = origin_url + '/payment/get_discount_detail_list/'
 
-    // axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
-    // .then((response) => {
-    //   discount_objs = response.data
+    axios.get(get_lust_url, {headers: {'Authorization': authorization_str}})
+    .then((response) => {
+      discount_objs = response.data
 
-    //   let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
-    //     discount_objs.forEach(function(d){
-    //     obj_id = d.id
-    //     if (d.amount_type == "flat_amount"){
-    //         var amount_value = '$ ' + (d.amount).toString()
-    //     }
-    //     else{
-    //         var amount_value = (d.amount).toString() + ' %'
-    //     }
-    //     delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
-    //     table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
-    //     table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
-    //     table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_from+'" onchange="getVaildFrom(this);" readonly />to<input id="valid_to_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_to+'" onchange="getVaildTo(this);" readonly/> </td>';
-    //     table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
-    // })
-    //   table += '</tbody>';
-    //   $('#discount_table').empty().html(table);
-    // });
+      let table = '<thead> <tr> <th>Discount Name</th> <th>Amount</th> <th>Timeframe</th> <th colspan="2">Action</th> </tr></thead><tbody></tbody>';
+        discount_objs.forEach(function(d){
+        obj_id = d.id
+        if (d.amount_type == "flat_amount"){
+            var amount_value = '$ ' + (d.amount).toString()
+        }
+        else{
+            var amount_value = (d.amount).toString() + ' %'
+        }
+        delete_url = origin_url + '/payment/delete_discount_detail/' + d.id
+        table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.promo_code+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.id+'">'+amount_value+'</td>';
+        table += '<td contenteditable="false" class="edit'+d.id+'"><input id="valid_from_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_from+'" onchange="getVaildFrom(this);" readonly />to<input id="valid_to_'+d.id+'" type="date" onkeydown="return false" class="form-control admin-bill-form-cntrl-b w-42 date-class" value = "'+d.valid_to+'" onchange="getVaildTo(this);" readonly/> </td>';
+        table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteDiscountFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editDiscountFunction('+obj_id+')">Edit</a></td></tr>';
+    })
+      table += '</tbody>';
+      $('#discount_table').empty().html(table);
+    });
 
     // data to load if the promo-code from the braintree
     get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'

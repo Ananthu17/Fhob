@@ -69,7 +69,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    UserRating, Location, UserRatingCombined, \
+                    Location, UserRatingCombined, \
                     UserTacking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined
 

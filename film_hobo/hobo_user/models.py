@@ -659,6 +659,44 @@ class ProjectReaction(models.Model):
 
 
 class PromoCode(models.Model):
+    FLAT_AMOUNT = 'flat_amount'
+    PERCENTAGE = 'percentage'
+    AMOUNT_TYPE = [
+        (FLAT_AMOUNT, 'Flat Amount'),
+        (PERCENTAGE, 'Percentage'),
+    ]
+    ADMIN = 'ADMIN'
+    HOBO = 'HOB'
+    INDIE = 'IND'
+    PRO = 'PRO'
+    PRODUCTION_COMPANY = 'COM'
+    USER_TYPE_CHOICES = [
+        (ADMIN, 'Admin'),
+        (HOBO, 'Hobo'),
+        (INDIE, 'Indie'),
+        (PRO, 'Pro'),
+        (PRODUCTION_COMPANY, 'Production Company')
+    ]
+    promo_code = models.CharField(max_length=1000, unique=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+    valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
+    valid_to = models.DateTimeField(_('Valid To'),
+                                    null=True, blank=True)
+    life_span = models.IntegerField(_('Valid for days'), null=True, blank=True)
+    amount_type = models.CharField(_("Amount Type"),
+                                   choices=AMOUNT_TYPE,
+                                   max_length=150, default=FLAT_AMOUNT)
+    amount = models.IntegerField(_('Amount'))
+    user_type = models.CharField(_("User Type"),
+                                 choices=USER_TYPE_CHOICES,
+                                 max_length=150, default=HOBO)
+
+    def __str__(self):
+        return str(self.promo_code)
+
+
+class BraintreePromoCode(models.Model):
     PAYPAL = 'paypal'
     BRAINTREE = 'braintree'
     SOURCE_TYPE = [
@@ -702,10 +740,6 @@ class PromoCode(models.Model):
                                          null=True, blank=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
-    valid_from = models.DateTimeField(_('Valid From'), null=True, blank=True)
-    valid_to = models.DateTimeField(_('Valid To'),
-                                    null=True, blank=True)
-    life_span = models.IntegerField(_('Valid for days'), null=True, blank=True)
     amount_type = models.CharField(_("Amount Type"),
                                    choices=AMOUNT_TYPE,
                                    max_length=150, default=FLAT_AMOUNT)

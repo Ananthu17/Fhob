@@ -15,8 +15,9 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     UserRatingCombined, UserRating, UserAgentManager, \
                     Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
-                    VideoRating,Video, ProjectMemberRating
+                    GroupUsers, Feedback, CompanyRating, \
+                    CompanyRatingCombined, \
+                    VideoRating, Video, ProjectMemberRating, BraintreePromoCode
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
@@ -108,6 +109,7 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
+admin.site.register(BraintreePromoCode)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
