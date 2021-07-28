@@ -66,3 +66,4 @@ def get_my_skill_rating(current_user, team_obj):
 def get_dict_value(dict, key):
     return dict[key]
 
+

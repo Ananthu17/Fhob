@@ -4,6 +4,8 @@ import io
 import json
 import requests
 import boto3
+import datetime
+
 
 from braces.views import JSONResponseMixin
 from reportlab.pdfgen import canvas
@@ -27,6 +29,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 
+from rest_framework.exceptions import ParseError
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,14 +39,14 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, get_object_or_404)
 
-from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project
-from .models import Character, Sides
+from .models import Audition, Character, Sides
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
-      SidesSerializer
+      SidesSerializer, AuditionSerializer
 from hobo_user.utils import notify, get_notifications_time
-from .forms import VideoSubmissionLastDateForm
+from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
 
 s3_client = boto3.client(
                 "s3",
@@ -78,12 +81,12 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["team_members"] = team_members
         context["project"] = project
 
-        if project.video_type == Project.UPLOAD_VIDEO:
-            bucket_prefix = ""
-            bucket_name = settings.S3_BUCKET_NAME
-            path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
-            s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
-            context['s3_url'] = s3_url
+        # if project.video_type == Project.UPLOAD_VIDEO:
+        #     bucket_prefix = ""
+        #     bucket_name = settings.S3_BUCKET_NAME
+        #     path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
+        #     s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
+        #     context['s3_url'] = s3_url
         return context
 
 
@@ -378,7 +381,7 @@ class CharacterCreateAPIView(APIView):
                 character_obj.description = data_dict['description']
                 character_obj.project = project
                 character_obj.password = data_dict['password']
-                # character_obj.password = make_password(data_dict['password'])
+                # character_obj.sort_order = data_dict['sort_order']
                 character_obj.save()
                 response = {'message': "Character added",
                             'status': status.HTTP_200_OK}
@@ -486,6 +489,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
+        # sort_order = self.request.POST.getlist('sort_order')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -493,6 +497,10 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
+            # if sort_order[i] != "":
+            #     json_dict['sort_order'] = sort_order[i]
+            # else:
+            #     json_dict['sort_order'] = 0
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
@@ -626,38 +634,6 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
             pass
         return context
 
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = {}
-        json_response = json.dumps(request.POST)
-        data_dict = ast.literal_eval(json_response)
-        project_id = self.kwargs.get('id')
-        character_id = self.request.POST.get('character_id')
-        data_dict['project'] = project_id
-        data_dict['character'] = character_id
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                    'http://127.0.0.1:8000/project/add-sides-api/',
-                    data=json.dumps(data_dict),
-                    headers={'Content-type': 'application/json',
-                             'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] != 200:
-                if 'errors' in response:
-                    errors = response['errors']
-                    print(errors)
-                    messages.warning(
-                        self.request, "Failed to update scenes !!")
-                    return HttpResponseRedirect(
-                        request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
 
 class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
     template_name = 'project/cast-apply-audition.html'
@@ -667,11 +643,39 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
+        project_creator_rating = 0
         character_id = self.request.GET.get('character_id')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
         character = get_object_or_404(Character, pk=character_id)
         context['character'] = character
+        context['video_types'] = Project.VIDEO_TYPE_CHOICES
+        context['locations'] = Location.objects.all()
+
+        # check if logged user can apply for audition
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+        logged_user = self.request.user
+        try:
+            logged_user_rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=logged_user) &
+                                    (
+                                        Q(job_type=actor) |
+                                        Q(job_type=actress)
+                                    )
+                                )
+            logged_user_rating = logged_user_rating_obj.rating
+        except UserRatingCombined.DoesNotExist:
+            logged_user_rating = 0
+        context['logged_user_rating'] = logged_user_rating
+        # end
+
         try:
             sides = Sides.objects.get(
                         Q(project=project) &
@@ -680,39 +684,76 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             context['sides'] = sides
         except Sides.DoesNotExist:
             pass
-        return context
 
+        project_creator_job = JobType.objects.filter(
+                               slug='project-creator'
+                               ).first()
+        if project_creator_job:
+            try:
+                project_creator = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=project_creator_job) 
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=project_creator) &
+                            Q(job_type=project_creator_job)
+                        ).first()
+                if rating_object:
+                    project_creator_rating = rating_object.rating*20
+                else:
+                    project_creator_rating = 0
+            except Team.DoesNotExist:
+                project_creator = ""
+            context['project_creator_rating'] = project_creator_rating
+        return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        # data_dict = {}
-        # json_response = json.dumps(request.POST)
-        # data_dict = ast.literal_eval(json_response)
-        # project_id = self.kwargs.get('id')
-        # character_id = self.request.POST.get('character_id')
-        # data_dict['project'] = project_id
-        # data_dict['character'] = character_id
-        # key = Token.objects.get(user=user).key
-        # token = 'Token '+key
-        # user_response = requests.post(
-        #             'http://127.0.0.1:8000/project/add-sides-api/',
-        #             data=json.dumps(data_dict),
-        #             headers={'Content-type': 'application/json',
-        #                      'Authorization': token})
-        # byte_str = user_response.content
-        # dict_str = byte_str.decode("UTF-8")
-        # response = ast.literal_eval(dict_str)
-        # response = dict(response)
-        # if 'status' in response:
-        #     if response['status'] != 200:
-        #         if 'errors' in response:
-        #             errors = response['errors']
-        #             print(errors)
-        #             messages.warning(
-        #                 self.request, "Failed to update scenes !!")
-        #             return HttpResponseRedirect(
-        #                 request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.POST.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        character = get_object_or_404(Character, pk=character_id)
+        cover_image = self.request.FILES['cover_image']
+        audition_obj = Audition()
+        audition_obj.project = project
+        audition_obj.character = character
+        audition_obj.name = data_dict['name']
+        audition_obj.user = self.request.user
+        location_id = data_dict['location']
+        audition_obj.location = get_object_or_404(Location, pk=location_id)
+        audition_obj.agent_name = data_dict['agent_name']
+        audition_obj.agent_email = data_dict['agent_email']
+        try:
+            agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+            audition_obj.agent = agent_user
+        except CustomUser.DoesNotExist:
+            pass
+        video_type = data_dict['video_type']
+        url = data_dict['video_url']
+        audition_obj.video_type = video_type
+        audition_obj.cover_image = cover_image
+
+        if video_type == 'youtube':
+            url_temp = url.split("v=")[1]
+            video_url = url_temp.split("&")[0]
+            audition_obj.video_url = video_url
+        if video_type == 'vimeo':
+            if url.startswith('https://vimeo.com/'):
+                video_url = url.split('https://vimeo.com/')[1]
+                audition_obj.video_url = video_url
+            if url.startswith('http://vimeo.com/'):
+                video_url = url.split('http://vimeo.com/')[1]
+                audition_obj.video_url = video_url
+            if url.startswith('vimeo.com/'):
+                video_url = url.split('vimeo.com/')[1]
+                audition_obj.video_url = video_url
+        if video_type == 'facebook':
+            audition_obj.video_url = url
+        audition_obj.save()
+        messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -756,3 +797,200 @@ def getpdf(request, **kwargs):
     except Sides.DoesNotExist:
         pass
     return response
+
+
+class SubmitAuditionAPI(APIView):
+    serializer_class = AuditionSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project']
+            character_id = data_dict['character']
+            project = get_object_or_404(Project, pk=project_id)
+            character = get_object_or_404(Character, pk=character_id)
+            audition_obj = Audition()
+            audition_obj.project = project
+            audition_obj.character = character
+            audition_obj.name = data_dict['name']
+            audition_obj.user = self.request.user
+            location_id = data_dict['location']
+            audition_obj.location = get_object_or_404(Location, pk=location_id)
+            audition_obj.agent_name = data_dict['agent_name']
+            audition_obj.agent_email = data_dict['agent_email']
+            try:
+                agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+                audition_obj.agent = agent_user
+            except CustomUser.DoesNotExist:
+                pass
+            video_type = data_dict['video_type']
+            url = data_dict['video_url']
+            audition_obj.video_type = video_type
+            try:
+                cover_image = request.data['cover_image']
+                audition_obj.cover_image = cover_image
+            except KeyError:
+                raise ParseError('Request has no cover image attached')
+
+            if video_type == 'youtube':
+                url_temp = url.split("v=")[1]
+                video_url = url_temp.split("&")[0]
+                audition_obj.video_url = video_url
+            if video_type == 'vimeo':
+                if url.startswith('https://vimeo.com/'):
+                    video_url = url.split('https://vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+                if url.startswith('http://vimeo.com/'):
+                    video_url = url.split('http://vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+                if url.startswith('vimeo.com/'):
+                    video_url = url.split('vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+            if video_type == 'facebook':
+                audition_obj.video_url = url
+            audition_obj.save()
+            response = {'message': "Audition Submitted",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AuditionListView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/audition-list.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        count_dict = {}
+        character_dict = {}
+        rating_dict = {}
+        casting_director_rating = 0
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        characters = Character.objects.filter(project=project)
+        audition_list = Audition.objects.filter(project=project)
+        casting_director_job = JobType.objects.filter(
+                               slug='casting-director'
+                               ).first()
+        if casting_director_job:
+            try:
+                casting_director = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=casting_director_job) 
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=casting_director) &
+                            Q(job_type=casting_director_job)
+                        ).first()
+                if rating_object:
+                    casting_director_rating = rating_object.rating*20
+                else:
+                    casting_director_rating = 0
+            except Team.DoesNotExist:
+                casting_director = ""
+            context['casting_director'] = casting_director
+            context['casting_director_rating'] = casting_director_rating
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+
+        for audition_obj in audition_list:
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                                Q(user=audition_obj.user) &
+                                (
+                                    Q(job_type=actor) |
+                                    Q(job_type=actress)
+                                )
+                            )
+                rating_dict[audition_obj.user.id] = (rating_obj.rating)*20
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[audition_obj.user.id] = 0
+
+        for obj in audition_list:
+            if obj.character in count_dict:
+                count_dict[obj.character] += 1
+            else:
+                count_dict[obj.character] = 1
+            if obj.character in character_dict:
+                character_dict[obj.character].append(obj)
+            else:
+                character_dict[obj.character] = []
+                character_dict[obj.character].append(obj)
+
+        context['characters'] = characters
+        context['project'] = project
+        context['count_dict'] = count_dict
+        context['character_dict'] = character_dict
+        context['rating_dict'] = rating_dict
+        return context
+
+
+class EditSidesView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/edit-sides.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.GET.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        character = get_object_or_404(Character, pk=character_id)
+        context['character'] = character
+        try:
+            sides = Sides.objects.get(
+                        Q(project=project) &
+                        Q(character=character)
+                        )
+            context['sides'] = sides
+            context['form'] = AddSidesForm(instance=sides)
+        except Sides.DoesNotExist:
+            context['form'] = AddSidesForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.POST.get('character_id')
+        data_dict['project'] = project_id
+        data_dict['character'] = character_id
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                    'http://127.0.0.1:8000/project/add-sides-api/',
+                    data=json.dumps(data_dict),
+                    headers={'Content-type': 'application/json',
+                             'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] != 200:
+                if 'errors' in response:
+                    errors = response['errors']
+                    print(errors)
+                    messages.warning(
+                        self.request, "Failed to update scenes !!")
+                    return HttpResponseRedirect(
+                        request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Sides updated successfully")
+        url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
+        return HttpResponseRedirect(url)

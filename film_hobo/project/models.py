@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from ckeditor.widgets import CKEditorWidget
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class Character(models.Model):
     name = models.CharField(max_length=1000)
@@ -9,6 +11,7 @@ class Character(models.Model):
                                 on_delete=models.CASCADE)
     description = models.TextField(_("Description"), null=True, blank=True)
     password = models.CharField(max_length=12, null=True, blank=True)
+    sort_order = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.project.title+" - "+self.name
@@ -25,12 +28,12 @@ class Sides(models.Model):
     character = models.ForeignKey(Character,
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
-    scene_1 = models.TextField(_("Scene Description"),
-                               null=True, blank=True)
-    scene_2 = models.TextField(_("Scene Description"),
-                               null=True, blank=True)
-    scene_3 = models.TextField(_("Scene Description"),
-                               null=True, blank=True)
+    scene_1 = RichTextField(_("Scene Description"),
+                            null=True, blank=True)
+    scene_2 = RichTextField(_("Scene Description"),
+                            null=True, blank=True)
+    scene_3 = RichTextField(_("Scene Description"),
+                            null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"
@@ -41,6 +44,25 @@ class Sides(models.Model):
 
 
 class Audition(models.Model):
+    YOUTUBE = 'youtube'
+    VIMEO = 'vimeo'
+    FACEBOOK = 'facebook'
+
+    VIDEO_TYPE_CHOICES = [
+        (YOUTUBE, 'Youtube'),
+        (VIMEO, 'Vimeo'),
+        (FACEBOOK, 'Facebook'),
+    ]
+    ATTACHED = 'attached'
+    PASSED = 'passed'
+    APPLIED = 'applied'
+    CALLBACK = 'callback'
+    STATUS_CHOICES = [
+        (ATTACHED, 'Attached'),
+        (PASSED, 'Passed'),
+        (APPLIED, 'Applied'),
+        (CALLBACK, 'Callback'),
+    ]
     project = models.ForeignKey('hobo_user.Project',
                                 verbose_name=_("Project"),
                                 on_delete=models.CASCADE)
@@ -64,3 +86,23 @@ class Audition(models.Model):
                                  related_name='audition_user_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
+    video_url = models.CharField(max_length=1000,
+                                 null=True, blank=True)
+    video_type = models.CharField(_("Video Type"),
+                                  choices=VIDEO_TYPE_CHOICES,
+                                  max_length=150, null=True,
+                                  default=VIMEO)
+    status = models.CharField(_("Status"),
+                              choices=STATUS_CHOICES,
+                              max_length=150,
+                              default=APPLIED)
+    cover_image = models.ImageField(upload_to='thumbnail/',
+                                    blank=True, null=True,
+                                    help_text="Image size:370 X 248.")
+
+    def __str__(self):
+        return self.project.title+" - "+self.character.name+"-"+self.name
+
+    class Meta:
+        verbose_name = 'Audition'
+        verbose_name_plural = 'Audition'

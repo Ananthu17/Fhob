@@ -46,6 +46,7 @@ urlpatterns = [
     path('password-reset-confirm/<str:uidb64>/<str:token>',
          PasswordResetConfirmView.as_view(),
          name='password_reset_confirm'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = initial_user_views.notfound
