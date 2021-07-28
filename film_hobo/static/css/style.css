@@ -415,3 +415,48 @@ input.pw {
   {
     text-decoration :none;
   }
+.txt-uppercase
+    {
+      text-transform: uppercase;
+    }
+.txt-capitalize
+    {
+      text-transform: capitalize;
+    }
+.applied-style
+    {
+      border:2px solid black;
+    }
+.passed-style
+    {
+      border:2px solid gray;
+    }
+.attached-style
+    {
+      border:2px solid green;
+    }
+.callback-style
+    {
+      border:2px solid orange;
+    }
+.samr-modal-title
+    {
+      font-size:18px;
+      color:red;
+      font-family:Myriad Pro;
+    }
+.samr-modal-txt
+    {
+      font-size:14px;
+      color: #000;
+      font-family:Myriad Pro;
+      font-weight: 200;
+    }
+.sides-font-style
+    {
+      font-family:initial;
+      font-size:initial;
+      font-weight:initial;
+      font-style: initial;
+      padding:5px;
+    }

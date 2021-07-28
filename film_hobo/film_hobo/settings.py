@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'channels',
     'paypal.standard.ipn',
     'corsheaders',
+    'ckeditor',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -334,3 +335,22 @@ BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY = \
     env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY")
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
+            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['RemoveFormat', ],
+            ['Cut', 'Copy', 'Paste', 'PasteText'],
+            ['Undo', 'Redo' ],
+            ['Format', 'Styles'],
+        ],
+        'width': 'auto',
+        'height': 140,
+        'margin-left': '10%',
+    },
+}

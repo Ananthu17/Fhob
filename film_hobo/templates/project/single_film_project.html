@@ -16,8 +16,7 @@
                 name="video_type" id = "video_type" required>
                 <option disabled selected hidden>Choose file type</option>
                     {% for item in video_types %}
-                        <option value="{{item.0}}"
-                            {% if obj.format == item.0 %} selected {% endif %}>
+                        <option value="{{item.0}}">
                             {{item.1}}
                         </option>
                     {% endfor %}

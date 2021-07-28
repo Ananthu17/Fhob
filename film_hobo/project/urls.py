@@ -4,7 +4,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      SaveProjectVideoUrlAPI, SaveVideoUploadTypeAjaxView, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
-     AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf
+     AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
+     SubmitAuditionAPI, AuditionListView, EditSidesView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -34,9 +35,15 @@ urlpatterns = [
           name='add-video-submit-last-date'),
      path('add-sides/<int:id>/', AddSidesView.as_view(),
           name='add-sides'),
+     path('edit-sides/<int:id>/', EditSidesView.as_view(),
+          name='edit-sides'),
      path('add-sides-api/', SidesCreateAPIView.as_view(),
           name='add-sides-api'),
      path('cast-apply-audition/<int:id>/', CastApplyAuditionView.as_view(),
           name='cast-apply-audition'),
-     path('pdf/<int:id>/', getpdf, name='pdf')
+     path('submit-audition-api/', SubmitAuditionAPI.as_view(),
+          name='submit-audition-api'),
+     path('pdf/<int:id>/', getpdf, name='pdf'),
+     path('audition-list/<int:id>/', AuditionListView.as_view(),
+          name='audition-list'),
     ]

@@ -1,5 +1,5 @@
 from hobo_user.models import UserRating, Project
-from project.models import Character, Sides
+from project.models import Audition, Character, Sides
 from rest_framework import serializers
 
 
@@ -79,3 +79,33 @@ class ProjectLastDateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'last_date']
+
+
+class AuditionSerializer(serializers.ModelSerializer):
+
+    project = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    character = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    location = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    video_type = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    video_url = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = Audition
+        fields = ['name', 'agent_email', 'agent_name',
+                  'project', 'character', 'location', 'video_url',
+                  'video_type', 'cover_image']

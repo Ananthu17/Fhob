@@ -2824,26 +2824,26 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             all_photos = Photo.objects.filter(user=user)
             photos = all_photos.filter(position__in=pos_list).order_by('position')
             context['photos'] = photos[:3]
+
+            rating_dict = {}
+            job_dict = {}
+            for job in profile.job_types.all():
+                try:
+                    rating_obj = UserRatingCombined.objects.get(
+                                Q(user=user) &
+                                Q(job_type=job))
+                    rating = rating_obj.rating * 20
+                    job_dict[job.id]=job.title
+                    rating_dict[job.id]=rating
+                except UserRatingCombined.DoesNotExist:
+                    rating_dict[job.id]=0
+                    job_dict[job.id]=job.title
+            context['job_dict'] = job_dict
+            context['rating_dict'] = rating_dict
         except UserProfile.DoesNotExist:
             message = "No Data Available"
             context['message'] = message
 
-        rating_dict = {}
-        job_dict = {}
-
-        for job in profile.job_types.all():
-            try:
-                rating_obj = UserRatingCombined.objects.get(
-                            Q(user=user) &
-                            Q(job_type=job))
-                rating = rating_obj.rating * 20
-                job_dict[job.id]=job.title
-                rating_dict[job.id]=rating
-            except UserRatingCombined.DoesNotExist:
-                rating_dict[job.id]=0
-                job_dict[job.id]=job.title
-        context['job_dict'] = job_dict
-        context['rating_dict'] = rating_dict
         try:
             settings = CustomUserSettings.objects.get(user=user)
             context['settings'] = settings

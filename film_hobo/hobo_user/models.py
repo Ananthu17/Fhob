@@ -1,7 +1,8 @@
 
 import datetime
-
+from autoslug import AutoSlugField
 from phonenumber_field.modelfields import PhoneNumberField
+
 from django.urls import reverse
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -9,6 +10,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.template.defaultfilters import slugify
 
 from solo.models import SingletonModel
 
@@ -442,7 +444,7 @@ class Location(models.Model):
                                null=True)
 
     def __str__(self):
-        location = self.city+","+self.state+","+self.country
+        location = self.city+", "+self.state+", "+self.country
         return str(location)
 
     class Meta:
@@ -527,12 +529,11 @@ class Project(models.Model):
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
     FACEBOOK = 'facebook'
-    UPLOAD_VIDEO = 'upload_video'
+    # UPLOAD_VIDEO = 'upload_video'
     VIDEO_TYPE_CHOICES = [
         (YOUTUBE, 'Youtube'),
         (VIMEO, 'Vimeo'),
         (FACEBOOK, 'Facebook'),
-        (UPLOAD_VIDEO, 'Upload Video'),
     ]
 
     ACTION = 'ACT'
@@ -604,7 +605,7 @@ class Project(models.Model):
     video_type = models.CharField(_("Video Type"),
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True, blank=True,
-                                  default=UPLOAD_VIDEO)
+                                  default=VIMEO)
     last_date = models.DateField(_("Last date for submitting video"),
                                  null=True, blank=True,)
     location = models.ForeignKey("hobo_user.Location",
@@ -1024,6 +1025,11 @@ class CustomUserSettings(models.Model):
 
 class JobType(models.Model):
     title = models.CharField(max_length=1000)
+    slug = models.SlugField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(JobType, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.title)
