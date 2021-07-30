@@ -44,7 +44,7 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
 from .models import Audition, Character, Sides
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
-      SidesSerializer, AuditionSerializer, PostProjectVideoSerializer
+      SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, PasswordSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
 
@@ -1105,3 +1105,28 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         messages.success(self.request, "Sides updated successfully")
         url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
         return HttpResponseRedirect(url)
+
+
+class ScriptPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.script_password == password:
+                response = {'message': "Password Verified",
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

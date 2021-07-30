@@ -114,12 +114,12 @@
                                     {% if project.script_password %}
                                     <a class="script_open_password_check" id="{{project.id}}">Open</a>
                                     {% else %}
-                                    <a href="{{project.script.url}}" target="_blank">Open</a>
+                                    <a href="{{project.script.url}}" class="cursor-pointer" target="_blank">Open</a>
                                     {% endif %}
                                 </span>
                                 <span class="sgl-info-download">
                                     {% if project.script_password %}
-                                    <a href="" >Download</a>
+                                    <a href=""  class="cursor-pointer">Download</a>
                                     {% else %}
                                     <a href="{{project.script.url}}" download>Download</a>
                                     {% endif %}
@@ -129,7 +129,8 @@
                         <div class="sgl-left-box-password">
                             <span>
                                 <input type="password"  name="password" class="sgl-info-password"
-                                placeholder="*****" required></span>
+                                placeholder="*****" id="script_password"></span>
+                                <span class="script-password-err errormsg"></span>
                         </div>
                     </div>
                 </div>
@@ -614,21 +615,34 @@ $('body').on('click' , '.publish_video', function(){
 <script>
     $('body').on('click' , '.script_open_password_check', function(){
         var project_id = $(this).attr('id')
+        var password = $("#script_password").val();
         var token = $("#token").val();
-        $.ajax
-          ({
-              type: "POST",
-              url: "/project/script_password_check/",
-              dataType: 'json',
-              async: false,
-              data: {'project_id':project_id},
-              beforeSend: function (xhr) {
-                  xhr.setRequestHeader ("Authorization", token);
-              },
-              success: function(response){
-                  console.log("here")
-              }
-          });
+        data_dict = {}
+        data_dict['project_id'] = project_id;
+        if(password!=""){
+            data_dict['password'] = password
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/script-password-check/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    console.log(response)
+                    if('errors' in response){
+                        $('.script-password-err').html(response['errors'])
+                    }else{
+                        
+                    }
+                }
+            });
+        }else{
+            $('.script-password-err').html("Password is required.")
+        }
     });
 </script>
 {% endblock %}

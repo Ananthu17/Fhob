@@ -6,7 +6,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
      SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
-     PostProjectVideoAPI
+     PostProjectVideoAPI, ScriptPasswordCheckAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -51,4 +51,6 @@ urlpatterns = [
           name='add-project-video'),
      path('post-project-video/', PostProjectVideoAPI.as_view(),
           name='post-project-video'),
+     path('script-password-check/', ScriptPasswordCheckAPI.as_view(),
+          name='script-password-check'),
     ]

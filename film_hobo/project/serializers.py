@@ -116,3 +116,14 @@ class PostProjectVideoSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class PasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
