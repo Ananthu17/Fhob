@@ -791,7 +791,7 @@ class CreateUserOrder(APIView):
             client = PayPalHttpClient(environment)
             create_order = OrdersCreateRequest()
 
-            create_order request for no discount added
+            # create_order request for no discount added
             create_order.request_body(
                 {
                     "intent": "CAPTURE",
