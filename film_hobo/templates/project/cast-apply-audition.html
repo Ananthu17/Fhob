@@ -47,11 +47,11 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
                 <div class="caa-center-section-align">
                     <!-- project menu  -->
-                    
+
                     <div class="sds-menu-bg">
                         <div class="cta-menu-align">
                             <ul class="sds-menu sds-menu-padding">
@@ -140,9 +140,7 @@
 
                             {% if samr_data.1 >= logged_user_rating or request.user.membership not in samr_data.2 %}
                             data-toggle="modal" data-target="#cannotapply"
-                            {% endif %}
-                            
-                            >
+                            {% endif %}>
                                 <form  method="post"
                                 action="{% url 'project:cast-apply-audition' project.id %}"
                                 id="sidesform" enctype="multipart/form-data">
@@ -187,10 +185,16 @@
                                                 </select>
                                             </span>
                                         </div>
-                                        <div class="caa-input-display mt-2">
+                                        <div class="caa-input-display-typeinfo">
+                                            <div class="cas-video-typ-info" title="Video url information">
+                                                This video must be confidential! Please use the "Unlisted" option for Youtube, or the "Private" and/or "Hide from Video" option for Vimeo. Only people with the link to your video will be able to watch it
+                                            </div>
+                                        </div>  
+                                        <div class="caa-input-display mt-1">
                                             <span class="caa-input-name">Video Url:</span>
                                             <span class="caa-input-align">
-                                                <input class="video_url caa-input-field" name='video_url' id='video_url' required>
+                                                <input class="video_url caa-input-field" name='video_url' id='video_url'
+                                                autocomplete="off" required>
                                             </span>
                                         </div>
                                         <div class="caa-input-display">
@@ -198,7 +202,7 @@
                                                 Video url information
                                             </div>
                                         </div>
-                                        <div class="caa-input-display">
+                                        <div class="caa-input-display mt-1">
                                             <span class="caa-input-name">Cover Image:</span>
                                             <span class="caa-input-align">
                                                 <input type="file" name="cover_image" accept="image/*"
@@ -262,20 +266,21 @@
                                 {% if sides%}
                                    <div class="caa-download-display">
                                        <span>
-                                           <a href="{% url 'project:pdf' project.id%}?character_id={{character.id}}"
-                                           class="download_sides">Download</a>
+                                           <a class="download_sides cursor-pointer" id="download_sides">
+                                               Download</a>
                                         </span>
                                         <span>
                                             <a class="cursor-pointer" id="print_sides"
                                             onclick="PrintElem('#printableArea')">Print</a>
+                                            <div id="editor"></div>
                                         </span>
                                    </div>
                                    <div class="caa-script-sec-frame">
                                         <div class="caa-script-sec-frame-inner">
                                             <div id="printableArea">
-                                                <b>Scene 1:</b><p>{{sides.scene_1}}</p>
-                                                <b>Scene 2:</b><p>{{sides.scene_2}}</p>
-                                                <b>Scene 3:</b><p>{{sides.scene_3}}</p>
+                                                <b>Scene 1:</b><p>{{sides.scene_1|safe}}</p>
+                                                <b>Scene 2:</b><p>{{sides.scene_2|safe}}</p>
+                                                <b>Scene 3:</b><p>{{sides.scene_3|safe}}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -284,11 +289,11 @@
                                <div id="script" class="caa-script-show">
                                 {% if project.script %}
                                     <div class="caa-download-display">
-                                        <span><a href="{{project.script.url}}" class="download_sides" download>Download</a></span>
+                                        <span><a href="{{project.script.url}}" class="" download>Download</a></span>
                                         <span>
                                             <a id="print_script"
                                             href="{{project.script.url}}" target="_blank"
-                                            onclick="printPdf({{project.script.url}})">Print</a></span>
+                                            >Print</a></span>
                                     </div>
                                     <div class="caa-script-sec-frame">
                                         <div class="caa-script-sec-pdf-frame-inner">
@@ -373,43 +378,39 @@
     });
 </script>
 <script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
-<script src="https://printjs-4de6.kxcdn.com/print.min.css"></script>
+<!-- <script src="https://printjs-4de6.kxcdn.com/print.min.css"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+<script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
 <script>
-    printPdf = function (url) {
-    var iframe = this._printIframe;
-    if (!this._printIframe) {
-        iframe = this._printIframe = document.createElement('iframe');
-        document.body.appendChild(iframe);
+    var doc = new jsPDF();
+    var specialElementHandlers = {
+        '#editor': function (element, renderer) {
+            return true;
+        }
+    };
 
-        iframe.style.display = 'none';
-        iframe.onload = function() {
-        setTimeout(function() {
-            iframe.focus();
-            iframe.contentWindow.print();
-        }, 1);
-        };
-    }
-
-    iframe.src = url;
-    }
+    $('body').on('click' , '#download_sides', function(){
+        console.log("hsdakjd")
+        doc.fromHTML($('#printableArea').html(), 15, 15, {
+            'width': 170,
+                'elementHandlers': specialElementHandlers
+        });
+        doc.save('sides.pdf');
+    });
 </script>
 <script type="text/javascript">
 
     function PrintElem(elem)
     {
-
         var data = $(elem).html();
-
         var mywindow = window.open('', 'new div', 'height=400,width=800');
         mywindow.document.write('<html><head><title>Sides</title>');
         mywindow.document.write('<h1>Sides</h1>');
         mywindow.document.write('</head><body >');
         mywindow.document.write(data);
         mywindow.document.write('</body></html>');
-
         mywindow.print();
         mywindow.close();
-
         return true;
     }
 
@@ -456,10 +457,11 @@
     $("#sides-tag").toggleClass('caa-side-switch-tag-active');
     jQuery("#sidesandscripts .caa-side-switch-tag").click(function(){
     jQuery("#sidesandscripts .caa-side-switch-tag").removeClass('caa-side-switch-tag-active');
-    jQuery(this).toggleClass('caa-side-switch-tag-active'); 
+    jQuery(this).toggleClass('caa-side-switch-tag-active');
     });
-    
+
 </script>
+
 {% endblock %}
 
 

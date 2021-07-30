@@ -5,7 +5,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
-     SubmitAuditionAPI, AuditionListView, EditSidesView
+     SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
+     PostProjectVideoAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -46,4 +47,8 @@ urlpatterns = [
      path('pdf/<int:id>/', getpdf, name='pdf'),
      path('audition-list/<int:id>/', AuditionListView.as_view(),
           name='audition-list'),
+     path('add-project-video/<int:id>/', AddProjectVideoView.as_view(),
+          name='add-project-video'),
+     path('post-project-video/', PostProjectVideoAPI.as_view(),
+          name='post-project-video'),
     ]

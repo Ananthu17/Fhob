@@ -455,6 +455,14 @@ class Project(models.Model):
         (PUBLIC, 'Public'),
         (PRIVATE, 'Private'),
     ]
+    UPLOADED = 'uploaded'
+    POSTED = 'posted'
+    NOT_AVAILABLE = 'not_available'
+    VIDEO_STATUS_CHOICES = [
+        (UPLOADED, 'Uploaded'),
+        (POSTED, 'Posted'),
+        (NOT_AVAILABLE, 'Not Available'),
+    ]
     NATION_WIDE = 'nation_wide'
     LOCAL_ONLY = 'local_only'
     CAST_ATTACHMENT_CHOICES = [
@@ -521,12 +529,12 @@ class Project(models.Model):
     ]
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
-    FACEBOOK = 'facebook'
+    # FACEBOOK = 'facebook'
     # UPLOAD_VIDEO = 'upload_video'
     VIDEO_TYPE_CHOICES = [
         (YOUTUBE, 'Youtube'),
         (VIMEO, 'Vimeo'),
-        (FACEBOOK, 'Facebook'),
+        # (FACEBOOK, 'Facebook'),
     ]
 
     ACTION = 'ACT'
@@ -622,6 +630,17 @@ class Project(models.Model):
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    video_status = models.CharField(_("Video Status"),
+                                    choices=VIDEO_STATUS_CHOICES,
+                                    max_length=150,
+                                    default=NOT_AVAILABLE)
+    video_cover_image = models.ImageField(upload_to='thumbnail/',
+                                          blank=True, null=True,
+                                          help_text="Image size:370 X 248.")
+    script_password = models.CharField(max_length=12, null=True, blank=True)
+    team_select_password = models.CharField(max_length=12, null=True,
+                                            blank=True)
+    cast_audition_password = models.CharField(max_length=12, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -1313,7 +1332,7 @@ class Video(models.Model):
 
     class Meta:
         verbose_name = 'Video'
-        verbose_name_plural = 'Video Ratings'
+        verbose_name_plural = 'Video'
 
 
 class VideoRating(models.Model):
@@ -1322,12 +1341,15 @@ class VideoRating(models.Model):
                                  related_name='Video_rated_by_user',
                                  verbose_name=_("User"),
                                  null=True)
-    video = models.ForeignKey("hobo_user.Video",
-                              on_delete=models.CASCADE,
-                              null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_video_rating',
+                                verbose_name=_("Project"),
+                                null=True)
     rating = models.IntegerField(_("Rating"),
                                  validators=[MinValueValidator(0),
                                  MaxValueValidator(5)], null=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.rated_by)
@@ -1335,6 +1357,22 @@ class VideoRating(models.Model):
     class Meta:
         verbose_name = 'Video Rating'
         verbose_name_plural = 'Video Ratings'
+
+
+class VideoRatingCombined(models.Model):
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_video_rating_combined',
+                                verbose_name=_("Project"),
+                                null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.project)
+
+    class Meta:
+        verbose_name = 'Video Ratings Combined'
+        verbose_name_plural = 'Video Ratings Combined'
 
 
 class CompanyRating(models.Model):

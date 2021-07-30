@@ -38,7 +38,7 @@ class ProjectVideoURLSerializer(serializers.Serializer):
 
     class Meta:
         model = Project
-        fields = ['id', 'video_url', 'video_type']
+        fields = ['id', 'video_url', 'video_type', 'video_cover_image']
 
 
 class CharacterSerializer(serializers.ModelSerializer):
@@ -109,3 +109,10 @@ class AuditionSerializer(serializers.ModelSerializer):
         fields = ['name', 'agent_email', 'agent_name',
                   'project', 'character', 'location', 'video_url',
                   'video_type', 'cover_image']
+
+
+class PostProjectVideoSerializer(serializers.Serializer):
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

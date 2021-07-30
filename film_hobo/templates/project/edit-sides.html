@@ -104,7 +104,7 @@
                                     <span class="sds-input-card-btn">
                                         <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/>
                                         <!-- <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a> -->
-                                        <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
+                                        <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
                             </div>

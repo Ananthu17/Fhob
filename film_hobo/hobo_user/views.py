@@ -69,7 +69,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Project, Team, UserProfile, JobType, \
                     UserRating, Location, UserRatingCombined, \
                     UserTacking, CompanyProfile, \
-                    Feedback, CompanyRating, CompanyRatingCombined
+                    Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -4028,11 +4028,12 @@ class ListAllFriendsAPI(APIView):
         response = {}
         friends_dict = {}
         user = request.user
-        friends = FriendRequest.objects.filter(
-                          Q(user=user) &
-                          Q(status=FriendRequest.ACCEPTED))
-        for obj in friends:
-            friends_dict[obj.requested_by.id] = obj.requested_by.email
+        try:
+            friend_obj = Friend.objects.get(user=user)
+        except Friend.DoesNotExist:
+            pass
+        for obj in friend_obj.friends.all():
+            friends_dict[obj.id] = obj.email
         response['friends'] = friends_dict
         return Response(response)
 
@@ -4331,30 +4332,25 @@ class VideoRatingView(APIView):
         serializer = self.serializer_class(data=request.data)
         allowed_members = ['IND','PRO','COM']
         if serializer.is_valid():
-            try:
-                user = serializer.validated_data.get('rated_by')
-                video = serializer.validated_data.get('video')
-                rating = serializer.validated_data.get('rating')
-                existing_review = VideoRating.objects.filter(rated_by=user,video=video)
+            user = self.request.user
+            project = serializer.validated_data.get('project')
+            rating = serializer.validated_data.get('rating')
+            reason = serializer.validated_data.get('reason')
+            rating_obj = VideoRating()
 
-                if user.membership in allowed_members:
-                    if existing_review:
-                        existing_review[0].rating = rating
-                        existing_review[0].save()
-                        self.refresh_rating(video)
-                        response = {'message': "Rating Updated",
-                                'status': status.HTTP_200_OK}
-                    else:
-                        serializer.save()
-                        self.refresh_rating(video)
-                        response = {'message': "Rating scuccess",
-                                    'status': status.HTTP_201_CREATED}
-                else:
-                    response = {'errors': "Unautharized access", 'status':
-                                status.HTTP_401_UNAUTHORIZED}
-            except:
-                response = {'errors': 'Invalid Video', 'status':
-                            status.HTTP_400_BAD_REQUEST}
+            if user.membership in allowed_members:
+                # project = get_object_or_404(Project, pk=project_id)
+                rating_obj.project = project
+                rating_obj.rating = rating
+                rating_obj.reason = reason
+                rating_obj.rated_by = user
+                rating_obj.save()
+                self.refresh_rating(project.id)
+                response = {'message': "Rating success",
+                            'status': status.HTTP_201_CREATED}
+            else:
+                response = {'errors': "Unautharized access", 'status':
+                            status.HTTP_401_UNAUTHORIZED}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -4366,16 +4362,23 @@ class VideoRatingView(APIView):
     and written to project everytime when user make a rating.
     """
 
-    def refresh_rating(self,video):
-        ratings = VideoRating.objects.filter(video=video)
+    def refresh_rating(self, project_id):
+        ratings = VideoRating.objects.filter(project=project_id)
         combined_rating = 0
         for item in ratings:
             combined_rating += item.rating
+            print(combined_rating)
         combined_rating = combined_rating / len(ratings)
-        print("Number of rating :",len(ratings))
-        print("Combined Rating :",combined_rating)
-        video.rating = combined_rating
-        video.save()
+        try:
+            video_rating_combined = VideoRatingCombined.objects.get(project=project_id)
+            video_rating_combined.rating = combined_rating
+            video_rating_combined.save()
+        except VideoRatingCombined.DoesNotExist:
+            video_rating_combined = VideoRatingCombined()
+            project = get_object_or_404(Project, pk=project_id)
+            video_rating_combined.project = project
+            video_rating_combined.rating = combined_rating
+            video_rating_combined.save()
 
 # API to find rating of a video
 class FindVideoRatingAPI(RetrieveAPIView):

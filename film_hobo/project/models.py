@@ -4,6 +4,7 @@ from ckeditor.widgets import CKEditorWidget
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
+
 class Character(models.Model):
     name = models.CharField(max_length=1000)
     project = models.ForeignKey('hobo_user.Project',
@@ -12,6 +13,11 @@ class Character(models.Model):
     description = models.TextField(_("Description"), null=True, blank=True)
     password = models.CharField(max_length=12, null=True, blank=True)
     sort_order = models.IntegerField(blank=True, null=True)
+    attached_user = models.ForeignKey('hobo_user.CustomUser',
+                                      verbose_name=_("Attached User"),
+                                      related_name='attached_user',
+                                      on_delete=models.SET_NULL, null=True,
+                                      blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.name
@@ -46,12 +52,12 @@ class Sides(models.Model):
 class Audition(models.Model):
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
-    FACEBOOK = 'facebook'
+    # FACEBOOK = 'facebook'
 
     VIDEO_TYPE_CHOICES = [
         (YOUTUBE, 'Youtube'),
         (VIMEO, 'Vimeo'),
-        (FACEBOOK, 'Facebook'),
+        # (FACEBOOK, 'Facebook'),
     ]
     ATTACHED = 'attached'
     PASSED = 'passed'
