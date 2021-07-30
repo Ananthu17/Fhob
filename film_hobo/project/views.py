@@ -36,21 +36,15 @@ from rest_framework.generics import (UpdateAPIView,
                                      get_object_or_404)
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project
+     UserRating, JobType, UserRatingCombined, UserNotification, Project, \
+     VideoRatingCombined
 from .models import Audition, Character, Sides
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
-      ProjectLastDateSerializer, SidesSerializer, AuditionSerializer
-from hobo_user.utils import notify, get_notifications_time
-from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, \
-    AddSidesForm
-
-s3_client = boto3.client(
-                "s3",
-                region_name="us-east-2",
-                aws_access_key_id=settings.AWS_CLIENT_ID,
-                aws_secret_access_key=settings.AWS_CLIENT_SECRET
-            )
+      ProjectLastDateSerializer, SidesSerializer, AuditionSerializer, \
+      PostProjectVideoSerializer
+from hobo_user.utils import notify
+from .forms import VideoSubmissionLastDateForm, AddSidesForm
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -249,7 +243,7 @@ class RateUserSkillsAPI(APIView):
                 # end notification section
 
                 response = {'message': "%s rated sucessfully"%(
-                            project_member_obj.user.get_full_name),
+                            project_member_obj.user.get_full_name()),
                             'status': status.HTTP_200_OK,
                             'combined_rating': user_rating_combined.rating}
                 msg = project_member_obj.job_type.title +" "+project_member_obj.user.get_full_name() +" rated with "+rating+"stars"
@@ -293,27 +287,101 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
+        project_creator_rating = 0
+
+        project_creator_job = JobType.objects.filter(
+                               slug='project-creator'
+                               ).first()
+        if project_creator_job:
+            try:
+                project_creator = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=project_creator_job) 
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=project_creator) &
+                            Q(job_type=project_creator_job)
+                        ).first()
+                if rating_object:
+                    project_creator_rating = rating_object.rating*20
+                else:
+                    project_creator_rating = 0
+            except Team.DoesNotExist:
+                project_creator = ""
+            context['project_creator_rating'] = project_creator_rating
+        try:
+            project_rating_obj = VideoRatingCombined.objects.get(project=project)
+            project_rating = project_rating_obj.rating*20
+        except VideoRatingCombined.DoesNotExist:
+            project_rating = 0
+
+        characters = Character.objects.filter(project=project)
+        context['characters'] = characters
+
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+        rating_dict = {}
+        for character in characters:
+            if character.attached_user:
+                try:
+                    rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=character.attached_user) &
+                                    (
+                                        Q(job_type=actor) |
+                                        Q(job_type=actress)
+                                    )
+                                )
+                    rating_dict[character.attached_user.id] = (rating_obj.rating)*20
+                except UserRatingCombined.DoesNotExist:
+                    rating_dict[character.attached_user.id] = 0
+        print("rating_dict", rating_dict)
+        context['rating_dict'] = rating_dict
         context['project'] = project
+        context['project_rating'] = project_rating
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
         return context
 
-    # DON'T DELETE
-    # def post(self, request, *args, **kwargs):
-    #     bucket_prefix = ""
-    #     project_id = self.kwargs.get('id')
-    #     project = Project.objects.get(id=project_id)
-    #     video = self.request.FILES['video']
-    #     bucket_name = settings.S3_BUCKET_NAME
-    #     path = f"{bucket_prefix}{self.request.user.id}/{project.title}/{project.id}.mp4"
-    #     response = s3_client.put_object(
-    #                     Bucket=bucket_name,
-    #                     Body=video,
-    #                     Key=path,
-    #                     ServerSideEncryption="AES256",
-    #                 )
-    #     print("response", response)
-    #     messages.success(self.request, "Video Uploaded")
-    #     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+class AddProjectVideoView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/single_film_project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    UPLOAD_FOLDER = "uploads"
+
+    def post(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('id')
+        print(self.request.POST)
+        project = get_object_or_404(Project, pk=project_id)
+        cover_image = self.request.FILES['video_cover_image']
+        video_type = self.request.POST.get('video_type')
+        url = self.request.POST.get('video_url')
+        project.video_type = video_type
+        project.video_cover_image = cover_image
+        project.video_status = Project.UPLOADED
+
+        if video_type == 'youtube':
+            url_temp = url.split("v=")[1]
+            video_url = url_temp.split("&")[0]
+            project.video_url = video_url
+        if video_type == 'vimeo':
+            if url.startswith('https://vimeo.com/'):
+                video_url = url.split('https://vimeo.com/')[1]
+                project.video_url = video_url
+            if url.startswith('http://vimeo.com/'):
+                video_url = url.split('http://vimeo.com/')[1]
+                project.video_url = video_url
+            if url.startswith('vimeo.com/'):
+                video_url = url.split('vimeo.com/')[1]
+                project.video_url = video_url
+        project.save()
+        messages.success(self.request, "Audition submitted successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class SaveProjectVideoUrlAPI(APIView):
@@ -325,7 +393,7 @@ class SaveProjectVideoUrlAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
+            # print(data_dict)
             id = data_dict['id']
             video_url = data_dict['video_url']
             video_type = data_dict['video_type']
@@ -333,10 +401,52 @@ class SaveProjectVideoUrlAPI(APIView):
                 project = Project.objects.get(pk=id)
                 project.video_type = video_type
                 project.video_url = video_url
+                try:
+                    cover_image = request.data['video_cover_image']
+                    project.video_cover_image = cover_image
+                except KeyError:
+                    raise ParseError('Request has no cover image attached')
+                project.video_status = Project.UPLOADED
                 project.save()
                 response = {'message': "Video URL Saved",
                             'status': status.HTTP_200_OK}
                 messages.success(self.request, "Video URL saved")
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class PostProjectVideoAPI(APIView):
+    serializer_class = PostProjectVideoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            try:
+                project = Project.objects.get(pk=project_id)
+                if project.video_status == Project.UPLOADED:
+                    project.video_status = Project.POSTED
+                    project.save()
+                    response = {'message': "Video Published",
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, "Video Published.")
+                elif project.video_status == Project.NOT_AVAILABLE:
+                    response = {'errors': 'Video not available.', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                    messages.warning(self.request, "Video not available.")
+                elif project.video_status == Project.POSTED:
+                    response = {'errors': 'Video already posted.', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                    messages.warning(self.request, "Video already posted.")
             except Project.DoesNotExist:
                 response = {'errors': 'Invalid project ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -690,7 +800,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             try:
                 project_creator = Team.objects.get(
                                     Q(project=project) &
-                                    Q(job_type=project_creator_job) 
+                                    Q(job_type=project_creator_job)
                                     ).user
                 rating_object = UserRatingCombined.objects.filter(
                             Q(user=project_creator) &
@@ -748,8 +858,6 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             if url.startswith('vimeo.com/'):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
-        if video_type == 'facebook':
-            audition_obj.video_url = url
         audition_obj.save()
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
@@ -789,9 +897,13 @@ def getpdf(request, **kwargs):
         scene_3_data = Paragraph(sides.scene_3)
         report.build([report_title, scene_1, scene_1_data, scene_2,
                       scene_2_data, scene_3, scene_3_data])
+
         response.write(buff.getvalue())
         buff.close()
         return response
+
+
+
     except Sides.DoesNotExist:
         pass
     return response

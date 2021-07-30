@@ -304,7 +304,7 @@ urlpatterns = [
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),
     #      name="project-search"),
-    path('video/rate',  VideoRatingView.as_view(),
+    path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
          name="find-videorating"),

@@ -460,3 +460,63 @@ input.pw {
       font-style: initial;
       padding:5px;
     }
+
+    .sides-textbox{
+      width: 100%;
+      height: 245px;
+      resize: none;
+      border: solid 1px black;
+      border-radius: 1px;
+      outline: none;
+      overflow: scroll;
+   }
+.video_url_section
+   {
+     font-size:12px;
+     font-family: Myriad Pro;
+     color:#656565;
+   }
+.alert-style
+   {
+     font-size:12px;
+     font-family: Myriad Pro;
+     color:red;
+   }
+
+   /* scroll bar */
+  .show-more-div
+   {
+    height:235px;
+    overflow-y:hidden;
+   }
+#style-2::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #f3f3f3;
+}
+
+#style-2::-webkit-scrollbar
+{
+  background-color: #f3f3f3;
+}
+
+#style-2::-webkit-scrollbar-thumb
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #e88b24;
+}
+#style-2::-webkit-scrollbar-track
+{
+	border-radius: 10px;
+}
+
+#style-2::-webkit-scrollbar
+{
+	width: 5px;
+}
+
+#style-2::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+}
+   /* end scroll bar */

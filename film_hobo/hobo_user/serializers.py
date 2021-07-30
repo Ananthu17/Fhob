@@ -1096,4 +1096,4 @@ class VideoRatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VideoRating
-        fields = ['rated_by', 'video', 'rating']
+        fields = ['project', 'rating', 'reason']

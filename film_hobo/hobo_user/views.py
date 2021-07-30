@@ -32,7 +32,7 @@ from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
@@ -52,8 +52,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from authemail.views import SignupVerify
 
-from django.core.mail import EmailMultiAlternatives
-from django.utils.html import strip_tags
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
@@ -69,9 +67,9 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    Location, UserRatingCombined, \
+                    UserRating, Location, UserRatingCombined, \
                     UserTacking, CompanyProfile, \
-                    Feedback, CompanyRating, CompanyRatingCombined
+                    Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -551,9 +549,6 @@ class ExtendedSignupVerify(SignupVerify):
                 signup_code.delete()
             except SignupCode.DoesNotExist:
                 pass
-            if user_membership == 'HOB':
-                CustomUser.objects.filter(email=email).update(
-                    registration_complete=True)
             content = {'message': 'Email address verified.', 'status':
                        status.HTTP_200_OK, 'email': email, 'user_membership':
                        user_membership}
@@ -1376,8 +1371,7 @@ class PasswordResetTemplateView(TemplateView):
         return render(request, 'registration/password_reset_from_key.html',
                       {'response': response,
                        'form': form,
-                      }
-                     )
+                      })
 
 
 class SettingsAPI(APIView):
@@ -1671,8 +1665,7 @@ class GetUnblockedMembersAjaxView(View, JSONResponseMixin):
         already_blocked_users.append(self.request.user.id)
 
         # exclude super users
-        super_users = CustomUser.objects.filter(is_staff=True).values_list(
-            'id', flat=True)
+        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
         for id in super_users:
             already_blocked_users.append(id)
 
@@ -3648,7 +3641,6 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'user_pages/get-profile-rating-notification.html'
 
     def get(self, *args, **kwargs):
-        import pdb;pdb.set_trace();
         context = dict()
         user = self.request.user
         id = self.request.GET.get('from_user')
@@ -4055,11 +4047,12 @@ class ListAllFriendsAPI(APIView):
         response = {}
         friends_dict = {}
         user = request.user
-        friends = FriendRequest.objects.filter(
-                          Q(user=user) &
-                          Q(status=FriendRequest.ACCEPTED))
-        for obj in friends:
-            friends_dict[obj.requested_by.id] = obj.requested_by.email
+        try:
+            friend_obj = Friend.objects.get(user=user)
+        except Friend.DoesNotExist:
+            pass
+        for obj in friend_obj.friends.all():
+            friends_dict[obj.id] = obj.email
         response['friends'] = friends_dict
         return Response(response)
 
@@ -4289,24 +4282,18 @@ class FeedbackWebView(View):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['creator', 'title', 'format', 'genre',
-                        'rating', 'video_url', 'video_type',
-                        'last_date', 'location', 'visibility',
-                        'visibility_password', 'cast_attachment',
-                        'cast_pay_rate', 'cast_samr']
-
+    filterset_fields = '__all__'
 
 class ProjectCreateAPIView(CreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+  permission_classes = (IsAuthenticated,)
+  queryset = Project.objects.all()
+  serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -4315,13 +4302,11 @@ class ProjectUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = ProjectSerializer
 
-
 class ProjectDeleteAPIView(DestroyAPIView):
     queryset = Project.objects.all()
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = ProjectSerializer
-
 
 # Team CRUD
 class TeamAPIView(ListAPIView):
@@ -4331,10 +4316,9 @@ class TeamAPIView(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = '__all__'
 
-
 class TeamCreateAPIView(CreateAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+  queryset = Team.objects.all()
+  serializer_class = TeamSerializer
 
 
 class TeamUpdateAPIView(UpdateAPIView):
@@ -4343,57 +4327,49 @@ class TeamUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-
 class TeamDeleteAPIView(DestroyAPIView):
     queryset = Team.objects.all()
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-
-# # Api to search in project
+# Search API for project
+# Api to search in project
 # class ProjectSearchView(ListAPIView):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
 #     # permission_classes = (IsAuthenticated,)
 #     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title", "format"]
-
+#     search_fields = ["title","format"]
 
 # Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        allowed_members = ['IND', 'PRO', 'COM']
+        allowed_members = ['IND','PRO','COM']
         if serializer.is_valid():
-            try:
-                user = serializer.validated_data.get('rated_by')
-                video = serializer.validated_data.get('video')
-                rating = serializer.validated_data.get('rating')
-                existing_review = VideoRating.objects.filter(rated_by=user,
-                                                             video=video)
+            user = self.request.user
+            project = serializer.validated_data.get('project')
+            rating = serializer.validated_data.get('rating')
+            reason = serializer.validated_data.get('reason')
+            rating_obj = VideoRating()
 
-                if user.membership in allowed_members:
-                    if existing_review:
-                        existing_review[0].rating = rating
-                        existing_review[0].save()
-                        self.refresh_rating(video)
-                        response = {'message': "Rating Updated",
-                                    'status': status.HTTP_200_OK}
-                    else:
-                        serializer.save()
-                        self.refresh_rating(video)
-                        response = {'message': "Rating scuccess",
-                                    'status': status.HTTP_201_CREATED}
-                else:
-                    response = {'errors': "Unautharized access", 'status':
-                                status.HTTP_401_UNAUTHORIZED}
-            except:
-                response = {'errors': 'Invalid Video', 'status':
-                            status.HTTP_400_BAD_REQUEST}
+            if user.membership in allowed_members:
+                # project = get_object_or_404(Project, pk=project_id)
+                rating_obj.project = project
+                rating_obj.rating = rating
+                rating_obj.reason = reason
+                rating_obj.rated_by = user
+                rating_obj.save()
+                self.refresh_rating(project.id)
+                response = {'message': "Rating success",
+                            'status': status.HTTP_201_CREATED}
+            else:
+                response = {'errors': "Unautharized access", 'status':
+                            status.HTTP_401_UNAUTHORIZED}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':
@@ -4405,17 +4381,23 @@ class VideoRatingView(APIView):
     and written to project everytime when user make a rating.
     """
 
-    def refresh_rating(self, video):
-        ratings = VideoRating.objects.filter(video=video)
+    def refresh_rating(self, project_id):
+        ratings = VideoRating.objects.filter(project=project_id)
         combined_rating = 0
         for item in ratings:
             combined_rating += item.rating
+            print(combined_rating)
         combined_rating = combined_rating / len(ratings)
-        print("Number of rating :", len(ratings))
-        print("Combined Rating :", combined_rating)
-        video.rating = combined_rating
-        video.save()
-
+        try:
+            video_rating_combined = VideoRatingCombined.objects.get(project=project_id)
+            video_rating_combined.rating = combined_rating
+            video_rating_combined.save()
+        except VideoRatingCombined.DoesNotExist:
+            video_rating_combined = VideoRatingCombined()
+            project = get_object_or_404(Project, pk=project_id)
+            video_rating_combined.project = project
+            video_rating_combined.rating = combined_rating
+            video_rating_combined.save()
 
 # API to find rating of a video
 class FindVideoRatingAPI(RetrieveAPIView):
@@ -4424,12 +4406,11 @@ class FindVideoRatingAPI(RetrieveAPIView):
     queryset = Video.objects.all()
     lookup_field = 'id'
 
-
 # Api to list Video based on rating
 class VideoListAPI(ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Video.objects.all().order_by('-rating', '-created')
+    queryset = Video.objects.all().order_by('-rating','-created')
 
 
 class ProjectView(LoginRequiredMixin, TemplateView):
@@ -4473,6 +4454,7 @@ class UserHomeProjectInvite(APIView):
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+
 
 class CreateProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/new-project.html'
