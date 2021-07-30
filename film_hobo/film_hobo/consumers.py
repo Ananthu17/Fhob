@@ -69,6 +69,15 @@ class NotificationConsumer(WebsocketConsumer):
                             'message': message,
                             "event": "USER_RATING"
                           })
+        if event == 'INVITE':
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                          self.room_group_name,
+                          {
+                            'type': 'send_project_invite_notification',
+                            'message': message,
+                            "event": "INVITE"
+                          })
 
     def receive_json(self, content, **kwargs):
         print("Received event: {}".format(content))
@@ -118,4 +127,13 @@ class NotificationConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message,
             'event': "MEMBERSHIP_CHANGE"
+        }))
+
+    def send_project_invite_notification(self, event):
+        message = event['message']
+        id = event['from']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'user_id': id,
+            'event': "INVITE"
         }))

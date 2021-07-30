@@ -2440,7 +2440,7 @@ ul.cta-side-setup-menu li{
 /* project page end  */
 /*fonts*/
 
-@font-face {
+/* @font-face {
    font-family: "Caliban Std"; 
    src:url("font/CalibanStd.otf") format("truetype"); 
 }
@@ -2467,7 +2467,7 @@ ul.cta-side-setup-menu li{
 @font-face {
   font-family: "Pooper Black Pro"; 
   src:url("font/P22\ Pooper\ Black\ Regular.ttf") format("truetype"); 
-}
+} */
 /*fonts-end*/
 /*header section*/
 .fh-header {

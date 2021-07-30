@@ -58,7 +58,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    EditUserInterestAPI, VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
                    CreateProjectView, ScreeningProjectDeatilView, \
-                   UserHomeProjectInvite
+                   UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
+                   GetScreeningProjectInviteNotificationAjaxView
 
 app_name = "hobo_user"
 
@@ -184,6 +185,9 @@ urlpatterns = [
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),
          name='projects_detail'),
+    path('user_home/invite/',
+         ScreeningProjectDeatilInviteView.as_view(),
+         name='projects_detail_invite'),
     path('user_home/project_invite/<int:id>/',
          UserHomeProjectInvite.as_view(),
          name='user_home_project_invite'),
@@ -293,6 +297,9 @@ urlpatterns = [
     path('get-profile-rating-notification-html/',
          GetProfileRatingNotificationAjaxView.as_view(),
          name='get-profile-rating-notification-html'),
+    path('get-screeing-project-notification-html/',
+         GetScreeningProjectInviteNotificationAjaxView.as_view(),
+         name='get-screeing-project-notification-html'),
     # path('projects/rating', UserRatingAPI.as_view(),
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),

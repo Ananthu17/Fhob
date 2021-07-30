@@ -30,43 +30,12 @@ $("#apply_promocode").click(function(){
     token_val = String(token)
     var authorization_str = token_str.concat(token_val);
 
-    // calculate_discount_url = origin_url + '/payment/calculate_discount/'
-    // calculate_discount_args = {
-    //     "amount": $("#full_amount").text(),
-    //     "promocode": $("#promocode").val()
-    // }
-    // axios.post(calculate_discount_url, calculate_discount_args)
-    // .then((response) => {
-    //     if (response.status == 200){
-    //         $('#promocode').val('');
-    //         $("#remove_promocode").show();
-    //         var title = "Promotion"
-    //         var modal = $("#promocode_modal")
-    //         var modal_success_text = "Promocode Applied Successfully"
-    //         modal.find('.modal-title').text(title)
-    //         modal.find('.modal-body').text(modal_success_text)
-    //         $("#promocode_modal").modal('show');
-    //         $('#full_amount').text(response.data.initial_amount);
-    //         $('#promotion_amount').text(response.data.promotion_amount);
-    //         localStorage.setItem('promocode', response.data.promocode);
-    //         localStorage.setItem('promotion_amount', parseFloat(response.data.promotion_amount));
-    //         localStorage.setItem('final_amount', parseFloat(response.data.final_amount));
-    //         $('#final_amount').text(response.data.final_amount);
-    //     }
-    // },(error) => {
-    //     var title = "Promotion"
-    //     var modal = $("#promocode_modal")
-    //     modal.find('.modal-title').text(title)
-    //     modal.find('.modal-body').text(JSON.parse(error.request.responseText).status)
-    //     $("#promocode_modal").modal('show');
-    // });
-
-    braintree_calculate_discount_url = origin_url + '/payment/braintree/calculate_discount/'
+    calculate_discount_url = origin_url + '/payment/calculate_discount/'
     calculate_discount_args = {
         "amount": $("#full_amount").text(),
         "promocode": $("#promocode").val()
     }
-    axios.post(braintree_calculate_discount_url, calculate_discount_args)
+    axios.post(calculate_discount_url, calculate_discount_args)
     .then((response) => {
         if (response.status == 200){
             $('#promocode').val('');
@@ -91,6 +60,37 @@ $("#apply_promocode").click(function(){
         modal.find('.modal-body').text(JSON.parse(error.request.responseText).status)
         $("#promocode_modal").modal('show');
     });
+
+    // braintree_calculate_discount_url = origin_url + '/payment/braintree/calculate_discount/'
+    // calculate_discount_args = {
+    //     "amount": $("#full_amount").text(),
+    //     "promocode": $("#promocode").val()
+    // }
+    // axios.post(braintree_calculate_discount_url, calculate_discount_args)
+    // .then((response) => {
+    //     if (response.status == 200){
+    //         $('#promocode').val('');
+    //         $("#remove_promocode").show();
+    //         var title = "Promotion"
+    //         var modal = $("#promocode_modal")
+    //         var modal_success_text = "Promocode Applied Successfully"
+    //         modal.find('.modal-title').text(title)
+    //         modal.find('.modal-body').text(modal_success_text)
+    //         $("#promocode_modal").modal('show');
+    //         $('#full_amount').text(response.data.initial_amount);
+    //         $('#promotion_amount').text(response.data.promotion_amount);
+    //         localStorage.setItem('promocode', response.data.promocode);
+    //         localStorage.setItem('promotion_amount', parseFloat(response.data.promotion_amount));
+    //         localStorage.setItem('final_amount', parseFloat(response.data.final_amount));
+    //         $('#final_amount').text(response.data.final_amount);
+    //     }
+    // },(error) => {
+    //     var title = "Promotion"
+    //     var modal = $("#promocode_modal")
+    //     modal.find('.modal-title').text(title)
+    //     modal.find('.modal-body').text(JSON.parse(error.request.responseText).status)
+    //     $("#promocode_modal").modal('show');
+    // });
 });
 
 $("#remove_promocode").click(function(){

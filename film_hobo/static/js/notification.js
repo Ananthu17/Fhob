@@ -99,6 +99,20 @@ notificationSocket.onmessage = function (e) {
                      }
              });
             break;
+            case "INVITE":
+                // get invite to see a project notification html
+                data_dict = {}
+                data_dict['from_user'] = user_id
+                data_dict['message'] = message
+                console.log(data_dict)
+                $.get('/hobo_user/get-profile-rating-notification-html/', data_dict)
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            $('.notification-modal-content').prepend(data['notification_html'])
+                        }
+                });
+               break;
         default:
             console.log("No event")
     }

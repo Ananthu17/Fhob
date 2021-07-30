@@ -1563,6 +1563,7 @@ class UserNotification(models.Model):
     READ = 'read'
     UNREAD = 'unread'
     MEMBERSHIP_CHANGE = 'membership_change'
+    INVITE = 'invite'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1572,6 +1573,8 @@ class UserNotification(models.Model):
                                  'Accepted Friend Request'),
                                 (MEMBERSHIP_CHANGE,
                                  'Membership Change'),
+                                (INVITE,
+                                 'Invite'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1596,6 +1599,7 @@ class UserNotification(models.Model):
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     message = models.TextField(_("Message"), null=True, blank=True)
+    invite_url = models.URLField(_("Invite URL"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

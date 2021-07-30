@@ -3648,6 +3648,7 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'user_pages/get-profile-rating-notification.html'
 
     def get(self, *args, **kwargs):
+        import pdb;pdb.set_trace();
         context = dict()
         user = self.request.user
         id = self.request.GET.get('from_user')
@@ -3659,6 +3660,29 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
                             Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
         notification_html = render_to_string(
                                 'user_pages/get-profile-rating-notification.html',
+                                {'from_user': from_user,
+                                'message':message,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetScreeningProjectInviteNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/get-screening-project-invite.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.INVITE)).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'user_pages/get-screening-project-invite.html',
                                 {'from_user': from_user,
                                 'message':message,
                                 'notification_id':notification_id,
@@ -4458,3 +4482,39 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+class ScreeningProjectDeatilInviteView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # send notification
+            logged_in_user = request.user
+            to_user = CustomUser.objects.get(email=request.data['to_user_email'])
+            project_url = request.data['project_url']
+            project_id = project_url.rsplit('/', 1)[-1]
+            project_obj = Project.objects.get(id=project_id)
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = to_user
+            notification.notification_type = UserNotification.INVITE
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" invited you to check his project titled "+str(project_obj.title)+""
+            notification.invite_url = project_url
+            notification.save()
+            # send notification
+            room_name = "user_"+str(logged_in_user.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(request.user.id),
+                    "event": "INVITE"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
+            if notification_msg:
+                return Response({"status": "invite success"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)

@@ -761,8 +761,13 @@ class CreateUserOrder(APIView):
         if request.data['promocodes_applied'] == "":
             promocodes_applied = None
         else:
-            promocodes_applied = PromoCode.objects.get(
-                promo_code=request.data['promocodes_applied'])
+            try:
+                promocodes_applied = PromoCode.objects.get(
+                    promo_code=request.data['promocodes_applied'])
+            except ObjectDoesNotExist:
+                return Response(
+                            {"status": "promocode does not exist"},
+                            status=status.HTTP_400_BAD_REQUEST)
         if request.data['promotion_amount'] == '':
             promotion_amount = 0
         else:
@@ -786,7 +791,7 @@ class CreateUserOrder(APIView):
             client = PayPalHttpClient(environment)
             create_order = OrdersCreateRequest()
 
-            # order
+            create_order request for no discount added
             create_order.request_body(
                 {
                     "intent": "CAPTURE",
@@ -813,6 +818,78 @@ class CreateUserOrder(APIView):
                     ],
                 }
             )
+
+            # order
+            # if membership_type == 'IND':
+            #     if payment_plan == 'monthly':
+            #         plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY
+            #     else:
+            #         plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY
+            # elif membership_type == 'PRO':
+            #     if payment_plan == 'monthly':
+            #         plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY
+            #     else:
+            #         plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY
+            # elif membership_type == 'COM':
+            #     if payment_plan == 'monthly':
+            #         plan_id = \
+            #             settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY
+            #     else:
+            #         plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY
+            # else:
+            #     return Response(
+            #             {"status": "this memebership type does not have a membership plan"},
+            #             status=status.HTTP_400_BAD_REQUEST)
+
+            # create_order.request_body(
+            #     {
+            #         "plan_id": plan_id,
+            #         "quantity": "1",
+            #         "subscriber": {
+            #             "name": {
+            #                 "given_name": logged_user.first_name,
+            #                 "surname": logged_user.middle_name + ' ' + logged_user.last_name
+            #             },
+            #             "email_address": logged_user.email
+            #         },
+            #         "plan": {
+            #             "billing_cycles": [
+            #                 {
+            #                     "sequence": 1,
+            #                     "total_cycles": 1,
+            #                     "pricing_scheme": {
+            #                         "fixed_price": {
+            #                             "value": final_amount,
+            #                             "currency_code": "USD"
+            #                         }
+            #                     }
+            #                 }
+            #             ]
+            #         },
+            #         "intent": "CAPTURE",
+            #         "application_context": {
+            #             "brand_name": "FILMHOBO INC",
+            #             "shipping_preference": "NO_SHIPPING"
+            #         },
+            #         "purchase_units": [
+            #             {
+            #                 "days_free": transaction.days_free,
+            #                 "payment_plan": transaction.payment_plan,
+            #                 "initial_amount": transaction.initial_amount,
+            #                 "amount": {
+            #                     "currency_code": "USD",
+            #                     "value": transaction.final_amount,
+            #                     "breakdown": {
+            #                         "item_total": {
+            #                             "currency_code": "USD",
+            #                             "value": transaction.final_amount
+            #                         }
+            #                         },
+            #                     },
+            #             }
+            #         ],
+            #     }
+            # )
 
             response = client.execute(create_order)
             data = response.result.__dict__['_dict']
