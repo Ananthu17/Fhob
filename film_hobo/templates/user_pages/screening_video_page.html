@@ -324,25 +324,12 @@
                     <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
                 </div>
                 <div class="modal-body">
-                    <!-- <div class="icon-container1 d-flex">
-                        <div class="smd"> <i class=" img-thumbnail fab fa-twitter fa-2x" style="color:#4c6ef5;background-color: aliceblue"></i>
-                            <p>{% post_to_twitter "" object_or_url "Post to Twitter" %}</p>
-                        </div>
-                        <div class="smd"> <i class="img-thumbnail fab fa-facebook fa-2x" style="color: #3b5998;background-color: #eceff5;"></i>
-                            <p>{% post_to_facebook object_or_url %}</p>
-                        </div>
-                        <div class="smd"> <i class="img-thumbnail fab fa-reddit-alien fa-2x" style="color: #FF5700;background-color: #fdd9ce;"></i>
-                            <p>{% post_to_reddit "Filmhobo: {{project.title}}" object_or_url  %}</p>
-                        </div>
+                    <div class="col-sm-12 email-id-row">
+                        <span class="to-input">To</span>
+                            <div class="all-mail">
+                            </div>
+                            <input type="text" name="email" class="enter-mail-id" placeholder="Enter the email id .." />
                     </div>
-                    <div class="icon-container2 d-flex">
-                        <div class="smd"> <i class="img-thumbnail fab fa-whatsapp fa-2x" style="color: #25D366;background-color: #eceff5;"></i>
-                            <p>{% post_to_whatsapp object_or_url "Post to WhatsApp" %}</p>
-                        </div>
-                        <div class="smd"> <i class="img-thumbnail fab fa-linkedin fa-2x" style="color: #0e76a8;background-color: #cef5dc;"></i>
-                            <p>{% post_to_linkedin object_or_url "Post to Linkedin" %}</p>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -356,12 +343,7 @@
                     <h5 class="modal-title">Invite</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="inviteModalClose" aria-hidden="true">&times;</span> </button>
                 </div>
                 <div class="modal-body">
-                    <div class="col-sm-12 email-id-row">
-                        <span class="to-input">To</span>
-                            <div class="all-mail">
-                            </div>
-                            <input type="text" name="email" class="enter-mail-id" placeholder="Enter the email id .." />
-                    </div>
+
                 </div>
                 <div class="modal-footer">
                   <button id="invite_send_btn" type="button" style="font-size:15px;" class="btn btn-primary btn-lg modal-btn add-friend-to-groups"
