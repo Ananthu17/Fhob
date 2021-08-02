@@ -641,6 +641,8 @@ class Project(models.Model):
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12, null=True, blank=True)
+    logline = models.CharField(max_length=1000,  null=True, blank=True)
+    project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -1397,7 +1399,7 @@ class CompanyRating(models.Model):
         verbose_name_plural = 'Company Ratings'
 
 
-class UserTacking(models.Model):
+class UserTracking(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
                              related_name='user_tracking',
@@ -1532,6 +1534,7 @@ class UserNotification(models.Model):
     READ = 'read'
     UNREAD = 'unread'
     MEMBERSHIP_CHANGE = 'membership_change'
+    PROJECT_TRACKING = 'project_tracking'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1541,6 +1544,8 @@ class UserNotification(models.Model):
                                  'Accepted Friend Request'),
                                 (MEMBERSHIP_CHANGE,
                                  'Membership Change'),
+                                (PROJECT_TRACKING,
+                                 'Project Tracking'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1565,6 +1570,11 @@ class UserNotification(models.Model):
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     message = models.TextField(_("Message"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_notification',
+                                verbose_name=_("Project"),
+                                null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

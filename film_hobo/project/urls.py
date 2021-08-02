@@ -6,7 +6,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
      SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
-     PostProjectVideoAPI, ScriptPasswordCheckAPI
+     PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
+     TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
+     TrackProjectAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -53,4 +55,14 @@ urlpatterns = [
           name='post-project-video'),
      path('script-password-check/', ScriptPasswordCheckAPI.as_view(),
           name='script-password-check'),
+     path('cast-audition-password-check/', CastAuditionPasswordCheckAPI.as_view(),
+          name='cast-audition-password-check'),
+     path('team-select-password-check/', TeamSelectPasswordCheckAPI.as_view(),
+          name='team-select-password-check'),
+     path('save-project-logline/', SaveProjectLoglineAPI.as_view(),
+          name='save-project-logline'),
+     path('list-project-trackers-api/', ListProjectTrackersAPI.as_view(),
+          name='list-project-trackers-api'),
+     path('track-project-api/', TrackProjectAPI.as_view(),
+          name='track-project-api'),
     ]

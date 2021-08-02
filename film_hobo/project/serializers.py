@@ -127,3 +127,21 @@ class PasswordSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class ProjectLoglineSerializer(serializers.ModelSerializer):
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = Project
+        fields = ['project_id', 'logline', 'project_info']
+
+
+class TrackProjectSerializer(serializers.Serializer):
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

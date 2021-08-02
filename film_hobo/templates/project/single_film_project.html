@@ -26,11 +26,9 @@
                             <li class="mt-1"><a data-toggle="modal" data-target="#rating_modal" class="cursor-pointer red-f log-fnt-weight">R<span class="mem-small-f">ATE THIS</span> P<span
                                 class="mem-small-f">ROJECT</span></a>
                                 <div class="sgl-rate-star" data-toggle="modal" data-target="#rating_modal">
-                                    <span class="fa fa-star-o"></span>
-                                    <span class="fa fa-star-o"></span>
-                                    <span class="fa fa-star-o"></span>
-                                    <span class="fa fa-star-o"></span>
-                                    <span class="fa fa-star-o"></span>
+                                    <div class="cta-stars-outer">
+                                        <div class="cta-stars-inner" style="width:{{project_rating}}%;"></div>
+                                    </div>
                                 </div>
 <!-- The Modal -->
 <div class="modal fade" id="rating_modal">
@@ -103,6 +101,7 @@
                 </div>
                 <div class="left-mode-sec  p-2   mt-2 sgl-left-mode-hgt">
                     <div>
+                        {% if project.script %}
                         <div class="card sgl-left-box-lg">
                             <div class="sgl-left-box-sm-align">
                                 <div class="sgl-left-box-lg-align">
@@ -112,14 +111,14 @@
                             <div class="sgl-info-open-txt-align">
                                 <span class="sgl-info-open">
                                     {% if project.script_password %}
-                                    <a class="script_open_password_check" id="{{project.id}}">Open</a>
+                                    <a class="script_open_password_check cursor-pointer" id="{{project.id}}">Open</a>
                                     {% else %}
                                     <a href="{{project.script.url}}" class="cursor-pointer" target="_blank">Open</a>
                                     {% endif %}
                                 </span>
                                 <span class="sgl-info-download">
                                     {% if project.script_password %}
-                                    <a href=""  class="cursor-pointer">Download</a>
+                                    <a id="{{project.id}}" class="script_download_password_check cursor-pointer">Download</a>
                                     {% else %}
                                     <a href="{{project.script.url}}" download>Download</a>
                                     {% endif %}
@@ -132,6 +131,7 @@
                                 placeholder="*****" id="script_password"></span>
                                 <span class="script-password-err errormsg"></span>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -315,12 +315,32 @@
                         <div class="left-mode-sec sgl-cast-crew-align">
                             <div class="sgl-cast-align">
                                 <div>
-                                    <span class="sgl-black-tag"><a href="">CAST AUDITION</a></span>
-                                    <div><input type="password"  name="password" class="sgl-cast-password" placeholder="******" required></div>
+                                    <span class="sgl-black-tag">
+                                        {% if project.cast_audition_password %}
+                                        <a class="cast_audition_password_check cursor-pointer" id="{{project.id}}">CAST AUDITION</a>
+                                        {% else %}
+                                        <a href="{% url 'project:audition-list' project.id %}" class="cursor-pointer">CAST AUDITION</a>
+                                        {% endif %}
+                                    </span>
+                                    <div>
+                                        <input type="password"  name="password" class="sgl-cast-password" placeholder="******"
+                                        id="cast_audition_password" required>
+                                        <span class="cast-audition-password-err errormsg"></span>
+                                    </div>
                                 </div>
                                 <div class="sgl-crew-align">
-                                    <span class="sgl-black-tag"><a href="">TEAM SELECT</a></span>
-                                    <div><input type="password" name="password" class="sgl-cast-password" placeholder="******" required></div>
+                                    <span class="sgl-black-tag">
+                                        {% if project.team_select_password %}
+                                        <a class="team_select_password_check cursor-pointer" id="{{project.id}}">TEAM SELECT</a>
+                                        {% else %}
+                                        <a href="{% url 'project:audition-list' project.id %}" class="cursor-pointer">TEAM SELECT</a>
+                                        {% endif %}
+                                    </span>
+                                    <div>
+                                        <input type="password" name="password" class="sgl-cast-password" placeholder="******"
+                                        id="team_select_password" required>
+                                        <span class="team-select-password-err errormsg"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -439,7 +459,6 @@
         <button class="btn btn-outline-danger btn-sm"
         data-dismiss="modal">Close</button>
         </div>
-        </form>
     </form>
 
     </div>
@@ -452,14 +471,97 @@
                         <div class="left-mode-sec sgl-topcol-align2">
                             <div class="sgl-logline-card-align">
                                 <div class="card sgl-logline-card">
+                                    <div class="logline-edit-div">
+                                        {% if project.creator == request.user %}
+                                        <a class="cursor-pointer" data-toggle="modal" data-target="#update_logline_modal">Edit</a>
+                                        {% endif %}
+                                    </div>
                                     <div class="sgl-card-inner-align">
-                                        <div>
-                                            <span class="sgl-logline-txt">Logline</span>
+                                        <div class="row">
+                                            <div class="col-12 col-sm-4 col-md-3">
+                                                <span class="sgl-logline-txt">Logline</span>
+                                            </div>
+                                            <div class="col-12 col-sm-8 col-md-9">
+                                                {% if project.logline %}
+                                                <span class="sgl-logline-txt">{{project.logline}}</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <div class="sgl-info-align">
-                                            <span class="sgl-logline-txt">Project Info:</span>
+                                            <div class="row">
+                                                <div class="col-12 col-sm-4 col-md-3">
+                                                    <span class="sgl-logline-txt">Project Info:</span>
+                                                </div>
+                                                <div class="col-12 col-sm-8 col-md-9">
+                                                    {% if project.project_info %}
+                                                    <span class="sgl-logline-txt">{{project.project_info}}</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>   
+                                    </div>
+<!-- The Modal -->
+<div class="modal fade" id="update_logline_modal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Update Project Logline & Project Info</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt">
+                        <span class="alert-style"></span>
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3">
+                    <span class=""> Logline</span>
+                </div>
+                <div class="col-7">
+                    <input class="form-control" name="logline" id="logline"
+                    value="
+                    {% if project.logline %}
+                        {{project.logline}}
+                    {% else %}
+                    {% endif %}
+                    " />
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3 ">
+                    <span class=""> Project Info </span>
+                </div>
+                <div class="col-7">
+                    <textarea class="form-control" name="project_info" rows=8
+                    id="project_info" >
+                    {% if project.project_info %}
+                        {{project.project_info}}
+                    {% else %}
+                    {% endif %}
+                    </textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <a class='btn btn-outline-danger btn-sm cursor-pointer save_logline'
+        id='{{project.id}}'>Save</a>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
                                 </div>
                                 <div class="card sgl-logline-card mt-4 mb-3">
                                     <div class="sgl-card2-inner-align">
@@ -632,17 +734,164 @@ $('body').on('click' , '.publish_video', function(){
                     xhr.setRequestHeader ("Authorization", token);
                 },
                 success: function(response){
-                    console.log(response)
+                    var url = response['url']
                     if('errors' in response){
                         $('.script-password-err').html(response['errors'])
                     }else{
-                        
-                    }
+                        $('.script-password-err').html("");
+                        $('#script_password').val("");
+                        window.open(url,'_blank');
+                    };
                 }
             });
         }else{
             $('.script-password-err').html("Password is required.")
         }
+    });
+
+    $('body').on('click' , '.script_download_password_check', function(){
+        var project_id = $(this).attr('id')
+        var password = $("#script_password").val();
+        var token = $("#token").val();
+        data_dict = {}
+        data_dict['project_id'] = project_id;
+        if(password!=""){
+            data_dict['password'] = password
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/script-password-check/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    var url = response['url']
+                    if('errors' in response){
+                        $('.script-password-err').html(response['errors'])
+                    }else{
+                        $('.script-password-err').html("");
+                        $('#script_password').val("");
+                        var link=document.createElement('a');
+                        link.href=url;
+                        link.download="script.pdf";
+                        link.click();
+                    };
+                }
+            });
+        }else{
+            $('.script-password-err').html("Password is required.")
+        }
+    });
+
+    $('body').on('click' , '.cast_audition_password_check', function(){
+        var project_id = $(this).attr('id')
+        var password = $("#cast_audition_password").val();
+        var token = $("#token").val();
+        data_dict = {}
+        data_dict['project_id'] = project_id;
+        if(password!=""){
+            data_dict['password'] = password
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/cast-audition-password-check/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    var url = response['url']
+                    if('errors' in response){
+                        $('.cast-audition-password-err').html(response['errors'])
+                    }else{
+                        $('.cast-audition-password-err').html("");
+                        $('#cast_audition_password').val("");
+                        window.location.href = "/project/audition-list/"+project_id+"/";
+                    };
+                }
+            });
+        }else{
+            $('.cast-audition-password-err').html("Password is required.")
+        }
+    });
+
+    $('body').on('click' , '.team_select_password_check', function(){
+        var project_id = $(this).attr('id')
+        var password = $("#team_select_password").val();
+        var token = $("#token").val();
+        data_dict = {}
+        data_dict['project_id'] = project_id;
+        if(password!=""){
+            data_dict['password'] = password
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/team-select-password-check/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    var url = response['url']
+                    if('errors' in response){
+                        $('.team-select-password-err').html(response['errors'])
+                    }else{
+                        $('.team-select-password-err').html("");
+                        $('#team_select_password').val("");
+                        window.location.href = "/project/audition-list/"+project_id+"/";
+                    };
+                }
+            });
+        }else{
+            $('.team-select-password-err').html("Password is required.")
+        }
+    });
+</script>
+<script>
+    // $('body').on('click' , '.edit_logline', function(){
+    //     var project_id = $(this).attr('id');
+    //      $('#logline').removeAttr("disabled");
+    //      $('#logline').css({
+    //         'border': '1px solid #c7c7c7'
+    //         });
+    //      $('#project_info').removeAttr("disabled");
+    //      $('#project_info').css({
+    //         'border': '1px solid #c7c7c7'
+    //         });
+    //     var submit_btn = "<a class='custom-save-btn btn mem-setup-blu-f save_logline' id='"+project_id+"'/>Save</a>"
+    //     $("#logline-sbmit-div").html(submit_btn)
+    // });
+    $('body').on('click' , '.save_logline', function(){
+        var project_id = $(this).attr('id')
+        var logline = $("#logline").val();
+        var project_info = $("#project_info").val();
+        var token = $("#token").val();
+        var data_dict = {};
+        data_dict['project_id'] = project_id;
+        data_dict['logline'] = logline
+        data_dict['project_info'] = project_info
+        console.log(data_dict)
+        $.ajax
+            ({
+                type: "POST",
+                url: "/project/save-project-logline/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    window.location.reload()
+                }
+            });
     });
 </script>
 {% endblock %}

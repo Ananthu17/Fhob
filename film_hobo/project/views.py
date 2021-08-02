@@ -41,10 +41,12 @@ from rest_framework.generics import (ListAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, VideoRatingCombined
-from .models import Audition, Character, Sides
+from .models import Audition, Character, Sides, ProjectTracking
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
-      SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, PasswordSerializer
+      SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
+      PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer
+from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
 
@@ -1121,6 +1123,7 @@ class ScriptPasswordCheckAPI(APIView):
             project = get_object_or_404(Project, pk=project_id)
             if project.script_password == password:
                 response = {'message': "Password Verified",
+                            'url': project.script.url,
                             'status': status.HTTP_200_OK}
             else:
                 response = {'errors': 'Wrong Password', 'status':
@@ -1130,3 +1133,237 @@ class ScriptPasswordCheckAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class CastAuditionPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.cast_audition_password == password:
+                response = {'message': "Password Verified",
+                            'url': project.script.url,
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TeamSelectPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.team_select_password == password:
+                response = {'message': "Password Verified",
+                            'url': project.script.url,
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class SaveProjectLoglineAPI(APIView):
+    serializer_class = ProjectLoglineSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print("data_dict----------",data_dict)
+            id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=id)
+            if 'logline' in data_dict and data_dict['logline'] is not None:
+                project.logline = data_dict['logline']
+            if 'project_info' in data_dict and data_dict['project_info'] is not None:
+                project.project_info = data_dict['project_info']
+            project.save()
+            response = {'message': "Logline and project info updated",
+                        'status': status.HTTP_200_OK}
+            messages.success(self.request, 'Project Info updated')
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ListProjectTrackersAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project = get_object_or_404(Project, pk=data_dict['project_id'])
+            try:
+                trackers_dict = {}
+                track_obj = ProjectTracking.objects.get(project=project)
+                trackers_list = track_obj.tracked_by.all()
+
+                for user in trackers_list:
+                    trackers_dict[user.id] = UserSerializer(user).data
+
+                response = {'Trackers': trackers_dict,
+                            'status': status.HTTP_200_OK}
+            except ProjectTracking.DoesNotExist:
+                response = {'Message': "Trackers list is empty", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TrackProjectAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            track_by_user = self.request.user
+
+            try:
+                track_obj = ProjectTracking.objects.get(project=project)
+                trackers_list = track_obj.tracked_by.all()
+                if track_by_user in trackers_list:
+                    response = {'message': "You are already tracking this user",
+                                'status': status.HTTP_400_BAD_REQUEST,
+                                'track_status': 'tracking'
+                                }
+                    return Response(response)
+                track_obj.tracked_by.add(track_by_user.id)
+
+            except ProjectTracking.DoesNotExist:
+                track_obj = ProjectTracking()
+                track_obj.project = project
+                track_obj.save()
+                track_obj.tracked_by.add(track_by_user.id)
+
+            # update notification table
+            notification = UserNotification()
+            notification.user = project.creator
+            notification.notification_type = UserNotification.PROJECT_TRACKING
+            notification.from_user = track_by_user
+            notification.project = project
+            notification.message = track_by_user.get_full_name()+" started tracking your project "+project.title
+            notification.save()
+
+            # send notification
+            room_name = "user_"+str(track_obj.project.creator.id)
+            notification_msg = {
+                    'type': 'send_project_tracking_notification',
+                    'message': str(notification.message),
+                    'track_by_user_id': str(self.request.user.id),
+                    "event": "PROJECT_TRACKING"
+                }
+            notify(room_name, notification_msg)
+
+            msg = "Started Tracking " + project.title
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status': 'tracking'}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetProjectTrackingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/get-single-notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.PROJECT_TRACKING)
+                            ).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'project/get-single-notification.html',
+                                {'from_user': from_user,
+                                 'message':message,
+                                 'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+# class UnTrackProjectAPI(APIView):
+#     serializer_class = TrackUserSerializer
+#     permission_classes = (IsAuthenticated,)
+
+#     def post(self, request):
+#         serializer = self.serializer_class(data=request.data)
+#         response = {}
+#         if serializer.is_valid():
+#             data_dict = serializer.data
+#             track_id = data_dict['track_id']
+#             track_user = CustomUser.objects.get(id=track_id)
+#             track_by_user = self.request.user
+
+#             try:
+#                 track_obj = UserTacking.objects.get(user=track_user)
+#                 track_obj.tracked_by.remove(track_by_user.id)
+#                 # remove from notification table
+#                 try:
+#                     notification = UserNotification.objects.get(
+#                         Q(user=track_user) &
+#                         Q(from_user=track_by_user) &
+#                         Q(notification_type=UserNotification.TRACKING)
+#                         )
+#                     notification.delete()
+#                 except UserNotification.DoesNotExist:
+#                     pass
+#             except UserTacking.DoesNotExist:
+#                 response = {'errors': "invalid id", 'status':
+#                              status.HTTP_400_BAD_REQUEST}
+#             msg = "Stopped Tracking " + track_user.get_full_name()
+#             response = {'message': msg,
+#                         'status': status.HTTP_200_OK,
+#                         'track_status':'not_tracking'}
+
+#         else:
+#             print(serializer.errors)
+#             response = {'errors': serializer.errors, 'status':
+#                         status.HTTP_400_BAD_REQUEST}
+#         return Response(response)

@@ -112,3 +112,23 @@ class Audition(models.Model):
     class Meta:
         verbose_name = 'Audition'
         verbose_name_plural = 'Audition'
+
+
+class ProjectTracking(models.Model):
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_tracking',
+                                verbose_name=_("User"),
+                                null=True)
+    tracked_by = models.ManyToManyField('hobo_user.CustomUser',
+                                        blank=True,
+                                        related_name="project_tracked_by",
+                                        verbose_name=_("Tracked by")
+                                        )
+
+    def __str__(self):
+        return str(self.project)
+
+    class Meta:
+        verbose_name = 'Project Tracking'
+        verbose_name_plural = 'Project Tracking'
