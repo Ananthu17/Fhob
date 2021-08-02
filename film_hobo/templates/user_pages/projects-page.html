@@ -144,24 +144,25 @@
                     <div class="row left-mode-search p-2 text-center mt-2 left-mode-search-height">
                         <div class="cnt-menu">
                             <label class=" txt-red float-left top-head-align">New Scenes</label>
-                            <ul class="cnt-menu-li float-left ml-2">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="cnt-menu-li float-left ml-2" for="scene">
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
                             </ul>
                         </div>
+                        <div class="owl-carousel owl-theme owl-algin" id="scene">
                         <!-- owl-carousel  -->
                         {% for project in scenes %}
                             <!-- carousel column  -->
@@ -227,39 +228,35 @@
                             </div>
                             <!-- carousel column End -->
                             {% endfor %}
+                            </div>
                         </div>
-                       
-                        <div class="owl-carousel owl-theme owl-algin" id="scene">
-                            
-                            
-                            
-                        <!-- owl-carousel End -->
 
-                        </div>
+                        <!-- owl-carousel End -->
                     <!-- End row 1 -->
                     <!-- row 2 -->
 
                     <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
                         <div class="cnt-menu">
                             <label class=" txt-red float-left top-head-align">Top Rated</label>
-                            <ul class="cnt-menu-li float-left ml-4">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="cnt-menu-li float-left ml-2" for="topscene">
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
                             </ul>
                         </div>
+                        <div class="owl-carousel owl-theme owl-algin" id="topscene">
                         <!-- owl-carousel  -->
                         {% for project in toprated_scenes %}
                         <div class="item pro-item">
@@ -323,38 +320,37 @@
                             </div>
                         </div>
                         {% endfor %}
-                        <div class="owl-carousel owl-theme owl-algin">
-                            
+                        </div>
 
                         </div>
                         <!-- owl-carousel End -->
 
-                    </div>
                     <!-- End row 2 -->
                     <!-- row 3 -->
 
                     <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
                         <div class="cnt-menu">
                             <label class=" txt-red float-left top-head-align">New Films</label>
-                            <ul class="cnt-menu-li float-left ml-4">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="cnt-menu-li float-left ml-2" for="filims">
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
                             </ul>
                         </div>
                         <!-- owl-carousel  -->
+                        <div class="owl-carousel owl-theme owl-algin" id="filims">
                          <!-- carousel column  -->
                          {% for project in filims %}
                          <div class="item pro-item">
@@ -419,8 +415,6 @@
                          </div>
                          <!-- carousel column End -->
                          {% endfor %}
-                        <div class="owl-carousel owl-theme owl-algin">
-                           
                         </div>
                         <!-- owl-carousel End -->
 
@@ -430,26 +424,27 @@
 
                     <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
                         <div class="cnt-menu">
-                            <label class=" txt-red float-left top-head-align">Top Rated</label>
-                            <ul class="cnt-menu-li float-left ml-4">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <label class=" txt-red float-left top-head-align">New Films</label>
+                            <ul class="cnt-menu-li float-left ml-2" for="topfilims">
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
                             </ul>
                         </div>
                         <!-- owl-carousel  -->
+                        <div class="owl-carousel owl-theme owl-algin" id="topfilims">
                         {% for project in toprated_filims %}
                             <!-- carousel column  -->
                             <div class="item pro-item">
@@ -514,8 +509,6 @@
                             </div>
                             <!-- carousel column End -->
                             {% endfor %}
-                        <div class="owl-carousel owl-theme owl-algin">
-                            
                         </div>
                         <!-- owl-carousel End -->
 
@@ -583,38 +576,132 @@
             <!-- container div -->
         </div>
     </div>
-
-
-    <script>
-        $('.owl-carousel').owlCarousel({
-            loop: true,
-            margin: 10,
-            responsiveClass: true,
-            nav: true,
-            navText: [
-                "<i class='fa fa-caret-left'></i>",
-                "<i class='fa fa-caret-right'></i>"
-            ],
-            responsive: {
-                0: {
-                    items: 1,
-                    nav: true
-                },
-                767: {
-                    items: 2,
-                    nav: true
-                },
-                991: {
-                    items: 2,
-                    nav: true
-                },
-                1320: {
-                    items: 3,
-                    nav: true,
-                    loop: false
-                }
-            }
-        })
-    </script>
 {% endblock %}
 
+{% block extrajs %}
+<script>
+    let genre = { 'ACTION':'ACT', 'ADVENTURE':'ADV', 'ANIMATION':'ANI', 'BIOGRAPHY':'BIO', 'COMEDY':'COM',
+                 'CRIME':'CRI', 'DOCUMENTARY':'DOC', 'DRAMA':'DRA', 'FAMILY':'FAM', 'FANTASY':'FAN', 'FILM_NOIR':'FIL',
+                 'GAME_SHOW':'GAM', 'HISTORY':'HIS', 'HORROR':'HOR', 'LGBTQ':'LGB', 'MILITARY':'MIL', 'MUSICAL':'MUS','MYSTERY':'MYS',
+                 'REALITY_TV':'REA','ROMANCE':'ROM', 'SCIENCE_FICTION':'SCI', 'SPORT':'SPO', 'TALK_SHOW':'TAL','THRILLER':'THR',
+                 'WESTERN':'WES'}
+
+    function cate_filter(data){
+        console.log(genre[data.innerHTML.toUpperCase()])
+        let keyword = data.innerHTML.toUpperCase()
+        origin_url = window.location.origin
+        post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
+        console.log('post url :',post_url)
+        parent = data.parentNode.parentNode.getAttribute("for");
+        axios.get(post_url)
+        .then((response) => {
+            localStorage.setItem('token', response.data.key);
+            console.log(response.data)
+            let count = 0
+            $(`#${parent}`).empty();
+            $(`#${parent}`).prepend("<div class='owl-stage' id='parent' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 2027px;'></div>")
+            jQuery.each(response.data, function() {
+                console.log(this.title)
+                count += 1
+                if(count > 3){
+                    
+                }
+                
+                let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
+                                <div class='card proj-card'>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-no'>\
+                                            Project<a href=''>${this.id}</a>\
+                                        </span>\
+                                        <span class='proj-pay'>\
+                                            $<a href=''>0</a>\
+                                        </span>\
+                                        <span class='proj-gener-align'>\
+                                            <a href=''>${this.genre}</a>\
+                                        </span>\
+                                        <span class='proj-symb'>\
+                                            <span class='fa fa-star checked'></span>\
+                                            <span class='fa fa-star checked'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-title'>\
+                                            Title:<a href=''>${this.title}</a>\
+                                        </span>\
+                                        <span class='proj-page-no'>\
+                                            Page:<a href=''>4</a>\
+                                        </span>\
+                                        <span class='proj-public'>\
+                                            <a href=''>Public</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Creator:<a href=''>${this.creator}</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Format:<a href=''>${this.format}</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Team:<a href=''>Actor,Director +</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Cast:<a href=''>Female(27),Female(35)</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1 mb-1'>\
+                                        <span class='proj-format'>\
+                                            Location:<a href=''>${this.location}</a>\
+                                        </span>\
+                                    </div>\
+                                </div>\
+                            </div></div>`
+                $('#parent').append(div);
+            });
+        }, (error) => {
+            console.log(error);
+        });
+    }
+
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        margin: 10,
+        responsiveClass: true,
+        nav: true,
+        navText: [
+            "<i class='fa fa-caret-left'></i>",
+            "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive: {
+            0: {
+                items: 1,
+                nav: true
+            },
+            767: {
+                items: 2,
+                nav: true
+            },
+            991: {
+                items: 2,
+                nav: true
+            },
+            1320: {
+                items: 3,
+                nav: true,
+                loop: false
+            }
+        }
+    })
+</script>
+
+
+{% endblock %}
