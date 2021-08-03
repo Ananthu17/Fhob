@@ -1328,42 +1328,42 @@ class GetProjectTrackingNotificationAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
-# class UnTrackProjectAPI(APIView):
-#     serializer_class = TrackUserSerializer
-#     permission_classes = (IsAuthenticated,)
+class UnTrackProjectAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
 
-#     def post(self, request):
-#         serializer = self.serializer_class(data=request.data)
-#         response = {}
-#         if serializer.is_valid():
-#             data_dict = serializer.data
-#             track_id = data_dict['track_id']
-#             track_user = CustomUser.objects.get(id=track_id)
-#             track_by_user = self.request.user
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            track_by_user = self.request.user
 
-#             try:
-#                 track_obj = UserTacking.objects.get(user=track_user)
-#                 track_obj.tracked_by.remove(track_by_user.id)
-#                 # remove from notification table
-#                 try:
-#                     notification = UserNotification.objects.get(
-#                         Q(user=track_user) &
-#                         Q(from_user=track_by_user) &
-#                         Q(notification_type=UserNotification.TRACKING)
-#                         )
-#                     notification.delete()
-#                 except UserNotification.DoesNotExist:
-#                     pass
-#             except UserTacking.DoesNotExist:
-#                 response = {'errors': "invalid id", 'status':
-#                              status.HTTP_400_BAD_REQUEST}
-#             msg = "Stopped Tracking " + track_user.get_full_name()
-#             response = {'message': msg,
-#                         'status': status.HTTP_200_OK,
-#                         'track_status':'not_tracking'}
+            try:
+                track_obj = ProjectTracking.objects.get(project=project)
+                track_obj.tracked_by.remove(track_by_user.id)
+                # remove from notification table
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(project=project) &
+                        Q(from_user=track_by_user) &
+                        Q(notification_type=UserNotification.PROJECT_TRACKING)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+            except ProjectTracking.DoesNotExist:
+                response = {'errors': "invalid id",
+                            'status': status.HTTP_400_BAD_REQUEST}
+            msg = "Stopped Tracking " + project.title
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status':'not_tracking'}
 
-#         else:
-#             print(serializer.errors)
-#             response = {'errors': serializer.errors, 'status':
-#                         status.HTTP_400_BAD_REQUEST}
-#         return Response(response)
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

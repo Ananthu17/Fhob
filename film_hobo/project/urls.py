@@ -8,7 +8,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
-     TrackProjectAPI
+     TrackProjectAPI, UnTrackProjectAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -65,4 +65,6 @@ urlpatterns = [
           name='list-project-trackers-api'),
      path('track-project-api/', TrackProjectAPI.as_view(),
           name='track-project-api'),
+     path('untrack-project-api/', UnTrackProjectAPI.as_view(),
+          name='untrack-project-api'),
     ]

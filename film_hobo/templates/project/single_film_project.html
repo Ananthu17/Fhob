@@ -3,6 +3,8 @@
 {% load project_rating_tag %}
 {% load samr_display_tag %}
 {% load user_account_tag %}
+{% load project_tracking_tag %}
+
 {% block extracss %}
 {% endblock %}
 
@@ -19,7 +21,24 @@
                         <ul class="list-unstyled">
                             <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
                                         class="mem-small-f">NVITE</span></a></li>
-                            <li class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">T<span class="mem-small-f">RACK</span></a>
+                            <li class="mt-1">
+
+
+                                {% get_project_tracking_list request.user project as is_tracking %}
+                                {% if is_tracking %}
+                                        <input type ="hidden" name="project_id" id="project_id" value ="{{project.id}}" />
+                                        <span class="track-btn">
+                                            <a class="mem-blu-link log-fnt-weight cursor-pointer un_track_project" id="{{project.title}}">T<span class="mem-small-f">RACKING</span></a>
+                                        </span>
+                                {% else %}
+                                        {% if project.creator.id != request.user.id %}
+                                                <input type ="hidden" name="project_id" id="project_id" value ="{{project.id}}" />
+                                                <span class="track-btn">
+                                                    <a class="mem-blu-link log-fnt-weight cursor-pointer track_project" id="{{project.title}}">T<span class="mem-small-f">RACK</span></a>
+                                                </span>
+                                        {% endif %}
+                                {% endif %}
+
                             </li>
                             <li class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                             </li>
@@ -894,6 +913,7 @@ $('body').on('click' , '.publish_video', function(){
             });
     });
 </script>
+<script src="{% static 'js/project_tracking.js' %}"></script>
 {% endblock %}
 
 
