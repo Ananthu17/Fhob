@@ -296,7 +296,7 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
             try:
                 project_creator = Team.objects.get(
                                     Q(project=project) &
-                                    Q(job_type=project_creator_job) 
+                                    Q(job_type=project_creator_job)
                                     ).user
                 rating_object = UserRatingCombined.objects.filter(
                             Q(user=project_creator) &

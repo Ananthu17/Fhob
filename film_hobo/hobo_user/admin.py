@@ -242,7 +242,9 @@ admin.site.register(UserRating, UserRatingAdmin)
 
 
 class UserNotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification_type', 'from_user', 'status_type', 'message', 'created_time')
+    list_display = (
+        'user', 'notification_type', 'from_user',
+        'status_type', 'message', 'created_time')
 
 
 admin.site.register(UserNotification, UserNotificationAdmin)

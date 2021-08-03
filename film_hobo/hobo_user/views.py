@@ -4052,7 +4052,7 @@ class ListAllFriendsAPI(APIView):
         except Friend.DoesNotExist:
             pass
         for obj in friend_obj.friends.all():
-            friends_dict[obj.id] = obj.email
+            friends_dict[obj.id] = obj.email, obj.first_name +' '+ obj.last_name
         response['friends'] = friends_dict
         return Response(response)
 

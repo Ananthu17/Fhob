@@ -196,7 +196,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio"  class="radio-settings form-check-input" name="profile_visibility"
+                                                <input type="radio"  class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility"
                                                 value="all_members" {% if user_settings.profile_visibility == 'all_members' %}checked{% endif %}>
                                                All Members
                                             </label>
@@ -205,7 +205,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="members_with_rating"
+                                                <input type="radio" class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility" value="members_with_rating"
                                                 {% if user_settings.profile_visibility != 'no_one' and user_settings.profile_visibility != 'pros_and_companies_only' and user_settings.profile_visibility != 'all_members' %}checked
                                                 {% endif %}>
                                                 <span class="rate"> Members with Rating &nbsp;
@@ -236,8 +236,8 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" name="profile_visibility" class="radio-settings form-check-input" 
-                                                value="pros_and_companies_only" {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
+                                                <input type="radio" name="profile_visibility" class="radio-settings form-check-input float-left"
+                                                style="position: initial;" value="pros_and_companies_only" {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -245,7 +245,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="no_one"
+                                                <input type="radio" class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility" value="no_one"
                                                 {% if user_settings.profile_visibility == 'no_one' %}checked{% endif %}/>
                                                 No one
                                             </label>
@@ -267,7 +267,7 @@
                                                 {% if user_settings.who_can_contact_me != 'no_one' and user_settings.who_can_contact_me != 'pros_and_companies_only'%}
                                                 checked
                                                 {% endif %}
-                                                class="form-check-input radio-settings">
+                                                class="form-check-input radio-settings float-left" style="position: initial;">
                                                 <span class="rate"> Members with Rating &nbsp;
 
                                                     <input type="radio" id="contact_star5" name="contact_rate" value="5"
@@ -304,7 +304,7 @@
                                                 {% if user_settings.who_can_contact_me == 'pros_and_companies_only' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -319,7 +319,7 @@
                                                 {% if user_settings.who_can_contact_me == 'no_one' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 No one
                                             </label>
                                         </div>
@@ -342,7 +342,7 @@
                                                 {% if user_settings.who_can_track_me == 'all_members' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 All Members
                                             </label>
                                         </div>
@@ -355,7 +355,7 @@
                                                 {% if user_settings.who_can_track_me != 'no_one' and user_settings.who_can_track_me != 'pros_and_companies_only' and user_settings.who_can_track_me != 'all_members' %}
                                                     checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 <span class="rate"> Members with Rating &nbsp;
                                                     <input type="radio" id="tracking_star5" name="tracking_rate" value="5"
                                                     {% if user_settings.who_can_track_me == 'members_with_rating_5_star' %}checked{% endif %}/>
@@ -384,12 +384,12 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" 
+                                                <input type="radio"
                                                 name="who_can_track_me" value="pros_and_companies_only"
                                                 {% if user_settings.who_can_track_me == 'pros_and_companies_only' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input" />
+                                                class="radio-settings form-check-input float-left" style="position: initial;" />
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -403,7 +403,7 @@
                                                 {% if user_settings.who_can_track_me == 'no_one' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 No one
                                             </label>
                                         </div>
@@ -538,7 +538,6 @@
                                                 <input type="checkbox"
                                                 name="friend_request"
                                                 class="form-check-input"
-                                                style="margin-left: 1rem;"
                                                 {% if user_settings.friend_request == True %}checked{% endif %}>
                                             </label>
                                         </div>
