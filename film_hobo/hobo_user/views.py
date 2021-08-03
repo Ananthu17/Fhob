@@ -28,7 +28,7 @@ from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 # from django_filters import rest_framework as filters
 from rest_framework import serializers
-
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
@@ -4264,12 +4264,19 @@ class FeedbackWebView(View):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 3
+
+
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
+    pagination_class = StandardResultsSetPagination
     filterset_fields = ['creator', 'title', 'format', 'genre',
                         'rating', 'video_url', 'video_type',
                         'last_date', 'location', 'visibility',
