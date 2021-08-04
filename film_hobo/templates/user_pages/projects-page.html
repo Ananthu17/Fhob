@@ -591,8 +591,8 @@
             font-size: 36px;
             color: #e5e5e5;
         }
-        .act{
-            color: #efae30;;
+        .cnt-menu-li li a:active{
+            color: #efae30 !important;
         }
     </style>
 {% endblock %}
@@ -609,7 +609,6 @@
     function cate_filter(data){
         console.log(genre[data.innerHTML.toUpperCase()])
         let keyword = data.innerHTML.toUpperCase()
-        data.setAttribute("class","act")
         origin_url = window.location.origin
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
         console.log('post url :',post_url)
