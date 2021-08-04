@@ -4486,7 +4486,7 @@ class ScreeningProjectDeatilInviteView(APIView):
             logged_in_user = request.user
             to_user = CustomUser.objects.get(email=request.data['to_user_email'])
             project_url = request.data['project_url']
-            project_id = project_url.rsplit('/', 1)[-1]
+            project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)
 
             #update notification table
