@@ -1,7 +1,9 @@
 $( document ).ready(function() {
     $("#remove_promocode").hide();
     // $("#paypal-div").hide();
-
+    localStorage.setItem('promocode', '');
+    localStorage.setItem('promotion_amount', '');
+    localStorage.setItem('final_amount', '');
     var promotion_amount = localStorage.getItem("promotion_amount");
     var final_amount = localStorage.getItem("final_amount");
     if (promotion_amount){
@@ -109,3 +111,19 @@ $("#modal_cancel").click(function(){
 $("#modal_cancel_cross").click(function(){
     $("#promocode_modal").modal("hide");
 });
+
+// paypal_get_new_plan_details_url = origin_url +'/payment/paypal/get_new_plan_details/'
+// paypal_get_new_plan_details_args = {
+//   "plan_type": "",
+//   "plan_tenure": $("#payment_plan").text(),
+//   "applied_promocode": "",
+//   "final_new_amount": ""
+// }
+
+
+// axios.post(paypal_get_new_plan_details_url, paypal_get_new_plan_details_args)
+// .then((response) => {
+//     if (response.status == 200){
+//     }
+// },(error) => {
+// });
