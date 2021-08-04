@@ -591,13 +591,18 @@
             font-size: 36px;
             color: #e5e5e5;
         }
-        .cnt-menu-li li a:active{
-            color: #efae30 !important;
+        .act {
+            color: orange !important;
         }
     </style>
 {% endblock %}
 
 {% block extrajs %}
+<script>
+    $( document ).ready(function() {
+
+    });
+</script>
 <!-- JS for Project filter API  -->
 <script>
     let genre = { 'ACTION':'ACT', 'ADVENTURE':'ADV', 'ANIMATION':'ANI', 'BIOGRAPHY':'BIO', 'COMEDY':'COM',
@@ -608,7 +613,9 @@
 
     function cate_filter(data){
         console.log(genre[data.innerHTML.toUpperCase()])
+        $('ul.cnt-menu-li a').removeClass('act')
         let keyword = data.innerHTML.toUpperCase()
+        data.setAttribute("class", "act");
         origin_url = window.location.origin
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
         console.log('post url :',post_url)
