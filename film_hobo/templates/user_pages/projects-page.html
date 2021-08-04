@@ -578,7 +578,7 @@
     </div>
     <style>
         .jquery-btn{
-            position: relative;
+            /* position: relative; */
             left: -38px;
             border: none;
             font: caption;
@@ -590,6 +590,9 @@
             border-radius: 3px;
             font-size: 36px;
             color: #e5e5e5;
+        }
+        .act{
+            color: #efae30;;
         }
     </style>
 {% endblock %}
@@ -606,6 +609,7 @@
     function cate_filter(data){
         console.log(genre[data.innerHTML.toUpperCase()])
         let keyword = data.innerHTML.toUpperCase()
+        data.setAttribute("class","act")
         origin_url = window.location.origin
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
         console.log('post url :',post_url)
@@ -616,7 +620,7 @@
             console.log("data is :",response.data.results)
             let count = 0
             $(`#${parent}`).empty();
-            $(`#${parent}`).prepend("<div class='owl-stage' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 2027px;display:flex;flex-direction:row;align-items:center;'></div>")
+            $(`#${parent}`).prepend("<div class='owl-stage' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; display:flex;flex-direction:row;align-items:center;'></div>")
             jQuery.each(response.data.results, function() {
                 console.log(this.title)
                 count += 1
