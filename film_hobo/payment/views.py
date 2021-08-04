@@ -791,112 +791,113 @@ class CreateUserOrder(APIView):
             client = PayPalHttpClient(environment)
             create_order = OrdersCreateRequest()
 
-            # create_order request for no discount added
-            create_order.request_body(
-                {
-                    "intent": "CAPTURE",
-                    "application_context": {
-                        "brand_name": "FILMHOBO INC",
-                        "shipping_preference": "NO_SHIPPING"
-                    },
-                    "purchase_units": [
+            if promocodes_applied:
+                if payment_plan.lower() == 'year' or 'yearly' or 'annually':
+                    payment_plan_time = 'YEAR'
+                else:
+                    payment_plan_time = 'MONTH'
+
+                new_plan_name = membership_type.capitalize() \
+                    + ' Payment - ' + payment_plan.capitalize() \
+                    + ' - ' + promocodes_applied.promo_code
+
+                data_dict = {
+                    "product_id": settings.PRODUCT_ID,
+                    "name": new_plan_name,
+                    "description": new_plan_name,
+                    "status": "ACTIVE",
+                    "billing_cycles": [
                         {
-                            "days_free": transaction.days_free,
-                            "payment_plan": transaction.payment_plan,
-                            "initial_amount": transaction.initial_amount,
-                            "amount": {
-                                "currency_code": "USD",
-                                "value": transaction.final_amount,
-                                "breakdown": {
-                                    "item_total": {
-                                        "currency_code": "USD",
-                                        "value": transaction.final_amount
-                                    }
-                                    },
-                                },
+                            "frequency": {
+                                "interval_unit": payment_plan_time,
+                                "interval_count": 1
+                            },
+                            "tenure_type": "REGULAR",
+                            "sequence": 1,
+                            "total_cycles": 0,
+                            "pricing_scheme": {
+                                "fixed_price": {
+                                    "value": final_amount,
+                                    "currency_code": "USD"
+                                }
+                            }
                         }
                     ],
-                }
-            )
+                    "payment_preferences": {
+                            "auto_bill_outstanding": True,
+                            "setup_fee": {
+                                "value": "0",
+                                "currency_code": "USD"
+                            },
+                            "setup_fee_failure_action": "CONTINUE",
+                            "payment_failure_threshold": 3
+                    },
+                    "taxes": {
+                        "percentage": "0",
+                        "inclusive": False
+                    }
+                    }
 
-            # order
-            # if membership_type == 'IND':
-            #     if payment_plan == 'monthly':
-            #         plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY
-            #     else:
-            #         plan_id = settings.BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY
-            # elif membership_type == 'PRO':
-            #     if payment_plan == 'monthly':
-            #         plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY
-            #     else:
-            #         plan_id = settings.BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY
-            # elif membership_type == 'COM':
-            #     if payment_plan == 'monthly':
-            #         plan_id = \
-            #             settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY
-            #     else:
-            #         plan_id = settings.BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY
-            # else:
-            #     return Response(
-            #             {"status": "this memebership type does not have a membership plan"},
-            #             status=status.HTTP_400_BAD_REQUEST)
+                paypal_client_id = settings.PAYPAL_CLIENT_ID
+                paypal_secret = settings.PAYPAL_SECRET_ID
+                data = {'grant_type': 'client_credentials'}
+                token_user_response = requests.post(
+                                    'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                    data=data,
+                                    auth=(paypal_client_id, paypal_secret),
+                                    headers={'Accept': 'application/json',
+                                             'Accept-Language': 'en_US'})
+                if token_user_response.status_code == 200:
+                    access_token = json.loads(token_user_response.content)['access_token']
+                else:
+                    return HttpResponse('Could not save data')
 
-            # create_order.request_body(
-            #     {
-            #         "plan_id": plan_id,
-            #         "quantity": "1",
-            #         "subscriber": {
-            #             "name": {
-            #                 "given_name": logged_user.first_name,
-            #                 "surname": logged_user.middle_name + ' ' + logged_user.last_name
-            #             },
-            #             "email_address": logged_user.email
-            #         },
-            #         "plan": {
-            #             "billing_cycles": [
-            #                 {
-            #                     "sequence": 1,
-            #                     "total_cycles": 1,
-            #                     "pricing_scheme": {
-            #                         "fixed_price": {
-            #                             "value": final_amount,
-            #                             "currency_code": "USD"
-            #                         }
-            #                     }
-            #                 }
-            #             ]
-            #         },
-            #         "intent": "CAPTURE",
-            #         "application_context": {
-            #             "brand_name": "FILMHOBO INC",
-            #             "shipping_preference": "NO_SHIPPING"
-            #         },
-            #         "purchase_units": [
-            #             {
-            #                 "days_free": transaction.days_free,
-            #                 "payment_plan": transaction.payment_plan,
-            #                 "initial_amount": transaction.initial_amount,
-            #                 "amount": {
-            #                     "currency_code": "USD",
-            #                     "value": transaction.final_amount,
-            #                     "breakdown": {
-            #                         "item_total": {
-            #                             "currency_code": "USD",
-            #                             "value": transaction.final_amount
-            #                         }
-            #                         },
-            #                     },
-            #             }
-            #         ],
-            #     }
-            # )
+                access_token_strting = 'Bearer ' + access_token
 
-            response = client.execute(create_order)
-            data = response.result.__dict__['_dict']
-            Transaction.objects.filter(id=transaction.id).update(
-                paypal_order_id=data['id'])
-            # return JsonResponse(data)
-            return Response(data, status=status.HTTP_201_CREATED)
+                create_plan_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                                data=json.dumps(data_dict),
+                                headers={'Content-type': 'application/json',
+                                         'Authorization': access_token_strting})
+                if create_plan_user_response.status_code == 201:
+                    plan_id = json.loads(create_plan_user_response.content)['id']
+                else:
+                    return HttpResponse('Could not save data')
+            else:
+                # create_order request for no discount added
+                create_order.request_body(
+                    {
+                        "intent": "CAPTURE",
+                        "application_context": {
+                            "brand_name": "FILMHOBO INC",
+                            "shipping_preference": "NO_SHIPPING"
+                        },
+                        "purchase_units": [
+                            {
+                                "days_free": transaction.days_free,
+                                "payment_plan": transaction.payment_plan,
+                                "initial_amount": transaction.initial_amount,
+                                "amount": {
+                                    "currency_code": "USD",
+                                    "value": transaction.final_amount,
+                                    "breakdown": {
+                                        "item_total": {
+                                            "currency_code": "USD",
+                                            "value": transaction.final_amount
+                                        }
+                                        },
+                                    },
+                            }
+                        ],
+                    }
+                )
+
+                response = client.execute(create_order)
+                data = response.result.__dict__['_dict']
+                Transaction.objects.filter(id=transaction.id).update(
+                    paypal_order_id=data['id'])
+                # return JsonResponse(data)
+                return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(
                         {"status": "transaction record failure"},
