@@ -11,7 +11,7 @@ $('#invite_send').click(function(event){
     var email = $("#all_mail")
     var to_send_email = email.children()[0].innerText.slice(0,-2)
     var url_to_share = window.location.origin + window.location.pathname
-    debugger
+
     invite_url = window.location.origin + '/hobo_user/user_home/invite/'
 
     invite_url_args = {
@@ -20,13 +20,11 @@ $('#invite_send').click(function(event){
     }
 
     token_auth_str = 'Token 44c4706c17c655c1332b513d26c62754e25557d7'
-    debugger
+
     axios.post(invite_url, invite_url_args, {headers: { 'Authorization': token_auth_str }})
     .then((response) => {
-        debugger
         console.log(response);
     }, (error) => {
-        debugger
         console.log(error);
     });
 
