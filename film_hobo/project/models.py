@@ -35,11 +35,11 @@ class Sides(models.Model):
     character = models.ForeignKey(Character,
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
-    scene_1 = RichTextField(_("Scene Description"),
+    scene_1 = RichTextUploadingField(_("Scene Description"),
                             null=True, blank=True)
-    scene_2 = RichTextField(_("Scene Description"),
+    scene_2 = RichTextUploadingField(_("Scene Description"),
                             null=True, blank=True)
-    scene_3 = RichTextField(_("Scene Description"),
+    scene_3 = RichTextUploadingField(_("Scene Description"),
                             null=True, blank=True)
 
     def __str__(self):

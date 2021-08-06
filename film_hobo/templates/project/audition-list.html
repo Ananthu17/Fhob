@@ -74,7 +74,9 @@
                                             {% if audition_obj.status == 'attached' %}cta-rate-image-frame-color-green{% endif %}
                                             {% if audition_obj.status == 'callback' %}cta-rate-image-frame-color-orange{% endif %}
                                             ">
-                                                <img src="{{audition_obj.cover_image.url}}" class="cta-rate-image">
+                                            <a href="{% url 'project:cast-video-audition' audition_obj.id %}">
+                                            <img src="{{audition_obj.cover_image.url}}" class="cta-rate-image">
+                                            </a>
                                             </div>
                                             <div>
                                                 <div class="cta-rate-txt-align">
@@ -94,9 +96,10 @@
                                                     <div>
                                                         <span class="cta-rate-name-txt">Audition</span>
                                                         <span class="cta-log-star">
+                                                            {% get_dict_value audition_rating_dict audition_obj.id as audition_rating %}
                                                             <div class="">
                                                                 <div class="cta-stars-outer">
-                                                                    <div class="cta-stars-inner" style="width:0%;"></div>
+                                                                    <div class="cta-stars-inner" style="width:{{audition_rating}}%;"></div>
                                                                   </div>
                                                             </div>
                                                         </span>

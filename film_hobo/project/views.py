@@ -979,6 +979,7 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         count_dict = {}
         character_dict = {}
         rating_dict = {}
+        audition_rating_dict = {}
         casting_director_rating = 0
         project_id = self.kwargs.get('id')
         project = get_object_or_404(Project, pk=project_id)
@@ -991,7 +992,7 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
             try:
                 casting_director = Team.objects.get(
                                     Q(project=project) &
-                                    Q(job_type=casting_director_job) 
+                                    Q(job_type=casting_director_job)
                                     ).user
                 rating_object = UserRatingCombined.objects.filter(
                             Q(user=casting_director) &
@@ -1026,6 +1027,12 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
                 rating_dict[audition_obj.user.id] = (rating_obj.rating)*20
             except UserRatingCombined.DoesNotExist:
                 rating_dict[audition_obj.user.id] = 0
+            try:
+                audition_rating_obj = AuditionRatingCombined.objects.get(
+                                      audition=audition_obj)
+                audition_rating_dict[audition_obj.id] = (audition_rating_obj.rating)*20
+            except AuditionRatingCombined.DoesNotExist:
+                audition_rating_dict[audition_obj.id] = 0
 
         for obj in audition_list:
             if obj.character in count_dict:
@@ -1043,6 +1050,7 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         context['count_dict'] = count_dict
         context['character_dict'] = character_dict
         context['rating_dict'] = rating_dict
+        context['audition_rating_dict'] = audition_rating_dict
         return context
 
 

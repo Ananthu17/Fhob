@@ -6,20 +6,67 @@
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-        <h3>Chemistry Room</h3>
-
-<p>{{project}}</p>
-{% for character,audition_list in audition_dict.items %}
-   <b>{{character.name}}</b>
-   {% for audition in audition_list %}
-        {{ audition.name }},
-   {% endfor %}
-   <p></p>
-{% endfor %}
+        <div class="container">
+                <h3>Chemistry Room</h3>
+                <div class="row">
+                        <div class="offset-2 col-4 screen_1_div" style="border:1px solid #000; height:300px;">
+                        </div>
+                        <div class="col-4 screen_2_div" style="border:1px solid #000; height:300px;">
+                        </div>
+                </div>
+                <p>{{project}}</p>
+                {% for character,audition_list in audition_dict.items %}
+                        <div class="row">
+                        <b>{{character.name}}</b>
+                        {% for audition in audition_list %}
+                                <div class="col-1">
+                                        <input type="hidden" name="video_url"  id="video_url-{{audition.id}}" value="{{audition.video_url}}" />
+                                        <input type="hidden" name="video_type" id="video_type-{{audition.id}}" value="{{audition.video_type}}" />
+                                        <img src="{{audition.cover_image.url}}" width="100%"/>
+                                        {{ audition.name }},
+                                        <a id="{{audition.id}}" class="screen_1 cursor-pointer">Screen 1</a>
+                                        <a id="{{audition.id}}" class="screen_2 cursor-pointer">Screen 2</a>
+                                </div>
+                        {% endfor %}
+                        </div>
+                {% endfor %}
+        </div>
 </div>
 {% endblock %}
 
 {% block extrajs %}
+<script>
+        $('body').on('click' , '.screen_1', function(){
+                var audition_id = $(this).attr("id");
+                var token = $("#token").val();
+                var video_url_id = '#video_url-'+audition_id;
+                var video_type_id = '#video_type-'+audition_id;
+                var video_url = $(video_url_id).val();
+                var video_type = $(video_type_id).val();
+                console.log(video_type)
+                console.log(video_url)
+                if(video_type=="vimeo"){
+                        $(".screen_1_div").html('<iframe src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
+                }else{
+                        $(".screen_1_div").html('<iframe src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
+                }
+        });
+        $('body').on('click' , '.screen_2', function(){
+                var audition_id = $(this).attr("id");
+                var token = $("#token").val();
+                var video_url_id = '#video_url-'+audition_id;
+                var video_type_id = '#video_type-'+audition_id;
+                var video_url = $(video_url_id).val();
+                var video_type = $(video_type_id).val();
+                console.log(video_type)
+                console.log(video_url)
+                if(video_type=="vimeo"){
+                        $(".screen_2_div").html('<iframe src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
+                }else{
+                        $(".screen_2_div").html('<iframe src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
+                }
+        });
+</script>
 {% endblock %}
 
 
