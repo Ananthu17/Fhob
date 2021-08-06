@@ -1573,3 +1573,4 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
         context['audition_dict'] = audition_dict
         return context
 
+
