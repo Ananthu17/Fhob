@@ -1,19 +1,16 @@
 
 import datetime
-from autoslug import AutoSlugField
-from django.contrib.auth.hashers import make_password
-from phonenumber_field.modelfields import PhoneNumberField
 
-from django.contrib.auth.hashers import make_password
-from django.urls import reverse
-from django.db import models
-from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
-from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
