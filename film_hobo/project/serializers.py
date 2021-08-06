@@ -1,5 +1,5 @@
 from hobo_user.models import UserRating, Project
-from project.models import Audition, Character, Sides
+from project.models import Audition, AuditionRating, Character, Sides
 from rest_framework import serializers
 
 
@@ -145,3 +145,37 @@ class TrackProjectSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class RateAuditionSerializer(serializers.ModelSerializer):
+    audition = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    team_member = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = AuditionRating
+        fields = ['audition', 'team_member', 'rating', 'review']
+
+
+class AuditionStatusSerializer(serializers.ModelSerializer):
+    audition = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    status = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = AuditionRating
+        fields = ['audition', 'status']

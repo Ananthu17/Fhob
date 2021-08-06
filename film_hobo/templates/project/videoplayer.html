@@ -31,27 +31,13 @@
                 <div class="col-sm-1"></div>
                 <div class="col-sm-6">
                     {% if project.video_type == 'vimeo' %}
-                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false" width="600" height="250"
+                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="600" height="250"
                         data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>
                         <img src=""/>
                     {% elif project.video_type == 'youtube' %}
                         <iframe
-                        src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1" width="450" height="250"
+                        src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ project.video_url }}&color=white" width="450" height="250"
                         data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>
-
-                    {% elif project.video_type == 'facebook' %}
-                        <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
-                        <div class="fb-video"
-                            data-href="{{ project.video_url }}"
-                            data-width="450" height="240"
-                            data-allowfullscreen="true"></div>
-
-                    {% elif project.video_type == 'upload_video' %}
-                        <video width="320" height="240" controls >
-                            <source src="{{ s3_url }}" type="video/mp4">
-                            <source src="movie.ogg" type="video/ogg">
-                            Your browser does not support the video tag.
-                      </video>
                     {% endif %}
 
 

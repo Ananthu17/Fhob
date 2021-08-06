@@ -1,8 +1,10 @@
 
 import datetime
 from autoslug import AutoSlugField
+from django.contrib.auth.hashers import make_password
 from phonenumber_field.modelfields import PhoneNumberField
 
+from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -637,10 +639,10 @@ class Project(models.Model):
     video_cover_image = models.ImageField(upload_to='thumbnail/',
                                           blank=True, null=True,
                                           help_text="Image size:370 X 248.")
-    script_password = models.CharField(max_length=12, null=True, blank=True)
-    team_select_password = models.CharField(max_length=12, null=True,
+    script_password = models.CharField(max_length=250, null=True, blank=True)
+    team_select_password = models.CharField(max_length=250, null=True,
                                             blank=True)
-    cast_audition_password = models.CharField(max_length=12, null=True, blank=True)
+    cast_audition_password = models.CharField(max_length=250, null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
@@ -656,6 +658,7 @@ class Project(models.Model):
             }
         )
         return url
+
 
 
 class ProjectReaction(models.Model):
@@ -1340,7 +1343,7 @@ class Video(models.Model):
 class VideoRating(models.Model):
     rated_by = models.ForeignKey("hobo_user.CustomUser",
                                  on_delete=models.CASCADE,
-                                 related_name='Video_rated_by_user',
+                                 related_name='video_rated_by_user',
                                  verbose_name=_("User"),
                                  null=True)
     project = models.ForeignKey("hobo_user.Project",

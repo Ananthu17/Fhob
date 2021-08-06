@@ -301,7 +301,7 @@
                                     <span class="sgl-orange-txt">{{character.name}}:</span>
                                     {% if character.attached_user %}
                                     <span class="sgl-blue-txt">
-                                        <a href="">{{character.attached_user.get_full_name|truncatechars:"10"}}</a>
+                                        <a href="{{character.attached_user.get_profile_url}}">{{character.attached_user.get_full_name|truncatechars:"10"}}</a>
                                     </span>
                                     <span class="log-star">
                                         {% get_dict_value rating_dict character.attached_user.id as rating%}
@@ -369,7 +369,10 @@
                             <div class="sgl-up-video-align">
                                 <div>
                                     <span class="sgl-upload-blue-tag">
-                                        {% if project.creator == request.user %}
+                                        {% if project.creator == request.user and project.video_url is not none %}
+                                        <a data-toggle="modal" data-target="#upload_video"
+                                        class="cursor-pointer">CHANGE VIDEO</a>
+                                        {% elif project.creator == request.user and project.video_url is none %}
                                         <a data-toggle="modal" data-target="#upload_video"
                                         class="cursor-pointer">UPLOAD VIDEO</a>
                                         {% else %}
@@ -379,11 +382,19 @@
                                 </div>
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-upload-vdo-frame">
+                                    <a
+                                    {% if project.video_status == 'uploaded'%}
+                                    data-toggle="modal" data-target="#video_player_modal"
+                                    {% elif project.video_status == 'posted' %}
+                                    href="{% url 'project:video' project.id %}"
+                                    {% endif %}
+                                     class="cursor-pointer">
                                     {% if project.video_cover_image %}
                                     <img src="{{ project.video_cover_image.url }}" class="sgl-upload-img" >
                                     {% else %}
                                     <img src="{% static 'images/video.png' %}" class="sgl-upload-img" >
                                     {% endif %}
+                                    </a>
                                 </div>
                                 <div class="sgl-upvideo-txt-align">
                                     <span class="sgl-sm-name-txt">Project</span><span class="sgl-blue-txt"><a > #{{project.id}}</a></span>
@@ -400,7 +411,80 @@
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-red-post-align">
                                     <span class="sgl-post-red-tag">
-                                        <a class="publish_video cursor-pointer" title="Publish Video" id="{{project.id}}">POST VIDEO</a>
+                                        <a class=" cursor-pointer" title="Publish Video" data-toggle="modal" data-target="#post_video">POST VIDEO</a>
+
+<!-- The Modal -->
+<div class="modal fade" id="video_player_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Watch {{project.title}}</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                            <div class="row" >
+                                <div class="col-12" >
+                                {% if project.video_type == 'vimeo' %}
+                                    <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250"
+                                    data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>
+                                    <img src=""/>
+                                {% elif project.video_type == 'youtube' %}
+                                    <iframe
+                                    src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ project.video_url }}&color=white" width="100%" height="250"
+                                    data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>
+                                {% endif %}
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+<!-- The Modal -->
+<div class="modal fade" id="post_video">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">POST VIDEO</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                            <div class="row" >
+                                <div class="col-12" >
+                                    <p clss="all-p">Do you want to post video to screening room?</p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm publish_video"
+                id="{{project.id}}" title="Publish Video">Publish</button>
+                <button type="button" class="btn btn-outline-danger btn-sm "
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
                                     </span>
                                 </div>
                             </div>
@@ -544,13 +628,7 @@
                     <span class=""> Logline</span>
                 </div>
                 <div class="col-7">
-                    <input class="form-control" name="logline" id="logline"
-                    value="
-                    {% if project.logline %}
-                        {{project.logline}}
-                    {% else %}
-                    {% endif %}
-                    " />
+                    <input class="form-control" name="logline" id="logline" value="{% if project.logline %}{{project.logline}}{% else %}{% endif %}" />
                 </div>
             </div>
             <div class="row mt-1">
@@ -558,13 +636,7 @@
                     <span class=""> Project Info </span>
                 </div>
                 <div class="col-7">
-                    <textarea class="form-control" name="project_info" rows=8
-                    id="project_info" >
-                    {% if project.project_info %}
-                        {{project.project_info}}
-                    {% else %}
-                    {% endif %}
-                    </textarea>
+                    <textarea class="form-control" name="project_info" rows=8 id="project_info" >{% if project.project_info %}{{project.project_info}}{% else %}{% endif %}</textarea>
                 </div>
             </div>
         </div>

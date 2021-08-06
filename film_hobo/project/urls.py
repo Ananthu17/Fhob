@@ -8,7 +8,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
-     TrackProjectAPI, UnTrackProjectAPI
+     TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
+     UpdateAuditionStatusAPI, ChemistryRoomView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -67,4 +68,12 @@ urlpatterns = [
           name='track-project-api'),
      path('untrack-project-api/', UnTrackProjectAPI.as_view(),
           name='untrack-project-api'),
+     path('cast-video-audition/<int:id>/', CastVideoAuditionView.as_view(),
+          name='cast-video-audition'),
+     path('rate-audition-api/', RateAuditionAPI.as_view(),
+          name='rate-audition-api'),
+     path('update-audition-status-api/', UpdateAuditionStatusAPI.as_view(),
+          name='update-audition-status-api'),
+     path('chemistry-room/<int:id>/', ChemistryRoomView.as_view(),
+          name='chemistry-room'),
     ]

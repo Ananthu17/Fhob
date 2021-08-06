@@ -26,7 +26,7 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import render
 
 from rest_framework.exceptions import ParseError
@@ -41,14 +41,16 @@ from rest_framework.generics import (ListAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, VideoRatingCombined
-from .models import Audition, Character, Sides, ProjectTracking
+from .models import Audition, AuditionRating, AuditionRatingCombined, Character, Sides, ProjectTracking
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
-      PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer
+      PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
+      RateAuditionSerializer, AuditionStatusSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
+from django.contrib.auth.hashers import make_password
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -75,13 +77,6 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["rating_dict"] = rating_dict
         context["team_members"] = team_members
         context["project"] = project
-
-        # if project.video_type == Project.UPLOAD_VIDEO:
-        #     bucket_prefix = ""
-        #     bucket_name = settings.S3_BUCKET_NAME
-        #     path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
-        #     s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
-        #     context['s3_url'] = s3_url
         return context
 
 
@@ -383,7 +378,7 @@ class AddProjectVideoView(LoginRequiredMixin, TemplateView):
                 video_url = url.split('vimeo.com/')[1]
                 project.video_url = video_url
         project.save()
-        messages.success(self.request, "Audition submitted successfully")
+        messages.success(self.request, "Video Uploaded")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -439,17 +434,17 @@ class PostProjectVideoAPI(APIView):
                 if project.video_status == Project.UPLOADED:
                     project.video_status = Project.POSTED
                     project.save()
-                    response = {'message': "Video Published",
+                    response = {'message': "Video posted to screening room.",
                                 'status': status.HTTP_200_OK}
-                    messages.success(self.request, "Video Published.")
+                    messages.success(self.request, "Video posted to screening room.")
                 elif project.video_status == Project.NOT_AVAILABLE:
                     response = {'errors': 'Video not available.', 'status':
                                 status.HTTP_400_BAD_REQUEST}
                     messages.warning(self.request, "Video not available.")
                 elif project.video_status == Project.POSTED:
-                    response = {'errors': 'Video already posted.', 'status':
+                    response = {'errors': 'Video already posted to screening room.', 'status':
                                 status.HTTP_400_BAD_REQUEST}
-                    messages.warning(self.request, "Video already posted.")
+                    messages.warning(self.request, "Video already posted to screening room.")
             except Project.DoesNotExist:
                 response = {'errors': 'Invalid project ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -1121,7 +1116,8 @@ class ScriptPasswordCheckAPI(APIView):
             password = data_dict['password']
             project_id = data_dict['project_id']
             project = get_object_or_404(Project, pk=project_id)
-            if project.script_password == password:
+            # if check_password(password, project.script_password):
+            if password == project.script_password:
                 response = {'message': "Password Verified",
                             'url': project.script.url,
                             'status': status.HTTP_200_OK}
@@ -1147,9 +1143,9 @@ class CastAuditionPasswordCheckAPI(APIView):
             password = data_dict['password']
             project_id = data_dict['project_id']
             project = get_object_or_404(Project, pk=project_id)
-            if project.cast_audition_password == password:
+            # if check_password(password, project.cast_audition_password):
+            if password == project.cast_audition_password:
                 response = {'message': "Password Verified",
-                            'url': project.script.url,
                             'status': status.HTTP_200_OK}
             else:
                 response = {'errors': 'Wrong Password', 'status':
@@ -1173,9 +1169,9 @@ class TeamSelectPasswordCheckAPI(APIView):
             password = data_dict['password']
             project_id = data_dict['project_id']
             project = get_object_or_404(Project, pk=project_id)
-            if project.team_select_password == password:
+            # if check_password(password, project.team_select_password):
+            if password == project.team_select_password:
                 response = {'message': "Password Verified",
-                            'url': project.script.url,
                             'status': status.HTTP_200_OK}
             else:
                 response = {'errors': 'Wrong Password', 'status':
@@ -1367,3 +1363,213 @@ class UnTrackProjectAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class CastVideoAuditionView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/cast-video-audition.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        audition_id = self.kwargs.get('id')
+        audition = get_object_or_404(Audition, pk=audition_id)
+        context['audition'] = audition
+
+        try:
+            casting_director = JobType.objects.get(slug='casting-director')
+            casting_directors = Team.objects.filter(
+                    Q(project=audition.project) &
+                    Q(job_type=casting_director)
+                    )
+        except JobType.DoesNotExist:
+            casting_director = ""
+            casting_directors = []
+        try:
+            director = JobType.objects.get(slug='director')
+            directors = Team.objects.filter(
+                    Q(project=audition.project) &
+                    Q(job_type=director)
+                    )
+        except JobType.DoesNotExist:
+            director = ""
+            directors = []
+        try:
+            producer = JobType.objects.get(slug='producer')
+            producers = Team.objects.filter(
+                    Q(project=audition.project) &
+                    Q(job_type=producer)
+                    )
+        except JobType.DoesNotExist:
+            producer = ""
+            producers = []
+        try:
+            writer = JobType.objects.get(slug='writer')
+            writers = Team.objects.filter(
+                        Q(project=audition.project) &
+                        Q(job_type=writer)
+                        )
+        except JobType.DoesNotExist:
+            writer = ""
+            writers = []
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+
+        context['casting_directors'] = casting_directors
+        context['directors'] = directors
+        context['producers'] = producers
+        context['writers'] = writers
+        try:
+            audition_user_rating = UserRatingCombined.objects.get(
+                                    Q(user=audition.user) &
+                                    (
+                                        Q(job_type=actor) |
+                                        Q(job_type=actress)
+                                    )
+                                )
+            audition_user_rating = audition_user_rating.rating*20
+        except UserRatingCombined.DoesNotExist:
+            audition_user_rating = 0
+        context['audition_user_rating'] = audition_user_rating
+
+        rating_dict = {}
+        audition_user_ratings = AuditionRating.objects.filter(
+                                    audition=audition)
+        for obj in audition_user_ratings:
+            rating_dict[obj.team_member] = obj.rating
+        context['rating_dict'] = rating_dict
+        context['audition_user_ratings'] = audition_user_ratings
+        return context
+
+
+class RateAuditionAPI(APIView):
+    serializer_class = RateAuditionSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            audition_id = data_dict['audition']
+            team_member_id = data_dict['team_member']
+            rating = data_dict['rating']
+            if 'review' in data_dict:
+                review = data_dict['review']
+            else:
+                review = ""
+            try:
+                team_member = Team.objects.get(pk=team_member_id)
+                try:
+                    audition = Audition.objects.get(pk=audition_id)
+                    try:
+                        audition_rating_obj = AuditionRating.objects.get(
+                                            Q(audition=audition) &
+                                            Q(team_member=team_member)
+                                            )
+                        audition_rating_obj.rating = rating
+                        audition_rating_obj.review = review
+                        audition_rating_obj.save()
+                    except AuditionRating.DoesNotExist:
+                        audition_rating_obj = AuditionRating()
+                        audition_rating_obj.audition = audition
+                        audition_rating_obj.team_member = team_member
+                        audition_rating_obj.rating = rating
+                        audition_rating_obj.review = review
+                        audition_rating_obj.save()
+
+                    # update combined rating
+                    try:
+                        audition_rating_combined = AuditionRatingCombined.objects.get(
+                                                   audition=audition)
+                        count = AuditionRating.objects.filter(
+                                audition=audition).count()
+                        aggregate_rating = AuditionRating.objects.filter(
+                                            audition=audition).aggregate(Sum('rating'))
+                        rating_sum = aggregate_rating['rating__sum']
+                        new_rating = rating_sum/count
+                        audition_rating_combined.rating = new_rating
+                        audition_rating_combined.save()
+                    except AuditionRatingCombined.DoesNotExist:
+                        audition_rating_combined = AuditionRatingCombined()
+                        audition_rating_combined.audition = audition
+                        audition_rating_combined.rating = rating
+                        audition_rating_combined.save()
+
+
+                    response = {'message': "Rating updated",
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, "Rated Successfully")
+                except Audition.DoesNotExist:
+                    response = {'errors': "Invalid Audition ID", 'status':
+                                status.HTTP_400_BAD_REQUEST}
+            except Team.DoesNotExist:
+                response = {'errors': "Invalid team member", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class UpdateAuditionStatusAPI(APIView):
+    serializer_class = AuditionStatusSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            audition_id = data_dict['audition']
+            audition_status = data_dict['status']
+            try:
+                audition = Audition.objects.get(pk=audition_id)
+                audition.status = audition_status
+                audition.save()
+                response = {'message': "Audition status updated",
+                            'status': status.HTTP_200_OK}
+                messages.success(self.request, "Audition status updated.")
+            except Audition.DoesNotExist:
+                response = {'errors': "Invalid Audition ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+                messages.warning(self.request, "Invalid audition!!")
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors,
+                        'status': status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ChemistryRoomView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/chemistry-room.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        audition_list = Audition.objects.filter(project=project)
+        # characters = Character.objects.filter(project=project)
+        audition_dict = {}
+
+        for audition in audition_list:
+            if audition.character in audition_dict:
+                audition_dict[audition.character].append(audition)
+            else:
+                audition_dict[audition.character] = []
+                audition_dict[audition.character].append(audition)
+
+        context['project'] = project
+        context['audition_dict'] = audition_dict
+        return context
+
