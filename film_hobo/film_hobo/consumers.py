@@ -137,3 +137,10 @@ class NotificationConsumer(WebsocketConsumer):
             'user_id': id,
             'event': "INVITE"
         }))
+
+    def send_project_tracking_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "PROJECT_TRACKING"
+        }))

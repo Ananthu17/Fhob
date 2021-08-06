@@ -68,7 +68,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
                     UserRating, Location, UserRatingCombined, \
-                    UserTacking, CompanyProfile, \
+                    UserTracking, CompanyProfile, \
                     Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -2050,13 +2050,13 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         context['coworkers'] = coworkers
 
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             context['trackers_list'] = trackers_list[:6]
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
 
@@ -2285,13 +2285,13 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['job_types'] = JobType.objects.all()
         context['my_interest_form'] = UserInterestForm
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             context['trackers_list'] = trackers_list[:6]
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
 
@@ -2405,13 +2405,13 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         context['client_dict'] = client_dict
 
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             context['trackers_list'] = trackers_list[:6]
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
         try:
@@ -2791,13 +2791,13 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         user = get_object_or_404(CustomUser, id=self.kwargs.get('id'))
 
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             context['trackers_list'] = trackers_list[:6]
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
 
@@ -2859,13 +2859,13 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
         photos = all_photos.filter(position__in=pos_list).order_by('position')
         context['photos'] = photos[:3]
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list'] = trackers_list[:6]
             context['trackers_list_count'] = trackers_list.count()
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             pass
-        tracking_list = UserTacking.objects.filter(
+        tracking_list = UserTracking.objects.filter(
             tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
@@ -2916,13 +2916,13 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
         context['photos'] = photos[:3]
 
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             context['trackers_list'] = trackers_list[:6]
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         context['tracking_list'] = tracking_list[:6]
 
@@ -3064,10 +3064,10 @@ class TrackUserAPI(APIView):
         try:
             trackers_dict = {}
             tracking_dict = {}
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             # trackers_list_ids = trackers_list.values_list('id', flat=True)
-            tracking_list = UserTacking.objects.filter(
+            tracking_list = UserTracking.objects.filter(
                             tracked_by=user)
             tracking_list_ids = tracking_list.values_list(
                                 'user__id', flat=True)
@@ -3079,7 +3079,7 @@ class TrackUserAPI(APIView):
             response = {'Trackers': trackers_dict,
                         'Tracking': tracking_dict,
                         'status': status.HTTP_200_OK}
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             response = {'errors': "Trackers list is empty", 'status':
                         status.HTTP_200_OK}
         return Response(response)
@@ -3127,7 +3127,7 @@ class TrackUserAPI(APIView):
 
             if can_track == True:
                 try:
-                    track_obj = UserTacking.objects.get(user=track_user)
+                    track_obj = UserTracking.objects.get(user=track_user)
                     trackers_list = track_obj.tracked_by.all()
                     if track_by_user in trackers_list:
                         response = {'message': "You are already tracking this user",
@@ -3137,8 +3137,8 @@ class TrackUserAPI(APIView):
                         return Response(response)
                     track_obj.tracked_by.add(track_by_user.id)
 
-                except UserTacking.DoesNotExist:
-                    track_obj = UserTacking()
+                except UserTracking.DoesNotExist:
+                    track_obj = UserTracking()
                     track_obj.user = track_user
                     track_obj.save()
                     track_obj.tracked_by.add(track_by_user.id)
@@ -3204,7 +3204,7 @@ class UnTrackUserAPI(APIView):
             track_by_user = self.request.user
 
             try:
-                track_obj = UserTacking.objects.get(user=track_user)
+                track_obj = UserTracking.objects.get(user=track_user)
                 track_obj.tracked_by.remove(track_by_user.id)
                 # remove from notification table
                 try:
@@ -3216,7 +3216,7 @@ class UnTrackUserAPI(APIView):
                     notification.delete()
                 except UserNotification.DoesNotExist:
                     pass
-            except UserTacking.DoesNotExist:
+            except UserTracking.DoesNotExist:
                 response = {'errors': "invalid id", 'status':
                              status.HTTP_400_BAD_REQUEST}
             msg = "Stopped Tracking " + track_user.get_full_name()
@@ -3268,7 +3268,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         except Friend.DoesNotExist:
             pass
         try:
-            track_obj = UserTacking.objects.get(user=user)
+            track_obj = UserTracking.objects.get(user=user)
             trackers_list = track_obj.tracked_by.all()
             context['trackers_list_count'] = trackers_list.count()
             paginator = Paginator(trackers_list, 5)
@@ -3280,9 +3280,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
             except EmptyPage:
                 trackers_list = paginator.page(paginator.num_pages)
             context['trackers_list'] = trackers_list
-        except UserTacking.DoesNotExist:
+        except UserTracking.DoesNotExist:
             context['trackers_list_count'] = 0
-        tracking_list = UserTacking.objects.filter(tracked_by=user)
+        tracking_list = UserTracking.objects.filter(tracked_by=user)
         context['tracking_list_count'] = tracking_list.count()
         paginator = Paginator(tracking_list, 20)
         page = self.request.GET.get('page1')

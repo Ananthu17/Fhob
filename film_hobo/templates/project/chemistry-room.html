@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+        <h3>Chemistry Room</h3>
+
+<p>{{project}}</p>
+{% for character,audition_list in audition_dict.items %}
+   <b>{{character.name}}</b>
+   {% for audition in audition_list %}
+        {{ audition.name }},
+   {% endfor %}
+   <p></p>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

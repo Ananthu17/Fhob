@@ -1,9 +1,10 @@
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
 from ckeditor.widgets import CKEditorWidget
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Character(models.Model):
     name = models.CharField(max_length=1000)
@@ -112,3 +113,63 @@ class Audition(models.Model):
     class Meta:
         verbose_name = 'Audition'
         verbose_name_plural = 'Audition'
+
+
+class ProjectTracking(models.Model):
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_tracking',
+                                verbose_name=_("User"),
+                                null=True)
+    tracked_by = models.ManyToManyField('hobo_user.CustomUser',
+                                        blank=True,
+                                        related_name="project_tracked_by",
+                                        verbose_name=_("Tracked by")
+                                        )
+
+    def __str__(self):
+        return str(self.project)
+
+    class Meta:
+        verbose_name = 'Project Tracking'
+        verbose_name_plural = 'Project Tracking'
+
+
+class AuditionRating(models.Model):
+    team_member = models.ForeignKey("hobo_user.Team",
+                                    on_delete=models.CASCADE,
+                                    related_name='audition_rating_team_member',
+                                    verbose_name=_("Team Member"),
+                                    null=True)
+    audition = models.ForeignKey("project.Audition",
+                                 on_delete=models.CASCADE,
+                                 related_name='audition',
+                                 verbose_name=_("Audition"),
+                                 null=True)
+    rating = models.IntegerField(_("Rating"),
+                                 validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True)
+    review = models.TextField(_("Review"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.audition.name) + " -rated by " +str(self.team_member.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'Audition Rating'
+        verbose_name_plural = 'Audition Ratings'
+
+
+class AuditionRatingCombined(models.Model):
+    audition = models.ForeignKey("project.Audition",
+                                 on_delete=models.CASCADE,
+                                 related_name='audition_rating_combined',
+                                 verbose_name=_("User"),
+                                 null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.audition.name)
+
+    class Meta:
+        verbose_name = 'Audition Ratings Combined'
+        verbose_name_plural = 'Audition Ratings Combined'

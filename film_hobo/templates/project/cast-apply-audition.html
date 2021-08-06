@@ -137,7 +137,6 @@
                         <!-- col-3  -->
                         <div class="caa-sec-bg">
                             <div class="caa-audition-info-align"
-
                             {% if samr_data.1 >= logged_user_rating or request.user.membership not in samr_data.2 %}
                             data-toggle="modal" data-target="#cannotapply"
                             {% endif %}>
@@ -259,7 +258,8 @@
                            <div>
                                <div class="caa-side-script-txt-align" id="sidesandscripts">
                                    <span class="caa-side-script-txt">
-                                       <a href="#?" class="caa-side-switch-tag" id="sides-tag" onclick="toggleVisibility('sides');">Sides</a>/<a href="#?" class="caa-side-switch-tag" id="script-tag" onclick="toggleVisibility('script');">script</a>
+                                       <!-- <a href="#?" class="caa-side-switch-tag" id="sides-tag" onclick="toggleVisibility('sides');">Sides</a>/<a href="#?" class="caa-side-switch-tag" id="script-tag" onclick="toggleVisibility('script');">script</a> -->
+                                       <a  class="caa-side-switch-tag" id="sides-tag" >Sides</a>
                                     </span>
                                </div>
                                <div id="sides">
@@ -276,8 +276,8 @@
                                         </span>
                                    </div>
                                    <div class="caa-script-sec-frame">
-                                        <div class="caa-script-sec-frame-inner">
-                                            <div id="printableArea">
+                                        <div class="caa-script-sec-frame-inner scroll-section">
+                                            <div id="printableArea" class="ml-3">
                                                 <b>Scene 1:</b><p>{{sides.scene_1|safe}}</p>
                                                 <b>Scene 2:</b><p>{{sides.scene_2|safe}}</p>
                                                 <b>Scene 3:</b><p>{{sides.scene_3|safe}}</p>
@@ -286,23 +286,7 @@
                                     </div>
                                 {% endif %}
                                </div>
-                               <div id="script" class="caa-script-show">
-                                {% if project.script %}
-                                    <div class="caa-download-display">
-                                        <span><a href="{{project.script.url}}" class="" download>Download</a></span>
-                                        <span>
-                                            <a id="print_script"
-                                            href="{{project.script.url}}" target="_blank"
-                                            >Print</a></span>
-                                    </div>
-                                    <div class="caa-script-sec-frame">
-                                        <div class="caa-script-sec-pdf-frame-inner">
-                                            <embed src="{{project.script.url}}" class="pdf-style" 
-                                            id="script_pdf" frameborder="0"></embed>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                               </div>
+                               
                            </div>
                         </div>
                     </div>

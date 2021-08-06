@@ -1,5 +1,5 @@
 from hobo_user.models import UserRating, Project
-from project.models import Audition, Character, Sides
+from project.models import Audition, AuditionRating, Character, Sides
 from rest_framework import serializers
 
 
@@ -116,3 +116,66 @@ class PostProjectVideoSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class PasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class ProjectLoglineSerializer(serializers.ModelSerializer):
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = Project
+        fields = ['project_id', 'logline', 'project_info']
+
+
+class TrackProjectSerializer(serializers.Serializer):
+    project_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class RateAuditionSerializer(serializers.ModelSerializer):
+    audition = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    team_member = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    rating = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = AuditionRating
+        fields = ['audition', 'team_member', 'rating', 'review']
+
+
+class AuditionStatusSerializer(serializers.ModelSerializer):
+    audition = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    status = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+    class Meta:
+        model = AuditionRating
+        fields = ['audition', 'status']

@@ -6,7 +6,10 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
      SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
-     PostProjectVideoAPI
+     PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
+     TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
+     TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
+     UpdateAuditionStatusAPI, ChemistryRoomView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -51,4 +54,26 @@ urlpatterns = [
           name='add-project-video'),
      path('post-project-video/', PostProjectVideoAPI.as_view(),
           name='post-project-video'),
+     path('script-password-check/', ScriptPasswordCheckAPI.as_view(),
+          name='script-password-check'),
+     path('cast-audition-password-check/', CastAuditionPasswordCheckAPI.as_view(),
+          name='cast-audition-password-check'),
+     path('team-select-password-check/', TeamSelectPasswordCheckAPI.as_view(),
+          name='team-select-password-check'),
+     path('save-project-logline/', SaveProjectLoglineAPI.as_view(),
+          name='save-project-logline'),
+     path('list-project-trackers-api/', ListProjectTrackersAPI.as_view(),
+          name='list-project-trackers-api'),
+     path('track-project-api/', TrackProjectAPI.as_view(),
+          name='track-project-api'),
+     path('untrack-project-api/', UnTrackProjectAPI.as_view(),
+          name='untrack-project-api'),
+     path('cast-video-audition/<int:id>/', CastVideoAuditionView.as_view(),
+          name='cast-video-audition'),
+     path('rate-audition-api/', RateAuditionAPI.as_view(),
+          name='rate-audition-api'),
+     path('update-audition-status-api/', UpdateAuditionStatusAPI.as_view(),
+          name='update-audition-status-api'),
+     path('chemistry-room/<int:id>/', ChemistryRoomView.as_view(),
+          name='chemistry-room'),
     ]
