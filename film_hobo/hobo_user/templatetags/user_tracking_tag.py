@@ -1,6 +1,6 @@
 from django import template
 from hobo_user.models import CustomUser, CustomUserSettings, \
-    UserTacking, UserRatingCombined
+    UserTracking, UserRatingCombined
 
 register = template.Library()
 
@@ -48,11 +48,11 @@ def get_tracking_list(logged_user, profile):
     track_user = profile
     track_by_user = logged_user
     try:
-        tracking_info = UserTacking.objects.get(
+        tracking_info = UserTracking.objects.get(
                         user=track_user).tracked_by.all()
         tracking_users = tracking_info.values_list('id', flat=True)
         if track_by_user.id in tracking_users:
             return True
-    except UserTacking.DoesNotExist:
+    except UserTracking.DoesNotExist:
         return False
 

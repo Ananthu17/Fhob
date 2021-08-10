@@ -1,7 +1,8 @@
 
 import datetime
-
+from autoslug import AutoSlugField
 from phonenumber_field.modelfields import PhoneNumberField
+
 from django.urls import reverse
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -9,6 +10,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.template.defaultfilters import slugify
 
 from solo.models import SingletonModel
 
@@ -441,7 +443,7 @@ class Location(models.Model):
                                null=True)
 
     def __str__(self):
-        location = self.city+","+self.state+","+self.country
+        location = self.city+", "+self.state+", "+self.country
         return str(location)
 
     class Meta:
@@ -458,6 +460,14 @@ class Project(models.Model):
     VISIBILITY_CHOICES = [
         (PUBLIC, 'Public'),
         (PRIVATE, 'Private'),
+    ]
+    UPLOADED = 'uploaded'
+    POSTED = 'posted'
+    NOT_AVAILABLE = 'not_available'
+    VIDEO_STATUS_CHOICES = [
+        (UPLOADED, 'Uploaded'),
+        (POSTED, 'Posted'),
+        (NOT_AVAILABLE, 'Not Available'),
     ]
     NATION_WIDE = 'nation_wide'
     LOCAL_ONLY = 'local_only'
@@ -525,13 +535,12 @@ class Project(models.Model):
     ]
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
-    FACEBOOK = 'facebook'
-    UPLOAD_VIDEO = 'upload_video'
+    # FACEBOOK = 'facebook'
+    # UPLOAD_VIDEO = 'upload_video'
     VIDEO_TYPE_CHOICES = [
         (YOUTUBE, 'Youtube'),
         (VIMEO, 'Vimeo'),
-        (FACEBOOK, 'Facebook'),
-        (UPLOAD_VIDEO, 'Upload Video'),
+        # (FACEBOOK, 'Facebook'),
     ]
 
     ACTION = 'ACT'
@@ -604,7 +613,7 @@ class Project(models.Model):
     video_type = models.CharField(_("Video Type"),
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True, blank=True,
-                                  default=UPLOAD_VIDEO)
+                                  default=VIMEO)
     last_date = models.DateField(_("Last date for submitting video"),
                                  null=True, blank=True,)
     location = models.ForeignKey("hobo_user.Location",
@@ -628,6 +637,20 @@ class Project(models.Model):
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    video_status = models.CharField(_("Video Status"),
+                                    choices=VIDEO_STATUS_CHOICES,
+                                    max_length=150,
+                                    default=NOT_AVAILABLE)
+    video_cover_image = models.ImageField(upload_to='thumbnail/',
+                                          blank=True, null=True,
+                                          help_text="Image size:370 X 248.")
+    script_password = models.CharField(max_length=12, null=True, blank=True)
+    team_select_password = models.CharField(max_length=12, null=True,
+                                            blank=True)
+    cast_audition_password = models.CharField(max_length=12, null=True, blank=True)
+    logline = models.CharField(max_length=1000,  null=True, blank=True)
+    project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    timestamp = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.title
@@ -963,6 +986,11 @@ class CustomUserSettings(models.Model):
 
 class JobType(models.Model):
     title = models.CharField(max_length=1000)
+    slug = models.SlugField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(JobType, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.title)
@@ -1314,7 +1342,7 @@ class Video(models.Model):
 
     class Meta:
         verbose_name = 'Video'
-        verbose_name_plural = 'Video Ratings'
+        verbose_name_plural = 'Video'
 
 
 class VideoRating(models.Model):
@@ -1323,12 +1351,15 @@ class VideoRating(models.Model):
                                  related_name='Video_rated_by_user',
                                  verbose_name=_("User"),
                                  null=True)
-    video = models.ForeignKey("hobo_user.Video",
-                              on_delete=models.CASCADE,
-                              null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_video_rating',
+                                verbose_name=_("Project"),
+                                null=True)
     rating = models.IntegerField(_("Rating"),
                                  validators=[MinValueValidator(0),
                                  MaxValueValidator(5)], null=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
 
     def __str__(self):
         return str(self.rated_by)
@@ -1336,6 +1367,22 @@ class VideoRating(models.Model):
     class Meta:
         verbose_name = 'Video Rating'
         verbose_name_plural = 'Video Ratings'
+
+
+class VideoRatingCombined(models.Model):
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_video_rating_combined',
+                                verbose_name=_("Project"),
+                                null=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.project)
+
+    class Meta:
+        verbose_name = 'Video Ratings Combined'
+        verbose_name_plural = 'Video Ratings Combined'
 
 
 class CompanyRating(models.Model):
@@ -1360,7 +1407,7 @@ class CompanyRating(models.Model):
         verbose_name_plural = 'Company Ratings'
 
 
-class UserTacking(models.Model):
+class UserTracking(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,
                              related_name='user_tracking',
@@ -1495,6 +1542,7 @@ class UserNotification(models.Model):
     READ = 'read'
     UNREAD = 'unread'
     MEMBERSHIP_CHANGE = 'membership_change'
+    PROJECT_TRACKING = 'project_tracking'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1504,6 +1552,8 @@ class UserNotification(models.Model):
                                  'Accepted Friend Request'),
                                 (MEMBERSHIP_CHANGE,
                                  'Membership Change'),
+                                (PROJECT_TRACKING,
+                                 'Project Tracking'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1528,6 +1578,11 @@ class UserNotification(models.Model):
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     message = models.TextField(_("Message"), null=True, blank=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_notification',
+                                verbose_name=_("Project"),
+                                null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

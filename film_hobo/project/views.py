@@ -4,6 +4,8 @@ import io
 import json
 import requests
 import boto3
+import datetime
+
 
 from braces.views import JSONResponseMixin
 from reportlab.pdfgen import canvas
@@ -27,6 +29,7 @@ from django.urls import reverse
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 
+from rest_framework.exceptions import ParseError
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,21 +39,16 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, get_object_or_404)
 
-from hobo_user.models import Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project
-from .models import Character, Sides
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
+     UserRating, JobType, UserRatingCombined, UserNotification, Project, VideoRatingCombined
+from .models import Audition, Character, Sides, ProjectTracking
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
-      SidesSerializer
+      SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
+      PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer
+from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
-from .forms import VideoSubmissionLastDateForm
-
-s3_client = boto3.client(
-                "s3",
-                region_name="us-east-2",
-                aws_access_key_id=settings.AWS_CLIENT_ID,
-                aws_secret_access_key=settings.AWS_CLIENT_SECRET
-            )
+from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -78,12 +76,12 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["team_members"] = team_members
         context["project"] = project
 
-        if project.video_type == Project.UPLOAD_VIDEO:
-            bucket_prefix = ""
-            bucket_name = settings.S3_BUCKET_NAME
-            path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
-            s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
-            context['s3_url'] = s3_url
+        # if project.video_type == Project.UPLOAD_VIDEO:
+        #     bucket_prefix = ""
+        #     bucket_name = settings.S3_BUCKET_NAME
+        #     path = f"{bucket_prefix}{project.creator.id}/{project.title}/{project_id}.mp4"
+        #     s3_url = project.generate_s3_signed_url(s3_client, path, bucket_name)
+        #     context['s3_url'] = s3_url
         return context
 
 
@@ -248,7 +246,7 @@ class RateUserSkillsAPI(APIView):
                 # end notification section
 
                 response = {'message': "%s rated sucessfully"%(
-                            project_member_obj.user.get_full_name),
+                            project_member_obj.user.get_full_name()),
                             'status': status.HTTP_200_OK,
                             'combined_rating': user_rating_combined.rating}
                 msg = project_member_obj.job_type.title +" "+project_member_obj.user.get_full_name() +" rated with "+rating+"stars"
@@ -292,27 +290,101 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
+        project_creator_rating = 0
+
+        project_creator_job = JobType.objects.filter(
+                               slug='project-creator'
+                               ).first()
+        if project_creator_job:
+            try:
+                project_creator = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=project_creator_job) 
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=project_creator) &
+                            Q(job_type=project_creator_job)
+                        ).first()
+                if rating_object:
+                    project_creator_rating = rating_object.rating*20
+                else:
+                    project_creator_rating = 0
+            except Team.DoesNotExist:
+                project_creator = ""
+            context['project_creator_rating'] = project_creator_rating
+        try:
+            project_rating_obj = VideoRatingCombined.objects.get(project=project)
+            project_rating = project_rating_obj.rating*20
+        except VideoRatingCombined.DoesNotExist:
+            project_rating = 0
+
+        characters = Character.objects.filter(project=project)
+        context['characters'] = characters
+
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+        rating_dict = {}
+        for character in characters:
+            if character.attached_user:
+                try:
+                    rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=character.attached_user) &
+                                    (
+                                        Q(job_type=actor) |
+                                        Q(job_type=actress)
+                                    )
+                                )
+                    rating_dict[character.attached_user.id] = (rating_obj.rating)*20
+                except UserRatingCombined.DoesNotExist:
+                    rating_dict[character.attached_user.id] = 0
+        print("rating_dict", rating_dict)
+        context['rating_dict'] = rating_dict
         context['project'] = project
+        context['project_rating'] = project_rating
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
         return context
 
-    # DON'T DELETE
-    # def post(self, request, *args, **kwargs):
-    #     bucket_prefix = ""
-    #     project_id = self.kwargs.get('id')
-    #     project = Project.objects.get(id=project_id)
-    #     video = self.request.FILES['video']
-    #     bucket_name = settings.S3_BUCKET_NAME
-    #     path = f"{bucket_prefix}{self.request.user.id}/{project.title}/{project.id}.mp4"
-    #     response = s3_client.put_object(
-    #                     Bucket=bucket_name,
-    #                     Body=video,
-    #                     Key=path,
-    #                     ServerSideEncryption="AES256",
-    #                 )
-    #     print("response", response)
-    #     messages.success(self.request, "Video Uploaded")
-    #     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+class AddProjectVideoView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/single_film_project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+    UPLOAD_FOLDER = "uploads"
+
+    def post(self, request, *args, **kwargs):
+        project_id = self.kwargs.get('id')
+        print(self.request.POST)
+        project = get_object_or_404(Project, pk=project_id)
+        cover_image = self.request.FILES['video_cover_image']
+        video_type = self.request.POST.get('video_type')
+        url = self.request.POST.get('video_url')
+        project.video_type = video_type
+        project.video_cover_image = cover_image
+        project.video_status = Project.UPLOADED
+
+        if video_type == 'youtube':
+            url_temp = url.split("v=")[1]
+            video_url = url_temp.split("&")[0]
+            project.video_url = video_url
+        if video_type == 'vimeo':
+            if url.startswith('https://vimeo.com/'):
+                video_url = url.split('https://vimeo.com/')[1]
+                project.video_url = video_url
+            if url.startswith('http://vimeo.com/'):
+                video_url = url.split('http://vimeo.com/')[1]
+                project.video_url = video_url
+            if url.startswith('vimeo.com/'):
+                video_url = url.split('vimeo.com/')[1]
+                project.video_url = video_url
+        project.save()
+        messages.success(self.request, "Audition submitted successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class SaveProjectVideoUrlAPI(APIView):
@@ -324,7 +396,7 @@ class SaveProjectVideoUrlAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
+            # print(data_dict)
             id = data_dict['id']
             video_url = data_dict['video_url']
             video_type = data_dict['video_type']
@@ -332,10 +404,52 @@ class SaveProjectVideoUrlAPI(APIView):
                 project = Project.objects.get(pk=id)
                 project.video_type = video_type
                 project.video_url = video_url
+                try:
+                    cover_image = request.data['video_cover_image']
+                    project.video_cover_image = cover_image
+                except KeyError:
+                    raise ParseError('Request has no cover image attached')
+                project.video_status = Project.UPLOADED
                 project.save()
                 response = {'message': "Video URL Saved",
                             'status': status.HTTP_200_OK}
                 messages.success(self.request, "Video URL saved")
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class PostProjectVideoAPI(APIView):
+    serializer_class = PostProjectVideoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            try:
+                project = Project.objects.get(pk=project_id)
+                if project.video_status == Project.UPLOADED:
+                    project.video_status = Project.POSTED
+                    project.save()
+                    response = {'message': "Video Published",
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, "Video Published.")
+                elif project.video_status == Project.NOT_AVAILABLE:
+                    response = {'errors': 'Video not available.', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                    messages.warning(self.request, "Video not available.")
+                elif project.video_status == Project.POSTED:
+                    response = {'errors': 'Video already posted.', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+                    messages.warning(self.request, "Video already posted.")
             except Project.DoesNotExist:
                 response = {'errors': 'Invalid project ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -378,7 +492,7 @@ class CharacterCreateAPIView(APIView):
                 character_obj.description = data_dict['description']
                 character_obj.project = project
                 character_obj.password = data_dict['password']
-                # character_obj.password = make_password(data_dict['password'])
+                # character_obj.sort_order = data_dict['sort_order']
                 character_obj.save()
                 response = {'message': "Character added",
                             'status': status.HTTP_200_OK}
@@ -486,6 +600,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
+        # sort_order = self.request.POST.getlist('sort_order')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -493,6 +608,10 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
+            # if sort_order[i] != "":
+            #     json_dict['sort_order'] = sort_order[i]
+            # else:
+            #     json_dict['sort_order'] = 0
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
@@ -626,38 +745,6 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
             pass
         return context
 
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = {}
-        json_response = json.dumps(request.POST)
-        data_dict = ast.literal_eval(json_response)
-        project_id = self.kwargs.get('id')
-        character_id = self.request.POST.get('character_id')
-        data_dict['project'] = project_id
-        data_dict['character'] = character_id
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                    'http://127.0.0.1:8000/project/add-sides-api/',
-                    data=json.dumps(data_dict),
-                    headers={'Content-type': 'application/json',
-                             'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] != 200:
-                if 'errors' in response:
-                    errors = response['errors']
-                    print(errors)
-                    messages.warning(
-                        self.request, "Failed to update scenes !!")
-                    return HttpResponseRedirect(
-                        request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
 
 class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
     template_name = 'project/cast-apply-audition.html'
@@ -667,11 +754,39 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
+        project_creator_rating = 0
         character_id = self.request.GET.get('character_id')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
         character = get_object_or_404(Character, pk=character_id)
         context['character'] = character
+        context['video_types'] = Project.VIDEO_TYPE_CHOICES
+        context['locations'] = Location.objects.all()
+
+        # check if logged user can apply for audition
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+        logged_user = self.request.user
+        try:
+            logged_user_rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=logged_user) &
+                                    (
+                                        Q(job_type=actor) |
+                                        Q(job_type=actress)
+                                    )
+                                )
+            logged_user_rating = logged_user_rating_obj.rating
+        except UserRatingCombined.DoesNotExist:
+            logged_user_rating = 0
+        context['logged_user_rating'] = logged_user_rating
+        # end
+
         try:
             sides = Sides.objects.get(
                         Q(project=project) &
@@ -680,39 +795,74 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             context['sides'] = sides
         except Sides.DoesNotExist:
             pass
-        return context
 
+        project_creator_job = JobType.objects.filter(
+                               slug='project-creator'
+                               ).first()
+        if project_creator_job:
+            try:
+                project_creator = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=project_creator_job)
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=project_creator) &
+                            Q(job_type=project_creator_job)
+                        ).first()
+                if rating_object:
+                    project_creator_rating = rating_object.rating*20
+                else:
+                    project_creator_rating = 0
+            except Team.DoesNotExist:
+                project_creator = ""
+            context['project_creator_rating'] = project_creator_rating
+        return context
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        # data_dict = {}
-        # json_response = json.dumps(request.POST)
-        # data_dict = ast.literal_eval(json_response)
-        # project_id = self.kwargs.get('id')
-        # character_id = self.request.POST.get('character_id')
-        # data_dict['project'] = project_id
-        # data_dict['character'] = character_id
-        # key = Token.objects.get(user=user).key
-        # token = 'Token '+key
-        # user_response = requests.post(
-        #             'http://127.0.0.1:8000/project/add-sides-api/',
-        #             data=json.dumps(data_dict),
-        #             headers={'Content-type': 'application/json',
-        #                      'Authorization': token})
-        # byte_str = user_response.content
-        # dict_str = byte_str.decode("UTF-8")
-        # response = ast.literal_eval(dict_str)
-        # response = dict(response)
-        # if 'status' in response:
-        #     if response['status'] != 200:
-        #         if 'errors' in response:
-        #             errors = response['errors']
-        #             print(errors)
-        #             messages.warning(
-        #                 self.request, "Failed to update scenes !!")
-        #             return HttpResponseRedirect(
-        #                 request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.POST.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        character = get_object_or_404(Character, pk=character_id)
+        cover_image = self.request.FILES['cover_image']
+        audition_obj = Audition()
+        audition_obj.project = project
+        audition_obj.character = character
+        audition_obj.name = data_dict['name']
+        audition_obj.user = self.request.user
+        location_id = data_dict['location']
+        audition_obj.location = get_object_or_404(Location, pk=location_id)
+        audition_obj.agent_name = data_dict['agent_name']
+        audition_obj.agent_email = data_dict['agent_email']
+        try:
+            agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+            audition_obj.agent = agent_user
+        except CustomUser.DoesNotExist:
+            pass
+        video_type = data_dict['video_type']
+        url = data_dict['video_url']
+        audition_obj.video_type = video_type
+        audition_obj.cover_image = cover_image
+
+        if video_type == 'youtube':
+            url_temp = url.split("v=")[1]
+            video_url = url_temp.split("&")[0]
+            audition_obj.video_url = video_url
+        if video_type == 'vimeo':
+            if url.startswith('https://vimeo.com/'):
+                video_url = url.split('https://vimeo.com/')[1]
+                audition_obj.video_url = video_url
+            if url.startswith('http://vimeo.com/'):
+                video_url = url.split('http://vimeo.com/')[1]
+                audition_obj.video_url = video_url
+            if url.startswith('vimeo.com/'):
+                video_url = url.split('vimeo.com/')[1]
+                audition_obj.video_url = video_url
+        audition_obj.save()
+        messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -750,9 +900,470 @@ def getpdf(request, **kwargs):
         scene_3_data = Paragraph(sides.scene_3)
         report.build([report_title, scene_1, scene_1_data, scene_2,
                       scene_2_data, scene_3, scene_3_data])
+
         response.write(buff.getvalue())
         buff.close()
         return response
+
+
+
     except Sides.DoesNotExist:
         pass
     return response
+
+
+class SubmitAuditionAPI(APIView):
+    serializer_class = AuditionSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project']
+            character_id = data_dict['character']
+            project = get_object_or_404(Project, pk=project_id)
+            character = get_object_or_404(Character, pk=character_id)
+            audition_obj = Audition()
+            audition_obj.project = project
+            audition_obj.character = character
+            audition_obj.name = data_dict['name']
+            audition_obj.user = self.request.user
+            location_id = data_dict['location']
+            audition_obj.location = get_object_or_404(Location, pk=location_id)
+            audition_obj.agent_name = data_dict['agent_name']
+            audition_obj.agent_email = data_dict['agent_email']
+            try:
+                agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+                audition_obj.agent = agent_user
+            except CustomUser.DoesNotExist:
+                pass
+            video_type = data_dict['video_type']
+            url = data_dict['video_url']
+            audition_obj.video_type = video_type
+            try:
+                cover_image = request.data['cover_image']
+                audition_obj.cover_image = cover_image
+            except KeyError:
+                raise ParseError('Request has no cover image attached')
+
+            if video_type == 'youtube':
+                url_temp = url.split("v=")[1]
+                video_url = url_temp.split("&")[0]
+                audition_obj.video_url = video_url
+            if video_type == 'vimeo':
+                if url.startswith('https://vimeo.com/'):
+                    video_url = url.split('https://vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+                if url.startswith('http://vimeo.com/'):
+                    video_url = url.split('http://vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+                if url.startswith('vimeo.com/'):
+                    video_url = url.split('vimeo.com/')[1]
+                    audition_obj.video_url = video_url
+            if video_type == 'facebook':
+                audition_obj.video_url = url
+            audition_obj.save()
+            response = {'message': "Audition Submitted",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AuditionListView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/audition-list.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        count_dict = {}
+        character_dict = {}
+        rating_dict = {}
+        casting_director_rating = 0
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        characters = Character.objects.filter(project=project)
+        audition_list = Audition.objects.filter(project=project)
+        casting_director_job = JobType.objects.filter(
+                               slug='casting-director'
+                               ).first()
+        if casting_director_job:
+            try:
+                casting_director = Team.objects.get(
+                                    Q(project=project) &
+                                    Q(job_type=casting_director_job) 
+                                    ).user
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=casting_director) &
+                            Q(job_type=casting_director_job)
+                        ).first()
+                if rating_object:
+                    casting_director_rating = rating_object.rating*20
+                else:
+                    casting_director_rating = 0
+            except Team.DoesNotExist:
+                casting_director = ""
+            context['casting_director'] = casting_director
+            context['casting_director_rating'] = casting_director_rating
+        try:
+            actor = JobType.objects.get(slug='actor')
+        except JobType.DoesNotExist:
+            actor = ""
+        try:
+            actress = JobType.objects.get(slug='actress')
+        except JobType.DoesNotExist:
+            actress = ""
+
+        for audition_obj in audition_list:
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                                Q(user=audition_obj.user) &
+                                (
+                                    Q(job_type=actor) |
+                                    Q(job_type=actress)
+                                )
+                            )
+                rating_dict[audition_obj.user.id] = (rating_obj.rating)*20
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[audition_obj.user.id] = 0
+
+        for obj in audition_list:
+            if obj.character in count_dict:
+                count_dict[obj.character] += 1
+            else:
+                count_dict[obj.character] = 1
+            if obj.character in character_dict:
+                character_dict[obj.character].append(obj)
+            else:
+                character_dict[obj.character] = []
+                character_dict[obj.character].append(obj)
+
+        context['characters'] = characters
+        context['project'] = project
+        context['count_dict'] = count_dict
+        context['character_dict'] = character_dict
+        context['rating_dict'] = rating_dict
+        return context
+
+
+class EditSidesView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/edit-sides.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.GET.get('character_id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        character = get_object_or_404(Character, pk=character_id)
+        context['character'] = character
+        try:
+            sides = Sides.objects.get(
+                        Q(project=project) &
+                        Q(character=character)
+                        )
+            context['sides'] = sides
+            context['form'] = AddSidesForm(instance=sides)
+        except Sides.DoesNotExist:
+            context['form'] = AddSidesForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.POST.get('character_id')
+        data_dict['project'] = project_id
+        data_dict['character'] = character_id
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        user_response = requests.post(
+                    'http://127.0.0.1:8000/project/add-sides-api/',
+                    data=json.dumps(data_dict),
+                    headers={'Content-type': 'application/json',
+                             'Authorization': token})
+        byte_str = user_response.content
+        dict_str = byte_str.decode("UTF-8")
+        response = ast.literal_eval(dict_str)
+        response = dict(response)
+        if 'status' in response:
+            if response['status'] != 200:
+                if 'errors' in response:
+                    errors = response['errors']
+                    print(errors)
+                    messages.warning(
+                        self.request, "Failed to update scenes !!")
+                    return HttpResponseRedirect(
+                        request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Sides updated successfully")
+        url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
+        return HttpResponseRedirect(url)
+
+
+class ScriptPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.script_password == password:
+                response = {'message': "Password Verified",
+                            'url': project.script.url,
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CastAuditionPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.cast_audition_password == password:
+                response = {'message': "Password Verified",
+                            'url': project.script.url,
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TeamSelectPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            if project.team_select_password == password:
+                response = {'message': "Password Verified",
+                            'url': project.script.url,
+                            'status': status.HTTP_200_OK}
+            else:
+                response = {'errors': 'Wrong Password', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class SaveProjectLoglineAPI(APIView):
+    serializer_class = ProjectLoglineSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print("data_dict----------",data_dict)
+            id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=id)
+            if 'logline' in data_dict and data_dict['logline'] is not None:
+                project.logline = data_dict['logline']
+            if 'project_info' in data_dict and data_dict['project_info'] is not None:
+                project.project_info = data_dict['project_info']
+            project.save()
+            response = {'message': "Logline and project info updated",
+                        'status': status.HTTP_200_OK}
+            messages.success(self.request, 'Project Info updated')
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ListProjectTrackersAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project = get_object_or_404(Project, pk=data_dict['project_id'])
+            try:
+                trackers_dict = {}
+                track_obj = ProjectTracking.objects.get(project=project)
+                trackers_list = track_obj.tracked_by.all()
+
+                for user in trackers_list:
+                    trackers_dict[user.id] = UserSerializer(user).data
+
+                response = {'Trackers': trackers_dict,
+                            'status': status.HTTP_200_OK}
+            except ProjectTracking.DoesNotExist:
+                response = {'Message': "Trackers list is empty", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TrackProjectAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            track_by_user = self.request.user
+
+            try:
+                track_obj = ProjectTracking.objects.get(project=project)
+                trackers_list = track_obj.tracked_by.all()
+                if track_by_user in trackers_list:
+                    response = {'message': "You are already tracking this user",
+                                'status': status.HTTP_400_BAD_REQUEST,
+                                'track_status': 'tracking'
+                                }
+                    return Response(response)
+                track_obj.tracked_by.add(track_by_user.id)
+
+            except ProjectTracking.DoesNotExist:
+                track_obj = ProjectTracking()
+                track_obj.project = project
+                track_obj.save()
+                track_obj.tracked_by.add(track_by_user.id)
+
+            # update notification table
+            notification = UserNotification()
+            notification.user = project.creator
+            notification.notification_type = UserNotification.PROJECT_TRACKING
+            notification.from_user = track_by_user
+            notification.project = project
+            notification.message = track_by_user.get_full_name()+" started tracking your project "+project.title
+            notification.save()
+
+            # send notification
+            room_name = "user_"+str(track_obj.project.creator.id)
+            notification_msg = {
+                    'type': 'send_project_tracking_notification',
+                    'message': str(notification.message),
+                    'track_by_user_id': str(self.request.user.id),
+                    "event": "PROJECT_TRACKING"
+                }
+            notify(room_name, notification_msg)
+
+            msg = "Started Tracking " + project.title
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status': 'tracking'}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetProjectTrackingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/get-single-notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.PROJECT_TRACKING)
+                            ).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'project/get-single-notification.html',
+                                {'from_user': from_user,
+                                 'message':message,
+                                 'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class UnTrackProjectAPI(APIView):
+    serializer_class = TrackProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project_id']
+            project = get_object_or_404(Project, pk=project_id)
+            track_by_user = self.request.user
+
+            try:
+                track_obj = ProjectTracking.objects.get(project=project)
+                track_obj.tracked_by.remove(track_by_user.id)
+                # remove from notification table
+                try:
+                    notification = UserNotification.objects.get(
+                        Q(project=project) &
+                        Q(from_user=track_by_user) &
+                        Q(notification_type=UserNotification.PROJECT_TRACKING)
+                        )
+                    notification.delete()
+                except UserNotification.DoesNotExist:
+                    pass
+            except ProjectTracking.DoesNotExist:
+                response = {'errors': "invalid id",
+                            'status': status.HTTP_400_BAD_REQUEST}
+            msg = "Stopped Tracking " + project.title
+            response = {'message': msg,
+                        'status': status.HTTP_200_OK,
+                        'track_status':'not_tracking'}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

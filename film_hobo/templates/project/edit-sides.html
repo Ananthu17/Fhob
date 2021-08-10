@@ -51,7 +51,7 @@
                 <div class="sds-input-bg">
                     <div class="sds-input-padding">
                         <form  method="post"
-                        action="{% url 'project:add-sides' project.id %}?{{character.id}}"
+                        action="{% url 'project:edit-sides' project.id %}?{{character.id}}"
                         id="sidesform">
                             {% csrf_token %}
                             <input type="hidden" name="character_id" value="{{character.id}}" />
@@ -75,12 +75,10 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt"><a >SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="sds-side-txt"><a href="">SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_1|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_1" id="scene_1" {% if sides.scene_1 %} disabled {% endif %}>{{sides.scene_1|striptags|safe}}</textarea> -->
+                                            {{form.scene_1}}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -88,9 +86,7 @@
                                             <span class="sds-scene-txt">SCENE TWO</span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_2|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_2" {% if sides.scene_2 %} disabled {% endif %}>{{sides.scene_2|striptags|safe}}</textarea> -->
+                                            {{form.scene_2}}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -98,9 +94,7 @@
                                             <span class="sds-scene-txt">SCENE THREE</span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_3|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_3" {% if sides.scene_3 %} disabled {% endif %}>{{sides.scene_3|striptags|safe}}</textarea> -->
+                                            {{form.scene_3}}
                                         </div>
                                     </div>
                                 </div>
@@ -108,10 +102,9 @@
                             <div>
                                 <div class="sds-card-btn-align">
                                     <span class="sds-input-card-btn">
-                                        <!-- <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/> -->
-                                        <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration"
-                                        href="{% url 'project:edit-sides' project.id %}?character_id={{character.id}}">EDIT</a>
-                                        <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
+                                        <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/>
+                                        <!-- <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a> -->
+                                        <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
                             </div>
