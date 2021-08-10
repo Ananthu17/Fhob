@@ -68,8 +68,10 @@ $('#invite_send').click(function(event){
         axios.post(invite_url, invite_url_args, {headers: { 'Authorization': token_auth_str }})
         .then((response) => {
             console.log(response);
+            $("#shareModal").modal('hide');
         }, (error) => {
             console.log(error);
+            $("#shareModal").modal('hide');
         });
     }
 });
