@@ -15,13 +15,13 @@
                         </div>
                         <div class="row justify-content-center">
                             <div>
-                                <a href=""><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
+                                <a href="javascript:void(0)" id="decreseyear"><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
                             </div>
                             <div class="ml-2">
-                                <label class="d-flex justify-content-center year">2021</label>
+                                <label class="d-flex justify-content-center year" id="year">2021</label>
                             </div>
                             <div class="ml-2">
-                                <a href=""><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
+                                <a href="javascript:void(0)" id="increseyear"><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
                             </div>
                         </div>
 
@@ -137,8 +137,17 @@
                     </div>
                 </div>
                 <!-- center -->
+                <div class="col-lg-8 col-md-12 col-sm-12 mt-3 col-xs-12 d-none" id="searchblock">
+                    <div class="row searchresult">
+                        <div id=emptysearch>
 
-                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
+                        </div>
+                        <div class="row" id="searchrow">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3" id="initialblock">
 
                     <!-- row 1 -->
                     <div class="row left-mode-search p-2 text-center mt-2 left-mode-search-height">
@@ -594,14 +603,129 @@
         .act {
             color: orange !important;
         }
+        .searchresult{
+            background-color: #f3f3f3;
+            border-radius: 0.7rem;
+            margin: 0.5rem;
+            padding: 1rem;
+        }
+        .searchresult span{
+            font-weight: bold;
+        }
+        #emptysearch,#searchrow{
+            width: 100%;
+        }
+        #emptysearch div{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 500px;
+            justify-content: center;
+        }
+        #emptysearch i{
+            font-size: 4rem;
+            color: #6f6f6c;
+        }
+        #emptysearch h2{
+            color: #6f6f6c;
+            margin-top: 1rem;
+            font-family: Courier;
+        }
     </style>
 {% endblock %}
 
 {% block extrajs %}
 <script>
-    $( document ).ready(function() {
-
-    });
+    $('#decreseyear').on('click',()=>{
+        document.getElementById('year').innerHTML = document.getElementById('year').innerHTML-1
+    })
+    $('#increseyear').on('click',()=>{
+        document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)+1
+    })
+    $('#search').on('change',()=>{
+            console.log($('#search').val())
+            origin_url = window.location.origin
+            post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
+            console.log('post url :',post_url)
+            axios.get(post_url)
+            .then((response) => {
+                console.log("data is :",response.data)
+                $('#initialblock').addClass('d-none')
+                $('#searchblock').removeClass('d-none')
+                $('#searchrow').empty()
+                if(response.data.length == 0){
+                    let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
+                    $('#emptysearch').append(div);
+                }
+                else{
+                    $('#emptysearch').empty();
+                }
+                jQuery.each(response.data, function() {
+                    let div = `<div class="col-lg-4 col-md-4 col-sm-6"><div class='item pro-item'> \
+                                <div class='card proj-card'>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-no'>\
+                                            Project<a href=''>${this.id}</a>\
+                                        </span>\
+                                        <span class='proj-pay'>\
+                                            $<a href=''>0</a>\
+                                        </span>\
+                                        <span class='proj-gener-align'>\
+                                            <a href=''>${this.genre}</a>\
+                                        </span>\
+                                        <span class='proj-symb'>\
+                                            <span class='fa fa-star checked'></span>\
+                                            <span class='fa fa-star checked'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                            <span class='fa fa-star-o'></span>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-title'>\
+                                            Title:<a href=''>${this.title}</a>\
+                                        </span>\
+                                        <span class='proj-page-no'>\
+                                            Page:<a href=''>4</a>\
+                                        </span>\
+                                        <span class='proj-public'>\
+                                            <a href=''>Public</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Creator:<a href=''>${this.creator}</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Format:<a href=''>${this.format}</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Team:<a href=''>Actor,Director +</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1'>\
+                                        <span class='proj-format'>\
+                                            Cast:<a href=''>Female(27),Female(35)</a>\
+                                        </span>\
+                                    </div>\
+                                    <div class='project-line mt-1 ml-1 mb-1'>\
+                                        <span class='proj-format'>\
+                                            Location:<a href=''>${this.location}</a>\
+                                        </span>\
+                                    </div>\
+                                </div>\
+                            </div></div>`;
+                    $('#searchrow').append(div);
+                })
+            }, (error) => {
+                console.log(error);
+            })
+    })
 </script>
 <!-- JS for Project filter API  -->
 <script>

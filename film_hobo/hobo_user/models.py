@@ -654,6 +654,7 @@ class Project(models.Model):
         max_length=250, null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    timestamp = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.title

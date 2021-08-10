@@ -51,6 +51,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
 
 from authemail.views import SignupVerify
+from rest_framework.filters import SearchFilter
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
@@ -4327,7 +4328,8 @@ class TeamAPIView(ListAPIView):
     serializer_class = TeamSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filterset_fields = ["title", "format", "genre",
+                        "rating", "timestamp"]
 
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
@@ -4348,12 +4350,15 @@ class TeamDeleteAPIView(DestroyAPIView):
 
 # Search API for project
 # Api to search in project
-# class ProjectSearchView(ListAPIView):
-#     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-#     # permission_classes = (IsAuthenticated,)
-#     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title","format"]
+class ProjectSearchView(ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    # permission_classes = (IsAuthenticated,)
+    # filter_backends = [filters.SearchFilter]
+    filter_backends = (SearchFilter, DjangoFilterBackend)
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
 
 # Api to add rating to project video
 class VideoRatingView(APIView):
