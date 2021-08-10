@@ -67,10 +67,8 @@ $('#invite_send').click(function(event){
 
         axios.post(invite_url, invite_url_args, {headers: { 'Authorization': token_auth_str }})
         .then((response) => {
-            debugger
             console.log(response);
         }, (error) => {
-            debugger
             console.log(error);
         });
     }
