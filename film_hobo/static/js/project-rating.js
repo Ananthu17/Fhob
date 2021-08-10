@@ -22,8 +22,6 @@
           var member_id = id.split("-")[1];
           var div_id = "#reason-div";
           var form_id = "#rating-form";
-          console.log(form_id)
-          console.log(div_id)
           if(rate<='2'){
               $('.reason-div').html(" ");
               var field = "<div class='row reason-div'>Reason<textarea id='reason' class='reason form-control' rows='4' name='reason'></textarea><div class='reason-error'></div></div>";
@@ -55,10 +53,11 @@
           }
         console.log("data_dict", data_dict);
         if((rate>2)|((rate<=2)&(reason!=""))){
+          console.log(data_dict)
           $.ajax
           ({
               type: "POST",
-              url: "/hobo_user/video/rate/",
+              url: "/project/project-rating-api/",
               dataType: 'json',
               async: false,
               data: data_dict,

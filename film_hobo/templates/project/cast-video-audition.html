@@ -550,7 +550,7 @@
                                         {% if audition.status == 'attached' %}cva-info-txt-green{% endif %}
                                         {% if audition.status == 'callback' %}cva-info-txt-red{% endif %}
                                         ">
-                                            {{audition.status}}
+                                            {{audition.get_status_display}}
                                         </span>
                                         </span>
                                         <p class=""><b>Comments:</b></p>

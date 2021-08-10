@@ -2064,7 +2064,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
         return context
 

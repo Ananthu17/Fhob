@@ -573,3 +573,11 @@ input.pw {
 	border-radius: 10px;
 }
 
+.chm-char-orange-txt-2{
+  color:#e88b24;
+  display: inline-block;
+  white-space: nowrap;
+  width: 96px;
+  text-overflow: ellipsis;
+  margin-bottom: -4px;
+}

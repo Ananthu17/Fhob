@@ -1,5 +1,6 @@
 from hobo_user.models import UserRating, Project
-from project.models import Audition, AuditionRating, Character, Sides
+from project.models import Audition, AuditionRating, Character, Sides, \
+    ProjectRating
 from rest_framework import serializers
 
 
@@ -179,3 +180,10 @@ class AuditionStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuditionRating
         fields = ['audition', 'status']
+
+
+class ProjectRatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProjectRating
+        fields = ['project', 'rating', 'reason']
