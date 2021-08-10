@@ -139,6 +139,7 @@
                 <!-- center -->
                 <div class="col-lg-8 col-md-12 col-sm-12 mt-3 col-xs-12 d-none" id="searchblock">
                     <div class="row searchresult">
+                        <div class="mb-3"><label class='txt-red float-left top-head-align'>Search Results</label></div>
                         <div id=emptysearch>
 
                         </div>
@@ -661,8 +662,11 @@
                 else{
                     $('#emptysearch').empty();
                 }
+                let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
+                $('#searchrow').append();
                 jQuery.each(response.data, function() {
-                    let div = `<div class="col-lg-4 col-md-4 col-sm-6"><div class='item pro-item'> \
+                    let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
+                                <div class='item pro-item'> \
                                 <div class='card proj-card'>\
                                     <div class='project-line mt-1 ml-1'>\
                                         <span class='proj-no'>\
