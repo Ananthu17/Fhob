@@ -7,9 +7,51 @@ $('#share-link').click(function(event){
     $("#shareModal").modal('show');
 });
 
+var token = $("#token")
+var token_auth_str = token.val()
+
+get_friends_list_url = origin_url + '/hobo_user/list-all-friend-api/'
+axios.get(get_friends_list_url, {headers: { 'Authorization': token_auth_str }})
+.then((response) => {
+    var friends_obj = response.data.friends
+    var validOptions = [];
+    $.each(friends_obj, function(key_1,valueObj_1){
+        $.each(valueObj_1, function(key_2,valueObj_2){
+            if (key_2 === "user"){
+                validOptions.push(valueObj_2);
+            }
+        });
+    });
+
+    previousValue = "";
+
+    $('#enter_email').autocomplete({
+        source: validOptions
+    }).keyup(function() {
+        var isValid = false;
+        for (i in validOptions) {
+            if (validOptions[i].toLowerCase().match(this.value.toLowerCase())) {
+                isValid = true;
+            }
+        }
+        if (!isValid) {
+            this.value = previousValue
+        } else {
+            previousValue = this.value;
+        }
+    });
+
+}, (error) => {
+    console.log(error);
+});
+
 $('#invite_send').click(function(event){
     var email = $("#all_mail")
-    var to_send_email = email.children()[0].innerText.slice(0,-2)
+    for ( var i = 0, l = email.length; i < l; i++ ) {
+        var to_send_email = email.children()[i].innerText.slice(0,-2)
+        console.log(to_send_email)
+    }
+    // var to_send_email = email.children()[0].innerText.slice(0,-2)
     var url_to_share = window.location.origin + window.location.pathname
 
     invite_url = window.location.origin + '/hobo_user/user_home/invite/'
@@ -18,8 +60,6 @@ $('#invite_send').click(function(event){
         "to_user_email": to_send_email,
         "project_url": url_to_share,
     }
-
-    token_auth_str = 'Token 44c4706c17c655c1332b513d26c62754e25557d7'
 
     axios.post(invite_url, invite_url_args, {headers: { 'Authorization': token_auth_str }})
     .then((response) => {
@@ -38,22 +78,22 @@ $('#share-close-cross').click(function(event){
     $("#shareModal").modal('hide');
 });
 
-get_friends_list_url = origin_url + '/payment/paypal/create/'
+// get_friends_list_url = origin_url + '/payment/paypal/create/'
 
-$('#invite-link').click(function(event){
-    var modal = $("#inviteModal")
-    var title = "Invite to"
-    modal.find('.modal-title').text(title)
-    $("#inviteModal").modal('show');
+// $('#invite-link').click(function(event){
+//     var modal = $("#inviteModal")
+//     var title = "Invite to"
+//     modal.find('.modal-title').text(title)
+//     $("#inviteModal").modal('show');
 
-    axios.get(get_friends_list_url)
-    .then((response) => {
-        plan_id = response.data.plan_id
-    }, (error) => {
-        console.log(error);
-    });
+//     axios.get(get_friends_list_url)
+//     .then((response) => {
+//         plan_id = response.data.plan_id
+//     }, (error) => {
+//         console.log(error);
+//     });
 
-});
+// });
 
 $('#shareModalClose').click(function(event){
     $("#shareModal").modal('hide');

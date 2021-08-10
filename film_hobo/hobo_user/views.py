@@ -4051,8 +4051,10 @@ class ListAllFriendsAPI(APIView):
             friend_obj = Friend.objects.get(user=user)
         except Friend.DoesNotExist:
             pass
-        for obj in friend_obj.friends.all():
-            friends_dict[obj.id] = obj.email, obj.first_name +' '+ obj.last_name
+        for ind, obj in enumerate(friend_obj.friends.all()):
+            individual_friend_data = {'email': obj.email, 'user': obj.first_name +' '+ obj.last_name}
+            # individual_friend_data = {obj.email, obj.first_name +' '+ obj.last_name}
+            friends_dict[ind] = individual_friend_data
         response['friends'] = friends_dict
         return Response(response)
 

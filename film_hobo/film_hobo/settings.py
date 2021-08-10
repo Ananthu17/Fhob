@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'django_filters',
     'django_social_share',
+    # 'subscription',
 
     # project apps
     'initial_user',
@@ -343,7 +344,7 @@ CKEDITOR_CONFIGS = {
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
-            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
             ['RemoveFormat', ],
             ['Cut', 'Copy', 'Paste', 'PasteText'],
             ['Undo', 'Redo' ],
@@ -354,3 +355,12 @@ CKEDITOR_CONFIGS = {
         'margin-left': '10%',
     },
 }
+
+# tijptjik/django-paypal-subscription package settings
+# SUBSCRIPTION_PAYPAL_SETTINGS = {
+#     'bussiness': 'kselivan@filmhobo.com'
+# }
+
+# SUBSCRIPTION_PAYPAL_FORM = 'paypal.standard.forms.PayPalPaymentsForm'
+
+# SUBSCRIPTION_GRACE_PERIOD = 0

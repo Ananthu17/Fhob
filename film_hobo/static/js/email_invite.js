@@ -1,5 +1,5 @@
 $(".enter-mail-id").keydown(function (e) {
-    if (e.keyCode == 13 || e.keyCode == 32) {
+    if (e.keyCode == 13) {
       //alert('You Press enter');
        var getValue = $(this).val();
        $('.all-mail').append('<span class="email-ids">'+ getValue +' <span class="cancel-email">x</span></span>');

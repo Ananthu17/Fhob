@@ -650,7 +650,8 @@ class Project(models.Model):
     script_password = models.CharField(max_length=250, null=True, blank=True)
     team_select_password = models.CharField(max_length=250, null=True,
                                             blank=True)
-    cast_audition_password = models.CharField(max_length=250, null=True, blank=True)
+    cast_audition_password = models.CharField(
+        max_length=250, null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
@@ -1395,7 +1396,8 @@ class UserRating(models.Model):
 
 class Video(models.Model):
     name = models.CharField(max_length=1000)
-    videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    videofile = models.FileField(
+        upload_to='videos/', null=True, verbose_name="")
     rating = models.FloatField(_("Rating"), null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 

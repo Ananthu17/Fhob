@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="{% static 'css/share.css' %}">
 <link rel="stylesheet" href="{% static 'css/email_invite.css' %}">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link>
 
 <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"> -->
 {% endblock %}
@@ -328,7 +329,7 @@
                         <span class="to-input">To</span>
                             <div id="all_mail" class="all-mail">
                             </div>
-                            <input type="text" name="email" class="enter-mail-id" placeholder="Enter the email id .." />
+                            <input id="enter_email" type="text" name="email" class="enter-mail-id" placeholder="Enter the user names .." />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -362,6 +363,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 <script src="{% static 'js/screening_video_page.js' %}"></script>
 <script src="{% static 'js/email_invite.js' %}"></script>
 {% endblock %}
