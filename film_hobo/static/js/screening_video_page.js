@@ -54,10 +54,6 @@ $('#invite_send').click(function(event){
 
     var email = $("#all_mail")
     var email_list = validEmails
-    // for ( var i = 0, l = email.children().length; i < l; i++ ) {
-    //     var to_send_email = email.children()[i].innerText.slice(0,-2)
-    //     email_list.push(to_send_email)
-    // }
 
     console.log(email_list)
     for ( var i = 0, l = email_list.length; i < l; i++ ) {
@@ -88,27 +84,9 @@ $('#share-close-cross').click(function(event){
     $("#shareModal").modal('hide');
 });
 
-// get_friends_list_url = origin_url + '/payment/paypal/create/'
-
-// $('#invite-link').click(function(event){
-//     var modal = $("#inviteModal")
-//     var title = "Invite to"
-//     modal.find('.modal-title').text(title)
-//     $("#inviteModal").modal('show');
-
-//     axios.get(get_friends_list_url)
-//     .then((response) => {
-//         plan_id = response.data.plan_id
-//     }, (error) => {
-//         console.log(error);
-//     });
-
-// });
-
 $('#shareModalClose').click(function(event){
     $("#shareModal").modal('hide');
 });
-
 
 $('#inviteModalClose').click(function(event){
     $("#inviteModal").modal('hide');

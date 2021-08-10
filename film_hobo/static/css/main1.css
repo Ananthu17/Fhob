@@ -898,6 +898,12 @@ div.cnt-txt > span{
    border: 1px solid black;
    border-radius: 1px;
 }
+.proj-card:hover{
+   background-color: rgb(201, 201, 201);
+}
+div.pointer {
+   cursor: pointer;
+ }
 .proj-card a{
    color : #0960be;
 }

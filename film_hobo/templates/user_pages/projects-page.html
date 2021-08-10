@@ -167,7 +167,7 @@
                         {% for project in scenes %}
                             <!-- carousel column  -->
                             <div class="item pro-item">
-                                <div class="card proj-card">
+                                <div class="card proj-card pointer">
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-no">
                                             Project<a href=""> #{{project.id}}</a>
@@ -260,7 +260,7 @@
                         <!-- owl-carousel  -->
                         {% for project in toprated_scenes %}
                         <div class="item pro-item">
-                            <div class="card proj-card">
+                            <div class="card proj-card pointer">
                                 <div class="project-line mt-1 ml-1">
                                     <span class="proj-no">
                                         Project<a href=""> #{{project.id}}</a>
@@ -354,7 +354,7 @@
                          <!-- carousel column  -->
                          {% for project in filims %}
                          <div class="item pro-item">
-                             <div class="card proj-card">
+                             <div class="card proj-card pointer">
                                  <div class="project-line mt-1 ml-1">
                                      <span class="proj-no">
                                          Project<a href=""> #{{project.id}}</a>
@@ -448,7 +448,7 @@
                         {% for project in toprated_filims %}
                             <!-- carousel column  -->
                             <div class="item pro-item">
-                                <div class="card proj-card">
+                                <div class="card proj-card pointer">
                                     <div class="project-line mt-1 ml-1">
                                         <span class="proj-no">
                                             Project<a href=""> #{{project.id}}</a>
@@ -631,7 +631,7 @@
                 console.log(this.title)
                 count += 1
                 let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-                                <div class='card proj-card'>\
+                                <div class='card proj-card pointer'>\
                                     <div class='project-line mt-1 ml-1'>\
                                         <span class='proj-no'>\
                                             Project<a href=''>${this.id}</a>\
@@ -707,7 +707,7 @@
                         console.log(this.title)
                         count += 1
                         let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-                                <div class='card proj-card'>\
+                                <div class='card proj-card pointer'>\
                                     <div class='project-line mt-1 ml-1'>\
                                         <span class='proj-no'>\
                                             Project<a href=''>${this.id}</a>\
@@ -811,5 +811,15 @@
     })
 </script>
 
+<script>
+$(".proj-card").click(function(){
+    var proj_card_ele = $(this)
+    var project_obj = proj_card_ele[0].children[0].children[0].innerText
+    var project_id = project_obj.split("#").pop();
+    origin_url = window.location.origin
+    var redirect_url = origin_url + '/project/video/' + project_id + '/'
+    window.location.replace(redirect_url);
+});
+</script>
 
 {% endblock %}
