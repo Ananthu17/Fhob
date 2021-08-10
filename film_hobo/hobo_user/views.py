@@ -4282,7 +4282,7 @@ class ProjectAPIView(ListAPIView):
                         'rating', 'video_url', 'video_type',
                         'last_date', 'location', 'visibility',
                         'visibility_password', 'cast_attachment',
-                        'cast_pay_rate', 'cast_samr']
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
 
 
 class ProjectCreateAPIView(CreateAPIView):
