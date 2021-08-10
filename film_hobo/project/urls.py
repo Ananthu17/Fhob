@@ -9,7 +9,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
      TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
-     UpdateAuditionStatusAPI, ChemistryRoomView
+     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -76,4 +76,6 @@ urlpatterns = [
           name='update-audition-status-api'),
      path('chemistry-room/<int:id>/', ChemistryRoomView.as_view(),
           name='chemistry-room'),
+     path('project-rating-api/', ProjectRatingAPI.as_view(),
+          name='project-rating-api'),
     ]

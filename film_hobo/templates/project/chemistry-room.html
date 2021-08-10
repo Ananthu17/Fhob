@@ -1,54 +1,324 @@
 {% extends 'base.html' %}
-
+{% load static %}
+{% load user_account_tag %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-        <div class="container">
-                <h3>Chemistry Room</h3>
-                <div class="row">
-                        <div class="offset-2 col-4 screen_1_div" style="border:1px solid #000; height:300px;">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Video player column -->
+                <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+                    <!-- project menu  -->
+
+                    <div class="chm-menu-bg">
+                        <div class="chm-menu-align">
+                            <ul class="chm-menu sds-menu-padding">
+                                <li><span class="video-menu-head">CALLBACK / CHEMISTRY ROOM</span></li>
+                                <li><span>Project: </span><span class="chm-menu-blue"><a href="">#{{project.id}}</a></span></li>
+                                <li><span>Title: </span><span class="chm-menu-blue txt-uppercase">{{project.title}}</span></li>
+                                <li><span>Format: </span><span class="chm-menu-blue">{{project.get_format_display}}</span></li>
+                            </ul>
                         </div>
-                        <div class="col-4 screen_2_div" style="border:1px solid #000; height:300px;">
-                        </div>
-                </div>
-                <p>{{project}}</p>
-                {% for character,audition_list in audition_dict.items %}
-                        <div class="row">
-                        <b>{{character.name}}</b>
-                        {% for audition in audition_list %}
-                                <div class="col-1">
-                                        <input type="hidden" name="video_url"  id="video_url-{{audition.id}}" value="{{audition.video_url}}" />
-                                        <input type="hidden" name="video_type" id="video_type-{{audition.id}}" value="{{audition.video_type}}" />
-                                        <img src="{{audition.cover_image.url}}" width="100%"/>
-                                        {{ audition.name }},
-                                        <a id="{{audition.id}}" class="screen_1 cursor-pointer">Screen 1</a>
-                                        <a id="{{audition.id}}" class="screen_2 cursor-pointer">Screen 2</a>
+                    </div>
+
+                    <!-- project menu  End-->
+                    <!-- camera section  -->
+
+                    <div class="chm-cam-bg">
+                        <div class="chm-cam-sec-align">
+                            <div class="chm-cam-display-sec">
+                                <div>
+                                    <div class="chm-cam-txt-sec">
+                                        <ul class="chm-cam-ul">
+                                            <li class="chm-camera-txt"><span class="chm-cam-txt-padding">CAMERA 1</span>
+                                            </li>
+                                            <li class="chm-char-txt">
+                                                <span class="chm-char-txt-block">
+                                                        <span>CHARACTER:</span>
+                                                        <span class="chm-char-orange-txt-2 txt-uppercase audition-character-1" >
+                                                                {{audition_list.0.character}}
+                                                        </span>
+                                                </span>
+                                        </li>
+                                        </ul>
+                                        <ul class="chm-cam-ul-right">
+                                            <li class="chm-char-txt-name">
+                                                    <span class="audition-name-1">{{audition_list.0.name}}</span>
+                                                </li>
+                                            <li class="chm-char-txt">
+                                                <span class="attach-link-1">
+                                                        {% if audition_list.0 %}
+                                                        <a id="{{audition_list.0.id}}" class="chm-green-tag attach cursor-pointer">ATTACH</a>
+                                                        {% endif %}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="chm-cam-img-frame screen_1_div">
+                                        {% if audition_list.0 %}
+                                                {% if audition_list.0.video_type == 'vimeo' %}
+                                                        <iframe src="https://player.vimeo.com/video/{{ audition_list.0.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="100%"
+                                                        data-show-text="false" frameborder="0"  allowfullscreen class="chm-cam-img"></iframe>
+                                                        <img src=""/>
+                                                {% elif audition_list.0.video_type == 'youtube' %}
+                                                        <iframe
+                                                        src="http://www.youtube.com/embed/{{ audition_list.0.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ audition_list.0.video_url }}&color=white" width="100%" height="100%"
+                                                        data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0" class="chm-cam-img"></iframe>
+                                                {% endif %}
+                                        {% else %}
+                                        <img src="{% static 'images/video.png' %}" class="chm-cam-img" />
+                                        {% endif %}
+                                    </div>
                                 </div>
-                        {% endfor %}
+                                <div>
+                                    <div class="chm-cam-txt-sec">
+                                        <ul class="chm-cam-ul">
+                                            <li class="chm-camera-txt"><span class="chm-cam-txt-padding">CAMERA 2</span>
+                                            </li>
+                                            <li class="chm-char-txt"><span>CHARACTER: </span><span
+                                                    class="chm-char-orange-txt-2 txt-uppercase audition-character-2" >
+                                                    {{audition_list.1.character}}
+                                                </span></li>
+                                        </ul>
+                                        <ul class="chm-cam-ul-right">
+                                            <li class="chm-char-txt-name"><span class="audition-name-2">{{audition_list.1.name}}</span></li>
+                                            <li class="chm-char-txt">
+                                                <span class="attach-link-2">
+                                                        {% if audition_list.1 %}
+                                                        <a id="{{audition_list.1.id}}" class="chm-green-tag attach cursor-pointer">ATTACH</a>
+                                                        {% endif %}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="chm-cam-img-frame screen_2_div">
+                                        {% if audition_list.1 %}
+                                                {% if audition_list.1.video_type == 'vimeo' %}
+                                                        <iframe src="https://player.vimeo.com/video/{{ audition_list.1.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="100%"
+                                                        data-show-text="false" frameborder="0"  allowfullscreen class="chm-cam-img"></iframe>
+                                                        <img src=""/>
+                                                {% elif audition_list.1.video_type == 'youtube' %}
+                                                        <iframe
+                                                        src="http://www.youtube.com/embed/{{ audition_list.1.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ audition_list.1.video_url }}&color=white" width="100%" height="100%"
+                                                        data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0" class="chm-cam-img"></iframe>
+                                                {% endif %}
+                                        {% else %}
+                                        <img src="{% static 'images/video.png' %}" class="chm-cam-img" />
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                {% endfor %}
+                    </div>
+
+                    <!-- camera section  End-->
+                    <!-- carousel Section  -->
+
+                    <div class="mt-3 mb-4">
+                        <div class="chm-owl-div-align">
+                            <div class="owl-carousel owl-theme" id="chm-owl-div">
+
+                                {% for character,audition_list in audition_dict.items %}
+                                <!-- carousel column 1  -->
+
+                                <div class="item">
+                                    <div class="chm-char-div-bg">
+                                        <div class="chm-char-name-padding">
+                                            <span class="chm-char-txt-orange"><a href="" class="txt-uppercase">{{character.name}} </a></span><span
+                                                class="chm-char-txt-num">(3)</span>
+                                        </div>
+                                        <div class="chm-frame-flex">
+                                            <div>
+                                                {% for audition in audition_list %}
+                                                <!-- Image frame 1 -->
+                                                <input type="hidden" name="character"  id="character-{{audition.id}}" value="{{audition.character.name}}" />
+                                                <input type="hidden" name="audition_name" id="audition_name-{{audition.id}}" value="{{audition.name}}" />
+                                                <input type="hidden" name="video_url"  id="video_url-{{audition.id}}" value="{{audition.video_url}}" />
+                                                <input type="hidden" name="video_type" id="video_type-{{audition.id}}" value="{{audition.video_type}}" />
+                                                <div class="chm-div-top-margin">
+                                                    <div class="chm-char-video-sec-display">
+                                                        <div>
+                                                            <a class="cursor-pointer chm-border-tag chm-border-tag-bg-blue screen_1"
+                                                            id="{{audition.id}}">1</a>
+                                                        </div>
+                                                        <div class="chm-char-video-frame chm-border-orange">
+                                                            <img src="{{audition.cover_image.url}}"
+                                                                class="chm-cam-img">
+                                                        </div>
+                                                        <div>
+                                                            <a class="cursor-pointer chm-border-tag chm-border-tag-bg-blue screen_2"
+                                                            id="{{audition.id}}">2</a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="chm-rate-txt-align">
+                                                        <span class="chm-rate-name-main" title="Mark Stonom">{{ audition.name }}</span>
+                                                        {% get_dict_value rating_dict audition.user.id as rating %}
+                                                        <span class="chm-log-star">
+                                                            <div class="cta-stars-outer">
+                                                                <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                    <div class="chm-rate-txt-frame">
+                                                        <div class="chm-aud-rate-txt-align">
+                                                            <span class="chm-aud-rate-name-txt">Audition</span>
+                                                            {% get_dict_value audition_rating_dict audition.id as audition_rating %}
+                                                            <span class="cta-log-star">
+                                                                <div class="cta-stars-outer">
+                                                                    <div class="cta-stars-inner" style="width:{{audition_rating}}%;"></div>
+                                                                </div>
+                                                            </span>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Image frame 1 End-->
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- carousel column 1 End  -->
+                                {% endfor %}
+
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- carousel Section  End-->
+                </div>
+                <!-- Video player column -->
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                    <div class="chm-sec-bg right-sec-height">
+                        <div class="mem-list-head">Top Actors</div>
+                        <ol class="mem-list-cont mb-0 ">
+                            <li class="mt-1">John Smith</li>
+                            <li class="mt-1">John Dow</li>
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Aaron McCarty</li>
+                            <li class="mt-1">Toli Chew</li>
+                        </ol>
+                        <div class="mem-list-head">Top Writers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Tom Saint</li>
+                            <li class="mt-1">Lola Carola</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Jamal Smith</li>
+                            <li class="mt-1">Nikita Selivan</li>
+                        </ol>
+                        <div class="mem-list-head">Top Directors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Ivan Drago</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Kendra Shulman</li>
+                            <li class="mt-1">Sandra O’brian</li>
+                        </ol>
+                        <div class="mem-list-head">Top Producers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top DPs</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top Sound Designers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head underline">TopTalent/Crew</div>
+                    </div>
+                </div>
+            </div>
         </div>
-</div>
+    </div>
 {% endblock %}
 
 {% block extrajs %}
+<script>
+        $('#chm-owl-div').owlCarousel({
+            // loop:true,
+            margin: 10,
+            responsiveClass: true,
+            nav: true,
+            navText: [
+                "<i class='fa fa-caret-left'></i>",
+                "<i class='fa fa-caret-right'></i>"
+            ],
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: true,
+                },
+                420: {
+                    items: 2,
+                    nav: true,
+                },
+                559: {
+                    items: 3,
+                    nav: true,
+                },
+                767: {
+                    items: 4,
+                    nav: true,
+                },
+                991: {
+                    items: 5,
+                    nav: true,
+                },
+                1200: {
+                    items: 5,
+                    nav: true,
+
+                },
+                1300: {
+                    items: 6,
+                    nav: true,
+
+                }
+            }
+        })
+    </script>
 <script>
         $('body').on('click' , '.screen_1', function(){
                 var audition_id = $(this).attr("id");
                 var token = $("#token").val();
                 var video_url_id = '#video_url-'+audition_id;
                 var video_type_id = '#video_type-'+audition_id;
+                var character_id = '#character-'+audition_id;
+                var audition_name_id = '#audition_name-'+audition_id;
                 var video_url = $(video_url_id).val();
                 var video_type = $(video_type_id).val();
-                console.log(video_type)
-                console.log(video_url)
+                var character = $(character_id).val();
+                var audition_name = $(audition_name_id).val();
+
+
+                $(".audition-character-1").html(character)
+                $(".audition-name-1").html(audition_name)
+                $(".attach-link-1").html('<a id="'+audition_id+'" class="chm-green-tag attach cursor-pointer">ATTACH</a>')
                 if(video_type=="vimeo"){
-                        $(".screen_1_div").html('<iframe src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
+                        $(".screen_1_div").html('<iframe class="chm-cam-img" src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
                 }else{
-                        $(".screen_1_div").html('<iframe src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
+                        $(".screen_1_div").html('<iframe class="chm-cam-img" src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
                 }
         });
         $('body').on('click' , '.screen_2', function(){
@@ -58,13 +328,50 @@
                 var video_type_id = '#video_type-'+audition_id;
                 var video_url = $(video_url_id).val();
                 var video_type = $(video_type_id).val();
-                console.log(video_type)
-                console.log(video_url)
+
+                var character_id = '#character-'+audition_id;
+                var audition_name_id = '#audition_name-'+audition_id;
+                var character = $(character_id).val();
+                var audition_name = $(audition_name_id).val();
+
+
+                $(".audition-character-2").html(character)
+                $(".audition-name-2").html(audition_name)
+                $(".attach-link-2").html('<a id="'+audition_id+'" class="chm-green-tag attach cursor-pointer">ATTACH</a>')
+
                 if(video_type=="vimeo"){
-                        $(".screen_2_div").html('<iframe src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
+                        $(".screen_2_div").html('<iframe class="chm-cam-img" src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
                 }else{
-                        $(".screen_2_div").html('<iframe src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
+                        $(".screen_2_div").html('<iframe class="chm-cam-img" src="http://www.youtube.com/embed/'+video_url+'?rel=0&modestbranding=1&loop=1&playlist='+video_url+'&color=white" width="100%" height="250" data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>');
                 }
+        });
+</script>
+
+<script>
+        $('body').on('click' , '.attach', function(){
+                var audition_id = $(this).attr('id');
+                var token = $("#token").val();
+                var audition_status = "attached";
+                console.log(audition_id)
+                console.log(audition_status)
+                data_dict = {}
+
+                data_dict['audition'] = audition_id
+                data_dict['status'] = audition_status
+                $.ajax
+                ({
+                        type: "POST",
+                        url: "/project/update-audition-status-api/",
+                        dataType: 'json',
+                        async: false,
+                        data: data_dict,
+                        beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                        },
+                        success: function(response){
+                        window.location.reload();
+                        }
+                });
         });
 </script>
 {% endblock %}

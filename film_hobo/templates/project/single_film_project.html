@@ -46,7 +46,7 @@
                                 class="mem-small-f">ROJECT</span></a>
                                 <div class="sgl-rate-star" data-toggle="modal" data-target="#rating_modal">
                                     <div class="cta-stars-outer">
-                                        <div class="cta-stars-inner" style="width:{{project_rating}}%;"></div>
+                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
                                     </div>
                                 </div>
 <!-- The Modal -->
@@ -168,7 +168,7 @@
                         <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
                         <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
                         <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
-                    </ul>    
+                    </ul>
                 </div>
                 <!-- Top menu  End-->
                 <!-- Three column  -->
@@ -312,7 +312,8 @@
                                         </span>
                                     </span>
                                     {% else %}
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
+                                    <span class="sgl-green-txt">
+                                        <a href="{% url 'project:cast-apply-audition' project.id %}?character_id={{character.id}}">Available</a></span>
                                     {% endif %}
                                 </div>
                                 {% endfor %}
@@ -401,7 +402,7 @@
                                     <span class="sgl-blue-txt sgl-upload-blue-txt-align"><a>{{project.get_format_display}}</a></span>
                                     <span class="sgl-upload-star">
                                         <div class="cta-stars-outer">
-                                            <div class="cta-stars-inner" style="width:{{project_rating}}%;"></div>
+                                            <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
                                         </div>
                                     </span>
                                 </div>
@@ -432,7 +433,7 @@
                                 <div class="col-12" >
                                 {% if project.video_type == 'vimeo' %}
                                     <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250"
-                                    data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>
+                                    data-show-text="false" frameborder="0" allowfullscreen></iframe>
                                     <img src=""/>
                                 {% elif project.video_type == 'youtube' %}
                                     <iframe
@@ -946,19 +947,7 @@ $('body').on('click' , '.publish_video', function(){
     });
 </script>
 <script>
-    // $('body').on('click' , '.edit_logline', function(){
-    //     var project_id = $(this).attr('id');
-    //      $('#logline').removeAttr("disabled");
-    //      $('#logline').css({
-    //         'border': '1px solid #c7c7c7'
-    //         });
-    //      $('#project_info').removeAttr("disabled");
-    //      $('#project_info').css({
-    //         'border': '1px solid #c7c7c7'
-    //         });
-    //     var submit_btn = "<a class='custom-save-btn btn mem-setup-blu-f save_logline' id='"+project_id+"'/>Save</a>"
-    //     $("#logline-sbmit-div").html(submit_btn)
-    // });
+
     $('body').on('click' , '.save_logline', function(){
         var project_id = $(this).attr('id')
         var logline = $("#logline").val();

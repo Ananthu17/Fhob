@@ -32,7 +32,7 @@
                         <form>
                             <ul class="cta-side-setup-menu sds-menu-padding">
                                 <li><span class="video-menu-head">AUDITION</span></li>
-                                <li><span><a href="" class="cta-tag-black">Chemistry Room</a></span></li>
+                                <li><span><a href="{% url 'project:chemistry-room' project.id %}" class="cta-tag-black">Chemistry Room</a></span></li>
                                 <li>
                                     <span class="">Casting Director: </span><a href="" class="cta-menu-blue"> {{casting_director.get_full_name}}</a>
                                     <span class="cta-log-star">
@@ -57,14 +57,14 @@
                 <div class="cta-rating-menu-bg {% if not forloop.first %} mt-2 {% endif %}">
                     <div class="row ml-2">
                         <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-2 mb-1">
-                            <div class="cta-left-name-display">
+                            <div class="cta-left-name-display ">
                                 {% get_dict_value count_dict character as count %}
                                 <span class="cta-name-orange">{{character.name}}</span><span class="cta-name-orange-num">({{count}})</span>
                             </div>
                         </div>
                         <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12 mt-3 mb-1">
                             <div class="cta-owl-align">
-                                <div class="owl-carousel owl-theme">
+                                <div class="cast-owl owl-carousel owl-theme">
                                     {% for audition_obj in audition_list %}
                                     <div class="item ">
                                         <div class="cta-rate-div-align">
@@ -182,44 +182,47 @@
 
 {% block extrajs %}
 <script>
-    $('.owl-carousel').owlCarousel({
-    loop:true,
-    margin:10,
-    responsiveClass:true,
-    nav: true,
-    navText: [
-    "<i class='fa fa-caret-left'></i>",
-    "<i class='fa fa-caret-right'></i>"
-    ],
-    responsive:{
-        0:{
-            items:1,
-            nav:true
-        },
-        561:{
-            items:2,
-            nav:true
-        },
-        767:{
-            items:3,
-            nav:true
-        },
-        991:{
-            items:3,
-            nav:true
-        },
-        1250:{
-            items:4,
-            nav:true,
-            loop:false
-        },
-        1300:{
-            items:5,
-            nav:true,
-            loop:false
+        $('.cast-owl').owlCarousel({
+        loop:false,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            444:{
+                items:2,
+                nav:true
+            },
+            611:{
+                items:3,
+                nav:true
+            },
+            810:{
+                items:4,
+                nav:true
+            },
+            992:{
+                items:3,
+                nav:true
+            },
+            1045:{
+                items:4,
+                nav:true
+            },
+            1320:{
+                items:5,
+                nav:true,
+                loop:false
+            }
         }
-    }
-})
+    })
 
 </script>
 {% endblock %}

@@ -68,7 +68,7 @@ class Audition(models.Model):
         (ATTACHED, 'Attached'),
         (PASSED, 'Passed'),
         (APPLIED, 'Applied'),
-        (CALLBACK, 'Callback'),
+        (CALLBACK, 'Chemistry Room'),
     ]
     project = models.ForeignKey('hobo_user.Project',
                                 verbose_name=_("Project"),
@@ -173,3 +173,27 @@ class AuditionRatingCombined(models.Model):
     class Meta:
         verbose_name = 'Audition Ratings Combined'
         verbose_name_plural = 'Audition Ratings Combined'
+
+
+class ProjectRating(models.Model):
+    rated_by = models.ForeignKey("hobo_user.CustomUser",
+                                 on_delete=models.CASCADE,
+                                 related_name='project_rated_by_user',
+                                 verbose_name=_("User"),
+                                 null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='rating_project',
+                                verbose_name=_("Project"),
+                                null=True)
+    rating = models.IntegerField(_("Rating"),
+                                 validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.rated_by)
+
+    class Meta:
+        verbose_name = 'Project Rating'
+        verbose_name_plural = 'Project Ratings'

@@ -40,13 +40,16 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView, get_object_or_404)
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project, VideoRatingCombined
-from .models import Audition, AuditionRating, AuditionRatingCombined, Character, Sides, ProjectTracking
+     UserRating, JobType, UserRatingCombined, UserNotification, Project, \
+     VideoRatingCombined
+from .models import Audition, AuditionRating, AuditionRatingCombined, \
+    Character, Sides, ProjectTracking, ProjectRating
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
-      CharacterSerializer, UpdateCharacterSerializer, ProjectLastDateSerializer, \
+      CharacterSerializer, UpdateCharacterSerializer, \
+      ProjectLastDateSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
-      RateAuditionSerializer, AuditionStatusSerializer
+      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
@@ -63,19 +66,40 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         rating_dict = {}
+        job_types_dict = {}
         team_members = Team.objects.filter(project=project_id)
+        for team_member in team_members:
+            if team_member.job_type in job_types_dict:
+                job_types_dict[team_member.job_type].append(team_member)
+            else:
+                job_types_dict[team_member.job_type] = []
+                job_types_dict[team_member.job_type].append(team_member)
+
         project_members_rating = ProjectMemberRating.objects.filter(
                                  project=project_id)
-        for obj in project_members_rating:
-            team_objs = obj.user.team_user.all()
-            key_obj = team_objs.filter(
-                    Q(project=obj.project) &
-                    Q(job_type=obj.job_type)
-                ).first()
-            key = key_obj.id
-            rating_dict[key] = obj.rating*20
+        # for obj in project_members_rating:
+        #     team_objs = obj.user.team_user.all()
+        #     key_obj = team_objs.filter(
+        #             Q(project=obj.project) &
+        #             Q(job_type=obj.job_type)
+        #         ).first()
+        #     key = key_obj.id
+        #     rating_dict[key] = obj.rating*20
+
+        for obj in team_members:
+            rating_dict[obj] = 0
+            try:
+                project_members_rating = ProjectMemberRating.objects.get(
+                                        Q(project=project_id) &
+                                        Q(user=obj.user) &
+                                        Q(job_type=obj.job_type)
+                                        )
+                rating_dict[obj.id] = project_members_rating.rating*20
+            except ProjectMemberRating.DoesNotExist:
+                rating_dict[obj.id] = 0
+
         context["rating_dict"] = rating_dict
-        context["team_members"] = team_members
+        context["job_types_dict"] = job_types_dict
         context["project"] = project
         return context
 
@@ -222,6 +246,17 @@ class RateUserSkillsAPI(APIView):
                     project_member_rating_obj.rating = rating
                     project_member_rating_obj.save()
 
+                # update total video rating
+                video_rating_objs_count = ProjectMemberRating.objects.filter(
+                                          project=project).count()
+                video_aggregate_rating = ProjectMemberRating.objects.filter(
+                                    project=project).aggregate(Sum('rating'))
+                rating_sum = video_aggregate_rating['rating__sum']
+                new_rating = rating_sum/video_rating_objs_count
+                project.video_rating = new_rating*20
+                project.save()
+
+
                 #update notification table
                 notification = UserNotification()
                 notification.user = user
@@ -307,41 +342,32 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
             except Team.DoesNotExist:
                 project_creator = ""
             context['project_creator_rating'] = project_creator_rating
-        try:
-            project_rating_obj = VideoRatingCombined.objects.get(project=project)
-            project_rating = project_rating_obj.rating*20
-        except VideoRatingCombined.DoesNotExist:
-            project_rating = 0
+
 
         characters = Character.objects.filter(project=project)
         context['characters'] = characters
 
         try:
-            actor = JobType.objects.get(slug='actor')
+            actoractress = JobType.objects.get(slug='actoractress')
         except JobType.DoesNotExist:
-            actor = ""
-        try:
-            actress = JobType.objects.get(slug='actress')
-        except JobType.DoesNotExist:
-            actress = ""
+            actoractress = ""
+        # try:
+        #     actress = JobType.objects.get(slug='actress')
+        # except JobType.DoesNotExist:
+        #     actress = ""
         rating_dict = {}
         for character in characters:
             if character.attached_user:
                 try:
                     rating_obj = UserRatingCombined.objects.get(
                                     Q(user=character.attached_user) &
-                                    (
-                                        Q(job_type=actor) |
-                                        Q(job_type=actress)
-                                    )
+                                    Q(job_type=actoractress)
                                 )
                     rating_dict[character.attached_user.id] = (rating_obj.rating)*20
                 except UserRatingCombined.DoesNotExist:
                     rating_dict[character.attached_user.id] = 0
-        print("rating_dict", rating_dict)
         context['rating_dict'] = rating_dict
         context['project'] = project
-        context['project_rating'] = project_rating
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
         return context
 
@@ -760,21 +786,18 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
 
         # check if logged user can apply for audition
         try:
-            actor = JobType.objects.get(slug='actor')
+            actoractress = JobType.objects.get(slug='actoractress')
         except JobType.DoesNotExist:
-            actor = ""
-        try:
-            actress = JobType.objects.get(slug='actress')
-        except JobType.DoesNotExist:
-            actress = ""
+            actoractress = ""
+        # try:
+        #     actress = JobType.objects.get(slug='actress')
+        # except JobType.DoesNotExist:
+        #     actress = ""
         logged_user = self.request.user
         try:
             logged_user_rating_obj = UserRatingCombined.objects.get(
                                     Q(user=logged_user) &
-                                    (
-                                        Q(job_type=actor) |
-                                        Q(job_type=actress)
-                                    )
+                                    Q(job_type=actoractress)
                                 )
             logged_user_rating = logged_user_rating_obj.rating
         except UserRatingCombined.DoesNotExist:
@@ -1007,22 +1030,19 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
             context['casting_director'] = casting_director
             context['casting_director_rating'] = casting_director_rating
         try:
-            actor = JobType.objects.get(slug='actor')
+            actoractress = JobType.objects.get(slug='actoractress')
         except JobType.DoesNotExist:
-            actor = ""
-        try:
-            actress = JobType.objects.get(slug='actress')
-        except JobType.DoesNotExist:
-            actress = ""
+            actoractress = ""
+        # try:
+        #     actress = JobType.objects.get(slug='actress')
+        # except JobType.DoesNotExist:
+        #     actress = ""
 
         for audition_obj in audition_list:
             try:
                 rating_obj = UserRatingCombined.objects.get(
                                 Q(user=audition_obj.user) &
-                                (
-                                    Q(job_type=actor) |
-                                    Q(job_type=actress)
-                                )
+                                Q(job_type=actoractress)
                             )
                 rating_dict[audition_obj.user.id] = (rating_obj.rating)*20
             except UserRatingCombined.DoesNotExist:
@@ -1421,13 +1441,13 @@ class CastVideoAuditionView(LoginRequiredMixin, TemplateView):
             writer = ""
             writers = []
         try:
-            actor = JobType.objects.get(slug='actor')
+            actoractress = JobType.objects.get(slug='actoractress')
         except JobType.DoesNotExist:
-            actor = ""
-        try:
-            actress = JobType.objects.get(slug='actress')
-        except JobType.DoesNotExist:
-            actress = ""
+            actoractress = ""
+        # try:
+        #     actress = JobType.objects.get(slug='actress')
+        # except JobType.DoesNotExist:
+        #     actress = ""
 
         context['casting_directors'] = casting_directors
         context['directors'] = directors
@@ -1436,10 +1456,7 @@ class CastVideoAuditionView(LoginRequiredMixin, TemplateView):
         try:
             audition_user_rating = UserRatingCombined.objects.get(
                                     Q(user=audition.user) &
-                                    (
-                                        Q(job_type=actor) |
-                                        Q(job_type=actress)
-                                    )
+                                    Q(job_type=actoractress)
                                 )
             audition_user_rating = audition_user_rating.rating*20
         except UserRatingCombined.DoesNotExist:
@@ -1562,12 +1579,15 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         project = get_object_or_404(Project, pk=project_id)
-        audition_list = Audition.objects.filter(project=project)
-        # characters = Character.objects.filter(project=project)
+        audition_list = Audition.objects.filter(
+                        Q(project=project) &
+                        Q(status=Audition.CALLBACK)
+                        )
         audition_dict = {}
 
         for audition in audition_list:
@@ -1577,8 +1597,74 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
                 audition_dict[audition.character] = []
                 audition_dict[audition.character].append(audition)
 
+        try:
+            actoractress = JobType.objects.get(slug='actoractress')
+        except JobType.DoesNotExist:
+            actoractress = ""
+
+        rating_dict = {}
+        audition_rating_dict = {}
+        for audition_obj in audition_list:
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                                Q(user=audition_obj.user) &
+                                Q(job_type=actoractress)
+                            )
+                rating_dict[audition_obj.user.id] = (rating_obj.rating)*20
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[audition_obj.user.id] = 0
+            try:
+                audition_rating_obj = AuditionRatingCombined.objects.get(
+                                      audition=audition_obj)
+                audition_rating_dict[audition_obj.id] = (audition_rating_obj.rating)*20
+            except AuditionRatingCombined.DoesNotExist:
+                audition_rating_dict[audition_obj.id] = 0
+
         context['project'] = project
         context['audition_dict'] = audition_dict
+        context['audition_list'] = audition_list
+        context['rating_dict'] = rating_dict
+        context['audition_rating_dict'] = audition_rating_dict
         return context
 
 
+class ProjectRatingAPI(APIView):
+    serializer_class = ProjectRatingSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            user = self.request.user
+            project_id = data_dict['project']
+            rating =  data_dict['rating']
+            reason =  data_dict['reason']
+            rating_obj = ProjectRating()
+            project = get_object_or_404(Project, pk=project_id)
+            rating_obj.project = project
+            rating_obj.rating = rating
+            rating_obj.reason = reason
+            rating_obj.rated_by = user
+            rating_obj.save()
+
+            # update combined project rating
+            ratings = ProjectRating.objects.filter(project=project_id)
+            combined_rating = 0
+            for item in ratings:
+                combined_rating += item.rating
+                print("combined_rating", combined_rating)
+            combined_rating = combined_rating / len(ratings)
+            project.rating = combined_rating*20
+            project.save()
+
+            msg = "Rated  "+project.title +" by "+str(rating_obj.rating)+" stars."
+            messages.success(self.request, msg)
+            response = {'message': "Rating success",
+                        'status': status.HTTP_201_CREATED}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
