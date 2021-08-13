@@ -19,8 +19,6 @@
                 <div class="left-mode-sec p-2 text-center ">
                     <div class="log-left-sec">
                         <ul class="list-unstyled">
-                            <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
-                                        class="mem-small-f">NVITE</span></a></li>
                             <li class="mt-1">
 
 
@@ -402,7 +400,7 @@
                                     <span class="sgl-blue-txt sgl-upload-blue-txt-align"><a>{{project.get_format_display}}</a></span>
                                     <span class="sgl-upload-star">
                                         <div class="cta-stars-outer">
-                                            <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                            <div class="cta-stars-inner" style="width:{{project.video_rating}}%;"></div>
                                         </div>
                                     </span>
                                 </div>
@@ -467,7 +465,10 @@
                     <div class="col-12 ">
                             <div class="row" >
                                 <div class="col-12" >
-                                    <p clss="all-p">Do you want to post video to screening room?</p>
+                                    <p class="all-p-light">Video posted to screening room cannot be deleted. But in future you can replace your video
+                                        with another video.
+                                    </p>
+                                    <p class="all-p">Do you want to post the video to screening room ?</p>
                                 </div>
                             </div>
                     </div>
@@ -477,7 +478,7 @@
             <!-- Modal footer -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger btn-sm publish_video"
-                id="{{project.id}}" title="Publish Video">Publish</button>
+                id="{{project.id}}" title="Publish Video">Yes</button>
                 <button type="button" class="btn btn-outline-danger btn-sm "
                 data-dismiss="modal">Cancel</button>
             </div>

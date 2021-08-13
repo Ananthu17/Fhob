@@ -32,8 +32,6 @@
                 <div class="left-mode-sec p-2 text-center ">
                     <div class="log-left-sec">
                         <ul class="list-unstyled invite-list">
-                            <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
-                                        class="mem-small-f">NVITE</span></a></li>
                             <li class="mt-1">
 
                             {% get_project_tracking_list request.user project as is_tracking %}
@@ -43,12 +41,10 @@
                                         <a class="mem-blu-link log-fnt-weight cursor-pointer un_track_project" id="{{project.title}}">T<span class="mem-small-f">RACKING</span></a>
                                     </span>
                             {% else %}
-                                    {% if project.creator.id != request.user.id %}
                                             <input type ="hidden" name="project_id" id="project_id" value ="{{project.id}}" />
                                             <span class="track-btn">
                                                 <a class="mem-blu-link log-fnt-weight cursor-pointer track_project" id="{{project.title}}">T<span class="mem-small-f">RACK</span></a>
                                             </span>
-                                    {% endif %}
                             {% endif %}
                         </li>
 

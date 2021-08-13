@@ -646,6 +646,7 @@ class Project(models.Model):
     cast_audition_password = models.CharField(max_length=250, null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    script_html = models.TextField(_("Script HTML"), null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -1539,6 +1540,9 @@ class UserNotification(models.Model):
     UNREAD = 'unread'
     MEMBERSHIP_CHANGE = 'membership_change'
     PROJECT_TRACKING = 'project_tracking'
+    AUDITION_STATUS = 'audition_status'
+    VIDEO_RATING = 'video_rating'
+    PROJECT_RATING = 'project_rating'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1550,6 +1554,9 @@ class UserNotification(models.Model):
                                  'Membership Change'),
                                 (PROJECT_TRACKING,
                                  'Project Tracking'),
+                                (AUDITION_STATUS, 'Audition Status'),
+                                (VIDEO_RATING, 'Video Rating'),
+                                (PROJECT_RATING, 'Project Rating'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1579,6 +1586,7 @@ class UserNotification(models.Model):
                                 related_name='project_notification',
                                 verbose_name=_("Project"),
                                 null=True, blank=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

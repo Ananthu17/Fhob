@@ -9,7 +9,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
      TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
-     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI
+     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI, \
+     GetAuditionStatusNotificationAjaxView, GetVideoRatingNotificationAjaxView, \
+     GetProjectRatingNotificationAjaxView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -78,4 +80,13 @@ urlpatterns = [
           name='chemistry-room'),
      path('project-rating-api/', ProjectRatingAPI.as_view(),
           name='project-rating-api'),
+     path('get-audition-status-notification/',
+          GetAuditionStatusNotificationAjaxView.as_view(),
+          name='get-audition-status-notification'),
+     path('get-video-rating-notification-html/',
+          GetVideoRatingNotificationAjaxView.as_view(),
+          name='get-video-rating-notification-html'),
+     path('get-project-rating-notification-html/',
+          GetProjectRatingNotificationAjaxView.as_view(),
+          name='get-project-rating-notification-html'),
     ]

@@ -3,6 +3,29 @@
 
 
 {% block extracss %}
+<style>
+    @media(min-width:300px) and (max-width:400px)
+    {
+        #cke_1_contents
+        {
+        height:200px!important;
+        }
+    }
+    @media(min-width:400px) and (max-width:500px)
+    {
+        #cke_1_contents
+        {
+        height:350px!important;
+        }
+    }
+    @media(min-width:500px) 
+    {
+    #cke_1_contents
+        {
+            height:470px!important;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -65,7 +88,9 @@
                                             <div class="sds-card-inneralign">
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
-                                                    <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
+                                                    <textarea class="ckeditor" class="pdf-style" id="editor1" name="editor1" >
+                                                        {{script_html}}
+                                                    </textarea> 
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -180,15 +205,19 @@
 <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
 <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
 <script>
-    // $(function(){
-    //     $('#sidesform').on('click','.edit-sides',function(){ 
-    //         $(".scenes").prop("disabled", false) 
-    //     });
-    // });
-</script>
-<script>
-    // CKEDITOR.replace( 'scene_1' );
+    CKEDITOR.replace( 'editor1', {
+    on: {
+        instanceReady: function( ev ) {
+            // Output paragraphs as <p>Text</p>.
+            this.dataProcessor.writer.setRules( 'p', {
+                indent: true,
+                breakBeforeOpen: true,
+                breakAfterOpen: true,
+                breakBeforeClose: true,
+                breakAfterClose: true
+            });
+        }
+    }
+} );
 </script>
 {% endblock %}
-
-

@@ -126,3 +126,25 @@ class NotificationConsumer(WebsocketConsumer):
             'message': message,
             'event': "PROJECT_TRACKING"
         }))
+
+    def send_audition_status_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "AUDITION_STATUS"
+        }))
+
+    def send_video_rating_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "VIDEO_RATING"
+        }))
+
+    def send_project_rating_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "PROJECT_RATING"
+        }))
+

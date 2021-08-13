@@ -104,7 +104,46 @@ notificationSocket.onmessage = function (e) {
              data_dict = {}
              data_dict['message'] = message
              console.log(data_dict)
-             $.get('/project/get-notification-html/', data_dict)
+             $.get('/project/get-project-tracking-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "AUDITION_STATUS":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-audition-status-notification/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "VIDEO_RATING":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-video-rating-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "PROJECT_RATING":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-project-rating-notification-html/', data_dict)
              .done(function(data) {
                  if(data.results!='')
                      {

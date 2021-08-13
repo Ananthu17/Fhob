@@ -60,7 +60,8 @@
                                     <span class="">CHARACTER: </span>
                                     <span class="video-menu-head txt-uppercase">{{audition.character.name}}</span>
                                 </li>
-                                <li><span class="">ACTOR: </span><span class="cva-menu-tag"><a href="" class="txt-uppercase">{{audition.name}}</a></span>
+                                <li><span class="">ACTOR: </span><span class="cva-menu-tag">
+                                    <a href="{{audition.user.get_profile_url}}" class="txt-uppercase">{{audition.name}}</a></span>
                                     <span class="caa-rate-star">
                                         <div class="cta-stars-outer">
                                             <div class="cta-stars-inner" style="width:{{audition_user_rating}}%;"></div>

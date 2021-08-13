@@ -106,6 +106,8 @@ class Audition(models.Model):
     cover_image = models.ImageField(upload_to='thumbnail/',
                                     blank=True, null=True,
                                     help_text="Image size:370 X 248.")
+    status_update_date = models.DateField(_("Status updated on"),
+                                          null=True, blank=True,)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+"-"+self.name

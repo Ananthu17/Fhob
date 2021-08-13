@@ -114,6 +114,12 @@
       font-family:Myraid Pro;
       font-size:14px; 
     }
+.all-p-light
+    {
+      font-family:Myraid Pro;
+      font-size:14px;
+      font-weight:200;
+    }
   .inp-border-none {
     border:none;
     /* padding: 5px 10px; */

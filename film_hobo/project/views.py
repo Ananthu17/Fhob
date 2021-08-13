@@ -5,6 +5,9 @@ import json
 import requests
 import boto3
 import datetime
+from django.utils import timezone
+import mammoth
+
 
 
 from braces.views import JSONResponseMixin
@@ -275,6 +278,24 @@ class RateUserSkillsAPI(APIView):
                 notify(room_name, notification_msg)
                 # end notification section
 
+                #update notification table - video rating
+                notification = UserNotification()
+                notification.user = project.creator
+                notification.project = project
+                notification.notification_type = UserNotification.VIDEO_RATING
+                notification.message = project.title+" video rating reached "+str(round(new_rating,2))+"/5"
+                notification.save()
+                # send notification - video rating
+                room_name = "user_"+str(project.creator.id)
+                notification_msg = {
+                        'type': 'send_video_rating_notification',
+                        'message': str(notification.message),
+                        'from': 'FilmHobo',
+                        "event": "VIDEO_RATING"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
                 response = {'message': "%s rated sucessfully"%(
                             project_member_obj.user.get_full_name()),
                             'status': status.HTTP_200_OK,
@@ -306,6 +327,57 @@ class GetMembershipChangeNotificationAjaxView(View, JSONResponseMixin):
         notification_html = render_to_string(
                                 'project/membership_change_notification.html',
                                 {'message': message})
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetAuditionStatusNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.AUDITION_STATUS)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetVideoRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.VIDEO_RATING)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetProjectRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.PROJECT_RATING)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
         context['notification_html'] = notification_html
         return self.render_json_response(context)
 
@@ -756,6 +828,7 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
         context['project'] = project
         character = get_object_or_404(Character, pk=character_id)
         context['character'] = character
+
         try:
             sides = Sides.objects.get(
                         Q(project=project) &
@@ -1087,6 +1160,38 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         context['project'] = project
         character = get_object_or_404(Character, pk=character_id)
         context['character'] = character
+
+        # generate html file of script
+        # style_map = """
+        #             """
+        # with open(project.script.path, "rb") as docx_file:
+        #     result = mammoth.convert_to_html(docx_file, include_default_style_map=True)
+        #     text = result.value
+        #     project.script_html = text
+        #     project.save()
+        #     path = 'media/script/'+str(project.id)+'.html'
+        #     with open(path, 'w') as html_file:
+        #         html_file.write(text)
+
+        # path = 'media/script/'+str(project.id)+'.html'
+        # from pydocx import PyDocX
+        # html = PyDocX.to_html(project.script.path)
+        # project.script_html = html
+        # project.save()
+        # f = open(path, 'w', encoding="utf-8")
+        # f.write(html)
+        # f.close()
+
+
+
+        # access html file of script
+        # path = 'media/script/'+str(project.id)+'.html'
+        # f = open(path, 'r')
+        # file_content = f.read()
+        # f.close()
+        # context['script_html'] = file_content
+        context['script_html'] = project.script_html
+
         try:
             sides = Sides.objects.get(
                         Q(project=project) &
@@ -1559,10 +1664,40 @@ class UpdateAuditionStatusAPI(APIView):
             try:
                 audition = Audition.objects.get(pk=audition_id)
                 audition.status = audition_status
+                audition.status_update_date = timezone.now()
                 audition.save()
                 response = {'message': "Audition status updated",
                             'status': status.HTTP_200_OK}
-                messages.success(self.request, "Audition status updated.")
+
+                if audition_status == 'attached':
+                    msg = "Attached "+audition.name+" to "+audition.project.title
+                else:
+                    msg = "Audition status updated to "+audition.get_status_display()
+
+                #update notification table
+                notification = UserNotification()
+                notification.user = audition.user
+                notification.project = audition.project
+                notification.notification_type = UserNotification.AUDITION_STATUS
+                if audition.status == 'attached':
+                    notification.message = "Congratulations!! You have been attached to project "+audition.project.title
+                elif audition.status == 'callback':
+                    notification.message = "Your audition for "+audition.project.title+" has been sent to chemistry room."
+                elif audition.status == 'passed':
+                    notification.message = "Sorry!! Your audition for "+audition.project.title+" has been passed."
+                notification.save()
+                # send notification
+                room_name = "user_"+str(audition.user.id)
+                notification_msg = {
+                        'type': 'send_audition_status_notification',
+                        'message': str(notification.message),
+                        'from': audition.project.title,
+                        "event": "AUDITION_STATUS"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
+                messages.success(self.request, msg)
             except Audition.DoesNotExist:
                 response = {'errors': "Invalid Audition ID", 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -1657,6 +1792,26 @@ class ProjectRatingAPI(APIView):
             combined_rating = combined_rating / len(ratings)
             project.rating = combined_rating*20
             project.save()
+
+            #update notification table - video rating
+            notification = UserNotification()
+            notification.user = project.creator
+            notification.from_user = user
+            notification.project = project
+            notification.rating = rating
+            notification.notification_type = UserNotification.PROJECT_RATING
+            notification.message = user.get_full_name()+" rated your project "+project.title+" as "+str(rating)+" stars"
+            notification.save()
+            # send notification - video rating
+            room_name = "user_"+str(project.creator.id)
+            notification_msg = {
+                    'type': 'send_project_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(user.id),
+                    "event": "PROJECT_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
 
             msg = "Rated  "+project.title +" by "+str(rating_obj.rating)+" stars."
             messages.success(self.request, msg)
