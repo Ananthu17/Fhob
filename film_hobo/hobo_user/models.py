@@ -529,9 +529,13 @@ class Project(models.Model):
                     ]
     SCENE = 'SCH'
     SHORTS = 'SHO'
+    PILOT = 'PIL'
+    FEATURE = 'FTR'
     FORMAT_CHOICES = [
         (SCENE, 'Scene'),
         (SHORTS, 'Shorts'),
+        (PILOT, 'Pilot'),
+        (FEATURE, 'Feature'),
     ]
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
@@ -630,9 +634,11 @@ class Project(models.Model):
     cast_attachment = models.CharField(_("Cast Attachment"),
                                        choices=CAST_ATTACHMENT_CHOICES,
                                        max_length=150, default=NATION_WIDE)
-    cast_pay_rate = models.CharField(_("Cast Pay Rate"),
-                                     choices=CAST_PAY_RATE_CHOICES,
-                                     max_length=150, default=NEGOTIABLE)
+    cast_pay_rate = models.IntegerField(_("Castpay Rate"),
+                                        null=True, blank=True)
+    sag_aftra = models.CharField(_("SAG AFTRA"),
+                                 choices=CAST_PAY_RATE_CHOICES,
+                                 max_length=150, default=NEGOTIABLE)
     cast_samr = models.CharField(_("Cast SAMR"),
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
@@ -640,14 +646,19 @@ class Project(models.Model):
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
-                                    default=NOT_AVAILABLE)
+                                    default=NOT_AVAILABLE,
+                                    null=True, blank=True)
     video_cover_image = models.ImageField(upload_to='thumbnail/',
                                           blank=True, null=True,
                                           help_text="Image size:370 X 248.")
+    script_visibility = models.CharField(_("Script Visibility"),
+                                  choices=VISIBILITY_CHOICES,
+                                  max_length=150, default=PUBLIC)
     script_password = models.CharField(max_length=12, null=True, blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
-    cast_audition_password = models.CharField(max_length=12, null=True, blank=True)
+    cast_audition_password = models.CharField(max_length=12,
+                                              null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
     timestamp = models.DateField(auto_now_add=True)
@@ -664,6 +675,13 @@ class Project(models.Model):
             }
         )
         return url
+
+
+class Writer(models.Model):
+    name = models.CharField(max_length=1000)
+    project = models.ForeignKey('hobo_user.Project',
+                                verbose_name=_("Project"),
+                                on_delete=models.CASCADE, null=True, blank=True)
 
 
 class ProjectReaction(models.Model):

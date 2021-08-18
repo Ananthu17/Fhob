@@ -7,8 +7,8 @@ from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings, AthleticSkill, UserInterest, UserProfile, CoWorker, \
-    CompanyProfile, Country, Photo, Feedback
+    CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, CoWorker, \
+    CompanyProfile, Country, Photo, Feedback, Writer
 
 
 class SignUpForm(UserCreationForm):
@@ -370,6 +370,7 @@ class FeedbackForm(forms.ModelForm):
         model = Feedback
         fields = '__all__'
 
+
 class CheckoutForm(forms.Form):
     payment_method_nonce = forms.CharField(
         max_length=1000,
@@ -383,3 +384,61 @@ class CheckoutForm(forms.Form):
             raise forms.ValidationError(_(
                 'We couldn\'t verify your payment. Please try again.'))
         return self.cleaned_data
+
+
+class ProjectCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ('creator', 'title', 'format', 'genre', 'script', 'video_url',
+                  'video_type', 'location', 'visibility', 'script',
+                  'cast_attachment', 'cast_pay_rate', 'cast_samr',
+                  'visibility_password', 'video_status', 'video_cover_image',
+                  'script_password', 'team_select_password', 'logline',
+                  'cast_audition_password', 'project_info', 'sag_aftra',
+                  'script_visibility'
+                  )
+        widgets = {
+                'title': forms.TextInput(attrs={"class": "inp-line"}),
+                'creator': forms.Select(attrs={'class': 'inp-line'}),
+                'format': forms.Select(attrs={'class': 'd-none'}),
+                'genre': forms.Select(attrs={'class': 'd-none'}),
+                'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
+                                                   "placeholder": '$  0 or\
+                                                   Greater/Negotiable'}),
+                'sag_aftra': forms.Select(attrs={'class': 'd-none'}),
+                'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
+                'visibility': forms.Select(attrs={'class': 'd-none'}),
+                'script_visibility': forms.Select(attrs={'class': 'd-none'}),
+                'visibility_password': forms.PasswordInput(attrs={
+                                                           "class": "form-control\
+                                                           form-control-input mem-b-placeholder",
+                                                           'placeholder': 'password'
+                                                           }),
+                'location': forms.Select(attrs={'class': 'inp-line'}),
+                'cast_samr': forms.Select(attrs={'class': 'd-none'}),
+                'script': forms.FileInput(),
+                'script_password': forms.PasswordInput(attrs={
+                                                            "class": "form-control form-control-input mem-b-placeholder",
+                                                            'placeholder': 'password'
+                                                            }),
+                'cast_audition_password': forms.PasswordInput(attrs={
+                                                            "class": "form-control form-control-input mem-b-placeholder",
+                                                            'placeholder': 'password'
+                                                            }),
+                'team_select_password': forms.PasswordInput(attrs={
+                                                            "class": "form-control form-control-input mem-b-placeholder",
+                                                            'placeholder': 'password'
+                                                            })
+
+                }
+
+
+class WriterForm(forms.ModelForm):
+
+    class Meta:
+        model = Writer
+        fields = ('name', 'project')
+        widgets = {
+                'name': forms.TextInput(attrs={"class": "inp-line"})
+                }

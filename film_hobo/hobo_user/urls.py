@@ -300,5 +300,5 @@ urlpatterns = [
     path('projectview/', ProjectView.as_view(),
          name='projects'),
     path('projectview/create/', CreateProjectView.as_view(),
-         name='new_project')
+         name='new-project')
 ]

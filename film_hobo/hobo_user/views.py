@@ -56,7 +56,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, CheckoutForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm, ProjectCreationForm, \
+    WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
@@ -4438,4 +4439,30 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['form'] = ProjectCreationForm
+        context['writerform'] = WriterForm
         return context
+
+    def post(self, request):
+        try:
+            projectform = ProjectCreationForm(request.POST or None)
+            writerform = WriterForm(request.POST or None)
+            print("valid ahno project:", projectform.is_valid())
+            print('form error project', projectform.errors)
+            print("valid ahno writer:", writerform.is_valid())
+            print('form error writer', writerform.errors)
+            if projectform.is_valid() and writerform.is_valid():
+                writer = writerform.save()
+                project = projectform.save()
+                writer.project = project
+                writer.save()
+                messages.success(request, "New project added.")
+                return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+            messages.error(request, "Form not valid")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+        except:
+            messages.error(request, "Can't read data")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
