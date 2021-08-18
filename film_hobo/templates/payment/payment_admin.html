@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/payment_admin.css' %}">
+{% endblock %}
+
 {% block content %}
       <div class="wrapper flex-grow-1">
           <div class="container admin-bill-sec pb-4">

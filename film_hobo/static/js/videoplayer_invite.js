@@ -13,7 +13,6 @@ var validUsers = [];
 var validEmails = [];
 
 get_friends_list_url = origin_url + '/hobo_user/list-all-friend-api/'
-
 axios.get(get_friends_list_url, {headers: { 'Authorization': token_auth_str }})
 .then((response) => {
     var friends_obj = response.data.friends
@@ -86,7 +85,6 @@ $('#share-close-cross').click(function(event){
 });
 
 $('#shareModalClose').click(function(event){
-    debugger
     $("#shareModal").modal('hide');
 });
 

@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  web:
+    build: ./film_hobo
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./film_hobo/:/usr/src/film_hobo/
+    ports:
+      - 8000:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=foo
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=postgres
+      - SQL_USER=film_hobo
+      - SQL_PASSWORD=film_hobo
+      - SQL_HOST=db
+      - SQL_PORT=5432
+      - DATABASE=postgres
+    depends_on:
+      - db
+  db:
+    image: postgres:12-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=film_hobo
+      - POSTGRES_PASSWORD=film_hobo
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

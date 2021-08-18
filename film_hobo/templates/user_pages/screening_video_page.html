@@ -4,11 +4,13 @@
 {% load social_share %}
 
 {% block extracss %}
-<link rel="stylesheet" href="{% static 'css/share.css' %}">
-<link rel="stylesheet" href="{% static 'css/email_invite.css' %}">
-<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link>
-
+<!-- <link rel="stylesheet" href="{% static 'css/share.css' %}"> -->
+<!-- <link rel="stylesheet" href="{% static 'css/email_invite.css' %}"> -->
+<!-- <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/> -->
+<!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link> -->
+<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>
+<link rel="stylesheet" href="{% static 'css/share_extra.css' %}">
+<link rel="stylesheet" href="{% static 'css/share_modal.css' %}">
 <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"> -->
 {% endblock %}
 
@@ -324,14 +326,17 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
                 </div>
+
                 <div class="modal-body">
-                    <div class="col-sm-12 email-id-row">
-                        <span class="to-input">To</span>
-                            <div id="all_mail" class="all-mail">
-                            </div>
-                            <input id="enter_email" type="text" name="email" class="enter-mail-id" placeholder="Enter the user names .." />
+                    <form class="needs-validation" novalidate>
+                      <div class="form-group">
+                        <label for="exampleInputUser" style="display:inline-block; width:100%; text-align:left;">To</label>
+                        <input type="text" name="restaurant" id="autocomplete" placeholder="Enter user"/>
+                        <p id="autocomplete-suggestion"></p>
                     </div>
-                </div>
+                    </form>
+                  </div>
+
                 <div class="modal-footer">
                     <button id="invite_send" type="button" class="btn btn-primary">Send</button>
                     <button id="invite_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -363,7 +368,10 @@
 {% endblock %}
 
 {% block extrajs %}
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
-<script src="{% static 'js/screening_video_page.js' %}"></script>
-<script src="{% static 'js/email_invite.js' %}"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>
+<script src="{% static 'js/share_extra.js' %}"></script>
+<!-- <script src="{% static 'js/screening_video_page.js' %}"></script> -->
+<!-- <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script> -->
+<!-- <script src="{% static 'js/email_invite.js' %}"></script> -->
 {% endblock %}

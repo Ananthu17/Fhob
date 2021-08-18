@@ -2828,32 +2828,32 @@ ul.cta-side-setup-menu li{
 /*fonts*/
 
 @font-face {
-   font-family: "Caliban Std"; 
-   src:url("font/CalibanStd.otf") format("truetype"); 
+   font-family: "Caliban Std";
+   src:url("../fonts/CalibanStd.otf") format("truetype");
 }
 @font-face {
-   font-family: "Satisfy-Regular"; 
-   src:url("font/Satisfy-Regular.ttf") format("truetype"); 
+   font-family: "Satisfy-Regular";
+   src:url("../fonts/Satisfy-Regular.ttf") format("truetype");
 }
 @font-face {
-   font-family: "Myraid Pro"; 
-   src:url("font/Myriad\ Pro\ Regular.ttf") format("truetype"); 
+   font-family: "Myraid Pro";
+   src:url("../fonts/Myriad-Pro-Regular.ttf") format("truetype");
 }
 @font-face {
-   font-family: "Courier Bold"; 
-   src:url("font/Courier-Bold.otf") format("truetype"); 
+   font-family: "Courier Bold";
+   src:url("../fonts/Courier-Bold.otf") format("truetype");
 }
 @font-face {
-  font-family: "Courier"; 
-  src:url("font/COURIER.TTF") format("truetype"); 
+  font-family: "Courier";
+  src:url("../fonts/COURIER.TTF") format("truetype");
 }
 @font-face {
-   font-family: "Arial Rounded Bold"; 
-   src:url("font/ARLRDBD.ttf") format("truetype"); 
+   font-family: "Arial Rounded Bold";
+   src:url("../fonts/ARLRDBD.ttf") format("truetype");
 }
 @font-face {
-  font-family: "Pooper Black Pro"; 
-  src:url("font/P22\ Pooper\ Black\ Regular.ttf") format("truetype"); 
+  font-family: "Pooper Black Pro";
+  src:url("../fonts/P22 Pooper Black Regular.ttf") format("truetype");
 }
 /*fonts-end*/
 /*header section*/

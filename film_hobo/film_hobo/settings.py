@@ -157,6 +157,17 @@ DATABASES = {
     }
 }
 
+# demo server database credentials
+# DATABASES = {
+#     'default': {
+#         'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+#         'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+#         'USER': env("DEMO_SERVER_DATABASE_USER"),
+#         'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+#         'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+#         'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -295,7 +306,8 @@ S3_BUCKET_NAME = "filmhobo-videos"
 CORS_ORIGIN_ALLOW = True
 CORS_ALLOWED_ORIGINS = (
     'http://localhost:8000',
-    "http://127.0.0.1:8000",
+    'http://127.0.0.1:8000',
+    'http://0.0.0.0',
 )
 
 

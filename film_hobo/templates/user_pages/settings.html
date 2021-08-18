@@ -587,14 +587,27 @@
                                     <label class="billing-label">Description</label>
                                 </div>
                                 <div class="col-12">
-                                    <span id="membership_type">{{ user.membership }}</span> Membership
+                                    {% if user.membership == 'IND' %}
+                                        <span id="membership_type">Indie</span> Membership
+                                    {% elif user.membership == 'PRO' %}
+                                        <span id="membership_type">Pro</span> Membership
+                                    {% elif user.membership == 'COM' %}
+                                        <span id="membership_type">Company</span> Membership
+                                    {% elif user.membership == 'ADMIN' %}
+                                        <span id="membership_type">Admin</span> Membership
+                                    {% else %}
+                                        <span id="membership_type">Hobo</span> Membership
+                                    {% endif %}
                                 </div>
-                                <div class="col-12 text-muted">
-                                    Annual: $<span id="membership_annual_fee">0.00</span>
-                                </div>
-                                <div class="col-12">
-                                    Monthly: $<span id="membership_monthly_fee">0.00</span>
-                                </div>
+                                {% if transaction.payment_plan == 'annually' %}
+                                    <div class="col-12 text-muted">
+                                        Annual: $<span id="membership_annual_fee">{{ transaction.final_amount }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="col-12">
+                                        Monthly: $<span id="membership_monthly_fee">{{ transaction.final_amount }}</span>
+                                    </div>
+                                {% endif %}
                                 <div class="col-12">
                                     Taxes: $<span id="membership_tax_fee">0.00</span>
                                 </div>

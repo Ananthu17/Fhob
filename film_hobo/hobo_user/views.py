@@ -1,40 +1,34 @@
 import ast
 import braintree
 import json
-from os import remove
-from django.contrib.auth.models import User
 import requests
 import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
-from django.core.files import File
-from django.db.models import Sum, Q
-from django.template import loader
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils import timezone
 from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
+from django.db.models import Sum, Q
+from django.template import loader
+from django.template.loader import render_to_string
+from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 # from django_filters import rest_framework as filters
-from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
@@ -51,7 +45,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
 
 from authemail.views import SignupVerify
-from rest_framework.filters import SearchFilter
+# from rest_framework.filters import SearchFilter
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
@@ -68,10 +62,11 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    UserRating, Location, UserRatingCombined, \
+                    Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, \
-                    Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
-
+                    CompanyRating, CompanyRatingCombined, \
+                    VideoRatingCombined
+from payment.models import Transaction
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
@@ -1477,6 +1472,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
+        context['transaction'] = \
+            Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2535,7 +2532,7 @@ class EditCoworkerAPI(APIView):
                     if 'position' in data_dict:
                         position = JobType.objects.get(id=data_dict['position'])
                         coworker.position = position
-                    if 'user' in data_dict and data_dict['user']!="":
+                    if 'user' in data_dict and data_dict['user'] != "":
                         user_id = data_dict['user']
                         user = CustomUser.objects.get(id=user_id)
                         coworker.user = user
@@ -4050,12 +4047,12 @@ class ListAllFriendsAPI(APIView):
         user = request.user
         try:
             friend_obj = Friend.objects.get(user=user)
+            for ind, obj in enumerate(friend_obj.friends.all()):
+                        individual_friend_data = {'email': obj.email, 'user': obj.first_name +' '+ obj.last_name}
+                        # individual_friend_data = {obj.email, obj.first_name +' '+ obj.last_name}
+                        friends_dict[ind] = individual_friend_data
         except Friend.DoesNotExist:
-            pass
-        for ind, obj in enumerate(friend_obj.friends.all()):
-            individual_friend_data = {'email': obj.email, 'user': obj.first_name +' '+ obj.last_name}
-            # individual_friend_data = {obj.email, obj.first_name +' '+ obj.last_name}
-            friends_dict[ind] = individual_friend_data
+            response['friends'] = {}
         response['friends'] = friends_dict
         return Response(response)
 
@@ -4350,14 +4347,14 @@ class TeamDeleteAPIView(DestroyAPIView):
 
 # Search API for project
 # Api to search in project
-class ProjectSearchView(ListAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    # permission_classes = (IsAuthenticated,)
-    # filter_backends = [filters.SearchFilter]
-    filter_backends = (SearchFilter, DjangoFilterBackend)
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
+# class ProjectSearchView(ListAPIView):
+#     queryset = Project.objects.all()
+#     serializer_class = ProjectSerializer
+#     # permission_classes = (IsAuthenticated,)
+#     # filter_backends = [filters.SearchFilter]
+#     filter_backends = (SearchFilter, DjangoFilterBackend)
+#     search_fields = ["title", "format", "genre",
+#                      "rating", "timestamp"]
 
 
 # Api to add rating to project video
