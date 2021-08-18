@@ -146,28 +146,28 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 # }
 
 # local database credentials
-DATABASES = {
-    'default': {
-        'ENGINE': env("DATABASE_ENGINE"),
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT"),
-    }
-}
-
-# demo server database credentials
 # DATABASES = {
 #     'default': {
-#         'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
-#         'NAME': env("DEMO_SERVER_DATABASE_NAME"),
-#         'USER': env("DEMO_SERVER_DATABASE_USER"),
-#         'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
-#         'HOST': env("DEMO_SERVER_DATABASE_HOST"),
-#         'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+#         'ENGINE': env("DATABASE_ENGINE"),
+#         'NAME': env("DATABASE_NAME"),
+#         'USER': env("DATABASE_USER"),
+#         'PASSWORD': env("DATABASE_PASSWORD"),
+#         'HOST': env("DATABASE_HOST"),
+#         'PORT': env("DATABASE_PORT"),
 #     }
 # }
+
+# demo server database credentials
+DATABASES = {
+    'default': {
+        'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+        'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+        'USER': env("DEMO_SERVER_DATABASE_USER"),
+        'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+        'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+        'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
