@@ -48,6 +48,10 @@
                         </div>
                     </div>
                     <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">
+                    {% if request.user.is_anonymous %}
+                        <ul class="list-inline mb-0 mt-20">
+                        </ul>
+                    {% else %}
                         <ul class="list-inline mb-0 mt-20">
                             <li class="list-inline-item"><i class="fa fa-envelope header-fnt-clr header-icon-pos"
                                     aria-hidden="true"></i></li>
@@ -63,6 +67,7 @@
                                     class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
 
                         </ul>
+                    {% endif %}
                     </div>
                 </div>
             </header>

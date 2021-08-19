@@ -3,11 +3,11 @@ version: '3.7'
 services:
   web:
     build: ./film_hobo
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8041
     volumes:
       - ./film_hobo/:/usr/src/film_hobo/
     ports:
-      - 8000:8000
+      - 8041:8041
     environment:
       - DEBUG=1
       - SECRET_KEY=foo
@@ -18,6 +18,8 @@ services:
       - SQL_HOST=db
       - SQL_PORT=5432
       - DATABASE=postgres
+    expose:
+        - 8041
     depends_on:
       - db
   db:
@@ -29,7 +31,7 @@ services:
       - POSTGRES_PASSWORD=film_hobo
       - POSTGRES_DB=postgres
     ports:
-      - "5432:5432"
+      - "5434:5432"
 
 volumes:
   postgres_data:
