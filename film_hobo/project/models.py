@@ -1,3 +1,4 @@
+import datetime
 from ckeditor.widgets import CKEditorWidget
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -5,6 +6,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 class Character(models.Model):
     name = models.CharField(max_length=1000)
@@ -19,6 +21,8 @@ class Character(models.Model):
                                       related_name='attached_user',
                                       on_delete=models.SET_NULL, null=True,
                                       blank=True)
+    attached_user_name = models.CharField(_("Attached User Name"), max_length=1000,
+                                          null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.name
@@ -199,3 +203,31 @@ class ProjectRating(models.Model):
     class Meta:
         verbose_name = 'Project Rating'
         verbose_name_plural = 'Project Ratings'
+
+
+class Comment(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='commented_user',
+                             verbose_name=_("User"),
+                             null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_comment',
+                                verbose_name=_("Project"),
+                                null=True)
+    comment_txt = models.TextField(_("Comment"), null=True, blank=True)
+    reply_to = models.ForeignKey("self",
+                                 on_delete=models.SET_NULL,
+                                 related_name='comment_reply',
+                                 verbose_name=_("Reply"),
+                                 null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.project.title+" commented by "+self.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'

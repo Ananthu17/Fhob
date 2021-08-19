@@ -1091,3 +1091,6 @@ class VideoRatingSerializer(serializers.ModelSerializer):
         model = VideoRating
         fields = ['project', 'rating', 'reason']
 
+
+
+

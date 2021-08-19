@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load samr_display_tag %}
+{% load user_account_tag %}
+{% block extracss %}
+<style>
+.select2-container--default .select2-selection--single {
+    background-color:transparent!important;
+    border:none!important;
+    border-radius:0!important;
+    border-bottom:1px solid #000!important;
+    font-size:12px!important;
+    font-family:Myraid Pro!important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg car-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-center-section-align">
+                    <!-- project menu  -->
+
+                    <div class="sds-menu-bg">
+                        <div class="cta-menu-align">
+                            <ul class="cva-menu ">
+                                <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                                <li><span >Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
+                                <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
+                                <li><span>Genre: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_genre_display}}</span></li>
+                                <li><span>Location(s): </span><span class="sgl-menu-blue txt-uppercase">{{project.location}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- project menu  End-->
+                    <!-- Input section   -->
+
+                    <div class="car-input-sec-bg">
+                        <div class="car-input-sec-align">
+                            <div class="car-input-head-display">
+                                <span>
+                                    CAST:
+                                </span>
+                                <span>
+                                    <a href="{% url 'project:audition-list' project.id %}">AUDITION</a>
+                                </span>
+                                <span>
+                                    <a href="{% url 'project:chemistry-room' project.id %}">CHEMISTRY ROOM</a>
+                                </span>
+                            </div>
+                            <hr class="car-input-head-hr">
+                            <div class="car-input-cast-sec">
+                                <span>Cast SAMR: </span>
+                                {% get_samr_display_value project.id as samr_data %}
+                                <span class="car-pro-txt">{{ samr_data.0 }}</span>
+                                <span class="car-input-rate-star">
+                                    <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                    <span class="fa {% if samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                    <span class="fa {% if samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                    <span class="fa {% if samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                    <span class="fa {% if samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                </span>
+                            </div>
+
+                            <!-- Input field section  -->
+                            {% for character in characters %}
+                            <div class="car-input-section car-input-section-margin">
+                                <div>
+                                    <div>
+                                        <span class="car-char-sec-orange-txt"><u class="txt-uppercase">{{character.name}}:</u></span>
+                                        {% if character.attached_user or character.attached_user_name %}
+                                        <span>
+                                            {% if character.attached_user %}
+                                            <a href="{{ character.attached_user.get_profile_url }}" class="car-char-sec-blue-txt">{{character.attached_user.get_full_name }}</a>
+                                            {% else %}
+                                            <a  class="car-char-sec-blue-txt">{{character.attached_user_name }}</a>
+                                            {% endif %}
+                                        </span>
+                                        {% if character.attached_user %}
+                                        {% get_dict_value rating_dict character.attached_user.id as rating%}
+                                        <span class="car-input-rate-star">
+                                            <div class="cta-stars-outer">
+                                                <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
+                                              </div>
+                                        </span>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="car-char-sec-green-txt">Available</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <textarea class="car-des-textarea message-box-2" placeholder="Character Description" disabled>{{character.description}}</textarea>
+                                    </div>
+                                </div>
+                                <div class="car-input-field-display">
+                                    <span class="car-name-label">Name:</span>
+                                    <span class="car-name-field-width " id="select2-div-{{character.id}}">
+                                        
+                                        <select class="car-input-field attached_user" id="user-{{character.id}}">
+                                            <option value="" selected disabled hidden ></option>
+                                            {% if character.attached_user is none and character.attached_user_name is not none %}
+                                            <option value="" selected disabled hidden >{{character.attached_user_name}}</option>
+                                            {% endif %}
+                                            <option value="0">Attach a Non FilmHobo Member</option>
+                                            {% for user in users %}
+                                            <option {%if character.attached_user == user %} selected {% endif %} value="{{user.id}}">{{user.get_full_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        
+                                        <!-- <input class="car-input-field attached_user" id="attached_user-{{character.id}}"/> -->
+                                    </span>
+                                </div>
+                                <div>
+                                    {% if character.attached_user or character.attached_user_name %}
+                                    <span><a  class="car-input-remove-tag cursor-pointer" data-toggle="modal" data-target="#remove-{{character.id}}">Remove</a></span>
+                                    <span><a  class="car-input-replace-tag replace-modal cursor-pointer" id="{{character.id}}">Replace</a></span>
+                                    {% else %}
+                                    <span><a  class="car-input-remove-tag replace-modal cursor-pointer" id="{{character.id}}">Attach</a></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+<!-- The Modal -->
+<div class="modal fade" id="remove-{{character.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Remove Attached Cast</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt">
+                        {% if character.attached_user %}
+                        Do you want to remove {{character.attached_user.get_full_name}} ?
+                        {% elif character.attached_user_name %}
+                        Do you want to remove {{character.attached_user_name}} ?
+                        {% else %}
+                        No users attached !!
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        {% if character.attached_user or character.attached_user_name %}
+        <a class='btn btn-outline-danger btn-sm cursor-pointer remove-cast' id="{{character.id}}">Remove</a>
+        {% endif %}
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Cancel</button>
+        </div>
+
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+<!-- The Modal -->
+<div class="modal fade" id="replace-{{character.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Replace Attached Cast</h5>
+        <button type="button" class="close close-modal" id="{{character.id}}" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt " id="replace-modal-fulltxt-{{character.id}}">
+                        {% if character.attached_user %}
+                        Do you want to replace {{character.attached_user.get_full_name}} with <span id="replace-modal-txt-{{character.id}}"></span>?
+                        {% elif character.attached_user_name %}
+                        Do you want to replace {{character.attached_user_name}} with <span id="replace-modal-txt-{{character.id}}"></span>?
+                        {% else %}
+                        Do you want to attach  <span id="replace-modal-txt-{{character.id}}"></span>?
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        {% if character.attached_user or character.attached_user_name %}
+        <a class='btn btn-outline-danger btn-sm cursor-pointer replace-cast' id="{{character.id}}">Replace</a>
+        {% else %}
+        <a class='btn btn-outline-danger btn-sm cursor-pointer replace-cast' id="{{character.id}}">Attach</a>
+        {% endif %}
+        <button class="btn btn-outline-danger btn-sm close-modal"
+        data-dismiss="modal" id="{{character.id}}">Cancel</button>
+        </div>
+
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                            {% endfor %}
+                            <!-- Input field section End  -->
+
+
+                        </div>
+                    </div>
+
+                    <!-- Input section End  -->
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="chm-sec-bg right-sec-height">
+                    <div class="mem-list-head">Top Actors</div>
+                    <ol class="mem-list-cont mb-0 ">
+                        <li class="mt-1">John Smith</li>
+                        <li class="mt-1">John Dow</li>
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Aaron McCarty</li>
+                        <li class="mt-1">Toli Chew</li>
+                    </ol>
+                    <div class="mem-list-head">Top Writers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Tom Saint</li>
+                        <li class="mt-1">Lola Carola</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Jamal Smith</li>
+                        <li class="mt-1">Nikita Selivan</li>
+                    </ol>
+                    <div class="mem-list-head">Top Directors</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Karen Do</li>
+                        <li class="mt-1">Ivan Drago</li>
+                        <li class="mt-1">Ken Track</li>
+                        <li class="mt-1">Kendra Shulman</li>
+                        <li class="mt-1">Sandra O’brian</li>
+                    </ol>
+                    <div class="mem-list-head">Top Producers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top DPs</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head">Top Sound Designers</div>
+                    <ol class="mem-list-cont mb-0">
+                        <li class="mt-1">Sarah Lee</li>
+                        <li class="mt-1">Colle Ace</li>
+                        <li class="mt-1">Duran Duran</li>
+                        <li class="mt-1">Char Hendrix</li>
+                        <li class="mt-1">Oleg Smirnov</li>
+                    </ol>
+                    <div class="mem-list-head underline">TopTalent/Crew</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+
+<script>
+    $(document).ready(function() {
+        $('.attached_user').select2();
+    });
+</script>
+<script>
+    $('body').on('click' , '.remove-cast', function(){
+        var character_id = $(this).attr("id");
+        var token = $("#token").val();
+        var data_dict = {};
+        data_dict['character'] = character_id;
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/remove-attached-cast-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+    $('body').on('click' , '.replace-cast', function(){
+        var character_id = $(this).attr("id");
+        var token = $("#token").val();
+        var data_dict = {};
+        var user_option_id = "#user-"+character_id
+        var name_id = "#name-"+character_id
+        var user = $(user_option_id).find("option:selected").val();
+        var name = $(name_id).val();
+        var token = $("#token").val();
+        var data_dict = {};
+        if(name!=""){
+            data_dict['name']=name;
+        }
+        if(user!=""){
+            data_dict['user']=user;
+        }
+        data_dict['character'] = character_id;
+        console.log(data_dict)
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/replace-attached-cast-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+
+    $('body').on('change' , '.attached_user', function(){
+        var id = $(this).attr("id");
+        var user = $(this).find("option:selected").val();
+        var character_id = id.split("-")[1];
+        var select2_div_id = "#select2-div-"+character_id
+        if(user==0){
+            $(select2_div_id).html("");
+            $(select2_div_id).html('<input class="car-input-field" value="" id="name-'+character_id+'"/>');
+        }
+    });
+
+    $('body').on('click' , '.replace-modal', function(){
+        var character_id = $(this).attr("id");
+        var user_option_id = "#user-"+character_id
+        var user = $(user_option_id).find("option:selected").text();
+        var name_id = "#name-"+character_id
+        var name = $(name_id).val();
+        var replace_modal_div_id = "#replace-modal-txt-"+character_id
+        var replace_modal_fulltxt_id = "#replace-modal-fulltxt-"+character_id
+        var modal_id = "#replace-"+character_id;
+        if(name){
+            $(replace_modal_div_id).html(name);
+            $(modal_id).modal('show');
+        }else if(user){
+            $(replace_modal_div_id).html(user);
+            $(modal_id).modal('show');
+        }else{
+        }
+    });
+
+    $('body').on('click' , '.close-modal', function(){
+        var character_id = $(this).attr("id");
+        var modal_id = "#replace-"+character_id;
+        $(modal_id).modal('hide');
+    });
+</script>
+{% endblock %}
+
+

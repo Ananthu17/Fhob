@@ -66,10 +66,11 @@
                                             <div class="sds-card-inneralign">
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
+                                                    <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
                                                     <!-- <iframe src="/media/script/{{project.id}}.html" class="pdf-style" frameborder="0"></iframe> -->
                                                     <!-- <iframe src="https://docs.google.com/gview?url=https://docs.google.com/document/d/1YfXflnjxQj4xabpoyNaqrLG3BhzaSHoTXhG5dxCL1W4/&embedded=true" class="pdf-style" frameborder="0"></iframe> -->
                                                     <!-- <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=http://localhost:8000{{project.script.url}}"></iframe> -->
-                                                   
+
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -79,7 +80,7 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt"><a >SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                         </div>
                                         <div>
                                             <div class="sides-textbox scenes sides-font-style ">{{sides.scene_1|safe}}</div>

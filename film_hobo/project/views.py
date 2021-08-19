@@ -46,13 +46,14 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
      VideoRatingCombined
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Sides, ProjectTracking, ProjectRating
+    Character, Comment, Sides, ProjectTracking, ProjectRating
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
-      ProjectLastDateSerializer, \
+      ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
-      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer
+      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
+      CommentSerializer, DeleteCommentSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
@@ -100,6 +101,21 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
                 rating_dict[obj.id] = project_members_rating.rating*20
             except ProjectMemberRating.DoesNotExist:
                 rating_dict[obj.id] = 0
+
+        comments = Comment.objects.filter(
+                   Q(project=project) &
+                   Q(reply_to=None)
+                    ).order_by('created_time')
+        reply_dict = {}
+        for obj in comments:
+            reply_dict[obj.id] = []
+            reply_comments = Comment.objects.filter(
+                                Q(project=project) &
+                                Q(reply_to=obj)
+                                ).order_by('created_time')
+            reply_dict[obj.id] = reply_comments
+        context['comments'] = comments
+        context['reply_dict'] = reply_dict
 
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
@@ -1161,37 +1177,6 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         character = get_object_or_404(Character, pk=character_id)
         context['character'] = character
 
-        # generate html file of script
-        # style_map = """
-        #             """
-        # with open(project.script.path, "rb") as docx_file:
-        #     result = mammoth.convert_to_html(docx_file, include_default_style_map=True)
-        #     text = result.value
-        #     project.script_html = text
-        #     project.save()
-        #     path = 'media/script/'+str(project.id)+'.html'
-        #     with open(path, 'w') as html_file:
-        #         html_file.write(text)
-
-        # path = 'media/script/'+str(project.id)+'.html'
-        # from pydocx import PyDocX
-        # html = PyDocX.to_html(project.script.path)
-        # project.script_html = html
-        # project.save()
-        # f = open(path, 'w', encoding="utf-8")
-        # f.write(html)
-        # f.close()
-
-
-
-        # access html file of script
-        # path = 'media/script/'+str(project.id)+'.html'
-        # f = open(path, 'r')
-        # file_content = f.read()
-        # f.close()
-        # context['script_html'] = file_content
-        context['script_html'] = project.script_html
-
         try:
             sides = Sides.objects.get(
                         Q(project=project) &
@@ -1670,6 +1655,38 @@ class UpdateAuditionStatusAPI(APIView):
                             'status': status.HTTP_200_OK}
 
                 if audition_status == 'attached':
+                    character_obj = get_object_or_404(
+                                    Character, pk=audition.character.id)
+                    character_obj.attached_user = audition.user
+                    character_obj.attached_user_name = audition.user.get_full_name()
+                    character_obj.save()
+
+                    # All other audition's status changed to passed
+                    all_auditions = Audition.objects.filter(
+                                    character=character_obj).exclude(
+                                    pk=audition.id)
+                    for obj in all_auditions:
+                        obj.status = Audition.PASSED
+                        obj.save()
+                        #update notification table- for removed user
+                        notification = UserNotification()
+                        notification.user = obj.user
+                        notification.project = character_obj.project
+                        notification.notification_type = UserNotification.AUDITION_STATUS
+                        notification.message = "Sorry!! Your audition for "+character_obj.project.title+" has been passed."
+                        notification.save()
+                        # send notification- for removed user
+                        room_name = "user_"+str(obj.user.id)
+                        notification_msg = {
+                                'type': 'send_audition_status_notification',
+                                'message': str(notification.message),
+                                'from': character_obj.project.title,
+                                "event": "AUDITION_STATUS"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+                    # end
+
                     msg = "Attached "+audition.name+" to "+audition.project.title
                 else:
                     msg = "Audition status updated to "+audition.get_status_display()
@@ -1725,6 +1742,7 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
                         )
         audition_dict = {}
 
+        context['all_audition'] = audition_list
         for audition in audition_list:
             if audition.character in audition_dict:
                 audition_dict[audition.character].append(audition)
@@ -1818,6 +1836,299 @@ class ProjectRatingAPI(APIView):
             response = {'message': "Rating success",
                         'status': status.HTTP_201_CREATED}
 
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CastAttachRemoveView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/cast-attach-remove.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        characters = Character.objects.filter(project=project)
+        context['project'] = project
+        context['characters'] = characters
+
+        try:
+            actoractress = JobType.objects.get(slug='actoractress')
+        except JobType.DoesNotExist:
+            actoractress = ""
+
+        rating_dict = {}
+        for character in characters:
+            if character.attached_user:
+                try:
+                    rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=character.attached_user) &
+                                    Q(job_type=actoractress)
+                                )
+                    rating_dict[character.attached_user.id] = (rating_obj.rating)*20
+                except UserRatingCombined.DoesNotExist:
+                    rating_dict[character.attached_user.id] = 0
+        context['rating_dict'] = rating_dict
+        users = CustomUser.objects.all()
+        context['users'] = users
+        return context
+
+
+class RemoveAttachedCastAPI(APIView):
+    serializer_class = RemoveCastSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        old_user = None
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character']
+            try:
+                character = Character.objects.get(id=character_id)
+                if character.attached_user or character.attached_user_name:
+                    if character.attached_user:
+                        old_user = character.attached_user
+                        msg = "Removed "+character.attached_user.get_full_name()
+                    elif character.attached_user_name:
+                        msg = "Removed "+character.attached_user_name
+                    character.attached_user = None
+                    character.attached_user_name = None
+                    character.save()
+                    response = {'message': msg,
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, msg)
+
+                    if old_user:
+                        #update notification table- for removed user
+                        notification = UserNotification()
+                        notification.user = old_user
+                        notification.project = character.project
+                        notification.notification_type = UserNotification.AUDITION_STATUS
+                        notification.message = "Sorry!! You have been removed from project "+character.project.title
+                        notification.save()
+                        # send notification- for removed user
+                        room_name = "user_"+str(old_user.id)
+                        notification_msg = {
+                                'type': 'send_audition_status_notification',
+                                'message': str(notification.message),
+                                'from': character.project.title,
+                                "event": "AUDITION_STATUS"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+                else:
+                    response = {'message': "No users attached",
+                                'status': status.HTTP_200_OK}
+            except Character.DoesNotExist:
+                response = {'errors': "Invalid ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ReplaceAttachedCastAPI(APIView):
+    serializer_class = ReplaceCastSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            user_id = None
+            old_user = None
+            name = ""
+            data_dict = serializer.data
+            character_id = data_dict['character']
+            if 'user' in data_dict:
+                user_id = data_dict['user']
+            if 'name' in data_dict:
+                name = data_dict['name']
+            try:
+                character = Character.objects.get(id=character_id)
+                all_auditions = Audition.objects.filter(
+                                character=character)
+                if user_id:
+                    try:
+                        user = CustomUser.objects.get(id=user_id)
+                        if character.attached_user:
+                            old_user = character.attached_user
+                        character.attached_user = user
+                        character.attached_user_name = user.get_full_name()
+                        character.save()
+                        response = {'message': "Replaced user",
+                                    'status': status.HTTP_200_OK}
+                        msg = "Attached "+user.get_full_name()+" to character-"+character.name
+                        messages.success(self.request, msg)
+
+
+                        attached_user_audition = all_auditions.filter(
+                                                  user=user).first()
+                        if attached_user_audition:
+                            attached_user_audition.status = Audition.ATTACHED
+                            attached_user_audition.save()
+                            all_auditions = all_auditions.exclude(
+                                            pk=attached_user_audition.id)
+                        # end
+
+                        if old_user:
+                            #update notification table- for removed user
+                            notification = UserNotification()
+                            notification.user = old_user
+                            notification.project = character.project
+                            notification.notification_type = UserNotification.AUDITION_STATUS
+                            notification.message = "Sorry!! You have been removed from project "+character.project.title
+                            notification.save()
+                            # send notification- for removed user
+                            room_name = "user_"+str(old_user.id)
+                            notification_msg = {
+                                    'type': 'send_audition_status_notification',
+                                    'message': str(notification.message),
+                                    'from': character.project.title,
+                                    "event": "AUDITION_STATUS"
+                                }
+                            notify(room_name, notification_msg)
+                            # end notification section
+
+                        #update notification table
+                        notification = UserNotification()
+                        notification.user = user
+                        notification.project = character.project
+                        notification.notification_type = UserNotification.AUDITION_STATUS
+                        notification.message = "Congratulations!! You have been attached to project "+character.project.title
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(character.attached_user.id)
+                        notification_msg = {
+                                'type': 'send_audition_status_notification',
+                                'message': str(notification.message),
+                                'from': character.project.title,
+                                "event": "AUDITION_STATUS"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+
+
+                    except CustomUser.DoesNotExist:
+                        response = {'errors': "Invalid user id", 'status':
+                                    status.HTTP_400_BAD_REQUEST}
+                if name:
+                    character.attached_user = None
+                    character.attached_user_name = name
+                    character.save()
+                    response = {'message': "Replaced user",
+                                'status': status.HTTP_200_OK}
+                    msg = "Attached "+name+" to character-"+character.name
+                    messages.success(self.request, msg)
+
+                # All other audition's status changed to passed
+                for obj in all_auditions:
+                    obj.status = Audition.PASSED
+                    obj.save()
+                    #update notification table- for removed user
+                    notification = UserNotification()
+                    notification.user = obj.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.AUDITION_STATUS
+                    notification.message = "Sorry!! Your audition for "+character.project.title+" has been passed."
+                    notification.save()
+                    # send notification- for removed user
+                    room_name = "user_"+str(obj.user.id)
+                    notification_msg = {
+                            'type': 'send_audition_status_notification',
+                            'message': str(notification.message),
+                            'from': character.project.title,
+                            "event": "AUDITION_STATUS"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+
+            except Character.DoesNotExist:
+                response = {'errors': "Invalid ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CommentAPI(APIView):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            try:
+                if 'reply_to' in data_dict:
+                    project = Project.objects.get(id=data_dict['project'])
+                    try:
+                        reply_to = Comment.objects.get(pk=data_dict['reply_to'])
+                        comment_obj = Comment()
+                        comment_obj.user = self.request.user
+                        comment_obj.comment_txt = data_dict['comment_txt']
+                        comment_obj.project = project
+                        comment_obj.reply_to = reply_to
+                        comment_obj.save()
+                        response = {'message': "Comment posted",
+                                    'id':comment_obj.id,
+                                    'status': status.HTTP_200_OK}
+                    except Comment.DoesNotExist:
+                        response = {'errors': 'Invalid reply_to field', 'status':
+                                     status.HTTP_400_BAD_REQUEST}
+                else:
+                    project = Project.objects.get(id=data_dict['project'])
+                    comment_obj = Comment()
+                    comment_obj.user = self.request.user
+                    comment_obj.comment_txt = data_dict['comment_txt']
+                    comment_obj.project = project
+                    comment_obj.reply_to = None
+                    comment_obj.save()
+                    response = {'message': "Comment posted",
+                                'id':comment_obj.id,
+                                'status': status.HTTP_200_OK}
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeleteCommentAPI(APIView):
+    serializer_class = DeleteCommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['comment_id']
+            try:
+                comment_obj = Comment.objects.get(pk=id)
+                comment_obj.delete()
+                response = {'message': "Comment deleted",
+                            'status': status.HTTP_200_OK}
+            except Comment.DoesNotExist:
+                response = {'errors': "Invalid id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':

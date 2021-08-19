@@ -1,6 +1,6 @@
 from hobo_user.models import UserRating, Project
-from project.models import Audition, AuditionRating, Character, Sides, \
-    ProjectRating
+from project.models import Audition, AuditionRating, Character, Comment, Sides, \
+    ProjectRating, Comment
 from rest_framework import serializers
 
 
@@ -187,3 +187,48 @@ class ProjectRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectRating
         fields = ['project', 'rating', 'reason']
+
+
+class RemoveCastSerializer(serializers.Serializer):
+    character = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class ReplaceCastSerializer(serializers.Serializer):
+    character = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    reply_to = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['project', 'comment_txt', 'reply_to']
+        extra_kwargs = {'comment_txt': {'required': True}}
+
+
+class DeleteCommentSerializer(serializers.Serializer):
+    comment_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )

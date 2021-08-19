@@ -4,7 +4,7 @@
 
 {% block extracss %}
 <style>
-    @media(min-width:300px) and (max-width:400px)
+    /* @media(min-width:300px) and (max-width:400px)
     {
         #cke_1_contents
         {
@@ -24,7 +24,7 @@
         {
             height:470px!important;
         }
-    }
+    } */
 </style>
 {% endblock %}
 
@@ -88,9 +88,7 @@
                                             <div class="sds-card-inneralign">
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
-                                                    <textarea class="ckeditor" class="pdf-style" id="editor1" name="editor1" >
-                                                        {{script_html}}
-                                                    </textarea> 
+                                                   <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -204,20 +202,5 @@
 {% block extrajs %}
 <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
 <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-<script>
-    CKEDITOR.replace( 'editor1', {
-    on: {
-        instanceReady: function( ev ) {
-            // Output paragraphs as <p>Text</p>.
-            this.dataProcessor.writer.setRules( 'p', {
-                indent: true,
-                breakBeforeOpen: true,
-                breakAfterOpen: true,
-                breakBeforeClose: true,
-                breakAfterClose: true
-            });
-        }
-    }
-} );
-</script>
+
 {% endblock %}

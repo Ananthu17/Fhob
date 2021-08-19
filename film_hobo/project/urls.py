@@ -11,7 +11,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
      UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI, \
      GetAuditionStatusNotificationAjaxView, GetVideoRatingNotificationAjaxView, \
-     GetProjectRatingNotificationAjaxView
+     GetProjectRatingNotificationAjaxView, CastAttachRemoveView, \
+     RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
+     DeleteCommentAPI
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -89,4 +91,17 @@ urlpatterns = [
      path('get-project-rating-notification-html/',
           GetProjectRatingNotificationAjaxView.as_view(),
           name='get-project-rating-notification-html'),
+     path('cast-attach-remove/<int:id>/',
+          CastAttachRemoveView.as_view(),
+          name='cast-attach-remove'),
+     path('remove-attached-cast-api/',
+          RemoveAttachedCastAPI.as_view(),
+          name='remove-attached-cast-api'),
+     path('replace-attached-cast-api/',
+          ReplaceAttachedCastAPI.as_view(),
+          name='replace-attached-cast-api'),
+     path('post-comment-api/', CommentAPI.as_view(),
+          name='post-comment-api'),
+     path('delete-comment-api/', DeleteCommentAPI.as_view(),
+          name='delete-comment-api'),
     ]

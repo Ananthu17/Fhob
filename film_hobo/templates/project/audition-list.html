@@ -34,7 +34,7 @@
                                 <li><span class="video-menu-head">AUDITION</span></li>
                                 <li><span><a href="{% url 'project:chemistry-room' project.id %}" class="cta-tag-black">Chemistry Room</a></span></li>
                                 <li>
-                                    <span class="">Casting Director: </span><a href="" class="cta-menu-blue"> {{casting_director.get_full_name}}</a>
+                                    <span class="">Casting Director: </span><a href="{{casting_director.get_profile_url}}" class="cta-menu-blue"> {{casting_director.get_full_name}}</a>
                                     <span class="cta-log-star">
                                         <div class="">
                                             <div class="cta-stars-outer">
@@ -43,7 +43,7 @@
                                         </div>
                                     </span>
                                 </li>
-                                <li><span><a href="" class="cta-tag-black">Cast Attach/Remove</a></span></li>
+                                <li><span><a href="{% url 'project:cast-attach-remove' project.id %}" class="cta-tag-black">Cast Attach/Remove</a></span></li>
                             </ul>
                         </form>
                     </div>

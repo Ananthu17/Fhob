@@ -38,7 +38,9 @@ class SubmitAuditionForm(forms.ModelForm):
 
 
 class AddSidesForm(forms.ModelForm):
-    description = forms.CharField(widget=CKEditorUploadingWidget())
+    # scene_1 = forms.CharField(widget=CKEditorUploadingWidget())
+    # scene_2 = forms.CharField(widget=CKEditorUploadingWidget())
+    # scene_3 = forms.CharField(widget=CKEditorUploadingWidget())
 
     class Meta:
         model = Sides

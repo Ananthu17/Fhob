@@ -57,7 +57,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetProfileRatingNotificationAjaxView, \
                    EditUserInterestAPI, \
                    VideoRatingView, ProjectView, \
-                   FindVideoRatingAPI, VideoListAPI
+                   FindVideoRatingAPI, VideoListAPI, GetAllUsersAPI
                #     ProjectSearchView
 
 
@@ -179,6 +179,7 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+    path('get-all-users-api/', GetAllUsersAPI.as_view(), name='get-all-users-api'),
 
 
     # web-view endpoints

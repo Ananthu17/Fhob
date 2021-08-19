@@ -347,7 +347,7 @@ CKEDITOR_CONFIGS = {
             ['RemoveFormat', ],
             ['Cut', 'Copy', 'Paste', 'PasteText'],
             ['Undo', 'Redo'],
-            ['Format', 'Styles', 'Image'],
+            ['Format', 'Styles', 'Font'],
         ],
         'width': 'auto',
         'height': 140,
