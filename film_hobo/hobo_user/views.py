@@ -276,6 +276,8 @@ class CustomUserSignupHobo(APIView):
                             complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
+            print("eeeeeeeeee")
+            print(user_response.status_code)
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
