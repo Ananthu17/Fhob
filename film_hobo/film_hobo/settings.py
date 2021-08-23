@@ -35,7 +35,7 @@ SECRET_KEY = env("SECRET_KEY")
 # 2 - DEMO_SERVER
 # 3 - AWS_PRODUCTION
 
-PROJECT_ENVIRONMENT = "LOCAL"
+PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     ORIGIN_URL = "http://202.88.246.92:8041"
@@ -322,6 +322,7 @@ CORS_ALLOWED_ORIGINS = (
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://0.0.0.0',
+    'http://202.88.246.92:8041',
 )
 
 
