@@ -270,8 +270,10 @@ class CustomUserSignupHobo(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration/'
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -360,8 +362,10 @@ class CustomUserSignupIndieView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_indie/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_indie/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -413,8 +417,10 @@ class CustomUserSignupProView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_pro/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_pro/',
+                complete_url,
                 data=json.dumps(json_dict),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -458,8 +464,10 @@ class CustomUserSignupCompany(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_company/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_company/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -629,8 +637,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -645,8 +655,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                    complete_url,
                     data=json.dumps(request.POST),
                     headers={'Content-type': 'application/json',
                              'Authorization': token})
@@ -666,8 +678,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -682,8 +696,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -703,8 +719,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         print(user_response)
@@ -720,8 +738,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -772,8 +792,10 @@ class PaymentIndieView(FormView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -912,8 +934,10 @@ class PaymentProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -974,8 +998,10 @@ class PaymentCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -1154,8 +1180,10 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
         message =""
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/enable-account-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/enable-account-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1299,8 +1327,10 @@ class ForgotPasswordView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/forgot-password-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         # print(user_response)
@@ -1334,9 +1364,10 @@ class PasswordResetTemplateView(TemplateView):
         uid = request.POST.get('uid')
         token = request.POST.get('token')
         email = request.POST.get('email')
-        url = 'http://127.0.0.1:8000/password-reset-confirm/'+uid+"/"+token
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/password-reset-confirm/'+uid+"/"+token
         user_response = requests.post(
-                            url,
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         byte_str = user_response.content
@@ -1595,8 +1626,10 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         json_dict['hide_ratings'] = hide_ratings
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/update-settings-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/update-settings-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1794,8 +1827,10 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
             json_dict['stop_age'] = None
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/personal-details-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2110,8 +2145,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             else:
                 edit_agent_dict['agent_email'] = ""
             # call edit-agent api
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/edit-agent-manager-api/'
             user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/edit-agent-manager-api/',
+                    complete_url,
                     data=json.dumps(edit_agent_dict),
                     headers={'Content-type': 'application/json',
                             'Authorization': token})
@@ -2186,8 +2223,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                         agent_dict['agent_email'] = ""
 
                 # save agents/manager
+                origin_url = settings.ORIGIN_URL
+                complete_url = origin_url + '/hobo_user/add-agent-manager-api/'
                 user_response = requests.post(
-                                    'http://127.0.0.1:8000/hobo_user/add-agent-manager-api/',
+                                    complete_url,
                                     data=json.dumps(agent_dict),
                                     headers={'Content-type': 'application/json',
                                             'Authorization': token})
@@ -2212,8 +2251,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                                     reverse('hobo_user:edit-profile'))
         if remove_agents:
             remove_dict['id'] = remove_agents
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/remove-agent-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/remove-agent-api/',
+                                complete_url,
                                 data=json.dumps(remove_dict),
                                 headers={
                                     'Content-type': 'application/json',
@@ -2232,8 +2273,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                             reverse('hobo_user:edit-profile'))
 
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2336,8 +2379,10 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/production-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/production-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2454,8 +2499,10 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/agency-management-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/agency-management-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -3506,8 +3553,10 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
             json_dict['budget'] = budget[i]
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/add-user-interest-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                         'Authorization': token})

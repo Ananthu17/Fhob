@@ -30,6 +30,20 @@ SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+# PROJECT_ENVIRONMENT valid options
+# 1 - LOCAL
+# 2 - DEMO_SERVER
+# 3 - AWS_PRODUCTION
+
+PROJECT_ENVIRONMENT = "LOCAL"
+
+if PROJECT_ENVIRONMENT == "DEMO_SERVER":
+    ORIGIN_URL = "http://202.88.246.92:8041"
+elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
+    ORIGIN_URL = "http://www.filmhobo.com"
+else:
+    ORIGIN_URL = "http://127.0.0.1:8000"
+
 # # for development
 DEBUG = True
 
