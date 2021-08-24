@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party packages
+    'environ',
     'rest_auth',
     'rest_framework',
     'django.contrib.sites',

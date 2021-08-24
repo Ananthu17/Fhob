@@ -1733,3 +1733,11 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Feedback'
         verbose_name_plural = 'Feedbacks'
+
+
+class BetaTesterCodes(models.Model):
+    code = models.CharField(_("Code"), max_length=10, unique=True)
+
+    class Meta:
+        verbose_name = 'Beta Tester Code'
+        verbose_name_plural = 'Beta Tester Codes'

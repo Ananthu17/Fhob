@@ -3,11 +3,26 @@
 {% load static %}
 
 {% block extracss %}
+<link rel="stylesheet" href="{% static 'css/choose_your_membership.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
     <div class="container-fluid memship-f">
+        <div class="box1 signup-form signup-section signup-border">
+            <div class="d-flex justify-content-center">
+              Hello welcome to Filmhobo, you are one amoung the beta testers to use this website,
+            </div>
+            <div class="d-flex justify-content-center">
+                use the following code to avail one free year of any Premium Memberships
+            </div>
+            <div class="d-flex justify-content-center">
+                <span id="copyText1" style="font-weight:bold">{{ beta_code }}</span>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="button" onclick="withJquery();">Click to Clipboard</button>
+            </div>
+          </div>
         <div class="row memship-row-head mt-2 ml-2 mr-2">
             <div class="col-4 memship-head">CHOOSE YOUR MEMBERSHIP</div>
             <div class="col-2 memship-pro-font underline" ><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></div>

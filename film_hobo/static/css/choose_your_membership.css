@@ -1,0 +1,26 @@
+.box1 {
+    display: block;
+    padding: 10px;
+    margin-bottom: 10px; /* SIMPLY SET THIS PROPERTY AS MUCH AS YOU WANT. This changes the space below box1 */
+    text-align: justify;
+}
+
+.box2 {
+    display: block;
+    text-align: justify;
+}
+
+.copy-notification {
+    color: #ffffff;
+    background-color: rgba(0,0,0,0.8);
+    padding: 20px;
+    border-radius: 30px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    margin-top: -30px;
+    margin-left: -85px;
+    display: none;
+    text-align:center;
+}

@@ -66,7 +66,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, \
                     CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined
+                    VideoRatingCombined, BetaTesterCodes
 from payment.models import Transaction
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -343,7 +343,10 @@ class ChooseMembershipPage(APIView):
     template_name = 'user_pages/choose_your_membership.html'
 
     def get(self, request):
-        return Response({})
+        # beta_test_codes = BetaTesterCodes.objects.all()
+        # for code in len(beta_test_codes):
+        beta_code = "DRUYsFwwcd"
+        return Response({'beta_code': beta_code})
 
 
 class CustomUserSignupIndieView(APIView):
