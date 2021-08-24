@@ -405,7 +405,7 @@ class ProjectCreationForm(forms.ModelForm):
                 'genre': forms.Select(attrs={'class': 'd-none'}),
                 'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
                                                    "placeholder": '$  0 or\
-                                                   Greater/Negotiable'}),
+                                                   Greater/Negotiable',"required":""}),
                 'sag_aftra': forms.Select(attrs={'class': 'd-none'}),
                 'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
                 'visibility': forms.Select(attrs={'class': 'd-none'}),
@@ -415,7 +415,7 @@ class ProjectCreationForm(forms.ModelForm):
                                                            form-control-input mem-b-placeholder",
                                                            'placeholder': 'password'
                                                            }),
-                'location': forms.Select(attrs={'class': 'inp-line'}),
+                'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
                 'script': forms.FileInput(),
                 'script_password': forms.PasswordInput(attrs={
