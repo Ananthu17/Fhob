@@ -18,7 +18,7 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     GroupUsers, Feedback, CompanyRating, \
                     CompanyRatingCombined, \
                     VideoRating, ProjectMemberRating, \
-                    BraintreePromoCode, VideoRatingCombined, BetaTesterCodes
+                    BraintreePromoCode, VideoRatingCombined
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
@@ -262,4 +262,4 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Team, TeamAdmin)
-admin.site.register(BetaTesterCodes)
+# admin.site.register(BetaTesterCodes)
