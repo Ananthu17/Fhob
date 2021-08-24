@@ -1,6 +1,7 @@
 import ast
 import braintree
 import json
+import random
 import requests
 import datetime
 from braces.views import JSONResponseMixin
@@ -343,10 +344,10 @@ class ChooseMembershipPage(APIView):
     template_name = 'user_pages/choose_your_membership.html'
 
     def get(self, request):
-        # beta_test_codes = BetaTesterCodes.objects.all()
-        # for code in len(beta_test_codes):
-        beta_code = "DRUYsFwwcd"
-        return Response({'beta_code': beta_code})
+        beta_test_codes = BetaTesterCodes.objects.all()
+        random_id = random.randint(1, len(beta_test_codes))
+        beta_code = BetaTesterCodes.objects.get(id=random_id).code
+        return Response({'beta_code': str(beta_code)})
 
 
 class CustomUserSignupIndieView(APIView):
