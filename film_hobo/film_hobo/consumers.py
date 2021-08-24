@@ -148,3 +148,24 @@ class NotificationConsumer(WebsocketConsumer):
             'event': "PROJECT_RATING"
         }))
 
+    def send_comments_mention_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS_MENTION"
+        }))
+
+    def send_comments_reply_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS_REPLY"
+        }))
+
+    def send_comments_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS"
+        }))
+

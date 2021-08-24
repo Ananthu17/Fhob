@@ -458,10 +458,18 @@ $(".comment-textarea")
         var name_list_2 = name_list;
         var name_str = name_list_2.join("|");
         var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
-
+        // var found = $('.mention_user', comment_txt);
+        var found = $(comment_txt).filter('.mention_user');
+        var id_list = [];
+        $(found).each(function( link ) {
+            var id = $(this).attr("id");
+            id_list.push(id)
+        });
         var data_dict = {};
         data_dict['project'] = project_id
         data_dict['comment_txt'] = comment_txt
+        data_dict['mentioned_users'] = JSON.stringify(id_list)
+
         console.log(data_dict)
         if(comment_txt){
             $.ajax
@@ -494,6 +502,12 @@ $(".comment-textarea")
         var name_str = name_list_2.join("|");
         var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
 
+        var found = $(comment_txt).filter('.mention_user');
+        var id_list = [];
+        $(found).each(function( link ) {
+            var id = $(this).attr("id");
+            id_list.push(id)
+        });
 
         var div_id = "#comment-"+comment_id;
         var data_dict = {};
@@ -501,7 +515,8 @@ $(".comment-textarea")
         data_dict['project'] = project_id
         data_dict['comment_txt'] = comment_txt
         data_dict['reply_to'] = comment_id
-        console.log(data_dict)
+        data_dict['mentioned_users'] = JSON.stringify(id_list)
+        // console.log(data_dict)
         if(comment_txt){
             $.ajax
             ({

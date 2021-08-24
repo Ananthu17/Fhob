@@ -1543,6 +1543,9 @@ class UserNotification(models.Model):
     AUDITION_STATUS = 'audition_status'
     VIDEO_RATING = 'video_rating'
     PROJECT_RATING = 'project_rating'
+    COMMENTS = 'comments'
+    COMMENTS_REPLY = 'comments_reply'
+    COMMENTS_MENTION = 'comments_mention'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1557,6 +1560,9 @@ class UserNotification(models.Model):
                                 (AUDITION_STATUS, 'Audition Status'),
                                 (VIDEO_RATING, 'Video Rating'),
                                 (PROJECT_RATING, 'Project Rating'),
+                                (COMMENTS, 'Comments'),
+                                (COMMENTS_REPLY, 'Comments Reply'),
+                                (COMMENTS_MENTION, 'Comments Mention'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),

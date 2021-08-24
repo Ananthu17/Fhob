@@ -1667,6 +1667,7 @@ class UpdateAuditionStatusAPI(APIView):
                                     pk=audition.id)
                     for obj in all_auditions:
                         obj.status = Audition.PASSED
+                        obj.status_update_date = timezone.now()
                         obj.save()
                         #update notification table- for removed user
                         notification = UserNotification()
@@ -1905,6 +1906,14 @@ class RemoveAttachedCastAPI(APIView):
                     messages.success(self.request, msg)
 
                     if old_user:
+                        audition_obj = Audition.objects.filter(
+                                       Q(character=character) &
+                                       Q(user=old_user)
+                                        ).first()
+                        if audition_obj:
+                            audition_obj.status = Audition.PASSED
+                            audition_obj.status_update_date = timezone.now()
+                            audition_obj.save()
                         #update notification table- for removed user
                         notification = UserNotification()
                         notification.user = old_user
@@ -1975,6 +1984,7 @@ class ReplaceAttachedCastAPI(APIView):
                                                   user=user).first()
                         if attached_user_audition:
                             attached_user_audition.status = Audition.ATTACHED
+                            attached_user_audition.status_update_date = timezone.now()
                             attached_user_audition.save()
                             all_auditions = all_auditions.exclude(
                                             pk=attached_user_audition.id)
@@ -2033,6 +2043,7 @@ class ReplaceAttachedCastAPI(APIView):
                 # All other audition's status changed to passed
                 for obj in all_auditions:
                     obj.status = Audition.PASSED
+                    obj.status_update_date = timezone.now()
                     obj.save()
                     #update notification table- for removed user
                     notification = UserNotification()
@@ -2073,9 +2084,10 @@ class CommentAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
+            print("data_dict", data_dict)
             try:
+                project = Project.objects.get(id=data_dict['project'])
                 if 'reply_to' in data_dict:
-                    project = Project.objects.get(id=data_dict['project'])
                     try:
                         reply_to = Comment.objects.get(pk=data_dict['reply_to'])
                         comment_obj = Comment()
@@ -2087,20 +2099,115 @@ class CommentAPI(APIView):
                         response = {'message': "Comment posted",
                                     'id':comment_obj.id,
                                     'status': status.HTTP_200_OK}
+
+                        # send mention notifications
+                        if 'mentioned_users' in data_dict:
+                            user_list = json.loads(data_dict['mentioned_users'])
+                            for user_id in user_list:
+                                try:
+                                    user_obj  = CustomUser.objects.get(pk=user_id)
+                                    #update notification table
+                                    notification = UserNotification()
+                                    notification.user = user_obj
+                                    notification.notification_type = UserNotification.COMMENTS_MENTION
+                                    notification.from_user = self.request.user
+                                    notification.project = project
+                                    notification.message = self.request.user.get_full_name()+" mentioned you in "+project.title+"'s post."
+                                    notification.save()
+                                    # send notification
+                                    room_name = "user_"+str(user_obj.id)
+                                    notification_msg = {
+                                            'type': 'send_comments_mention_notification',
+                                            'message': str(notification.message),
+                                            'from': str(self.request.user.id),
+                                            "event": "COMMENTS_MENTION"
+                                        }
+                                    notify(room_name, notification_msg)
+                                    # end notification section
+                                except CustomUser.DoesNotExist:
+                                    pass
+
+
+                        #send reply notification
+                        #update notification table
+                        notification = UserNotification()
+                        notification.user = reply_to.user
+                        notification.notification_type = UserNotification.COMMENTS_REPLY
+                        notification.from_user = self.request.user
+                        notification.project = project
+                        notification.message = self.request.user.get_full_name()+" replied to your comment on your project "+project.title+"'s video."
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(reply_to.user.id)
+                        notification_msg = {
+                                'type': 'send_comments_reply_notification',
+                                'message': str(notification.message),
+                                'from': str(self.request.user.id),
+                                "event": "COMMENTS_REPLY"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+
                     except Comment.DoesNotExist:
                         response = {'errors': 'Invalid reply_to field', 'status':
                                      status.HTTP_400_BAD_REQUEST}
                 else:
-                    project = Project.objects.get(id=data_dict['project'])
                     comment_obj = Comment()
                     comment_obj.user = self.request.user
                     comment_obj.comment_txt = data_dict['comment_txt']
                     comment_obj.project = project
                     comment_obj.reply_to = None
                     comment_obj.save()
+                    if 'mentioned_users' in data_dict:
+                        user_list = json.loads(data_dict['mentioned_users'])
+                        for user_id in user_list:
+                            try:
+                                user_obj  = CustomUser.objects.get(pk=user_id)
+                                #update notification table
+                                notification = UserNotification()
+                                notification.user = user_obj
+                                notification.notification_type = UserNotification.COMMENTS_MENTION
+                                notification.from_user = self.request.user
+                                notification.project = project
+                                notification.message = self.request.user.get_full_name()+" mentioned you in "+project.title+"'s post."
+                                notification.save()
+                                # send notification
+                                room_name = "user_"+str(user_obj.id)
+                                notification_msg = {
+                                        'type': 'send_comments_mention_notification',
+                                        'message': str(notification.message),
+                                        'from': str(self.request.user.id),
+                                        "event": "COMMENTS_MENTION"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+                            except CustomUser.DoesNotExist:
+                                pass
                     response = {'message': "Comment posted",
                                 'id':comment_obj.id,
                                 'status': status.HTTP_200_OK}
+
+                #send comment notification to project creator
+                #update notification table
+                notification = UserNotification()
+                notification.user = project.creator
+                notification.notification_type = UserNotification.COMMENTS
+                notification.from_user = self.request.user
+                notification.project = project
+                notification.message = self.request.user.get_full_name()+" commented on your project "+project.title+"'s video."
+                notification.save()
+                # send notification
+                room_name = "user_"+str(project.creator.id)
+                notification_msg = {
+                        'type': 'send_comments_notification',
+                        'message': str(notification.message),
+                        'from': str(self.request.user.id),
+                        "event": "COMMENTS"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
+
             except Project.DoesNotExist:
                 response = {'errors': 'Invalid project ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -2134,3 +2241,54 @@ class DeleteCommentAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class GetCommentsMentionNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS_MENTION)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCommentsNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCommentsReplyNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS_REPLY)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)

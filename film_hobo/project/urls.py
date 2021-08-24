@@ -13,7 +13,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetAuditionStatusNotificationAjaxView, GetVideoRatingNotificationAjaxView, \
      GetProjectRatingNotificationAjaxView, CastAttachRemoveView, \
      RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
-     DeleteCommentAPI
+     DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
+     GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -104,4 +105,13 @@ urlpatterns = [
           name='post-comment-api'),
      path('delete-comment-api/', DeleteCommentAPI.as_view(),
           name='delete-comment-api'),
+     path('get-comments-mention-notification-html/',
+          GetCommentsMentionNotificationAjaxView.as_view(),
+          name='get-comments-mention-notification-html'),
+     path('get-comments-notification-html/',
+          GetCommentsNotificationAjaxView.as_view(),
+          name='get-comments-notification-html'),
+     path('get-comments-reply-notification-html/',
+          GetCommentsReplyNotificationAjaxView.as_view(),
+          name='get-comments-reply-notification-html'),
     ]

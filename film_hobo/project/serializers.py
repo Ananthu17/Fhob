@@ -220,10 +220,14 @@ class CommentSerializer(serializers.ModelSerializer):
         max_length=150,
         required=False,
     )
+    mentioned_users = serializers.CharField(
+                        max_length=150,
+                        required=False,
+                    )
 
     class Meta:
         model = Comment
-        fields = ['project', 'comment_txt', 'reply_to']
+        fields = ['project', 'comment_txt', 'reply_to', 'mentioned_users']
         extra_kwargs = {'comment_txt': {'required': True}}
 
 

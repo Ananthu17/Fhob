@@ -4414,11 +4414,12 @@ class GetAllUsersAPI(APIView):
     def get(self, request):
         super_users = CustomUser.objects.filter(is_superuser=True).values_list('id')
         all_users = CustomUser.objects.exclude(id__in=super_users)
+        all_users = all_users.exclude(id=self.request.user.id)
         serializer_list = []
         name_list = []
         name_dict = {}
         for user in all_users:
             serializer_list.append(user.get_full_name())
             name_list.append(user.get_full_name())
-            name_dict[user.get_full_name()]="<a href="+user.get_profile_url()+">"+user.get_full_name()+"</a> "
+            name_dict[user.get_full_name()]="<a href='"+user.get_profile_url()+"' id='"+str(user.id)+"' class='mention_user'>"+user.get_full_name()+"</a> "
         return Response({"serializer_list": serializer_list, "name_dict": name_dict, "name_list": name_list})

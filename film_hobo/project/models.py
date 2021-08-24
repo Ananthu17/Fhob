@@ -112,6 +112,12 @@ class Audition(models.Model):
                                     help_text="Image size:370 X 248.")
     status_update_date = models.DateField(_("Status updated on"),
                                           null=True, blank=True,)
+    i_agree = models.BooleanField(
+                _('I Agree'),
+                default=True,
+                help_text=_(
+                    'Designates whether the user accepted the terms and conditions.'),
+            )
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+"-"+self.name
