@@ -1,5 +1,5 @@
 from hobo_user.models import UserRating, Project
-from project.models import Audition, AuditionRating, Character, Comment, Sides, \
+from project.models import Audition, AuditionRating, Character, Comment, SceneImages, Sides, \
     ProjectRating, Comment
 from rest_framework import serializers
 
@@ -236,3 +236,37 @@ class DeleteCommentSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
+
+
+class PdfToImageSerializer(serializers.Serializer):
+    path = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    project_id = serializers.CharField(
+                    max_length=150,
+                    required=True,
+                )
+    page_no = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class SceneImagesSerializer(serializers.ModelSerializer):
+    scene = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    project_id = serializers.CharField(
+                    max_length=150,
+                    required=True,
+                )
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+    class Meta:
+        model = SceneImages
+        fields = ['scene', 'project_id', 'character_id', 'image']

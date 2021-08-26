@@ -237,3 +237,41 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
+
+
+class SceneImages(models.Model):
+    SCENE_1 = 'scene_1'
+    SCENE_2 = 'scene_2'
+    SCENE_3 = 'scene_3'
+
+    SCENE_CHOICES = [
+        (SCENE_1, 'Scene 1'),
+        (SCENE_2, 'Scene 2'),
+        (SCENE_3, 'Scene 3'),
+    ]
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_scene_image',
+                                verbose_name=_("Project"),
+                                null=True)
+    character = models.ForeignKey("project.Character",
+                                  on_delete=models.CASCADE,
+                                  related_name='character_scene_image',
+                                  verbose_name=_("Character"),
+                                  null=True)
+    image = models.ImageField(upload_to='scene/',
+                              null=True,
+                              help_text="Image size:370 X 248.")
+    scene = models.CharField(_("Video Type"),
+                             choices=SCENE_CHOICES,
+                             max_length=150, null=True,
+                             default=SCENE_1)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.project.title+" - "+str(self.get_scene_display()))
+
+    class Meta:
+        verbose_name = 'Scene Image'
+        verbose_name_plural = 'Scene Images'

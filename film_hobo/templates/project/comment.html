@@ -1,0 +1,36 @@
+
+
+{% load notification_tag %}
+{% load comment_tag %}
+
+<div class="row" style="padding-left:1em;" id="reply-section-{{comment.id}}">
+{% for reply in reply_comments %}
+    <div class="col-12">
+        <div class="comment-div" >
+            <span class="txt-capitalize comment-name-style">
+                <a href="{{comment.user.get_profile_url}}">{{reply.user.get_full_name}}</a>:
+            </span>
+            <span class="comment-style">{{reply.comment_txt|safe}}</span>
+        </div>
+        <div>
+            {% get_notifications_time reply.created_time as comment_time%}
+            <span class="comment-style-time">{{comment_time}}</span>
+            <span class="comment-style-time pl-2">
+                <a class="cursor-pointer reply comment-style-time remove-decoration" id="{{reply.id}}">Reply</a>
+            </span>
+            <span class="comment-style-time pl-2">
+                {% if request.user == reply.user %}
+                <a class="cursor-pointer delete comment-style-time remove-decoration" id="{{reply.id}}">
+                    Delete
+                </a>
+                {% endif %}
+            </span>
+        </div>
+        <div id="comment-{{reply.id}}" class="comment-reply-box"></div>
+        {% get_reply_comments reply project as reply_comments_2 %}
+        {% if reply_comments != none %}
+            {% include 'project/comment2.html' %}
+        {% endif %}
+    </div>
+{% endfor %}
+</div>

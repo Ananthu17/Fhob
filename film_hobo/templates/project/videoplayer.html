@@ -4,6 +4,9 @@
 {% load user_account_tag %}
 {% load notification_tag %}
 {% load project_tracking_tag %}
+{% load comment_tag %}
+
+
 {% block extracss %}
 <style>
     #player.vp-title
@@ -123,12 +126,14 @@
                                             <div class="row comment_section">
                                             {% for comment in comments %}
                                                 <div class="col-12 ">
+                                                    {% if comment.reply_to == none %}
                                                     <div class="comment-div" >
                                                         <span class="txt-capitalize comment-name-style">
                                                             <a href="{{comment.user.get_profile_url}}">{{comment.user.get_full_name}}</a>:
                                                         </span>
                                                         <span class="comment-style">{{comment.comment_txt|safe}}</span>
-                                                        <div>
+                                                    </div>
+                                                    <div>
                                                         {% get_notifications_time comment.created_time as comment_time%}
                                                         <span class="comment-style-time">{{comment_time}}</span>
                                                         <span class="comment-style-time pl-2">
@@ -142,31 +147,14 @@
                                                             {% endif %}
                                                         </span>
                                                     </div>
-                                                        <div id="comment-{{comment.id}}" class="comment-reply-box"></div>
-                                                    </div>
-                                                    <div class="row" style="padding-left:1em;" id="reply-section-{{comment.id}}">
-                                                        {% get_dict_value reply_dict comment.id as reply_list %}
-                                                        {% for reply in reply_list %}
-                                                        <div class="col-12">
-                                                            <span class="txt-capitalize comment-name-style">
-                                                                <a href="{{reply.user.get_profile_url}}">{{reply.user.get_full_name}}</a>:
-                                                            </span>
-                                                            <span class="comment-style">{{reply.comment_txt|safe}}</span>
-                                                            <div>
-                                                            {% get_notifications_time reply.created_time as reply_time%}
-                                                            <span class="comment-style-time">{{reply_time}}</span>
-                                                            <span class="comment-style-time pl-2">
-                                                                {% if request.user == reply.user %}
-                                                                <a class="cursor-pointer delete comment-style-time remove-decoration" id="{{reply.id}}">
-                                                                    Delete
-                                                                </a>
-                                                                {% endif %}
-                                                            </span>
-                                                            </div>
-                                                        </div>
-                                                        {% endfor %}
-                                                    </div>
+                                                    <div id="comment-{{comment.id}}" class="comment-reply-box"></div>
+                                                        {% get_reply_comments comment project as reply_comments %}
+                                                        {% if reply_comments != none %}
+                                                            {% include 'project/comment.html' %}
+                                                        {% endif %}
+                                                    {% endif %}
                                                 </div>
+
                                             {% endfor %}
                                         </div>
                                         </div>
@@ -483,9 +471,10 @@ $(".comment-textarea")
                     xhr.setRequestHeader ("Authorization", token);
                 },
                 success: function (response){
-                    var comment_id = response['id']
-                    $('#comment_txt').val("");
-                    $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
+                    window.location.reload()
+                    // var comment_id = response['id']
+                    // $('#comment_txt').val("");
+                    // $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
 
                 }
             });
@@ -529,9 +518,10 @@ $(".comment-textarea")
                     xhr.setRequestHeader ("Authorization", token);
                 },
                 success: function (response){
-                    var comm_id = response['id'];
-                    $(".comment-reply-box").html("");
-                    $(reply_section).append('<div class="col-12 "><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comm_id+'">Delete</a></span></div></div>');
+                    window.location.reload();
+                    // var comm_id = response['id'];
+                    // $(".comment-reply-box").html("");
+                    // $(reply_section).append('<div class="col-12 "><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comm_id+'">Delete</a></span></div></div>');
                 }
             });
         }

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Character, Sides, Audition, ProjectTracking, \
-    AuditionRating, AuditionRatingCombined, ProjectRating, Comment
+    AuditionRating, AuditionRatingCombined, ProjectRating, Comment, \
+    SceneImages
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 
@@ -20,3 +21,4 @@ class ProjectTrackingAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProjectTracking, ProjectTrackingAdmin)
+admin.site.register(SceneImages)

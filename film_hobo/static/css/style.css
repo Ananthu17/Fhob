@@ -537,11 +537,12 @@ input.pw {
     text-align:right;
     padding:15px;
   }
-.comment-name-style
+.comment-name-style a
   {
-    color: #0e62b5;
+    color: #e88b24!important;
     font-size:14px;
     font-family: Myriad Pro;
+    font-weight:600;
   }
 .comment-style
   {
@@ -621,4 +622,34 @@ input.pw {
 .blue_color_link
  {
    color:#0e62b5;
+ }
+ .modal_pdf_img
+ {
+   width:100%!important;
+   max-width: 100%!important;
+ }
+#crop-image
+ {
+   visibility:hidden;
+ }
+.screenshot-img
+ {
+   width:100%;
+   height:auto;
+ }
+.btn-simple
+ {
+   padding:5px 15px ;
+   font-size:12px;
+   font-family:Myraid Pro;
+   border:1px solid #e88b24;
+   background-color:#e88b24;
+   color:#000;
+   cursor:pointer;
+   border-radius: 5px;
+ }
+.btn-simple:hover
+ {
+  text-decoration: none;
+  color:#000;
  }

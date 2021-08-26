@@ -14,7 +14,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetProjectRatingNotificationAjaxView, CastAttachRemoveView, \
      RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
      DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
-     GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView
+     GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
+     PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI \
+
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -114,4 +116,10 @@ urlpatterns = [
      path('get-comments-reply-notification-html/',
           GetCommentsReplyNotificationAjaxView.as_view(),
           name='get-comments-reply-notification-html'),
+     path('pdf-to-image-api/', PdfToImageAPI.as_view(),
+          name='pdf-to-image-api'),
+     path('add-scene-images/<int:id>/', AddSceneImagesView.as_view(),
+          name='add-scene-images'),
+     path('generate-scene-image-pdf-api/', GenerateSceneImagePDFAPI.as_view(),
+          name='generate-scene-image-pdf-api'),
     ]

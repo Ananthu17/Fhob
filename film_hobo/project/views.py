@@ -7,9 +7,13 @@ import boto3
 import datetime
 from django.utils import timezone
 import mammoth
+import fitz
 
-
-
+import PIL
+from fpdf import FPDF
+from django.core import files
+from io import BytesIO
+from pdf2image import convert_from_path
 from braces.views import JSONResponseMixin
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
@@ -46,14 +50,15 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
      VideoRatingCombined
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Comment, Sides, ProjectTracking, ProjectRating
+    Character, Comment, SceneImages, Sides, ProjectTracking, ProjectRating
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
       RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
-      CommentSerializer, DeleteCommentSerializer
+      CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
+      SceneImagesSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
@@ -102,20 +107,22 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
             except ProjectMemberRating.DoesNotExist:
                 rating_dict[obj.id] = 0
 
-        comments = Comment.objects.filter(
-                   Q(project=project) &
-                   Q(reply_to=None)
-                    ).order_by('created_time')
-        reply_dict = {}
-        for obj in comments:
-            reply_dict[obj.id] = []
-            reply_comments = Comment.objects.filter(
-                                Q(project=project) &
-                                Q(reply_to=obj)
-                                ).order_by('created_time')
-            reply_dict[obj.id] = reply_comments
+        comments = Comment.objects.filter(project=project).order_by('-created_time')
+
+        # comments = Comment.objects.filter(
+        #            Q(project=project) &
+        #            Q(reply_to=None)
+        #             ).order_by('created_time')
+        # reply_dict = {}
+        # for obj in comments:
+        #     reply_dict[obj.id] = []
+        #     reply_comments = Comment.objects.filter(
+        #                         Q(project=project) &
+        #                         Q(reply_to=obj)
+        #                         ).order_by('created_time')
+        #     reply_dict[obj.id] = reply_comments
         context['comments'] = comments
-        context['reply_dict'] = reply_dict
+        # context['reply_dict'] = reply_dict
 
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
@@ -1186,6 +1193,7 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
             context['form'] = AddSidesForm(instance=sides)
         except Sides.DoesNotExist:
             context['form'] = AddSidesForm()
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1220,6 +1228,119 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         messages.success(self.request, "Sides updated successfully")
         url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
         return HttpResponseRedirect(url)
+
+
+class AddSceneImagesView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/add-scene-images.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        character_id = self.request.GET.get('character_id')
+        scene = self.request.GET.get('scene')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        character = get_object_or_404(Character, pk=character_id)
+        context['character'] = character
+
+        scene = 'scene_'+scene
+        scene_image_objs = SceneImages.objects.filter(
+                            Q(project=project) &
+                            Q(character=character) &
+                            Q(scene=scene)
+                        ).order_by('created_time')
+        context['scene_image_objs'] = scene_image_objs
+        return context
+
+    def post(self, request, *args, **kwargs):
+        print(self.request.POST)
+        scene = self.request.POST.get('scene')
+        project_id = self.request.POST.get('project_id')
+        character_id = self.request.POST.get('character_id')
+        scene_image_obj = SceneImages()
+        scene_image_obj.project = get_object_or_404(
+                                  Project, pk = project_id)
+        scene_image_obj.character = get_object_or_404(
+                                    Character, pk = character_id)
+        if scene == '1':
+            scene_image_obj.scene = SceneImages.SCENE_1
+        if scene == '2':
+            scene_image_obj.scene = SceneImages.SCENE_2
+        if scene == '3':
+            scene_image_obj.scene = SceneImages.SCENE_3
+        # scene_image_obj.image = 'media/script/project_6.jpg'
+        url = "http://localhost:8000/media/script/project_"+project_id+".jpg"
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            pass
+
+        fp = BytesIO()
+        fp.write(resp.content)
+        file_name = url.split("/")[-1]  # There's probably a better way of doing this but this is just a quick example
+        scene_image_obj.image.save(file_name, files.File(fp))
+        scene_image_obj.save()
+
+        x = float(self.request.POST.get('x'))
+        y = float(self.request.POST.get('y'))
+        w = float(self.request.POST.get('width'))
+        h = float(self.request.POST.get('height'))
+
+        image = PIL.Image.open(scene_image_obj.image)
+        cropped_image = image.crop((x, y, w+x, h+y))
+        # resized_image = cropped_image.resize((200, 200), PIL.Image.ANTIALIAS)
+        cropped_image.save(scene_image_obj.image.path)
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class GenerateSceneImagePDFAPI(APIView):
+    serializer_class = SceneImagesSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+
+            project_id = data_dict['project_id']
+            character_id = data_dict['character_id']
+            scene = data_dict['scene']
+            
+            project = get_object_or_404(Project, pk=project_id)
+            character = get_object_or_404(Character, pk=character_id)
+
+            print(data_dict)
+            scene_image_objs = SceneImages.objects.filter(
+                            Q(project=project) &
+                            Q(character=character) &
+                            Q(scene=scene)
+                        ).order_by('created_time')
+
+            pdf = FPDF()
+            for img_obj in scene_image_objs:
+                pdf.add_page()
+                img_path = str(img_obj.image.url)[1:]
+                pdf.image(img_path, 0, 0, 0, 0)
+            output_path = "media/scene/"+scene+str(project_id)+str(character_id)+".pdf"
+            pdf.output(output_path, "F")
+            if scene == 'scene_1':
+                msg = "Scene 1 updated"
+            if scene == 'scene_2':
+                msg = "Scene 2 updated"
+            if scene == 'scene_3':
+                msg = "Scene 3 updated"
+            messages.success(self.request, msg)
+            response = {'message': "Scene Pdf uploaded",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
 
 
 class ScriptPasswordCheckAPI(APIView):
@@ -2148,6 +2269,8 @@ class CommentAPI(APIView):
                         notify(room_name, notification_msg)
                         # end notification section
 
+                        messages.success(self.request, "Reply posted.")
+
                     except Comment.DoesNotExist:
                         response = {'errors': 'Invalid reply_to field', 'status':
                                      status.HTTP_400_BAD_REQUEST}
@@ -2186,26 +2309,28 @@ class CommentAPI(APIView):
                     response = {'message': "Comment posted",
                                 'id':comment_obj.id,
                                 'status': status.HTTP_200_OK}
+                    messages.success(self.request, "Comment posted.")
 
                 #send comment notification to project creator
-                #update notification table
-                notification = UserNotification()
-                notification.user = project.creator
-                notification.notification_type = UserNotification.COMMENTS
-                notification.from_user = self.request.user
-                notification.project = project
-                notification.message = self.request.user.get_full_name()+" commented on your project "+project.title+"'s video."
-                notification.save()
-                # send notification
-                room_name = "user_"+str(project.creator.id)
-                notification_msg = {
-                        'type': 'send_comments_notification',
-                        'message': str(notification.message),
-                        'from': str(self.request.user.id),
-                        "event": "COMMENTS"
-                    }
-                notify(room_name, notification_msg)
-                # end notification section
+                if self.request.user != project.creator:
+                    #update notification table
+                    notification = UserNotification()
+                    notification.user = project.creator
+                    notification.notification_type = UserNotification.COMMENTS
+                    notification.from_user = self.request.user
+                    notification.project = project
+                    notification.message = self.request.user.get_full_name()+" commented on your project "+project.title+"'s video."
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(project.creator.id)
+                    notification_msg = {
+                            'type': 'send_comments_notification',
+                            'message': str(notification.message),
+                            'from': str(self.request.user.id),
+                            "event": "COMMENTS"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
 
 
             except Project.DoesNotExist:
@@ -2292,3 +2417,34 @@ class GetCommentsReplyNotificationAjaxView(View, JSONResponseMixin):
                                 })
         context['notification_html'] = notification_html
         return self.render_json_response(context)
+
+
+class PdfToImageAPI(APIView):
+    serializer_class = PdfToImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            path = data_dict['path']
+            project_id = data_dict['project_id']
+            page_no = int(data_dict['page_no'])
+            print("page_no: ", page_no)
+            pdffile = path
+            doc = fitz.open(path)
+            page = doc.loadPage(page_no)  # number of page
+            pix = page.getPixmap(matrix = mat)
+            output = 'media/script/project_{0}.jpg'.format(str(project_id))
+            pix.writePNG(output)
+
+
+            response = {'message': "Image generated",
+                        'image_path': output,
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

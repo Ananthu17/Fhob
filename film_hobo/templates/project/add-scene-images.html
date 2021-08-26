@@ -76,16 +76,9 @@
 
                 <div class="sds-input-bg">
                     <div class="sds-input-padding">
-                        <form  method="post"
-                        action="{% url 'project:edit-sides' project.id %}?{{character.id}}"
-                        id="sidesform">
-                            {% csrf_token %}
-                            <input type="hidden" name="character_id" value="{{character.id}}" />
                             <div class="row">
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-input-right-info">
-                                        Copy each Scene and Paste to the right
-                                        <a class="cursor-pointer crop_img_btn">Crop Image</a>
                                     </div>
                                     <div>
                                         <div class="card sds-script-card" >
@@ -98,71 +91,88 @@
                                             </div>
                                         </div>
 
-<!-- MODAL TO CROP THE IMAGE -->
+<!-- The Modal -->
 <div class="modal fade" id="modalCrop">
     <div class="modal-dialog">
-      <div class="modal-content">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title">Crop the photo</h4>
+        <h5 class="modal-title samr-modal-title">Crop the photo</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
         </div>
+        <form  method="post"
+        action="{% url 'project:add-scene-images' project.id %}"
+        id="sidesform" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="project_id" id="project_id" value="{{project.id}}" />
+            <input type="hidden" name="character_id" id="character_id" value="{{character.id}}" />
+            <input type="hidden" name="scene" id="scene" value="{{ request.GET.scene }}" />
+
+            <input type="hidden" name="x" id="x" />
+            <input type="hidden" name="y" id="y" />
+            <input type="hidden" name="width" id="width" />
+            <input type="hidden" name="height" id="height"/>
+        <!-- Modal body -->
         <div class="modal-body">
-          <!-- <img src="" id="image" style="max-width: 100%;"> -->
-          <div class="pdf_img"></div>
-          <!-- <img src="https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_960_720.jpg" id="image" style="max-width: 100%;"> -->
-          <div id="cropped_result"></div>
+            <div class="pdf_img"></div>
+            <div id="cropped_result"></div>
         </div>
+
+        <!-- Modal footer -->
         <div class="modal-footer">
-          <div class="btn-group pull-left" role="group">
-            <button type="button" class="btn btn-default js-zoom-in">
-              <span class="glyphicon glyphicon-zoom-in"></span>
-            </button>
-            <button type="button" class="btn btn-default js-zoom-out">
-              <span class="glyphicon glyphicon-zoom-out"></span>
-            </button>
-          </div>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
-          <button type="button" class="btn btn-primary js-crop-and-upload">Crop and upload</button>
+        <button type="button"
+        class="btn btn-outline-danger btn-sm js-crop-and-upload">
+        Crop and upload</button>
+        <button class="btn btn-outline-danger btn-sm close-modal"
+        data-dismiss="modal">Close</button>
+
         </div>
-      </div>
+    </form>
     </div>
-  </div>
+    </div>
+</div>
 <!-- end of modal -->
+
 
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt">
-                                                <a href="">SIDES</a>
-                                            </span>
-                                            <span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
-                                            <span class="pl-4" >
-                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">Crop from Script</a>
-                                            </span>
-                                           
+                                            <span class="sds-side-txt"></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                         </div>
-                                        <div>
-                                            {{form.scene_1}}
+                                        <div class="row mt-4">
+                                            <div class="col-4">
+                                                <input class="inp-line pdf_page_number" placeholder="Page Number" />
+                                            </div>
+                                            <div class="col-8">
+                                                <a class="cursor-pointer crop_img_btn btn-simple ">Crop Image</a>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="sds-textarea-padding">
-                                        <div class="sds-scene-head">
-                                            <span class="sds-scene-txt">SCENE TWO</span>
+                                        <div class="mt-4" >
+                                        {% for obj in scene_image_objs %}
+                                        {% if forloop.first or forloop.counter0|divisibleby:4 %}
+                                        <div class="row mt-2">
+                                        {% endif %}
+                                            <div class="col-12 col-md-3">
+                                                <img src = {{obj.image.url}} class="screenshot-img" />
+                                            </div>
+                                        {% if forloop.last or forloop.counter|divisibleby:4 %}
                                         </div>
-                                        <div>
-                                            {{form.scene_2}}
-                                        </div>
-                                    </div>
-                                    <div class="sds-textarea-padding">
-                                        <div class="sds-scene-head">
-                                            <span class="sds-scene-txt">SCENE THREE</span>
-                                        </div>
-                                        <div>
-                                            {{form.scene_3}}
+                                        {% endif %}
+                                        {% endfor %}
+                                       </div>
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                {% if request.GET.scene == '1' %}
+                                                <a class=" btn-simple generate_pdf" id="scene_1">Update Scene 1</a>
+                                                {% elif request.GET.scene == '2' %}
+                                                <a class=" btn-simple generate_pdf" id="scene_2">Update Scene 2</a>
+                                                {% elif request.GET.scene == '3' %}
+                                                <a class=" btn-simple generate_pdf" id="scene_3">Update Scene 3</a>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -170,13 +180,11 @@
                             <div>
                                 <div class="sds-card-btn-align">
                                     <span class="sds-input-card-btn">
-                                        <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/>
                                         <!-- <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a> -->
                                         <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
                             </div>
-                        </form>
                     </div>
                 </div>
 
@@ -250,28 +258,18 @@
 
 
  <script type="text/javascript" src="{% static 'js/cropper.min.js' %}"></script>
-<!--<script type="text/javascript" src="{% static 'js/pdf.min.js' %}"></script> -->
-<!-- <script type="text/javascript" src="{% static 'js/rcrop.min.js' %}"></script> -->
-<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.15/js/jquery.Jcrop.js"></script> -->
 <script>
     $('body').on('click' , '.crop_img_btn', function(){
         var comment_id = $(this).attr("id");
         var token = $("#token").val();
+        var pdf_page_number = $(".pdf_page_number").val();
         var data_dict = {};
         var path = '{{ project.script.path }}';
         var project_id = '{{ project.id }}';
-        var page_no = "36";
+        var page_no = pdf_page_number;
         data_dict['path'] = path;
         data_dict['project_id'] = project_id;
         data_dict['page_no'] = page_no;
-        // console.log(data_dict)
-
-        // var iFrame =  document.getElementById('script_id');
-        // if ( iFrame.contentDocument ) {
-        //     currentPageNum= iFrame.contentDocument.getElementById('pageselector').value;
-        // }
-        // console.log(currentPageNum);
-
 
         $.ajax
         ({
@@ -285,13 +283,12 @@
             },
             success: function (response){
                 var img_path = "/media/script/project_"+project_id+".jpg"
-                $(".pdf_img").html('<img src="'+img_path+'" id="image" style="max-width: 100%;"/>');
+                $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
                 $("#modalCrop").modal('show');
-               
-                
+
 
                     /* SCRIPTS TO HANDLE THE CROPPER BOX */
-                    var $image = $("#image");
+                    var $image = $("#pdfimage");
                     var cropBoxData;
                     var canvasData;
                     $("#modalCrop").on("shown.bs.modal", function () {
@@ -311,13 +308,6 @@
                     $image.cropper("destroy");
                     });
 
-                    $(".js-zoom-in").click(function () {
-                    $image.cropper("zoom", 0.1);
-                    });
-
-                    $(".js-zoom-out").click(function () {
-                    $image.cropper("zoom", -0.1);
-                    });
 
 
                     /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
@@ -327,8 +317,13 @@
                         var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
                         var img = document.createElement("img");
                         img.src = croppedimage;
-                        document.getElementById("cropped_result").append(img);
-                        console.log(croppedimage);
+                        $("#x").val(cropData['x'])
+                        $("#y").val(cropData['y'])
+                        $("#width").val(cropData['width'])
+                        $("#height").val(cropData['height'])
+                        // document.getElementById("cropped_result").append(img);
+                        $("#sidesform").submit();
+
                     });
 
             }
@@ -336,7 +331,32 @@
 
     });
     $('body').on('click' , '.close-modal', function(){
-        $("#crop_image_modal").modal('hide');
+        $("#modalCrop").modal('hide');
+    });
+    $('body').on('click' , '.generate_pdf', function(){
+        var scene = $(this).attr('id') ;
+        var project_id = '{{ project.id }}' ;
+        var character_id = '{{ character.id }}' ;
+        var token = $("#token").val();
+        data_dict = {};
+        data_dict['project_id'] = project_id;
+        data_dict['character_id'] = character_id;
+        data_dict['scene'] = scene;
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/generate-scene-image-pdf-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                var path = "/project/add-sides/"+project_id+"?character_id="+character_id;
+                window.location.href = path;
+            }
+        });
     });
 
 </script>
