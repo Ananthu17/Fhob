@@ -67,4 +67,9 @@
 {% endblock %}
 {% block extrajs %}
 <script src="{% static 'js/base.js' %}"></script>
+<script>
+$( document ).ready(function() {
+    $("#login_link").addClass('active');
+});
+</script>
 {% endblock %}

@@ -1,9 +1,10 @@
 import ast
 import braintree
+import datetime
 import json
+import os
 import random
 import requests
-import datetime
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
@@ -17,7 +18,7 @@ from django.db.models import Sum, Q
 from django.template import loader
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, FileResponse
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -4599,3 +4600,15 @@ class ScreeningProjectDeatilInviteView(APIView):
         except:
             return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
 
+class TermsOfService(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'terms_of_service.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+class PrivacyPolicy(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'privacy_policy.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')

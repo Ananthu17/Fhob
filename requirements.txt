@@ -30,6 +30,7 @@ phonenumbers==8.12.21
 Pillow==8.2.0
 psycopg2-binary==2.8.6
 reportlab==3.5.68
+remote-pdb==2.1.0
 setuptools==56.0.0
 # signals==0.0.2
 # utils==1.0.1

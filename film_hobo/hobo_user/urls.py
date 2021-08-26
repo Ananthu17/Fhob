@@ -59,7 +59,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FindVideoRatingAPI, VideoListAPI, \
                    CreateProjectView, ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
-                   GetScreeningProjectInviteNotificationAjaxView
+                   GetScreeningProjectInviteNotificationAjaxView, \
+                   TermsOfService, PrivacyPolicy
 app_name = "hobo_user"
 
 urlpatterns = [
@@ -180,6 +181,8 @@ urlpatterns = [
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
+    path('terms_of_service/', TermsOfService.as_view(), name='terms_of_service'),
+    path('privacy_policy/', PrivacyPolicy.as_view(), name='privacy_policy'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),

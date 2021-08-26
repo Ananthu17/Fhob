@@ -1,20 +1,19 @@
-/* a:link {
-    color: white;
-    background-color: transparent;
+.nav-link-non-clickable{
+  color: #9c9c9c;
+  text-decoration: none;
+  font-family: Courier Bold;
+  font-size:12px;
+}
+
+.nav-link-non-clickable:hover {
+  color: rgba(0,0,0,.5); 
+}
+
+.nav-link-non-clickable{
+  text-decoration: none;
+}
+
+.nav-link-non-clickable:hover, .nav-link-non-clickable:visited, .nav-link-non-clickable:link, .nav-link-non-clickable:active
+{
     text-decoration: none;
-  }
-  a:visited {
-    color: white;
-    background-color: transparent;
-    text-decoration: none;
-  }
-  a:hover {
-    color: rgb(29,96,169);
-    background-color: transparent;
-    text-decoration: underline;
-  }
-  a:active {
-    color: white;
-    background-color: transparent;
-    text-decoration: underline;
-  } */
+}

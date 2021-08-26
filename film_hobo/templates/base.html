@@ -49,10 +49,6 @@
                         </div>
                     </div>
                     <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">
-                    {% if request.user.is_anonymous %}
-                        <ul class="list-inline mb-0 mt-20">
-                        </ul>
-                    {% else %}
                         <ul class="list-inline mb-0 mt-20">
                             <li class="list-inline-item"><i class="fa fa-envelope header-fnt-clr header-icon-pos"
                                     aria-hidden="true"></i></li>
@@ -66,9 +62,7 @@
                             </li>
                             <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
-
                         </ul>
-                    {% endif %}
                     </div>
                 </div>
             </header>
@@ -80,6 +74,9 @@
             <div class="collapse navbar-collapse" id="collapsibleNavbar">
                 <!-- Links -->
                 <ul class="navbar-nav justify-content-between w-100">
+                    <li class="nav-item">
+                        <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                    </li>
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item">
                             <a id="showcase" class="nav-link" href="{% url 'hobo_user:user_home' %}">SHOWCASE</a>
@@ -134,9 +131,28 @@
                             </div>
                         </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
-                    </li>
+
+                    {% if request.user.is_anonymous %}
+                        <li class="nav-item">
+                            <a id="showcase_non_clickable" class="nav-link-non-clickable" href="">SHOWCASE</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="screeing_room_non_clickable" class="nav-link-non-clickable" href="">SCREENING ROOM</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="projects_non_clickable" class="nav-link-non-clickable" href="">PROJECTS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="scenes_non_clickable" class="nav-link-non-clickable" href="">SCENES</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="shorts_non_clickable" class="nav-link-non-clickable" href="">SHORTS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="pilots_features_non_clickable" class="nav-link-non-clickable" href="">PILOTS/FEATURES</a>
+                        </li>
+                    {% else %}
+                    {% endif %}
 
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete %}
@@ -179,7 +195,7 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                            <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -248,8 +264,8 @@
                 </div>
                 <div class="col-sm-4 mt-4 mb-2">
                     <ul class="list-unstyled fw">
-                        <li>Terms of Service</li>
-                        <li>Privacy Policy</li>
+                        <li><a href="{% url 'hobo_user:terms_of_service' %}" style="color: white;">Terms of Service</a></li>
+                        <li><a href="{% url 'hobo_user:privacy_policy' %}" style="color: white;">Privacy Policy</a></li>
                         <li>Refund Policy</li>
                         <li>Intellectual Property Rights</li>
                     </ul>
