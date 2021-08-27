@@ -58,7 +58,7 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
       RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
-      SceneImagesSerializer
+      SceneImagesSerializer, SceneImageSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
@@ -829,6 +829,35 @@ class SidesCreateAPIView(APIView):
                 sides_obj.scene_3 = data_dict['scene_3']
                 sides_obj.save()
 
+            if sides_obj.scene_1:
+                sides_obj.scene_1_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_1)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            if sides_obj.scene_2:
+                sides_obj.scene_2_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_2)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            if sides_obj.scene_3:
+                sides_obj.scene_3_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_3)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            sides_obj.save()
+
             response = {'message': "Scenes added",
                         'status': status.HTTP_200_OK}
         else:
@@ -849,16 +878,21 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
         character_id = self.request.GET.get('character_id')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
-        character = get_object_or_404(Character, pk=character_id)
-        context['character'] = character
-
         try:
-            sides = Sides.objects.get(
-                        Q(project=project) &
-                        Q(character=character)
+            character = Character.objects.get(
+                            Q(project=project) &
+                            Q(id=character_id)
                         )
-            context['sides'] = sides
-        except Sides.DoesNotExist:
+            context['character'] = character
+            try:
+                sides = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                context['sides'] = sides
+            except Sides.DoesNotExist:
+                pass
+        except Character.DoesNotExist:
             pass
         return context
 
@@ -1181,18 +1215,23 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         character_id = self.request.GET.get('character_id')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
-        character = get_object_or_404(Character, pk=character_id)
-        context['character'] = character
-
         try:
-            sides = Sides.objects.get(
-                        Q(project=project) &
-                        Q(character=character)
+            character = Character.objects.get(
+                            Q(project=project) &
+                            Q(id=character_id)
                         )
-            context['sides'] = sides
-            context['form'] = AddSidesForm(instance=sides)
-        except Sides.DoesNotExist:
-            context['form'] = AddSidesForm()
+            context['character'] = character
+            try:
+                sides = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                context['sides'] = sides
+                context['form'] = AddSidesForm(instance=sides)
+            except Sides.DoesNotExist:
+                context['form'] = AddSidesForm()
+        except Character.DoesNotExist:
+            pass
 
         return context
 
@@ -1242,16 +1281,22 @@ class AddSceneImagesView(LoginRequiredMixin, TemplateView):
         scene = self.request.GET.get('scene')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
-        character = get_object_or_404(Character, pk=character_id)
-        context['character'] = character
-
-        scene = 'scene_'+scene
-        scene_image_objs = SceneImages.objects.filter(
+        try:
+            character = Character.objects.get(
                             Q(project=project) &
-                            Q(character=character) &
-                            Q(scene=scene)
-                        ).order_by('created_time')
-        context['scene_image_objs'] = scene_image_objs
+                            Q(id=character_id)
+                        )
+            context['character'] = character
+
+            scene = 'scene_'+scene
+            scene_image_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=scene)
+                            ).order_by('created_time')
+            context['scene_image_objs'] = scene_image_objs
+        except Character.DoesNotExist:
+            pass
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1278,7 +1323,7 @@ class AddSceneImagesView(LoginRequiredMixin, TemplateView):
 
         fp = BytesIO()
         fp.write(resp.content)
-        file_name = url.split("/")[-1]  # There's probably a better way of doing this but this is just a quick example
+        file_name = url.split("/")[-1]
         scene_image_obj.image.save(file_name, files.File(fp))
         scene_image_obj.save()
 
@@ -1309,11 +1354,10 @@ class GenerateSceneImagePDFAPI(APIView):
             project_id = data_dict['project_id']
             character_id = data_dict['character_id']
             scene = data_dict['scene']
-            
+
             project = get_object_or_404(Project, pk=project_id)
             character = get_object_or_404(Character, pk=character_id)
 
-            print(data_dict)
             scene_image_objs = SceneImages.objects.filter(
                             Q(project=project) &
                             Q(character=character) &
@@ -1322,17 +1366,69 @@ class GenerateSceneImagePDFAPI(APIView):
 
             pdf = FPDF()
             for img_obj in scene_image_objs:
-                pdf.add_page()
                 img_path = str(img_obj.image.url)[1:]
-                pdf.image(img_path, 0, 0, 0, 0)
+                cover = PIL.Image.open(img_path)
+                width, height = cover.size
+                # convert pixel in mm with 1px=0.264583 mm
+                width, height = float(width * 0.264583), float(height * 0.264583)
+                # given we are working with A4 format size
+                pdf_size = {'P': {'w': 210, 'h': 297}, 'L': {'w': 297, 'h': 210}}
+                # get page orientation from image size
+                orientation = 'P' if width < height else 'L'
+                #  make sure image size is not greater than the pdf format size
+                width = width if width < pdf_size[orientation]['w'] else pdf_size[orientation]['w']
+                height = height if height < pdf_size[orientation]['h'] else pdf_size[orientation]['h']
+                pdf.add_page(orientation=orientation)
+                pdf.image(img_path, 0, 0, width, height)
+
             output_path = "media/scene/"+scene+str(project_id)+str(character_id)+".pdf"
             pdf.output(output_path, "F")
-            if scene == 'scene_1':
-                msg = "Scene 1 updated"
-            if scene == 'scene_2':
-                msg = "Scene 2 updated"
-            if scene == 'scene_3':
-                msg = "Scene 3 updated"
+
+            # Save PDF to db
+            url = "http://localhost:8000/"+output_path
+            resp = requests.get(url)
+            if resp.status_code != requests.codes.ok:
+                pass
+            fp = BytesIO()
+            fp.write(resp.content)
+            file_name = url
+
+            try:
+                sides_obj = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                if scene == 'scene_1':
+                    sides_obj.scene_1 = ""
+                    sides_obj.scene_1_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 1 updated"
+                if scene == 'scene_2':
+                    sides_obj.scene_2 = ""
+                    sides_obj.scene_2_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 2 updated"
+                if scene == 'scene_3':
+                    sides_obj.scene_3 = ""
+                    sides_obj.scene_3_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 3 updated"
+                sides_obj.save()
+            except Sides.DoesNotExist:
+                sides_obj = Sides()
+                sides_obj.project = project
+                sides_obj.character = character
+                if scene == 'scene_1':
+                    sides_obj.scene_1 = ""
+                    sides_obj.scene_1_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 1 updated"
+                if scene == 'scene_2':
+                    sides_obj.scene_2 = ""
+                    sides_obj.scene_2_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 2 updated"
+                if scene == 'scene_3':
+                    sides_obj.scene_3 = ""
+                    sides_obj.scene_3_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 3 updated"
+                sides_obj.save()
+
             messages.success(self.request, msg)
             response = {'message': "Scene Pdf uploaded",
                         'status': status.HTTP_200_OK}
@@ -2368,6 +2464,31 @@ class DeleteCommentAPI(APIView):
         return Response(response)
 
 
+class DeleteSceneImageAPI(APIView):
+    serializer_class = SceneImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                scene_image_obj = SceneImages.objects.get(pk=id)
+                scene_image_obj.delete()
+                response = {'message': "Scene Image deleted",
+                            'status': status.HTTP_200_OK}
+            except SceneImages.DoesNotExist:
+                response = {'errors': "Invalid id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
 class GetCommentsMentionNotificationAjaxView(View, JSONResponseMixin):
     template_name = 'project/comment_notification.html'
 
@@ -2431,11 +2552,18 @@ class PdfToImageAPI(APIView):
             path = data_dict['path']
             project_id = data_dict['project_id']
             page_no = int(data_dict['page_no'])
+            if page_no>0:
+                page_no = page_no-1
             print("page_no: ", page_no)
             pdffile = path
             doc = fitz.open(path)
             page = doc.loadPage(page_no)  # number of page
+
+            zoom = 2    # zoom factor
+            mat = fitz.Matrix(zoom, zoom)
             pix = page.getPixmap(matrix = mat)
+
+            # pix = page.getPixmap()
             output = 'media/script/project_{0}.jpg'.format(str(project_id))
             pix.writePNG(output)
 

@@ -40,11 +40,14 @@ class Sides(models.Model):
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
     scene_1 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
+                                     null=True, blank=True)
     scene_2 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
+                                     null=True, blank=True)
     scene_3 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
+                                     null=True, blank=True)
+    scene_1_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scene_2_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scene_3_pdf = models.FileField(upload_to='script/', null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"

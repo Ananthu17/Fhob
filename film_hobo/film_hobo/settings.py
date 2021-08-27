@@ -343,9 +343,7 @@ CKEDITOR_CONFIGS = {
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
-            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['RemoveFormat', ],
-            ['Cut', 'Copy', 'Paste', 'PasteText'],
+            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
             ['Undo', 'Redo'],
             ['Format', 'Styles', 'Font'],
         ],

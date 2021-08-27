@@ -115,8 +115,8 @@
             <input type="hidden" name="height" id="height"/>
         <!-- Modal body -->
         <div class="modal-body">
-            <div class="pdf_img"></div>
-            <div id="cropped_result"></div>
+            <div class="pdf_img">
+            </div>
         </div>
 
         <!-- Modal footer -->
@@ -125,7 +125,7 @@
         class="btn btn-outline-danger btn-sm js-crop-and-upload">
         Crop and upload</button>
         <button class="btn btn-outline-danger btn-sm close-modal"
-        data-dismiss="modal">Close</button>
+        data-dismiss="modal" type="button">Close</button>
 
         </div>
     </form>
@@ -149,6 +149,9 @@
                                             <div class="col-8">
                                                 <a class="cursor-pointer crop_img_btn btn-simple ">Crop Image</a>
                                             </div>
+                                            <div class="col-12">
+                                                <p class="page_number_error all-p-light"></p>
+                                            </div>
                                         </div>
                                         <div class="mt-4" >
                                         {% for obj in scene_image_objs %}
@@ -156,21 +159,44 @@
                                         <div class="row mt-2">
                                         {% endif %}
                                             <div class="col-12 col-md-3">
-                                                <img src = {{obj.image.url}} class="screenshot-img" />
+                                                <img src = {{obj.image.url}} class="screenshot-img"
+                                                data-toggle="modal" data-target="#modal_img_view_{{obj.id}}"/>
+                                                <div class="text-center">
+                                                    <a class=" all-p-light cursor-pointer delete_screenshots" id="{{obj.id}}">
+                                                        <i class="fa fa-trash-o" aria-hidden="true" title="Delete"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         {% if forloop.last or forloop.counter|divisibleby:4 %}
                                         </div>
                                         {% endif %}
+<!-- The Modal -->
+<div class="modal fade" id="modal_img_view_{{obj.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+        <div class="modal-body">
+            <img src = {{obj.image.url}} class="" style="max-width: 100%;"/>
+        </div>
+    </form>
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
                                         {% endfor %}
                                        </div>
-                                        <div class="row mt-2">
+                                        <div class="row mt-4">
                                             <div class="col-12">
-                                                {% if request.GET.scene == '1' %}
-                                                <a class=" btn-simple generate_pdf" id="scene_1">Update Scene 1</a>
-                                                {% elif request.GET.scene == '2' %}
-                                                <a class=" btn-simple generate_pdf" id="scene_2">Update Scene 2</a>
-                                                {% elif request.GET.scene == '3' %}
-                                                <a class=" btn-simple generate_pdf" id="scene_3">Update Scene 3</a>
+                                                {% if scene_image_objs %}
+                                                    {% if request.GET.scene == '1' %}
+                                                    <a class=" btn-simple generate_pdf" id="scene_1">Update Scene 1</a>
+                                                    {% elif request.GET.scene == '2' %}
+                                                    <a class=" btn-simple generate_pdf" id="scene_2">Update Scene 2</a>
+                                                    {% elif request.GET.scene == '3' %}
+                                                    <a class=" btn-simple generate_pdf" id="scene_3">Update Scene 3</a>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -270,6 +296,7 @@
         data_dict['path'] = path;
         data_dict['project_id'] = project_id;
         data_dict['page_no'] = page_no;
+        $(".page_number_error").html('');
 
         $.ajax
         ({
@@ -282,50 +309,55 @@
                 xhr.setRequestHeader ("Authorization", token);
             },
             success: function (response){
-                var img_path = "/media/script/project_"+project_id+".jpg"
-                $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
-                $("#modalCrop").modal('show');
+                if(response['image_path']){
+                    var img_path = "/media/script/project_"+project_id+".jpg"
+                    $(".pdf_img").html('');
+                    $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
+                    $("#modalCrop").modal('show');
 
 
-                    /* SCRIPTS TO HANDLE THE CROPPER BOX */
-                    var $image = $("#pdfimage");
-                    var cropBoxData;
-                    var canvasData;
-                    $("#modalCrop").on("shown.bs.modal", function () {
-                    $image.cropper({
-                        viewMode: 1,
-                        aspectRatio: 3/4,
-                        minCropBoxWidth: 200,
-                        minCropBoxHeight: 200,
-                        ready: function () {
-                        $image.cropper("setCanvasData", canvasData);
-                        $image.cropper("setCropBoxData", cropBoxData);
-                        }
-                    });
-                    }).on("hidden.bs.modal", function () {
-                    cropBoxData = $image.cropper("getCropBoxData");
-                    canvasData = $image.cropper("getCanvasData");
-                    $image.cropper("destroy");
-                    });
+                        /* SCRIPTS TO HANDLE THE CROPPER BOX */
+                        var $image = $("#pdfimage");
+                        var cropBoxData;
+                        var canvasData;
+                        $("#modalCrop").on("shown.bs.modal", function () {
+                        $image.cropper({
+                            autoCropArea: 1,
+                            viewMode: 1,
+                            aspectRatio: 3/4,
+                            minCropBoxWidth: 200,
+                            minCropBoxHeight: 200,
+                            ready: function () {
+                            $image.cropper("setCanvasData", canvasData);
+                            $image.cropper("setCropBoxData", cropBoxData);
+                            }
+                        });
+                        }).on("hidden.bs.modal", function () {
+                        cropBoxData = $image.cropper("getCropBoxData");
+                        canvasData = $image.cropper("getCanvasData");
+                        $image.cropper("destroy");
+                        });
 
 
 
-                    /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
-                    $(".js-crop-and-upload").click(function () {
-                        var cropData = $image.cropper("getData");
-                        console.log(cropData);
-                        var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
-                        var img = document.createElement("img");
-                        img.src = croppedimage;
-                        $("#x").val(cropData['x'])
-                        $("#y").val(cropData['y'])
-                        $("#width").val(cropData['width'])
-                        $("#height").val(cropData['height'])
-                        // document.getElementById("cropped_result").append(img);
-                        $("#sidesform").submit();
+                        /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
+                        $(".js-crop-and-upload").click(function () {
+                            var cropData = $image.cropper("getData");
+                            console.log(cropData);
+                            var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
+                            var img = document.createElement("img");
+                            img.src = croppedimage;
+                            $("#x").val(cropData['x'])
+                            $("#y").val(cropData['y'])
+                            $("#width").val(cropData['width'])
+                            $("#height").val(cropData['height'])
+                            // document.getElementById("cropped_result").append(img);
+                            $("#sidesform").submit();
 
-                    });
-
+                        });
+                }else{
+                    $(".page_number_error").html('Please provide page number !!');
+                }
             }
         });
 
@@ -333,6 +365,26 @@
     $('body').on('click' , '.close-modal', function(){
         $("#modalCrop").modal('hide');
     });
+
+    $('body').on('click' , '.delete_screenshots', function(){
+        var scene_obj_id = $(this).attr('id') ;
+        var token = $("#token").val();
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/delete-scene-image-api/",
+            dataType: 'json',
+            async: false,
+            data: {'id':scene_obj_id},
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+
     $('body').on('click' , '.generate_pdf', function(){
         var scene = $(this).attr('id') ;
         var project_id = '{{ project.id }}' ;

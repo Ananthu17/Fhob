@@ -253,6 +253,13 @@ class PdfToImageSerializer(serializers.Serializer):
             )
 
 
+class SceneImageSerializer(serializers.Serializer):
+    id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
 class SceneImagesSerializer(serializers.ModelSerializer):
     scene = serializers.CharField(
                 max_length=150,

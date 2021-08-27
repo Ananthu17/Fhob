@@ -83,9 +83,13 @@
                                             <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                         </div>
                                         <div>
+                                            {% if sides.scene_1 %}
                                             <div class="sides-textbox scenes sides-font-style ">{{sides.scene_1|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_1" id="scene_1" {% if sides.scene_1 %} disabled {% endif %}>{{sides.scene_1|striptags|safe}}</textarea> -->
+                                            {% elif sides.scene_1_pdf %}
+                                            <iframe src="{{ sides.scene_1_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -93,9 +97,13 @@
                                             <span class="sds-scene-txt">SCENE TWO</span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_2|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_2" {% if sides.scene_2 %} disabled {% endif %}>{{sides.scene_2|striptags|safe}}</textarea> -->
+                                            {% if sides.scene_2 %}
+                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_2|safe}}</div>
+                                            {% elif sides.scene_2_pdf %}
+                                            <iframe src="{{ sides.scene_2_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
@@ -103,9 +111,13 @@
                                             <span class="sds-scene-txt">SCENE THREE</span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_3|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_3" {% if sides.scene_3 %} disabled {% endif %}>{{sides.scene_3|striptags|safe}}</textarea> -->
+                                            {% if sides.scene_3 %}
+                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_3|safe}}</div>
+                                            {% elif sides.scene_3_pdf %}
+                                            <iframe src="{{ sides.scene_3_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

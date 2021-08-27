@@ -15,7 +15,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
      DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
      GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
-     PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI \
+     PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
+     DeleteSceneImageAPI
 
 
 urlpatterns = [
@@ -122,4 +123,6 @@ urlpatterns = [
           name='add-scene-images'),
      path('generate-scene-image-pdf-api/', GenerateSceneImagePDFAPI.as_view(),
           name='generate-scene-image-pdf-api'),
+     path('delete-scene-image-api/', DeleteSceneImageAPI.as_view(),
+          name='delete-scene-image-api'),
     ]
