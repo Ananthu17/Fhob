@@ -1,12 +1,16 @@
-# pull official base image
-FROM python:3.8.3-alpine
+FROM python:3.8.11-alpine
 
-# set work directory
-WORKDIR /usr/src/film_hobo
-
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+
+COPY ./requirements.txt /requirements.txt
+
+# Install postgres client
+RUN apk add --update --no-cache postgresql-client
+
+# Install individual dependencies
+# so that we could avoid installing extra packages to the container
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+	gcc libc-dev linux-headers postgresql-dev
 
 # install psycopg2 dependencies
 RUN apk update \
@@ -29,16 +33,16 @@ RUN apk --update add \
     jpeg-dev \
     zlib-dev
 
-# install dependencies
-RUN pip install --upgrade pip
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r /requirements.txt
 
-# copy entrypoint.sh
-COPY ./film_hobo/entrypoint.sh .
+# Remove dependencies
+RUN apk del .tmp-build-deps
 
-# copy project
-COPY . .
+RUN mkdir /film_hobo
+WORKDIR /film_hobo
+COPY ./film_hobo /film_hobo
 
-# run entrypoint.sh
-ENTRYPOINT ["/usr/src/film_hobo/film_hobo/entrypoint.sh"]
+# [Security] Limit the scope of user who run the docker image
+RUN adduser -D user
+
+USER user

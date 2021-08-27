@@ -175,14 +175,13 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 
 # demo server database credentials
 DATABASES = {
-    'default': {
-        'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
-        'NAME': env("DEMO_SERVER_DATABASE_NAME"),
-        'USER': env("DEMO_SERVER_DATABASE_USER"),
-        'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
-        'HOST': env("DEMO_SERVER_DATABASE_HOST"),
-        'PORT': env("DEMO_SERVER_DATABASE_PORT"),
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'HOST': os.environ.get('DB_HOST'),
+    'NAME': os.environ.get('DB_NAME'),
+    'USER': os.environ.get('DB_USER'),
+    'PASSWORD': os.environ.get('DB_PASS'),
+  }
 }
 
 # Password validation
