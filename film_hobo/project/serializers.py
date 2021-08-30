@@ -1,4 +1,4 @@
-from hobo_user.models import UserRating, Project
+from hobo_user.models import UserRating, Project, UserRatingCombined
 from project.models import Audition, AuditionRating, Character, Comment, SceneImages, Sides, \
     ProjectRating, Comment
 from rest_framework import serializers
@@ -277,3 +277,6 @@ class SceneImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SceneImages
         fields = ['scene', 'project_id', 'character_id', 'image']
+
+
+

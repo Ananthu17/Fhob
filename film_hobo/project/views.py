@@ -2576,3 +2576,47 @@ class PdfToImageAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+class TopRatedMembersAjaxView(View, JSONResponseMixin):
+    template_name = 'project/top-rated-members.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user_list = []
+        user_rating_objs = UserRatingCombined.objects.all()
+
+        try:
+            actoractress = JobType.objects.get(slug='actoractress')
+            actoractress_list = user_rating_objs.filter(job_type=actoractress)[:5]
+        except JobType.DoesNotExist:
+            actoractress_list = []
+
+        try:
+            director = JobType.objects.get(slug='director')
+            director_list = user_rating_objs.filter(job_type=director)[:5]
+        except JobType.DoesNotExist:
+            director_list = []
+
+        try:
+            writer = JobType.objects.get(slug='writer')
+            writer_list = user_rating_objs.filter(job_type=writer)[:5]
+        except JobType.DoesNotExist:
+            writer_list = []
+
+        try:
+            producer = JobType.objects.get(slug='producer')
+            producer_list = user_rating_objs.filter(job_type=producer)[:5]
+        except JobType.DoesNotExist:
+            producer_list = []
+
+
+        top_rated_members_html = render_to_string(
+                                'project/top-rated-members.html',
+                                {
+                                    'actoractress_list': actoractress_list,
+                                    'director_list': director_list,
+                                    'writer_list': writer_list,
+                                    'producer_list': producer_list,
+                                 })
+        context['top_rated_members_html'] = top_rated_members_html
+        return self.render_json_response(context)

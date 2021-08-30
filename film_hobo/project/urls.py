@@ -16,7 +16,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
      GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
      PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
-     DeleteSceneImageAPI
+     DeleteSceneImageAPI, TopRatedMembersAjaxView
 
 
 urlpatterns = [
@@ -125,4 +125,6 @@ urlpatterns = [
           name='generate-scene-image-pdf-api'),
      path('delete-scene-image-api/', DeleteSceneImageAPI.as_view(),
           name='delete-scene-image-api'),
+     path('show-top-rated-member/', TopRatedMembersAjaxView.as_view(),
+          name='show-top-rated-member'),
     ]
