@@ -69,11 +69,15 @@
                                     <div class="item ">
                                         <div class="cta-rate-div-align">
                                             <div class="cta-rate-image-frame
-                                            {% if audition_obj.status == 'applied' %}cta-rate-image-frame-color-grey-thin{% endif %}
-                                            {% if audition_obj.status == 'passed' %}cta-rate-image-frame-color-grey{% endif %}
-                                            {% if audition_obj.status == 'attached' %}cta-rate-image-frame-color-green{% endif %}
-                                            {% if audition_obj.status == 'callback' %}cta-rate-image-frame-color-orange{% endif %}
-                                            ">
+                                            {% if audition_obj.audition_status == 'applied' %}cta-rate-image-frame-color-grey-thin{% endif %}
+                                            {% if audition_obj.audition_status == 'passed' %}cta-rate-image-frame-color-grey{% endif %}
+                                            {% if audition_obj.audition_status == 'attached' %}cta-rate-image-frame-color-green{% endif %}
+                                            {% if audition_obj.audition_status == 'callback' %}cta-rate-image-frame-color-orange{% endif %}"
+                                            {% if audition_obj.audition_status == 'applied' %}title="Applied"{% endif %}
+                                            {% if audition_obj.audition_status == 'passed' %}title="Passed"{% endif %}
+                                            {% if audition_obj.audition_status == 'attached' %}title="Attached"{% endif %}
+                                            {% if audition_obj.audition_status == 'callback' %}title="Chemistry Room"{% endif %}
+                                            >
                                             <a href="{% url 'project:cast-video-audition' audition_obj.id %}">
                                             <img src="{{audition_obj.cover_image.url}}" class="cta-rate-image">
                                             </a>

@@ -595,6 +595,130 @@
                     </div>
                     {% endif %}
 
+                    <!-- my projects -->
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">My Projects</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in my_projects %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:single-film-project' obj.project.id %}"  title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+                                            <div>
+                                                <div class="cta-rate-txt-align">
+                                                    <span class="cta-rate-name-main mem-list-head" title="{{obj.project.title}}">{{obj.project.title}}</span>
+
+                                                </div>
+                                            </div>
+                                            <!-- <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-txt">Audition</span>
+
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end my projects -->
+                    {% if profile.user.id == request.user.id  %}{% endif %}
+                    <!-- Favorites -->
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">Favorites</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in favorites %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:cast-apply-audition' obj.project.id %}?character_id={{obj.character.id}}"
+                                            title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+                                            <div>
+                                                <div class="cta-rate-txt-align">
+                                                   
+
+                                                </div>
+                                            </div>
+                                            <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-main mem-list-head" title="{{obj.project.title}}">{{obj.project.title}}</span><br>
+                                                        <span class="cta-rate-name-txt">Character: {{obj.character.name}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end Favorites -->
+                    <!-- applied -->
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">Applied Projects</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in applied %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:audition-list' obj.project.id  %}"  title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+
+                                            <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-main mem-list-head" title="{{obj.project.title}}">{{obj.project.title}}</span><br>
+                                                        <span class="cta-rate-name-txt">Character: {{obj.character.name}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end applied -->
+                    
                 </div>
                 <div class="left-mode-sec p-2 mt-3">
                     <div class="row mem-white-bg">
@@ -630,6 +754,50 @@
 
 {% block extrajs %}
 <!-- <script src="{% static 'js/user-rating.js' %}"></script> -->
+<script>
+        $('.cast-owl').owlCarousel({
+        loop:false,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            444:{
+                items:2,
+                nav:true
+            },
+            611:{
+                items:3,
+                nav:true
+            },
+            810:{
+                items:4,
+                nav:true
+            },
+            992:{
+                items:3,
+                nav:true
+            },
+            1045:{
+                items:4,
+                nav:true
+            },
+            1320:{
+                items:5,
+                nav:true,
+                loop:false
+            }
+        }
+    })
+
+</script>
 {% endblock %}
 
 

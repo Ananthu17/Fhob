@@ -1,31 +1,26 @@
 
 <div class="left-mode-sec right-sec-height">
+    <div class="top-members-head text-center pt-2">TOP RATED</div>
     {% if actoractress_list %}
-    <div class="mem-list-head">Top Actors</div>
+    <div class="mem-list-head">Actors</div>
     <ol class="mem-list-cont mb-0 ">
         {% for obj in actoractress_list %}
         <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
         {% endfor %}
     </ol>
     {% endif %}
-    {% if writer_list %}
-    <div class="mem-list-head">Top Writers</div>
-    <ol class="mem-list-cont mb-0">
-        {% for obj in writer_list %}
-        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
-        {% endfor %}
-    </ol>
-    {% endif %}
+
     {% if director_list %}
-    <div class="mem-list-head">Top Directors</div>
+    <div class="mem-list-head">Directors</div>
     <ol class="mem-list-cont mb-0">
         {% for obj in director_list %}
         <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
         {% endfor %}
     </ol>
     {% endif %}
+
     {% if producer_list %}
-    <div class="mem-list-head">Top Producers</div>
+    <div class="mem-list-head">Producers</div>
     <ol class="mem-list-cont mb-0">
         {% for obj in producer_list %}
         <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
@@ -33,15 +28,88 @@
     </ol>
     {% endif %}
 
-    <div class="mem-list-head">Top DPs</div>
+    {% if writer_list %}
+    <div class="mem-list-head">Writers</div>
     <ol class="mem-list-cont mb-0">
-        
+        {% for obj in writer_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
     </ol>
-    <div class="mem-list-head">Top Sound Designers</div>
+    {% endif %}
+
+    {% if dp_list %}
+    <div class="mem-list-head">DPs</div>
     <ol class="mem-list-cont mb-0">
-       
+        {% for obj in dp_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
     </ol>
-    <!-- <div class="mem-list-head underline">TopTalent/Crew</div> -->
+    {% endif %}
+
+    {% if costume_designer_list %}
+    <div class="mem-list-head">Costume Designers</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in costume_designer_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if art_director_list %}
+    <div class="mem-list-head">Art Directors</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in art_director_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if editor_list %}
+    <div class="mem-list-head">Editors</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in editor_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if casting_director_list %}
+    <div class="mem-list-head">Casting Directors</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in casting_director_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if make_up_hair_artist_list %}
+    <div class="mem-list-head">Make-Up/Hair Artist</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in make_up_hair_artist_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if sound_designer_list %}
+    <div class="mem-list-head">Sound Designer</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in sound_designer_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+    {% if composer_list %}
+    <div class="mem-list-head">Composer</div>
+    <ol class="mem-list-cont mb-0">
+        {% for obj in composer_list %}
+        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+
+
 </div>
 
 

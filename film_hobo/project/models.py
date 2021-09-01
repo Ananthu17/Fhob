@@ -21,8 +21,17 @@ class Character(models.Model):
                                       related_name='attached_user',
                                       on_delete=models.SET_NULL, null=True,
                                       blank=True)
-    attached_user_name = models.CharField(_("Attached User Name"), max_length=1000,
+    requested_user = models.ForeignKey('hobo_user.CustomUser',
+                                       verbose_name=_("Requested User"),
+                                       related_name='requested_user',
+                                       on_delete=models.SET_NULL, null=True,
+                                       blank=True)
+    attached_user_name = models.CharField(_("Attached User Name"),
+                                          max_length=1000,
                                           null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'),
+                                        default=datetime.datetime.now,
+                                        blank=False)
 
     def __str__(self):
         return self.project.title+" - "+self.name
@@ -106,10 +115,10 @@ class Audition(models.Model):
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True,
                                   default=VIMEO)
-    status = models.CharField(_("Status"),
-                              choices=STATUS_CHOICES,
-                              max_length=150,
-                              default=APPLIED)
+    audition_status = models.CharField(_("Status"),
+                                       choices=STATUS_CHOICES,
+                                       max_length=150,
+                                       default=APPLIED)
     cover_image = models.ImageField(upload_to='thumbnail/',
                                     blank=True, null=True,
                                     help_text="Image size:370 X 248.")

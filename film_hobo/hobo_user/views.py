@@ -60,7 +60,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, UserProject, Video, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
@@ -68,7 +68,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
                     UserRating, Location, UserRatingCombined, \
-                    UserTracking, CompanyProfile, \
+                    UserTracking, CompanyProfile, UserProject, \
                     Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -2846,6 +2846,14 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        user_projects = UserProject.objects.filter(user=user)
+        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED)
+        favorites = user_projects.filter(relation_type = UserProject.FAVORITE)
+        applied = user_projects.filter(relation_type = UserProject.APPLIED)
+        context['my_projects'] = my_projects
+        context['favorites'] = favorites
+        context['applied'] = applied
         return context
 
 

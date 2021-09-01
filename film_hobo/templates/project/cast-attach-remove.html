@@ -86,23 +86,23 @@
                                     <div>
                                         <span class="car-char-sec-orange-txt"><u class="txt-uppercase">{{character.name}}:</u></span>
                                         {% if character.attached_user or character.attached_user_name %}
-                                        <span>
+                                            <span>
+                                                {% if character.attached_user %}
+                                                <a href="{{ character.attached_user.get_profile_url }}" class="car-char-sec-blue-txt">{{character.attached_user.get_full_name }}</a>
+                                                {% else %}
+                                                <a  class="car-char-sec-blue-txt">{{character.attached_user_name }}</a>
+                                                {% endif %}
+                                            </span>
                                             {% if character.attached_user %}
-                                            <a href="{{ character.attached_user.get_profile_url }}" class="car-char-sec-blue-txt">{{character.attached_user.get_full_name }}</a>
-                                            {% else %}
-                                            <a  class="car-char-sec-blue-txt">{{character.attached_user_name }}</a>
+                                                {% get_dict_value rating_dict character.attached_user.id as rating%}
+                                                <span class="car-input-rate-star">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
+                                                    </div>
+                                                </span>
                                             {% endif %}
-                                        </span>
-                                        {% if character.attached_user %}
-                                        {% get_dict_value rating_dict character.attached_user.id as rating%}
-                                        <span class="car-input-rate-star">
-                                            <div class="cta-stars-outer">
-                                                <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
-                                              </div>
-                                        </span>
-                                        {% endif %}
                                         {% else %}
-                                        <span class="car-char-sec-green-txt">Available</span>
+                                            <span class="car-char-sec-green-txt">Available</span>
                                         {% endif %}
                                     </div>
                                     <div>
@@ -110,9 +110,10 @@
                                     </div>
                                 </div>
                                 <div class="car-input-field-display">
+                                    {% if not character.requested_user %}
                                     <span class="car-name-label">Name:</span>
                                     <span class="car-name-field-width " id="select2-div-{{character.id}}">
-                                        
+
                                         <select class="car-input-field attached_user" id="user-{{character.id}}">
                                             <option value="" selected disabled hidden ></option>
                                             {% if character.attached_user is none and character.attached_user_name is not none %}
@@ -123,19 +124,69 @@
                                             <option {%if character.attached_user == user %} selected {% endif %} value="{{user.id}}">{{user.get_full_name}}</option>
                                             {% endfor %}
                                         </select>
-                                        
+
                                         <!-- <input class="car-input-field attached_user" id="attached_user-{{character.id}}"/> -->
                                     </span>
+                                    {% else %}
+                                    <span class="car-name-label">Name:</span>
+                                    <span class="car-name-field-width " >
+                                    <input class="car-input-field car-name-label car-char-sec-green-txt" value="Request sent to {{ character.requested_user.get_full_name}}" disabled/>
+                                    </span>
+                                    {% endif %}
                                 </div>
                                 <div>
                                     {% if character.attached_user or character.attached_user_name %}
                                     <span><a  class="car-input-remove-tag cursor-pointer" data-toggle="modal" data-target="#remove-{{character.id}}">Remove</a></span>
                                     <span><a  class="car-input-replace-tag replace-modal cursor-pointer" id="{{character.id}}">Replace</a></span>
+                                    {% elif character.requested_user  %}
+                                    <span><a  class="car-input-remove-tag  cursor-pointer" id="{{character.id}}"
+                                    data-toggle="modal" data-target="#cancel_cast_attach_request_{{character.id}}">Cancel Request</a></span>
                                     {% else %}
                                     <span><a  class="car-input-remove-tag replace-modal cursor-pointer" id="{{character.id}}">Attach</a></span>
                                     {% endif %}
                                 </div>
                             </div>
+<!-- The Modal -->
+<div class="modal fade" id="cancel_cast_attach_request_{{character.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Cancel Cast Attach Request</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt">
+                        {% if character.requested_user %}
+                        Do you want to cancel attach request send to {{character.requested_user.get_full_name}} ?
+                        {% else %}
+                        No request send !!
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        {% if character.requested_user %}
+        <a class='btn btn-outline-danger btn-sm cursor-pointer cancel_cast_request' id="{{character.id}}">Cancel Request</a>
+        {% endif %}
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
 <!-- The Modal -->
 <div class="modal fade" id="remove-{{character.id}}">
     <div class="modal-dialog">
@@ -338,6 +389,10 @@
         var modal_id = "#replace-"+character_id;
         $(modal_id).modal('hide');
     });
+
+
+
+
 </script>
 {% endblock %}
 

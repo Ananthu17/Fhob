@@ -46,7 +46,7 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, get_object_or_404)
 
-from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
      VideoRatingCombined
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
@@ -58,7 +58,8 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
       RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
-      SceneImagesSerializer, SceneImageSerializer
+      SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
+      CancelCastRequestSerializer, UserProjectSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify, get_notifications_time
 from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
@@ -437,7 +438,6 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
             except Team.DoesNotExist:
                 project_creator = ""
             context['project_creator_rating'] = project_creator_rating
-
 
         characters = Character.objects.filter(project=project)
         context['characters'] = characters
@@ -1010,6 +1010,15 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
         audition_obj.save()
+        # update user-project-table
+        user_project_obj = UserProject()
+        user_project_obj.user = self.request.user
+        user_project_obj.project = project
+        user_project_obj.relation_type = UserProject.APPLIED
+        user_project_obj.audition = audition_obj
+        user_project_obj.character = character
+        user_project_obj.save()
+        # end
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -1113,6 +1122,17 @@ class SubmitAuditionAPI(APIView):
             if video_type == 'facebook':
                 audition_obj.video_url = url
             audition_obj.save()
+
+            # update user-project-table
+            user_project_obj = UserProject()
+            user_project_obj.user = self.request.user
+            user_project_obj.project = project
+            user_project_obj.relation_type = UserProject.APPLIED
+            user_project_obj.audition = audition_obj
+            user_project_obj.character = character
+            user_project_obj.save()
+            # end
+
             response = {'message': "Audition Submitted",
                         'status': status.HTTP_200_OK}
         else:
@@ -1136,7 +1156,7 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         casting_director_rating = 0
         project_id = self.kwargs.get('id')
         project = get_object_or_404(Project, pk=project_id)
-        characters = Character.objects.filter(project=project)
+        characters = Character.objects.filter(project=project).order_by('created_time')
         audition_list = Audition.objects.filter(project=project)
         casting_director_job = JobType.objects.filter(
                                slug='casting-director'
@@ -1865,7 +1885,7 @@ class UpdateAuditionStatusAPI(APIView):
             audition_status = data_dict['status']
             try:
                 audition = Audition.objects.get(pk=audition_id)
-                audition.status = audition_status
+                audition.audition_status = audition_status
                 audition.status_update_date = timezone.now()
                 audition.save()
                 response = {'message': "Audition status updated",
@@ -1878,12 +1898,38 @@ class UpdateAuditionStatusAPI(APIView):
                     character_obj.attached_user_name = audition.user.get_full_name()
                     character_obj.save()
 
+                    # add to user-project table
+                    try:
+                        user_project_obj = UserProject.objects.get(
+                                            Q(user=audition.user) &
+                                            Q(project=audition.project) &
+                                            Q(character=audition.character) &
+                                            Q(relation_type=UserProject.ATTACHED)
+                                            )
+                    except UserProject.DoesNotExist:
+                        user_project_obj = UserProject()
+                        user_project_obj.user = audition.user
+                        user_project_obj.project = audition.project
+                        user_project_obj.character = audition.character
+                        user_project_obj.relation_type = UserProject.ATTACHED
+                        user_project_obj.save()
+                    # end
+
+                    # add to team
+                    team_obj = Team()
+                    team_obj.user = audition.user
+                    team_obj.project = audition.project
+                    team_obj.job_type = JobType.objects.get(slug='actoractress')
+                    team_obj.save()
+                    # end
+
                     # All other audition's status changed to passed
                     all_auditions = Audition.objects.filter(
-                                    character=character_obj).exclude(
-                                    pk=audition.id)
+                                    Q(character=character_obj) &
+                                    ~Q(audition_status=Audition.PASSED)
+                                    ).exclude(pk=audition.id)
                     for obj in all_auditions:
-                        obj.status = Audition.PASSED
+                        obj.audition_status = Audition.PASSED
                         obj.status_update_date = timezone.now()
                         obj.save()
                         #update notification table- for removed user
@@ -1914,11 +1960,11 @@ class UpdateAuditionStatusAPI(APIView):
                 notification.user = audition.user
                 notification.project = audition.project
                 notification.notification_type = UserNotification.AUDITION_STATUS
-                if audition.status == 'attached':
+                if audition.audition_status == 'attached':
                     notification.message = "Congratulations!! You have been attached to project "+audition.project.title
-                elif audition.status == 'callback':
+                elif audition.audition_status == 'callback':
                     notification.message = "Your audition for "+audition.project.title+" has been sent to chemistry room."
-                elif audition.status == 'passed':
+                elif audition.audition_status == 'passed':
                     notification.message = "Sorry!! Your audition for "+audition.project.title+" has been passed."
                 notification.save()
                 # send notification
@@ -1956,7 +2002,7 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
         project = get_object_or_404(Project, pk=project_id)
         audition_list = Audition.objects.filter(
                         Q(project=project) &
-                        Q(status=Audition.CALLBACK)
+                        Q(audition_status=Audition.CALLBACK)
                         )
         audition_dict = {}
 
@@ -2070,7 +2116,7 @@ class CastAttachRemoveView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         project = get_object_or_404(Project, pk=project_id)
-        characters = Character.objects.filter(project=project)
+        characters = Character.objects.filter(project=project).order_by('created_time')
         context['project'] = project
         context['characters'] = characters
 
@@ -2128,9 +2174,35 @@ class RemoveAttachedCastAPI(APIView):
                                        Q(user=old_user)
                                         ).first()
                         if audition_obj:
-                            audition_obj.status = Audition.PASSED
+                            audition_obj.audition_status = Audition.PASSED
                             audition_obj.status_update_date = timezone.now()
                             audition_obj.save()
+
+                        # add to user-project table
+                        try:
+                            user_project_obj = UserProject.objects.get(
+                                                Q(user=old_user) &
+                                                Q(project=character.project) &
+                                                Q(character=character) &
+                                                Q(relation_type=UserProject.ATTACHED)
+                                                )
+                            user_project_obj.delete()
+                        except UserProject.DoesNotExist:
+                            pass
+                        # end
+
+                        # remove from team
+                        try:
+                            actor_actress = JobType.objects.get(slug='actoractress')
+                            team_obj = Team.objects.filter(
+                                        Q(user = old_user) &
+                                        Q(project = character.project) &
+                                        Q(job_type = actor_actress))
+                            team_obj.delete()
+                        except JobType.DoesNotExist:
+                            pass
+                        # end
+
                         #update notification table- for removed user
                         notification = UserNotification()
                         notification.user = old_user
@@ -2182,41 +2254,88 @@ class ReplaceAttachedCastAPI(APIView):
             try:
                 character = Character.objects.get(id=character_id)
                 all_auditions = Audition.objects.filter(
-                                character=character)
+                                Q(character=character) &
+                                ~Q(audition_status=Audition.PASSED)
+                                )
                 if user_id:
                     try:
                         user = CustomUser.objects.get(id=user_id)
-                        if character.attached_user:
-                            old_user = character.attached_user
-                        character.attached_user = user
-                        character.attached_user_name = user.get_full_name()
-                        character.save()
-                        response = {'message': "Replaced user",
-                                    'status': status.HTTP_200_OK}
-                        msg = "Attached "+user.get_full_name()+" to character-"+character.name
-                        messages.success(self.request, msg)
+                        attached_user_audition = Audition.objects.filter(
+                                                    Q(character=character) &
+                                                    Q(user=user)).first()
 
-
-                        attached_user_audition = all_auditions.filter(
-                                                  user=user).first()
                         if attached_user_audition:
-                            attached_user_audition.status = Audition.ATTACHED
+                            if character.attached_user:
+                                old_user = character.attached_user
+                            character.attached_user = user
+                            character.attached_user_name = user.get_full_name()
+                            character.save()
+                            response = {'message': "Replaced user",
+                                        'status': status.HTTP_200_OK}
+                            msg = "Attached "+user.get_full_name()+" to character-"+character.name
+                            messages.success(self.request, msg)
+
+                            attached_user_audition.audition_status = Audition.ATTACHED
                             attached_user_audition.status_update_date = timezone.now()
                             attached_user_audition.save()
+
+                            # add to user-project table
+                            try:
+                                user_project_obj = UserProject.objects.get(
+                                                        Q(user=attached_user_audition.user) &
+                                                        Q(project=attached_user_audition.project) &
+                                                        Q(character=attached_user_audition.character) &
+                                                        Q(relation_type=UserProject.ATTACHED)
+                                                    )
+                            except UserProject.DoesNotExist:
+                                user_project_obj = UserProject()
+                                user_project_obj.user = attached_user_audition.user
+                                user_project_obj.project = attached_user_audition.project
+                                user_project_obj.character = attached_user_audition.character
+                                user_project_obj.relation_type = UserProject.ATTACHED
+                                user_project_obj.save()
+                            # end
+
+                            # add to team
+                            team_obj = Team()
+                            team_obj.user = attached_user_audition.user
+                            team_obj.project = attached_user_audition.project
+                            team_obj.job_type = JobType.objects.get(slug='actoractress')
+                            team_obj.save()
+                            # end
+
                             all_auditions = all_auditions.exclude(
                                             pk=attached_user_audition.id)
-                        # end
 
-                        if old_user:
-                            #update notification table- for removed user
+
+                            if old_user:
+                                #update notification table- for removed user
+                                notification = UserNotification()
+                                notification.user = old_user
+                                notification.project = character.project
+                                notification.notification_type = UserNotification.AUDITION_STATUS
+                                notification.message = "Sorry!! You have been removed from project "+character.project.title
+                                notification.save()
+                                # send notification- for removed user
+                                room_name = "user_"+str(old_user.id)
+                                notification_msg = {
+                                        'type': 'send_audition_status_notification',
+                                        'message': str(notification.message),
+                                        'from': character.project.title,
+                                        "event": "AUDITION_STATUS"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+
+                            #update notification table
                             notification = UserNotification()
-                            notification.user = old_user
+                            notification.user = user
                             notification.project = character.project
                             notification.notification_type = UserNotification.AUDITION_STATUS
-                            notification.message = "Sorry!! You have been removed from project "+character.project.title
+                            notification.message = "Congratulations!! You have been attached to project "+character.project.title
                             notification.save()
-                            # send notification- for removed user
-                            room_name = "user_"+str(old_user.id)
+                            # send notification
+                            room_name = "user_"+str(character.attached_user.id)
                             notification_msg = {
                                     'type': 'send_audition_status_notification',
                                     'message': str(notification.message),
@@ -2225,25 +2344,56 @@ class ReplaceAttachedCastAPI(APIView):
                                 }
                             notify(room_name, notification_msg)
                             # end notification section
+                        else:
+                            if character.attached_user:
+                                old_user = character.attached_user
+                            character.requested_user = user
+                            character.attached_user = None
+                            character.attached_user_name = ""
+                            character.save()
 
-                        #update notification table
-                        notification = UserNotification()
-                        notification.user = user
-                        notification.project = character.project
-                        notification.notification_type = UserNotification.AUDITION_STATUS
-                        notification.message = "Congratulations!! You have been attached to project "+character.project.title
-                        notification.save()
-                        # send notification
-                        room_name = "user_"+str(character.attached_user.id)
-                        notification_msg = {
-                                'type': 'send_audition_status_notification',
-                                'message': str(notification.message),
-                                'from': character.project.title,
-                                "event": "AUDITION_STATUS"
-                            }
-                        notify(room_name, notification_msg)
-                        # end notification section
+                            #update notification table
+                            notification = UserNotification()
+                            notification.user = user
+                            notification.project = character.project
+                            notification.character = character
+                            notification.notification_type = UserNotification.CAST_ATTACH_REQUEST
+                            notification.message = str(character.project.creator)+" wants to attach you to character <b>"+str(character.name)+"</b> to his project <b>"+str(character.project.title)+"</b>"
+                            notification.save()
+                            # send attach request notification
+                            room_name = "user_"+str(character.requested_user.id)
+                            notification_msg = {
+                                    'type': 'send_cast_attach_request_notification',
+                                    'message': str(notification.message),
+                                    'from': character.project.creator,
+                                    "event": "CAST_ATTACH_REQUEST"
+                                }
+                            notify(room_name, notification_msg)
+                            # end notification section
 
+                            response = {'message': "Request Sent",
+                                        'status': status.HTTP_200_OK}
+                            msg = "Request sent to "+user.get_full_name()
+                            messages.success(self.request, msg)
+
+                            if old_user:
+                                #update notification table- for removed user
+                                notification = UserNotification()
+                                notification.user = old_user
+                                notification.project = character.project
+                                notification.notification_type = UserNotification.AUDITION_STATUS
+                                notification.message = "Sorry!! You have been removed from project "+character.project.title
+                                notification.save()
+                                # send notification- for removed user
+                                room_name = "user_"+str(old_user.id)
+                                notification_msg = {
+                                        'type': 'send_audition_status_notification',
+                                        'message': str(notification.message),
+                                        'from': character.project.title,
+                                        "event": "AUDITION_STATUS"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
 
                     except CustomUser.DoesNotExist:
                         response = {'errors': "Invalid user id", 'status':
@@ -2259,7 +2409,7 @@ class ReplaceAttachedCastAPI(APIView):
 
                 # All other audition's status changed to passed
                 for obj in all_auditions:
-                    obj.status = Audition.PASSED
+                    obj.audition_status = Audition.PASSED
                     obj.status_update_date = timezone.now()
                     obj.save()
                     #update notification table- for removed user
@@ -2577,6 +2727,142 @@ class PdfToImageAPI(APIView):
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
 
+
+class CancelCastAttachRequestAPI(APIView):
+    serializer_class = CancelCastRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+
+            try:
+                character = Character.objects.get(pk=character_id)
+                notification_obj =UserNotification.objects.filter(
+                                    Q(user = character.requested_user) &
+                                    Q(character = character) &
+                                    Q(notification_type = UserNotification.CAST_ATTACH_REQUEST)
+                                )
+                notification_obj.delete()
+                character.requested_user = None
+                character.save()
+                if data_dict['type'] == 'decline':
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = character.project.creator
+                    notification.from_user = self.request.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.CAST_ATTACH_RESPONSE
+                    notification.message = self.request.user.get_full_name()+" declined your attach request for character <b>"+character.name+"</b> of the project <b>"+str(character.project.title)+"</b>"
+                    notification.character = character
+                    notification.save()
+                    # send notification to project creator
+                    room_name = "user_"+str(character.project.creator.id)
+                    notification_msg = {
+                            'type': 'send_cast_attach_response_notification',
+                            'message': str(notification.message),
+                            'from': notification.from_user.get_full_name(),
+                            "event": "CAST_ATTACH_RESPONSE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+                response = {'message': "Cast Attach Request Removed",
+                            'character': character.name,
+                            'project': character.project.title,
+                            'status': status.HTTP_200_OK}
+            except Character.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AcceptCastAttachRequestAPI(APIView):
+    serializer_class = CastRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+
+            try:
+                character = Character.objects.get(pk=character_id)
+                if  character.requested_user == self.request.user:
+                    character.attached_user = character.requested_user
+                    character.attached_user_name = character.requested_user.get_full_name()
+                    character.requested_user = None
+                    character.save()
+
+                    # update user project table
+                    user_project_obj = UserProject()
+                    user_project_obj.user = self.request.user
+                    user_project_obj.project = character.project
+                    user_project_obj.character = character
+                    user_project_obj.relation_type = UserProject.ATTACHED
+                    user_project_obj.save()
+                    # end
+
+                    # add to team
+                    team_obj = Team()
+                    team_obj.user = self.request.user
+                    team_obj.project = character.project
+                    team_obj.job_type = JobType.objects.get(slug='actoractress')
+                    team_obj.save()
+                    # end
+
+                    notification_obj = UserNotification.objects.filter(
+                                        Q(user=self.request.user) &
+                                        Q(notification_type=UserNotification.CAST_ATTACH_REQUEST) &
+                                        Q(character=character)
+                                       ).first()
+                    notification_obj.delete()
+
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = character.project.creator
+                    notification.from_user = self.request.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.CAST_ATTACH_RESPONSE
+                    notification.message = self.request.user.get_full_name()+" accepted your attach request for character <b>"+character.name+"</b> of the project <b>"+str(character.project.title)+"</b>"
+                    notification.character = character
+                    notification.save()
+                    # send notification to project creator
+                    room_name = "user_"+str(character.project.creator.id)
+                    notification_msg = {
+                            'type': 'send_cast_attach_response_notification',
+                            'message': str(notification.message),
+                            'from': notification.from_user.get_full_name(),
+                            "event": "CAST_ATTACH_RESPONSE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+                    response = {'message': "Cast Attach Request Accepted",
+                                'character': character.name,
+                                'project': character.project.title,
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': 'Invalid user', 'status':
+                                 status.HTTP_400_BAD_REQUEST}
+            except Character.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
 class TopRatedMembersAjaxView(View, JSONResponseMixin):
     template_name = 'project/top-rated-members.html'
 
@@ -2587,27 +2873,75 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
 
         try:
             actoractress = JobType.objects.get(slug='actoractress')
-            actoractress_list = user_rating_objs.filter(job_type=actoractress)[:5]
+            actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating')[:5]
         except JobType.DoesNotExist:
             actoractress_list = []
 
         try:
             director = JobType.objects.get(slug='director')
-            director_list = user_rating_objs.filter(job_type=director)[:5]
+            director_list = user_rating_objs.filter(job_type=director).order_by('-rating')[:5]
         except JobType.DoesNotExist:
             director_list = []
 
         try:
             writer = JobType.objects.get(slug='writer')
-            writer_list = user_rating_objs.filter(job_type=writer)[:5]
+            writer_list = user_rating_objs.filter(job_type=writer).order_by('-rating')[:5]
         except JobType.DoesNotExist:
             writer_list = []
 
         try:
             producer = JobType.objects.get(slug='producer')
-            producer_list = user_rating_objs.filter(job_type=producer)[:5]
+            producer_list = user_rating_objs.filter(job_type=producer).order_by('-rating')[:5]
         except JobType.DoesNotExist:
             producer_list = []
+
+        try:
+            dp = JobType.objects.get(slug='director-of-photography')
+            dp_list = user_rating_objs.filter(job_type=dp).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            dp_list = []
+
+        try:
+            costume_designer = JobType.objects.get(slug='costume-designer')
+            costume_designer_list = user_rating_objs.filter(job_type=costume_designer).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            costume_designer_list = []
+
+        try:
+            art_director = JobType.objects.get(slug='art-director')
+            art_director_list = user_rating_objs.filter(job_type=art_director).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            art_director_list = []
+
+        try:
+            editor = JobType.objects.get(slug='editor')
+            editor_list = user_rating_objs.filter(job_type=editor).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            editor_list = []
+
+        try:
+            casting_director = JobType.objects.get(slug='casting-director')
+            casting_director_list = user_rating_objs.filter(job_type=casting_director).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            casting_director_list = []
+
+        try:
+            make_up_hair_artist = JobType.objects.get(slug='make-uphair-artist')
+            make_up_hair_artist_list = user_rating_objs.filter(job_type=make_up_hair_artist).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            make_up_hair_artist_list = []
+
+        try:
+            sound_designer = JobType.objects.get(slug='sound-designer')
+            sound_designer_list = user_rating_objs.filter(job_type=sound_designer).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            sound_designer_list = []
+
+        try:
+            composer = JobType.objects.get(slug='composer')
+            composer_list = user_rating_objs.filter(job_type=composer).order_by('-rating')[:5]
+        except JobType.DoesNotExist:
+            composer_list = []
 
 
         top_rated_members_html = render_to_string(
@@ -2617,6 +2951,98 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
                                     'director_list': director_list,
                                     'writer_list': writer_list,
                                     'producer_list': producer_list,
+                                    'dp_list': dp_list,
+                                    'costume_designer_list': costume_designer_list,
+                                    'art_director_list': art_director_list,
+                                    'editor_list': editor_list,
+                                    'casting_director_list': casting_director_list,
+                                    'make_up_hair_artist_list': make_up_hair_artist_list,
+                                    'sound_designer_list': sound_designer_list,
+                                    'composer_list': composer_list,
                                  })
         context['top_rated_members_html'] = top_rated_members_html
         return self.render_json_response(context)
+
+
+class GetCastAtachRequestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_request_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.CAST_ATTACH_REQUEST)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_request_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCastAtachResponseNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_response_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.CAST_ATTACH_RESPONSE)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_response_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+
+class AddToFavoritesAPI(APIView):
+    serializer_class = UserProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project']
+            character_id = data_dict['character']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    character = Character.objects.get(pk=character_id)
+                    try:
+                        user_project_obj = UserProject.objects.get(
+                                                Q(user=user) &
+                                                Q(project=project) &
+                                                Q(character=character) &
+                                                Q(relation_type=UserProject.FAVORITE)
+                                            )
+                        response = {'message': "Already added to favorites!!",
+                                    'status': status.HTTP_200_OK}
+                    except UserProject.DoesNotExist:
+                        user_project_obj = UserProject()
+                        user_project_obj.user = user
+                        user_project_obj.project = project
+                        user_project_obj.character = character
+                        user_project_obj.relation_type = UserProject.FAVORITE
+                        user_project_obj.save()
+                        response = {'message': "Project added to favorites.",
+                                    'status': status.HTTP_200_OK}
+
+                except Character.DoesNotExist:
+                    response = {'errors': 'Invalid Character ID', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid Project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

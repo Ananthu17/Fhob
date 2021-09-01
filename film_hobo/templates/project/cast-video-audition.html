@@ -547,9 +547,9 @@
                                     <span class="cva-msg-txt">
                                         <span class="txt-capitalize float-right">Status:
                                         <span class="txt-capitalize
-                                        {% if audition.status == 'passed' %}cva-info-txt-black{% endif %}
-                                        {% if audition.status == 'attached' %}cva-info-txt-green{% endif %}
-                                        {% if audition.status == 'callback' %}cva-info-txt-red{% endif %}
+                                        {% if audition.audition_status == 'passed' %}cva-info-txt-black{% endif %}
+                                        {% if audition.audition_status == 'attached' %}cva-info-txt-green{% endif %}
+                                        {% if audition.audition_status == 'callback' %}cva-info-txt-red{% endif %}
                                         ">
                                             {{audition.get_status_display}}
                                         </span>

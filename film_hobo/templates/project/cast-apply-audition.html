@@ -115,6 +115,12 @@
                                         </span>
                                     </span>
                                 </div>
+                                <div>
+                                    <span class="">
+                                        <a class="video-menu-head cursor-pointer add_to_favorites favorites-btn remove-decoration"
+                                        id="{{project.id}}">Add to Favorites</a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <!-- col-2   -->
@@ -445,7 +451,34 @@
     });
 
 </script>
+<script>
+    $('body').on('click' , '.add_to_favorites', function(){
+       var project_id = $(this).attr("id");
+       var token = $("#token").val();
+       data_dict = {};
+       data_dict['project']=project_id;
+       data_dict['character']= '{{ character.id }}';
 
+       $.ajax
+       ({
+           type: "POST",
+           url: "/project/add-to-favorites-api/",
+           dataType: 'json',
+           async: false,
+           data: data_dict,
+           beforeSend: function (xhr) {
+               xhr.setRequestHeader ("Authorization", token);
+           },
+           success: function(response){
+               console.log(response)
+               $('#success_message').fadeIn().html(response['message']);
+               setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+           }
+       });
+
+     });
+
+</script>
 {% endblock %}
 
 

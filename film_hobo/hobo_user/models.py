@@ -1,5 +1,6 @@
 
 import datetime
+from django.db.models import Q
 from autoslug import AutoSlugField
 from django.contrib.auth.hashers import make_password
 from phonenumber_field.modelfields import PhoneNumberField
@@ -1546,6 +1547,8 @@ class UserNotification(models.Model):
     COMMENTS = 'comments'
     COMMENTS_REPLY = 'comments_reply'
     COMMENTS_MENTION = 'comments_mention'
+    CAST_ATTACH_REQUEST = 'cast_attach_request'
+    CAST_ATTACH_RESPONSE = 'cast_attach_response'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1563,6 +1566,8 @@ class UserNotification(models.Model):
                                 (COMMENTS, 'Comments'),
                                 (COMMENTS_REPLY, 'Comments Reply'),
                                 (COMMENTS_MENTION, 'Comments Mention'),
+                                (CAST_ATTACH_REQUEST, 'Cast Attach Request'),
+                                (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1593,6 +1598,10 @@ class UserNotification(models.Model):
                                 verbose_name=_("Project"),
                                 null=True, blank=True)
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    character = models.ForeignKey('project.Character',
+                                  verbose_name=_("Character"),
+                                  on_delete=models.CASCADE,
+                                  null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1656,3 +1665,45 @@ class Feedback(models.Model):
     class Meta:
         verbose_name = 'Feedback'
         verbose_name_plural = 'Feedbacks'
+
+
+class UserProject(models.Model):
+    FAVORITE = 'favorite'
+    APPLIED = 'applied'
+    ATTACHED = 'attached'
+    RELATION_TYPE_CHOICES = [
+                (FAVORITE, 'Favorite'),
+                (APPLIED, 'Applied'),
+                (ATTACHED, 'Attached'),
+                ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_project_user',
+                             verbose_name=_("User"),
+                             null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='user_project_project',
+                                verbose_name=_("Project"),
+                                null=True)
+    relation_type = models.CharField(_("Status Type"),
+                                     choices=RELATION_TYPE_CHOICES,
+                                     max_length=150, default=ATTACHED)
+    audition = models.ForeignKey("project.Audition",
+                                 on_delete=models.CASCADE,
+                                 related_name='user_project_audition',
+                                 verbose_name=_("Audition"),
+                                 null=True, blank=True)
+    character = models.ForeignKey("project.Character",
+                                  on_delete=models.CASCADE,
+                                  related_name='user_project_character',
+                                  verbose_name=_("Character"),
+                                  null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'User Project'
+        verbose_name_plural = 'User Projects'
+

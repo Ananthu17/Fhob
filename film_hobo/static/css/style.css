@@ -653,3 +653,19 @@ input.pw {
   text-decoration: none;
   color:#000;
  }
+ .favorites-btn
+  {
+    padding:2px 4px;
+    border:1px solid #e88b24;
+  }
+ .favorites-btn:hover
+  {
+    padding:2px 4px;
+    border:1px solid #0e62b5;
+  }
+ .top-members-head
+  {
+    color:#e88b24;
+    /* color:#0e62b5; */
+    font-weight: 600;
+  }

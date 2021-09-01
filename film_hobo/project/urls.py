@@ -16,7 +16,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
      GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
      PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
-     DeleteSceneImageAPI, TopRatedMembersAjaxView
+     DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
+     GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
+     GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI
 
 
 urlpatterns = [
@@ -127,4 +129,18 @@ urlpatterns = [
           name='delete-scene-image-api'),
      path('show-top-rated-member/', TopRatedMembersAjaxView.as_view(),
           name='show-top-rated-member'),
+     path('get-cast-attach-request-notification-html/',
+          GetCastAtachRequestNotificationAjaxView.as_view(),
+          name='get-cast-attach-request-notification-html'),
+     path('get-cast-attach-response-notification-html/',
+          GetCastAtachResponseNotificationAjaxView.as_view(),
+          name='get-cast-attach-response-notification-html'),
+     path('cancel-cast-attach-request-api/',
+          CancelCastAttachRequestAPI.as_view(),
+          name='cancel-cast-attach-request-api'),
+     path('accept-cast-attach-request-api/',
+          AcceptCastAttachRequestAPI.as_view(),
+          name='accept-cast-attach-request-api'),
+     path('add-to-favorites-api/', AddToFavoritesAPI.as_view(),
+          name='add-to-favorites-api'),
     ]

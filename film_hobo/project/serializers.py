@@ -1,6 +1,7 @@
-from hobo_user.models import UserRating, Project, UserRatingCombined
-from project.models import Audition, AuditionRating, Character, Comment, SceneImages, Sides, \
-    ProjectRating, Comment
+from hobo_user.models import UserProject, UserRating, Project, \
+    UserRatingCombined, UserProject
+from project.models import Audition, AuditionRating, Character, Comment, \
+    SceneImages, Sides, ProjectRating, Comment
 from rest_framework import serializers
 
 
@@ -277,6 +278,39 @@ class SceneImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SceneImages
         fields = ['scene', 'project_id', 'character_id', 'image']
+
+
+class CastRequestSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class CancelCastRequestSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    type = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class UserProjectSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    character = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+    class Meta:
+        model = UserProject
+        fields = ['project', 'character']
 
 
 

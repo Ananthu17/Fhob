@@ -169,3 +169,18 @@ class NotificationConsumer(WebsocketConsumer):
             'event': "COMMENTS"
         }))
 
+    def send_cast_attach_request_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CAST_ATTACH_REQUEST",
+        }))
+
+    def send_cast_attach_response_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CAST_ATTACH_RESPONSE",
+        }))
+
+

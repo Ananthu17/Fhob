@@ -60,6 +60,18 @@ notificationSocket.onmessage = function (e) {
                      }
              });
              break;
+        case "CAST_ATTACH_REQUEST":
+            // get friend request notification html
+            data_dict = {}
+            data_dict['from_user'] = user_id
+            $.get('/project/get-cast-attach-request-notification-html/', data_dict)
+            .done(function(data) {
+                if(data.results!='')
+                    {
+                        $('.notification-modal-content').prepend(data['notification_html'])
+                    }
+            });
+            break;
         case "FRIEND_REQUEST_ACCEPT":
              // get friend request accept notification html
              data_dict = {}
@@ -183,6 +195,19 @@ notificationSocket.onmessage = function (e) {
              data_dict['message'] = message
              console.log(data_dict)
              $.get('/project/get-comments-reply-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "CAST_ATTACH_RESPONSE":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-cast-attach-response-notification-html/', data_dict)
              .done(function(data) {
                  if(data.results!='')
                      {
