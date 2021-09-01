@@ -60,7 +60,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CreateProjectView, ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
-                   TermsOfService, PrivacyPolicy
+                   TermsOfService, PrivacyPolicy, AddBetaTesterCode, \
+                   ListBetaTesterCode, DeleteBetaTesterCode, \
+                   EditBetaTesterCode, CheckBetaTesterCode
 app_name = "hobo_user"
 
 urlpatterns = [
@@ -177,7 +179,16 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
-
+    path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
+         name='add-beta-tester-code'),
+    path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
+         name='list-beta-tester-code'),
+    path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
+         name='delete-beta-tester-code'),
+    path('edit-beta-tester-code/', EditBetaTesterCode.as_view(),
+         name='edit-beta-tester-code'),
+    path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
+         name='check-beta-tester-code'),
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),

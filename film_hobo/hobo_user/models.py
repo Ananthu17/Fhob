@@ -1735,9 +1735,10 @@ class Feedback(models.Model):
         verbose_name_plural = 'Feedbacks'
 
 
-# class BetaTesterCodes(models.Model):
-#     code = models.CharField(_("Code"), max_length=10, unique=True)
+class BetaTesterCodes(models.Model):
+    code = models.CharField(_("Code"), max_length=10, unique=True)
+    days = models.IntegerField(_("Days"), blank=False)
 
-#     class Meta:
-#         verbose_name = 'Beta Tester Code'
-#         verbose_name_plural = 'Beta Tester Codes'
+    class Meta:
+        verbose_name = 'Beta Tester Code'
+        verbose_name_plural = 'Beta Tester Codes'

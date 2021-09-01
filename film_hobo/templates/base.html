@@ -45,7 +45,11 @@
                         <div class="head-tp mt-20">Stardom starts with one scene</div>
                         <div class="head-btm mt-1">Create your project, find a team, get noticed... </div>
                         <div class="search-container">
-                            <input type="text" placeholder="Search" class="search-placeholder" id="search">
+                            {% if request.user.is_anonymous %}
+                                <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
+                            {% else %}
+                                <input type="text" placeholder="Search" class="search-placeholder" id="search">
+                            {% endif %}
                         </div>
                     </div>
                     <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">

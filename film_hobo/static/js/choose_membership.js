@@ -12,6 +12,13 @@ $( document ).ready(function() {
         $('#monthly_company').text(response.data.monthly_company);
     });
 
+    // var modal = $("#membershipModal")
+    // var title = "Enter Code"
+    // var modal_text = "Enter a Beta Tester Code"
+    // modal.find('.modal-title').text(title)
+    // modal.find('.modal-body').text(modal_text)
+    // $("#membershipModal").modal('show');
+
 });
 
 function withJquery(){
@@ -51,3 +58,18 @@ function CopyToClipboard(value, showNotification, notificationText) {
         });
     }
 }
+
+$('#close-membership-btn').click(function(event){
+    $("#membershipModal").modal('hide');
+});
+
+$('#close-cross').click(function(event){
+    $("#membershipModal").modal('hide');
+});
+
+$('#beta-tester-modal').click(function(event){
+    var modal = $("#membershipModal")
+    var title = "Enter Code"
+    modal.find('.modal-title').text(title)
+    $("#membershipModal").modal('show');
+});

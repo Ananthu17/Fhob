@@ -9,6 +9,9 @@ from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
 from django.conf import settings
+from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
@@ -28,7 +31,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from rest_framework import authentication
 from rest_framework import status
+from rest_framework import permissions
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -68,7 +73,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, \
                     CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined
+                    VideoRatingCombined, BetaTesterCodes
 from payment.models import Transaction
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -92,14 +97,25 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    VideoRatingSerializer, VideoSerializer
-
+    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+from payment.views import IsSuperUser
 
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
+
+
+class AdminAuthenticationPermission(permissions.BasePermission):
+    ADMIN_ONLY_AUTH_CLASSES = [authentication.BasicAuthentication, authentication.SessionAuthentication]
+
+    def has_permission(self, request, view):
+        user = request.user
+        if user and user.is_authenticated():
+            return user.is_superuser or \
+                not any(isinstance(request._authenticator, x) for x in self.ADMIN_ONLY_AUTH_CLASSES)
+        return False
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -345,10 +361,6 @@ class ChooseMembershipPage(APIView):
     template_name = 'user_pages/choose_your_membership.html'
 
     def get(self, request):
-        # beta_test_codes = BetaTesterCodes.objects.all()
-        # random_id = random.randint(1, len(beta_test_codes))
-        # beta_code = BetaTesterCodes.objects.get(id=random_id).code
-        # return Response({'beta_code': str(beta_code)})
         return Response()
 
 
@@ -4319,6 +4331,102 @@ class FeedbackAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddBetaTesterCode(APIView):
+    """
+    API endpoint to add a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = AddBetaTesterCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListBetaTesterCode(APIView):
+    """
+    API endpoint to list beta tester codes
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        filter_objs = BetaTesterCodes.objects.all()
+        serialized_results = AddBetaTesterCodeSerializer(filter_objs, many=True)
+        if serialized_results.is_valid:
+            return Response(serialized_results.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serialized_results.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteBetaTesterCode(APIView):
+    """
+    API endpoint to delete a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            delete_obj_id = kwargs['id']
+            delete_obj = BetaTesterCodes.objects.get(id=delete_obj_id)
+            delete_obj.delete()
+            return Response(
+                {'status': 'code deleted successfully'}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {'status': 'code with this id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditBetaTesterCode(APIView):
+    """
+    API endpoint to edit a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['id']
+            testercode_instance = BetaTesterCodes.objects.get(id=unique_id)
+            serializer = AddBetaTesterCodeSerializer(testercode_instance,
+                                             data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.update(BetaTesterCodes.objects.get(id=unique_id),
+                                  request.data)
+                return Response(
+                    {"status": "success",
+                     "message": "beta tester code updated successfully"})
+            else:
+                return Response(serializer.errors)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code record not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class CheckBetaTesterCode(APIView):
+    """
+    API endpoint to check a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['code']
+            testercode_instance = BetaTesterCodes.objects.get(id=unique_id)
+            if testercode_instance:
+                return Response(
+                    {"status": "success",
+                     "message": "beta tester code exists"})
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code does not exist"},
+                status=status.HTTP_404_NOT_FOUND)
 
 
 class FeedbackWebView(View):
