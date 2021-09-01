@@ -1,3 +1,9 @@
+var token = localStorage.getItem("token");
+token_str = "Token "
+token_val = String(token)
+var authorization_str = token_str.concat(token_val);
+origin_url = window.location.origin
+
 $( document ).ready(function() {
     origin_url = window.location.origin
     get_url = origin_url + '/payment/get_membership_fee_detail_public/'
@@ -72,4 +78,23 @@ $('#beta-tester-modal').click(function(event){
     var title = "Enter Code"
     modal.find('.modal-title').text(title)
     $("#membershipModal").modal('show');
+});
+
+$('#check-code').click(function(event){
+    debugger
+    check_url = origin_url + '/hobo_user/check-beta-tester-code/'
+    var check_args = {
+        "code": document.getElementById("input_code").value,
+    }
+
+    axios.get(check_url, check_args)
+    .then((response) => {
+    if (response.status == 200){
+            var modal = $("#membershipModal")
+            var modal_text = "Code Applied Successfully"
+            modal.find('.modal-body').text(modal_text)
+        }
+    }, (error) => {
+        console.log(error);
+    });
 });

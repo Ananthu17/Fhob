@@ -49,7 +49,6 @@ function deleteCodeFunction(obj_id) {
 }
 
 function editCodeFunction(obj_id) {
-  debugger
   edit_field_element = '#modify_edit_' + obj_id
   edit_state = $(edit_field_element).text()
   if (edit_state === 'Edit'){
@@ -69,58 +68,6 @@ function editCodeFunction(obj_id) {
       editable_elements.item(2).children[1].readOnly = false
   }
   else{
-      editable_fields = 'edit' + obj_id
-      var editable_elements = document.getElementsByClassName(editable_fields);
-      edit_discount_url = origin_url + '/payment/edit_discount_detail/'
-
-      for (var i = 0; i < editable_elements.length; i++) {
-          promo_code_val = editable_elements.item(0).textContent
-          amount_val = editable_elements.item(0).textContent
-
-      }
-      editable_fields = '.edit' + obj_id
-      edtiable_date = '#valid_from_' + obj_id
-      var edit_class = $(editable_fields);
-
-      if (editable_elements[1].innerText.includes("$")){
-          var amount_type_value = "flat_amount"
-          var amount_value_value = editable_elements[1].innerText.replace(/[A-Za-z$-]/g, "")
-      }
-      else{
-          var amount_type_value = "percentage"
-          var amount_value_value = editable_elements[1].innerText.replace(new RegExp('%', 'g'),"")
-      }
-
-      if (vaild_from_date){
-          vaild_from_date_final = vaild_from_date
-      }
-      else{
-          vaild_from_date_final = $(editable_fields).find('input')[0].getAttribute("value");
-      }
-
-      if (vaild_to_date){
-          vaild_to_date_final = vaild_to_date
-      }
-      else{
-          vaild_to_date_final = $(editable_fields).find('input')[1].getAttribute("value");
-      }
-
-      edit_extra_args = {"id": obj_id,
-                      "promo_code": editable_elements[0].innerText,
-                      "valid_from": vaild_from_date_final,
-                      "valid_to": vaild_to_date_final,
-                      "amount_type": amount_type_value,
-                      "amount": amount_value_value,
-                      }
-
-      axios.put(edit_discount_url, edit_extra_args, {headers: {'Authorization': authorization_str}})
-      .then((response) => {
-          if (response.status == 200){
-              location.reload();
-          }
-      }, (error) => {
-          console.log(error);
-      });
   }
 }
 
@@ -146,10 +93,13 @@ $("#modal_delete").click(function(){
   delete_url = origin_url + '/hobo_user/delete-beta-tester-code/' + obj_id + '/'
   axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
   .then((response) => {
+  debugger
   if (response.status == 200){
+    debugger
           location.reload();
       }
   }, (error) => {
+    debugger
       console.log(error);
   });
 });

@@ -4412,13 +4412,12 @@ class CheckBetaTesterCode(APIView):
     """
     API endpoint to check a beta tester code
     """
-    permission_classes = (IsSuperUser,)
 
     def get(self, request, *args, **kwargs):
         try:
             data = request.data
             unique_id = request.data['code']
-            testercode_instance = BetaTesterCodes.objects.get(id=unique_id)
+            testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
             if testercode_instance:
                 return Response(
                     {"status": "success",
