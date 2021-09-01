@@ -4471,18 +4471,24 @@ class ProjectDateFilterAPI(APIView):
 
     def post(self, request):
         received_data = json.loads(request.body)
-        print(received_data['year'])
-        year = received_data['year']
-        # month = received_data['month']
         # day = received_data['day']
-        if year:
-            project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"])
-            print("project", project)
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-"+month+"-01",
+                                                               year+"-"+month+"-30"])
             project_dict = {}
             for item in project:
                 project_dict[item.id] = ProjectSerializer(item).data
-            print(project_dict)
+            return Response(project_dict)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            project_dict = {}
+            for item in project:
+                project_dict[item.id] = ProjectSerializer(item).data
             return Response(project_dict)
 
 
