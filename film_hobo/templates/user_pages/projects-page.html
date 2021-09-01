@@ -765,7 +765,7 @@
                 $('#searchblock').removeClass('d-none')
                 $('#searchrow').empty()
                 $('#emptysearch').empty()
-                if(response.data.length == 0){
+                if(Object.keys(response.data).length == 0){
                     let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
                     $('#emptysearch').append(div);
                 }
@@ -861,7 +861,7 @@
                 $('#searchblock').removeClass('d-none')
                 $('#searchrow').empty()
                 $('#emptysearch').empty()
-                if(response.data == {}){
+                if(Object.keys(response.data).length == {}){
                     let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
                     $('#emptysearch').append(div);
                 }
