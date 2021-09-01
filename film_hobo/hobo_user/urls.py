@@ -58,7 +58,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
                    GetProfileRatingNotificationAjaxView, EditUserInterestAPI, \
                    VideoRatingView, ProjectView, FindVideoRatingAPI, \
-                   VideoListAPI
+                   VideoListAPI, ProjectDateFilterAPI
 
 app_name = "hobo_user"
 
@@ -300,5 +300,7 @@ urlpatterns = [
     path('projectview/', ProjectView.as_view(),
          name='projects'),
     path('projectview/create/', CreateProjectView.as_view(),
-         name='new-project')
+         name='new-project'),
+    path('projects/date/', ProjectDateFilterAPI.as_view(),
+         name="date_filter")
 ]

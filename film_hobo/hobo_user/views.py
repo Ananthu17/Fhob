@@ -49,6 +49,7 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from datetime import date
 
 from authemail.views import SignupVerify
 
@@ -4284,6 +4285,25 @@ class ProjectAPIView(ListAPIView):
                         'last_date', 'location', 'visibility',
                         'visibility_password', 'cast_attachment',
                         'cast_pay_rate', 'cast_samr', 'timestamp']
+
+
+class ProjectDateFilterAPI(APIView):
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        print(received_data['year'])
+        year = received_data['year']
+        # month = received_data['month']
+        # day = received_data['day']
+        if year:
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            print("project", project)
+            project_dict = {}
+            for item in project:
+                project_dict[item.id] = ProjectSerializer(item).data
+            print(project_dict)
+            return Response(project_dict)
 
 
 class ProjectCreateAPIView(CreateAPIView):
