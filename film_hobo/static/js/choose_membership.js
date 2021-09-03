@@ -18,6 +18,7 @@ $( document ).ready(function() {
         $('#monthly_company').text(response.data.monthly_company);
     });
 
+    $('#success-alert-box').hide();
     // var modal = $("#membershipModal")
     // var title = "Enter Code"
     // var modal_text = "Enter a Beta Tester Code"
@@ -67,6 +68,7 @@ function CopyToClipboard(value, showNotification, notificationText) {
 
 $('#close-membership-btn').click(function(event){
     $("#membershipModal").modal('hide');
+    location.reload();
 });
 
 $('#close-cross').click(function(event){
@@ -90,11 +92,11 @@ $('#check-code').click(function(event){
     .then((response) => {
 
     if (response.status == 200){
-            var modal = $("#membershipModal")
-            var modal_text = "Code Applied Successfully"
-            modal.find('.modal-body').text(modal_text)
+            $("#membershipModalForm").hide()
+            $("#membershipModalBody").append($('#success-alert-box').html());
         }
     }, (error) => {
-        console.log(error);
+        $('#input_code').css('border-color', 'red');
+        $('#invlid-error').show();
     });
 });
