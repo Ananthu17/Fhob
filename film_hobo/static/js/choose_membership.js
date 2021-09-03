@@ -81,14 +81,14 @@ $('#beta-tester-modal').click(function(event){
 });
 
 $('#check-code').click(function(event){
-    debugger
     check_url = origin_url + '/hobo_user/check-beta-tester-code/'
     var check_args = {
         "code": $('#input_code').val(),
     }
 
-    axios.get(check_url, check_args)
+    axios.post(check_url, check_args)
     .then((response) => {
+
     if (response.status == 200){
             var modal = $("#membershipModal")
             var modal_text = "Code Applied Successfully"

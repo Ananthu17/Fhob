@@ -4414,7 +4414,7 @@ class CheckBetaTesterCode(APIView):
     API endpoint to check a beta tester code
     """
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             data = request.data
             unique_id = request.data['code']
