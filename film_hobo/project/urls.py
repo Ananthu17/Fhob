@@ -5,7 +5,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
-     SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
+     SubmitAuditionAPI, AuditionListView, AddProjectVideoView, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
      TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
@@ -18,7 +18,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
      DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
      GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
-     GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI
+     GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI, \
+     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView
 
 
 urlpatterns = [
@@ -49,8 +50,6 @@ urlpatterns = [
           name='add-video-submit-last-date'),
      path('add-sides/<int:id>/', AddSidesView.as_view(),
           name='add-sides'),
-     path('edit-sides/<int:id>/', EditSidesView.as_view(),
-          name='edit-sides'),
      path('add-sides-api/', SidesCreateAPIView.as_view(),
           name='add-sides-api'),
      path('cast-apply-audition/<int:id>/', CastApplyAuditionView.as_view(),
@@ -66,7 +65,8 @@ urlpatterns = [
           name='post-project-video'),
      path('script-password-check/', ScriptPasswordCheckAPI.as_view(),
           name='script-password-check'),
-     path('cast-audition-password-check/', CastAuditionPasswordCheckAPI.as_view(),
+     path('cast-audition-password-check/',
+          CastAuditionPasswordCheckAPI.as_view(),
           name='cast-audition-password-check'),
      path('team-select-password-check/', TeamSelectPasswordCheckAPI.as_view(),
           name='team-select-password-check'),
@@ -143,4 +143,10 @@ urlpatterns = [
           name='accept-cast-attach-request-api'),
      path('add-to-favorites-api/', AddToFavoritesAPI.as_view(),
           name='add-to-favorites-api'),
+     path('remove-from-favorites-api/', RemoveFromFavoritesAPI.as_view(),
+          name='remove-from-favorites-api'),
+     path('remove-character-scenes-api/', RemoveCharacterScenesAPI.as_view(),
+          name='remove-character-scenes-api'),
+     path('all-members/<int:id>/', AllMembersView.as_view(),
+          name='all-members'),
     ]

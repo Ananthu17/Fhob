@@ -321,29 +321,35 @@
                                </div>
                                <div id="sides">
                                 {% if sides%}
-                                   <div class="caa-download-display">
+                                   <div class="caa-download-display mt-1">
                                        <span>
-                                           <a class="download_sides cursor-pointer" id="download_sides">
+                                        <!-- {% if sides.scenes_combined %}
+                                           <a class="download_sides cursor-pointer" id="download_sides"
+                                           href="{{sides.scenes_combined.url}}">
                                                Download</a>
+                                        {% endif %} -->
                                         </span>
                                         <span>
-                                            <a class="cursor-pointer" id="print_sides"
+                                            <!-- <a class="cursor-pointer" id="print_sides"
                                             onclick="PrintElem('#printableArea')">Print</a>
-                                            <div id="editor"></div>
+                                            <div id="editor"></div> -->
                                         </span>
                                    </div>
                                    <div class="caa-script-sec-frame">
-                                        <div class="caa-script-sec-frame-inner scroll-section">
-                                            <div id="printableArea" class="ml-3">
-                                                <b>Scene 1:</b><p>{{sides.scene_1|safe}}</p>
-                                                <b>Scene 2:</b><p>{{sides.scene_2|safe}}</p>
-                                                <b>Scene 3:</b><p>{{sides.scene_3|safe}}</p>
-                                            </div>
-                                        </div>
+                                   <div class="caa-script-sec-pdf-frame-inner">
+                                        {% if sides.scenes_combined %}
+                                        <iframe src="{{ sides.scenes_combined.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        <!-- {% if sides.scene_2_pdf %}
+                                        <iframe src="{{ sides.scene_2_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        {% if sides.scene_3_pdf %}
+                                        <iframe src="{{ sides.scene_3_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}-->
+                                    </div>
                                     </div>
                                 {% endif %}
                                </div>
-                               
                            </div>
                         </div>
                     </div>
@@ -372,37 +378,37 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
 <script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
 <script>
-    var doc = new jsPDF();
-    var specialElementHandlers = {
-        '#editor': function (element, renderer) {
-            return true;
-        }
-    };
+    // var doc = new jsPDF();
+    // var specialElementHandlers = {
+    //     '#editor': function (element, renderer) {
+    //         return true;
+    //     }
+    // };
 
-    $('body').on('click' , '#download_sides', function(){
-        console.log("hsdakjd")
-        doc.fromHTML($('#printableArea').html(), 15, 15, {
-            'width': 170,
-                'elementHandlers': specialElementHandlers
-        });
-        doc.save('sides.pdf');
-    });
+    // $('body').on('click' , '#download_sides', function(){
+    //     console.log("hsdakjd")
+    //     doc.fromHTML($('#printableArea').html(), 15, 15, {
+    //         'width': 170,
+    //             'elementHandlers': specialElementHandlers
+    //     });
+    //     doc.save('sides.pdf');
+    // });
 </script>
 <script type="text/javascript">
 
-    function PrintElem(elem)
-    {
-        var data = $(elem).html();
-        var mywindow = window.open('', 'new div', 'height=400,width=800');
-        mywindow.document.write('<html><head><title>Sides</title>');
-        mywindow.document.write('<h1>Sides</h1>');
-        mywindow.document.write('</head><body >');
-        mywindow.document.write(data);
-        mywindow.document.write('</body></html>');
-        mywindow.print();
-        mywindow.close();
-        return true;
-    }
+    // function PrintElem(elem)
+    // {
+    //     var data = $(elem).html();
+    //     var mywindow = window.open('', 'new div', 'height=400,width=800');
+    //     mywindow.document.write('<html><head><title>Sides</title>');
+    //     mywindow.document.write('<h1>Sides</h1>');
+    //     mywindow.document.write('</head><body >');
+    //     mywindow.document.write(data);
+    //     mywindow.document.write('</body></html>');
+    //     mywindow.print();
+    //     mywindow.close();
+    //     return true;
+    // }
 
 </script>
 <script>

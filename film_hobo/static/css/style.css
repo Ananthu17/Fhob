@@ -669,3 +669,10 @@ input.pw {
     /* color:#0e62b5; */
     font-weight: 600;
   }
+.border-cls
+  {
+    border:1px solid #000;
+  }
+.grey-bg{
+    background-color: #f3f3f3;
+}

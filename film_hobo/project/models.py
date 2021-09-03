@@ -1,4 +1,9 @@
+import PyPDF2
 import datetime
+import requests
+from io import BytesIO
+from django.core import files
+from django.conf import settings
 from ckeditor.widgets import CKEditorWidget
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -48,15 +53,16 @@ class Sides(models.Model):
     character = models.ForeignKey(Character,
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
-    scene_1 = RichTextUploadingField(_("Scene Description"),
-                                     null=True, blank=True)
-    scene_2 = RichTextUploadingField(_("Scene Description"),
-                                     null=True, blank=True)
-    scene_3 = RichTextUploadingField(_("Scene Description"),
-                                     null=True, blank=True)
+    # scene_1 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
+    # scene_2 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
+    # scene_3 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
     scene_1_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_2_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_3_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scenes_combined = models.FileField(upload_to='script/', null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"

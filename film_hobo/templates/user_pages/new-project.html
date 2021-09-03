@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <style>
+        .fileuploaddiv{
+            border: 1px solid;
+            background-color: #cecece;
+            width: 150px;
+            text-align: right;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .act{
+            background-color: #f32121 !important;
+        }
+
+        /* .containerradio input:checked .checkmarkagree{
+            background-color: #f32121 !important;
+        } */
+
+    </style>
+    <div class="wrapper flex-grow-1">
+        <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container-fluid member-setup-sec">
+            <div class="row mb-4">
+                <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
+                    <div class="left-mode-sec mb-2 pl-3 pr-3 h-100">
+
+                        <div class="row pt-1">
+                            <div class="col-12">
+                                <a href="" class="prjct-log-link  float-right">EDIT</a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2 ">
+                                <label class="form-title mem-setup-blu-f">PROJECT TITLE:</label>
+                            </div>
+                            <div class="col-6">
+                                {{form.title}}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 mb-3">
+                            <div class="col-10 prjct-log-bx ml-3">
+                                By typing my name below, I (Creator of this Project) <span class="red-f">certify</span> that I am the owner of the
+                                rights of the Literature Material I am
+                                submitting on this page for this Project or I have permission to do so.
+                                <div class="row mt-1 mb-2 mr-4 float-right ">
+                                    <label class="containerradio red-f">Acknowledge
+                                        <input type="radio" name="radio" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2 ">
+                                <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
+                            </div>
+                            <div class="col-6">
+                                {{form.creator}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2">
+                                <label class="form-title mem-setup-blu-f">WRITER:</label>
+                            </div>
+                            <div class="col-6">
+                                {{writerform.name}}
+                            </div>
+                            <div class="col-4 mt-2">
+                                <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER WRITER</a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-12">
+                                <label class="form-title mem-setup-blu-f">FORMAT:</label>
+                            </div>
+                            <div class="col-md-9 col-sm-12 mt-3">
+                                {{form.format}}
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold"> SCENE
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="1" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold"> SHORT
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="2">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PILOT (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">FEATURE (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="4">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2 ">
+                                <label class="form-title mem-setup-blu-f">NUMBER OF PAGES:</label>
+                            </div>
+                            <div class="col-6">
+                                <input class="inp-line" placeholder="" required />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-12">
+                                <label class="form-title mem-setup-blu-f">GENRE:</label>
+                            </div>
+                            <div class="col-md-9 col-sm-12 mt-3">
+                                {{form.genre}}
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold"> DRAMA
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="8" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">COMEDY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="5">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">CRIME
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="6">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">ROMANCE
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="20">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">SCI-FI
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="21">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">HORROR
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="14">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">ACTION / ADVENTURE
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="1">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">MYSTERY / THRILLER
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="18">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">MUSICAL
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="17">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">WAR / MILITARY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="16">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">FAMILY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">FANTASY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="10">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">LGBTQ
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="15">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">SPORT
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="22">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">ANIMATION
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="3">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-11 mt-2">
+                                <div class="form-check-inline">
+                                    <label class="containerradio mem-setup-blu-f">SAG-AFTRA
+                                        <input type="radio" name="radiorow3" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline ml-3">
+                                    <label class="containerradio mem-setup-blu-f">INDIE
+                                        <input type="radio" name="radiorow3">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2 ">
+                                <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
+                            </div>
+                            <div class="col-6">
+                                {{form.cast_pay_rate}}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-6 ">
+                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
+                            </div>
+                            <div class="col-md-10 col-sm-6 mt-3">
+                                {{form.sag_aftra}}
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Ultra Low
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="2" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Moderate Low
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="3">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Low
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="4">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Theatrical
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="5">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Short
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="6">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Micro
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="7">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Student
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="8">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-6">
+                                <label class="form-title mem-setup-blu-f">CAST ATTACHMENT:</label>
+                            </div>
+                            <div class="col-md-10 col-sm-6 mt-3">
+                                {{form.cast_attachment}}
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Nationwide
+                                        <input type="radio" name="radiorow5" onclick="selectcast(this)" value="0" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Local Only
+                                        <input type="radio" name="radiorow5" onclick="selectcast(this)" value="1">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2 col-sm-6">
+                                <label class="form-title mem-setup-blu-f">VISIBILITY:</label>
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                {{form.visibility}}
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PUBLIC
+                                        <input type="radio" name="radiorow6" id="public" onclick="selectvisibility(this)" value="0" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PRIVATE
+                                        <input type="radio" name="radiorow6" id="private" onclick="selectvisibility(this)" value="1">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mt-3">
+                                <form class="form-inline">
+                                    <div class="form-group d-none" id="visibility_password">
+                                        <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
+                                        {{form.visibility_password}}
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3">Your Crew and Cast will
+                                need this Password when they click on the Project Number to get to
+                                the Project Page.
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2 ">
+                                <label class="form-title mem-setup-blu-f">LOCATION(S):</label>
+                            </div>
+                            <div class="col-6">
+                                <!-- <input class="inp-line" placeholder="Separate by Commas" /> -->
+                                {{form.location}}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <a href="#" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
+                                class="mt-2 ml-3 bold">(0)</span>
+                        </div>
+
+                        <div class="row mt-3">
+                            <a href="#" class="btn prjct-log-btn">CREW SET UP</a> <span
+                                class="mt-2 ml-3 bold">(0)</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span>(Status And
+                                    Minimum Rating):</label>
+                            </div>
+                            <div class="col-md-9 mt-3">
+                                {{form.cast_samr}}
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Indie
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="0" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Pro
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="5">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Indie & Pro
+                                        <span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star checked "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="10">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span>(Status And
+                                    Minimum Rating):</label>
+                            </div>
+                            <div class="col-md-9 mt-3">
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Indie
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="1">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Pro & Comp
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="6">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Indie, Pro & Comp
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="11">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
+                            </div>
+                            <div class="col-md-2 mt-3">
+                                <div class="form-check-inline">
+                                    {{form.script_visibility}}
+                                    <label class="containerradio bold">Public
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow8" id="public_script" onclick="selectscript(this)" value="0">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-2 mt-3 cus-file-upload">
+                                <label class="snf-file-upload d-flex flex-row align-items-center">
+                                    {{form.script}}<span class="mem-setup-blu-f underline ml-1">Upload</span>
+                                    (PDF)
+                                </label>
+                                <div class="fileuploaddiv d-none" id="filenameblock">
+                                    <span id="filename" class="mr-1"></span>
+                                    <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                            </div>
+                            <div class="col-md-2 mt-3">
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">Private
+                                        <span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o "></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span>
+                                        <input type="radio" name="radiorow8" id="private_script" onclick="selectscript(this)" value="1" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mt-2">
+                                <form class="form-inline">
+                                    <div class="form-group d-none" id="script_password">
+                                        <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
+                                        {{form.script_password}}
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-2 mt-2 cus-file-upload">
+
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER SCRIPT</a> <span
+                                class="mt-2 ml-3 bold">(For Modified and Working scripts)</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2">
+                                <label class="form-title bold mem-setup-blu-f">VIDEO AUDITION:</label>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mt-2">
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
+                                        {{form.cast_audition_password}}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-2">
+                                <label class="form-title bold mem-setup-blu-f">CREW SELECT:</label>
+                            </div>
+                            <div class="col-md-3 col-sm-6 mt-2">
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
+                                        {{form.team_select_password}}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <hr class="prjct-log-blck-hr">
+
+                        <div class="row mb-4">
+                            <div class="col-2">
+                                <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
+                            </div>
+                            <div class="col-3">
+                                <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-2">
+                                <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                    <div class="left-mode-sec h-100">
+                        <div class="mem-list-head">Top Actors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">John Smith</li>
+                            <li class="mt-1">John Dow</li>
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Aaron McCarty</li>
+                            <li class="mt-1">Toli Chew</li>
+                        </ol>
+                        <div class="mem-list-head">Top Writers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Tom Saint</li>
+                            <li class="mt-1">Lola Carola</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Jamal Smith</li>
+                            <li class="mt-1">Nikita Selivan</li>
+                        </ol>
+                        <div class="mem-list-head">Top Directors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Ivan Drago</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Kendra Shulman</li>
+                            <li class="mt-1">Sandra O’brian</li>
+                        </ol>
+                        <div class="mem-list-head">Top Producers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top DPs</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top Editors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head underline">TopTalent/Crew</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+<!-- <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data" id="submit">
+        {% csrf_token %}
+        {{form.as_p}}
+        <button type="submit" class="btn btn-orange btn-block">Save</button>
+    </form> -->
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    function selectformat(data){
+        $('option:selected','#id_format').attr('selected', false);
+        $(`#id_format>option:eq(${data.value})`).attr('selected', true);
+        data.setAttribute("checked", "");
+    }
+    function selectgenre(data){
+        $('option:selected','#id_genre').attr('selected', false);
+        $(`#id_genre>option:eq(${data.value})`).attr('selected', true);
+        data.setAttribute("checked", "");
+    }
+    function selectsagAftra(data){
+        $('option:selected','#id_sag_aftra').attr('selected', false);
+        $(`#id_sag_aftra>option:eq(${data.value})`).attr('selected', true);
+        data.setAttribute("checked", "");
+    }
+    function selectcast(data){
+        $('option:selected','#id_cast_attachment').attr('selected', false);
+        $(`#id_cast_attachment>option:eq(${data.value})`).attr('selected', true);
+    }
+    function selectvisibility(data){
+        $('option:selected','#id_visibility').attr('selected', false);
+        $(`#id_visibility>option:eq(${data.value})`).attr('selected', true);
+    }
+    function selectsamr(data){
+        $('option:selected','#id_cast_samr').attr('selected', false);
+        $(`#id_cast_samr>option:eq(${data.value})`).attr('selected', true);
+    }
+    function selectscript(data){
+        $('option:selected','#id_script_visibility').attr('selected', false);
+        $(`#id_script_visibility>option:eq(${data.value})`).attr('selected', true);
+    }
+    $('#private_script').on(('click'),()=>{
+        $('#script_password').removeClass('d-none')
+    })
+    $('#public_script').on(('click'),()=>{
+        $('#script_password').addClass('d-none')
+    })
+    $('#private').on(('click'),()=>{
+        $('#visibility_password').removeClass('d-none')
+    })
+    $('#public').on(('click'),()=>{
+        $('#visibility_password').addClass('d-none')
+    })
+    $('#id_script').on(('change'),()=>{
+        var filename = $('#id_script').val().split('\\').pop();
+        console.log("FILE:",filename)
+        $('#filenameblock').removeClass('d-none')
+        $('#filename').html(filename)
+    })
+    $('#fileremove').on(('click'),()=>{
+        document.getElementById("id_script").value = "";
+        $('#filenameblock').addClass('d-none')
+    })
+    $('input:checkbox').change(function(){
+    if($(this).is(":checked")) {
+        $('.containerradio .checkmarkagree').addClass("act");
+    } else {
+        $('.containerradio .checkmarkagree').removeClass("act");
+    }
+    });
+
+</script>
+{% endblock %}

@@ -21,6 +21,10 @@
     display:none!important;
     }
 </style>
+<!-- <link rel="stylesheet" href="{% static 'css/share.css' %}">
+<link rel="stylesheet" href="{% static 'css/email_invite.css' %}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link> -->
 {% endblock %}
 
 {% block content %}
@@ -36,6 +40,8 @@
                 <div class="left-mode-sec p-2 text-center ">
                     <div class="log-left-sec">
                         <ul class="list-unstyled invite-list">
+                            <!-- <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
+                                        class="mem-small-f">NVITE</span></a></li> -->
                             <li class="mt-1">
 
                             {% get_project_tracking_list request.user project as is_tracking %}
@@ -53,7 +59,7 @@
                         </li>
 
 
-                            <li class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
+                            <li id="share-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                             </li>
                             <li><a href="#" class="red-f log-fnt-weight">R<span class="mem-small-f">EPORT THIS</span> V<span
                                 class="mem-small-f">IDEO</span></a>
@@ -63,7 +69,7 @@
                 </div>
                 <div class="left-mode-sec  p-2   mt-2">
                     <div class="add-space d-flex justify-content-center log-addspace">
-                        <span class="">Ad Banner</span> 
+                        <span class="">Ad Banner</span>
                     </div>
                 </div>
 
@@ -278,6 +284,7 @@
     </div>
 </div>
 
+
  <!-- The Modal -->
  <div class="modal fade" id="delete-comment-modal">
     <div class="modal-dialog">
@@ -310,11 +317,37 @@
     </div>
 </div>
 <!-- Modal End -->
+
+<!-- Share Modal Start -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content col-12">
+            <div class="modal-header">
+                <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 email-id-row">
+                    <span class="to-input">To</span>
+                        <div id="all_mail" class="all-mail">
+                        </div>
+                        <input id="enter_email" type="text" name="email" class="enter-mail-id" placeholder="Enter the user names .." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="invite_send" type="button" class="btn btn-primary">Send</button>
+                <button id="invite_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- Share Modal End -->
+
 {% endblock %}
 {% block extrajs %}
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 <script src="{% static 'js/user-rating.js' %}"></script>
 <script src="{% static 'js/project_tracking.js' %}"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script>
 var  availableTags = [];
@@ -588,5 +621,9 @@ $(".comment-textarea")
     });
 </script>
 
+
+
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
+<script src="{% static 'js/email_invite.js' %}"></script>
 
 {% endblock %}

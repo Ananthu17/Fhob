@@ -1,20 +1,21 @@
 
 import datetime
+
 from django.db.models import Q
 from autoslug import AutoSlugField
 from django.contrib.auth.hashers import make_password
 from phonenumber_field.modelfields import PhoneNumberField
 
-from django.contrib.auth.hashers import make_password
-from django.urls import reverse
-from django.db import models
-from django.core.exceptions import ValidationError
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
-from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
@@ -42,6 +43,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('registration_complete', True)
         extra_fields.setdefault('membership', 'ADMIN')
 
         if extra_fields.get('is_staff') is not True:
@@ -435,9 +437,15 @@ class AthleticSkillInline(models.Model):
 
 
 class Location(models.Model):
-    city = models.CharField(max_length=1000, verbose_name='City', null=True)
-    state = models.CharField(max_length=1000, verbose_name='State', null=True)
-    country = models.CharField(max_length=1000, verbose_name='Country', null=True)
+    city = models.CharField(max_length=1000,
+                            verbose_name='City',
+                            null=True)
+    state = models.CharField(max_length=1000,
+                             verbose_name='State',
+                             null=True)
+    country = models.CharField(max_length=1000,
+                               verbose_name='Country',
+                               null=True)
 
     def __str__(self):
         location = self.city+", "+self.state+", "+self.country
@@ -526,9 +534,13 @@ class Project(models.Model):
                     ]
     SCENE = 'SCH'
     SHORTS = 'SHO'
+    PILOT = 'PIL'
+    FEATURE = 'FTR'
     FORMAT_CHOICES = [
         (SCENE, 'Scene'),
         (SHORTS, 'Shorts'),
+        (PILOT, 'Pilot'),
+        (FEATURE, 'Feature'),
     ]
     YOUTUBE = 'youtube'
     VIMEO = 'vimeo'
@@ -618,6 +630,9 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
+    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
+                                  related_name='project_team',
+                                  blank=True)
     script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
@@ -627,9 +642,11 @@ class Project(models.Model):
     cast_attachment = models.CharField(_("Cast Attachment"),
                                        choices=CAST_ATTACHMENT_CHOICES,
                                        max_length=150, default=NATION_WIDE)
-    cast_pay_rate = models.CharField(_("Cast Pay Rate"),
-                                     choices=CAST_PAY_RATE_CHOICES,
-                                     max_length=150, default=NEGOTIABLE)
+    cast_pay_rate = models.IntegerField(_("Castpay Rate"),
+                                        null=True, blank=True)
+    sag_aftra = models.CharField(_("SAG AFTRA"),
+                                 choices=CAST_PAY_RATE_CHOICES,
+                                 max_length=150, default=NEGOTIABLE)
     cast_samr = models.CharField(_("Cast SAMR"),
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
@@ -637,17 +654,24 @@ class Project(models.Model):
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
-                                    default=NOT_AVAILABLE)
+                                    default=NOT_AVAILABLE,
+                                    null=True, blank=True)
     video_cover_image = models.ImageField(upload_to='thumbnail/',
                                           blank=True, null=True,
                                           help_text="Image size:370 X 248.")
-    script_password = models.CharField(max_length=250, null=True, blank=True)
-    team_select_password = models.CharField(max_length=250, null=True,
+    script_visibility = models.CharField(_("Script Visibility"),
+                                         choices=VISIBILITY_CHOICES,
+                                         max_length=150, default=PUBLIC)
+    script_password = models.CharField(max_length=12, null=True, blank=True)
+    team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
-    cast_audition_password = models.CharField(max_length=250, null=True, blank=True)
+    cast_audition_password = models.CharField(max_length=12,
+                                              null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
-    script_html = models.TextField(_("Script HTML"), null=True, blank=True)
+
+    timestamp = models.DateField(auto_now_add=True)
+
 
     def __str__(self):
         return self.title
@@ -662,6 +686,13 @@ class Project(models.Model):
         )
         return url
 
+
+class Writer(models.Model):
+    name = models.CharField(max_length=1000)
+    project = models.ForeignKey('hobo_user.Project',
+                                verbose_name=_("Project"),
+                                on_delete=models.CASCADE, null=True,
+                                blank=True)
 
 
 class ProjectReaction(models.Model):
@@ -714,10 +745,67 @@ class PromoCode(models.Model):
         return str(self.promo_code)
 
 
+class BraintreePromoCode(models.Model):
+    PAYPAL = 'paypal'
+    BRAINTREE = 'braintree'
+    SOURCE_TYPE = [
+        (PAYPAL, 'paypal'),
+        (BRAINTREE, 'braintree'),
+    ]
+    SUBSCRIPTION_DURATION = 'Duration of Subscription'
+    BILLING_CYCLE_DURATION = 'For n billing Cycles'
+    DURATION_TYPE = [
+        (SUBSCRIPTION_DURATION, 'full_subscription'),
+        (BILLING_CYCLE_DURATION, 'billing_cycle_subscription')
+    ]
+    FLAT_AMOUNT = 'flat_amount'
+    PERCENTAGE = 'percentage'
+    AMOUNT_TYPE = [
+        (FLAT_AMOUNT, 'Flat Amount'),
+        (PERCENTAGE, 'Percentage'),
+    ]
+    ADMIN = 'ADMIN'
+    HOBO = 'HOB'
+    INDIE = 'IND'
+    PRO = 'PRO'
+    PRODUCTION_COMPANY = 'COM'
+    USER_TYPE_CHOICES = [
+        (ADMIN, 'Admin'),
+        (HOBO, 'Hobo'),
+        (INDIE, 'Indie'),
+        (PRO, 'Pro'),
+        (PRODUCTION_COMPANY, 'Production Company')
+    ]
+    source = models.CharField(_("Source Type"),
+                              choices=SOURCE_TYPE,
+                              max_length=150, default=BRAINTREE)
+    braintree_id = models.CharField(_("Braintree ID"), max_length=150)
+    promo_code = models.CharField(max_length=1000, unique=True)
+    description = models.TextField(_("Description"), null=True, blank=True)
+    duration = models.CharField(_("Duration Type"),
+                                choices=DURATION_TYPE,
+                                max_length=150, default=SUBSCRIPTION_DURATION)
+    billing_cycles = models.IntegerField(_('Billing Cycles'),
+                                         null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+    amount_type = models.CharField(_("Amount Type"),
+                                   choices=AMOUNT_TYPE,
+                                   max_length=150, default=FLAT_AMOUNT)
+    amount = models.IntegerField(_('Amount'))
+    user_type = models.CharField(_("User Type"),
+                                 choices=USER_TYPE_CHOICES,
+                                 max_length=150, default=HOBO)
+
+    def __str__(self):
+        return str(self.promo_code)
+
+
 class Team(models.Model):
     team = models.CharField(max_length=1000, null=True, blank=True)
     project = models.ForeignKey('hobo_user.Project',
                                 verbose_name=_("Project"),
+                                related_name='team_project',
                                 on_delete=models.CASCADE, null=True)
     user = models.ForeignKey('hobo_user.CustomUser',
                              verbose_name=_("User"),
@@ -725,10 +813,20 @@ class Team(models.Model):
                              on_delete=models.SET_NULL, null=True)
     job_type = models.ForeignKey('hobo_user.JobType',
                                  verbose_name=_("Job Type"),
+                                 related_name='team_job_type',
                                  on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.project.title +" - "+ self.job_type.title
+
+    def save(self, *args, **kwargs):
+        try:
+            profile_obj = UserProfile.objects.get(user=self.user)
+            profile_obj.job_types.add(self.job_type)
+            profile_obj.save()
+        except UserProfile.DoesNotExist:
+            pass
+        super(Team, self).save(*args, **kwargs)
 
 
 class Country(models.Model):
@@ -959,7 +1057,8 @@ class CustomUserSettings(models.Model):
         )
     new_project = models.BooleanField(
         default=True,
-        verbose_name=_("If someone I track has started a new project or got attached to a project")
+        verbose_name=_(
+            "If someone I track has started a new project or got attached to a project")
         )
     friend_request = models.BooleanField(
         default=True,
@@ -1178,6 +1277,7 @@ class CompanyClient(models.Model):
         verbose_name = 'Company Client'
         verbose_name_plural = 'Company Clients'
 
+
 class UserInterest(models.Model):
     SCENE = 'scene'
     SHORT = 'short'
@@ -1246,6 +1346,8 @@ class UserRatingCombined(models.Model):
                                  verbose_name=_("Job Types")
                                  )
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
+    no_of_projects = models.IntegerField(_("No of Projects"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1331,7 +1433,8 @@ class UserRating(models.Model):
 
 class Video(models.Model):
     name = models.CharField(max_length=1000)
-    videofile = models.FileField(upload_to='videos/', null=True, verbose_name="")
+    videofile = models.FileField(
+        upload_to='videos/', null=True, verbose_name="")
     rating = models.FloatField(_("Rating"), null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -1540,6 +1643,7 @@ class UserNotification(models.Model):
     READ = 'read'
     UNREAD = 'unread'
     MEMBERSHIP_CHANGE = 'membership_change'
+    INVITE = 'invite'
     PROJECT_TRACKING = 'project_tracking'
     AUDITION_STATUS = 'audition_status'
     VIDEO_RATING = 'video_rating'
@@ -1558,6 +1662,8 @@ class UserNotification(models.Model):
                                  'Accepted Friend Request'),
                                 (MEMBERSHIP_CHANGE,
                                  'Membership Change'),
+                                (INVITE,
+                                 'Invite'),
                                 (PROJECT_TRACKING,
                                  'Project Tracking'),
                                 (AUDITION_STATUS, 'Audition Status'),
@@ -1592,6 +1698,7 @@ class UserNotification(models.Model):
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     message = models.TextField(_("Message"), null=True, blank=True)
+    invite_url = models.URLField(_("Invite URL"), null=True, blank=True)
     project = models.ForeignKey("hobo_user.Project",
                                 on_delete=models.CASCADE,
                                 related_name='project_notification',
@@ -1699,6 +1806,8 @@ class UserProject(models.Model):
                                   related_name='user_project_character',
                                   verbose_name=_("Character"),
                                   null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                    blank=True)
 
     def __str__(self):
         return str(self.user.get_full_name())
@@ -1706,4 +1815,13 @@ class UserProject(models.Model):
     class Meta:
         verbose_name = 'User Project'
         verbose_name_plural = 'User Projects'
+
+
+class BetaTesterCodes(models.Model):
+    code = models.CharField(_("Code"), max_length=10, unique=True)
+    days = models.IntegerField(_("Days"), blank=False)
+
+    class Meta:
+        verbose_name = 'Beta Tester Code'
+        verbose_name_plural = 'Beta Tester Codes'
 

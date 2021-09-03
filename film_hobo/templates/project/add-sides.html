@@ -81,11 +81,12 @@
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
                                             <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            {% if sides.scene_1 %}
-                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_1|safe}}</div>
-                                            {% elif sides.scene_1_pdf %}
+                                            {% if sides.scene_1_pdf %}
                                             <iframe src="{{ sides.scene_1_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
                                             {% else %}
                                             <div class="sides-textbox scenes sides-font-style "></div>
@@ -95,11 +96,12 @@
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
                                             <span class="sds-scene-txt">SCENE TWO</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            {% if sides.scene_2 %}
-                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_2|safe}}</div>
-                                            {% elif sides.scene_2_pdf %}
+                                            {% if sides.scene_2_pdf %}
                                             <iframe src="{{ sides.scene_2_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
                                             {% else %}
                                             <div class="sides-textbox scenes sides-font-style "></div>
@@ -109,11 +111,12 @@
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
                                             <span class="sds-scene-txt">SCENE THREE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            {% if sides.scene_3 %}
-                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_3|safe}}</div>
-                                            {% elif sides.scene_3_pdf %}
+                                            {% if sides.scene_3_pdf %}
                                             <iframe src="{{ sides.scene_3_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
                                             {% else %}
                                             <div class="sides-textbox scenes sides-font-style "></div>
@@ -126,8 +129,6 @@
                                 <div class="sds-card-btn-align">
                                     <span class="sds-input-card-btn">
                                         <!-- <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/> -->
-                                        <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration"
-                                        href="{% url 'project:edit-sides' project.id %}?character_id={{character.id}}">EDIT</a>
                                         <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
@@ -150,18 +151,7 @@
 {% endblock %}
 
 {% block extrajs %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-<script>
-    // $(function(){
-    //     $('#sidesform').on('click','.edit-sides',function(){ 
-    //         $(".scenes").prop("disabled", false) 
-    //     });
-    // });
-</script>
-<script>
-    // CKEDITOR.replace( 'scene_1' );
-</script>
+
 {% endblock %}
 
 

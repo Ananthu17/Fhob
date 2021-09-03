@@ -1,16 +1,17 @@
-
-from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.views.generic.base import View
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import HelpSerializer
 
 from .models import Help
+from .serializers import HelpSerializer
 
 # Create your views here.
 
@@ -75,3 +76,18 @@ class HelpView(LoginRequiredMixin, TemplateView):
         help_obj.save()
         messages.success(self.request, "Message received. Will get back to you soon.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class BetaUserAdmin(View):
+    """
+    Web URL View to load the beta user page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'beta_user/beta_user_admin.html')
+
+
+class AddBetaUserCode(APIView):
+
+    def post(self, request):
+        
+        return Response(response)

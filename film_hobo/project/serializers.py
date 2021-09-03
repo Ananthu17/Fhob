@@ -287,6 +287,24 @@ class CastRequestSerializer(serializers.Serializer):
             )
 
 
+class IdSerializer(serializers.Serializer):
+    id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class SidesPDFSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    scene = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
 class CancelCastRequestSerializer(serializers.Serializer):
     character_id = serializers.CharField(
                 max_length=150,

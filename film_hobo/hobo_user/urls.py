@@ -53,14 +53,21 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ProjectAPIView, ProjectCreateAPIView, \
                    ProjectUpdateAPIView, ProjectDeleteAPIView, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
-                   TeamDeleteAPIView, RateCompanyAPI, \
+                   TeamDeleteAPIView, \
                    GetProfileRatingNotificationAjaxView, \
-                   EditUserInterestAPI, \
-                   VideoRatingView, ProjectView, \
-                   FindVideoRatingAPI, VideoListAPI, GetAllUsersAPI
-               #     ProjectSearchView
-
-
+                   GetAllUsersAPI, \
+                   EditUserInterestAPI, VideoRatingView, ProjectView, \
+                   FindVideoRatingAPI, VideoListAPI, \
+                   CreateProjectView, ScreeningProjectDeatilView, \
+                   UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
+                   GetScreeningProjectInviteNotificationAjaxView, \
+                   TermsOfService, PrivacyPolicy, AddBetaTesterCode, \
+                   ListBetaTesterCode, DeleteBetaTesterCode, \
+                   EditBetaTesterCode, CheckBetaTesterCode, \
+                   TeamDeleteAPIView, VideoRatingView, \
+                   FindVideoRatingAPI, VideoListAPI, ProjectView, \
+                   CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
+                   ProjectDateFilterAPI
 
 
 app_name = "hobo_user"
@@ -179,12 +186,35 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+
     path('get-all-users-api/', GetAllUsersAPI.as_view(), name='get-all-users-api'),
+
+    path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
+         name='add-beta-tester-code'),
+    path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
+         name='list-beta-tester-code'),
+    path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
+         name='delete-beta-tester-code'),
+    path('edit-beta-tester-code/', EditBetaTesterCode.as_view(),
+         name='edit-beta-tester-code'),
+    path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
+         name='check-beta-tester-code'),
 
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
+    path('terms_of_service/', TermsOfService.as_view(), name='terms_of_service'),
+    path('privacy_policy/', PrivacyPolicy.as_view(), name='privacy_policy'),
     path('user_home/', HomePage.as_view(), name='user_home'),
+    path('user_home/<int:id>/',
+         ScreeningProjectDeatilView.as_view(),
+         name='projects_detail'),
+    path('user_home/invite/',
+         ScreeningProjectDeatilInviteView.as_view(),
+         name='projects_detail_invite'),
+    path('user_home/project_invite/<int:id>/',
+         UserHomeProjectInvite.as_view(),
+         name='user_home_project_invite'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),
          name="signup_company"),
@@ -291,10 +321,13 @@ urlpatterns = [
     path('get-profile-rating-notification-html/',
          GetProfileRatingNotificationAjaxView.as_view(),
          name='get-profile-rating-notification-html'),
-#     path('projects/rating', UserRatingAPI.as_view(),
-#          name="rate-api"),
-#     path('projects/search/',  ProjectSearchView.as_view(),
-#          name="project-search"),
+    path('get-screeing-project-notification-html/',
+         GetScreeningProjectInviteNotificationAjaxView.as_view(),
+         name='get-screeing-project-notification-html'),
+    # path('projects/rating', UserRatingAPI.as_view(),
+    #      name="rate-api"),
+    # path('projects/search/',  ProjectSearchView.as_view(),
+    #      name="project-search"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
@@ -302,6 +335,9 @@ urlpatterns = [
     path('video/top-rated',  VideoListAPI.as_view(),
          name="top-rated-videos"),
     path('projectview/', ProjectView.as_view(),
-         name='projects')
-
+         name='projects'),
+    path('projectview/create/', CreateProjectView.as_view(),
+         name='new-project'),
+    path('projects/date/', ProjectDateFilterAPI.as_view(),
+         name="date_filter")
 ]

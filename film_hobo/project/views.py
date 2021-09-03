@@ -1,5 +1,4 @@
 import ast
-import os
 import io
 import json
 import requests
@@ -8,19 +7,19 @@ import datetime
 from django.utils import timezone
 import mammoth
 import fitz
-
+import PyPDF2
 import PIL
+
 from fpdf import FPDF
 from django.core import files
 from io import BytesIO
 from pdf2image import convert_from_path
+
 from braces.views import JSONResponseMixin
-from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.platypus import Paragraph, Spacer, Table, Image
+from reportlab.platypus import Paragraph, Table
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
 
 from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
@@ -33,8 +32,8 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
 
 from rest_framework.exceptions import ParseError
 from rest_framework.authtoken.models import Token
@@ -42,13 +41,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import (ListAPIView,
-                                     CreateAPIView, DestroyAPIView,
-                                     UpdateAPIView, get_object_or_404)
+from rest_framework.generics import (UpdateAPIView,
+                                     get_object_or_404)
 
-from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProject, \
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
      VideoRatingCombined
+
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, SceneImages, Sides, ProjectTracking, ProjectRating
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
@@ -59,11 +58,11 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
       SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
-      CancelCastRequestSerializer, UserProjectSerializer
+      CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
+      SidesPDFSerializer
 from hobo_user.serializers import UserSerializer
-from hobo_user.utils import notify, get_notifications_time
-from .forms import VideoSubmissionLastDateForm, SubmitAuditionForm, AddSidesForm
-from django.contrib.auth.hashers import make_password
+from hobo_user.utils import notify
+from .forms import VideoSubmissionLastDateForm
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -87,14 +86,6 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
 
         project_members_rating = ProjectMemberRating.objects.filter(
                                  project=project_id)
-        # for obj in project_members_rating:
-        #     team_objs = obj.user.team_user.all()
-        #     key_obj = team_objs.filter(
-        #             Q(project=obj.project) &
-        #             Q(job_type=obj.job_type)
-        #         ).first()
-        #     key = key_obj.id
-        #     rating_dict[key] = obj.rating*20
 
         for obj in team_members:
             rating_dict[obj] = 0
@@ -109,21 +100,7 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
                 rating_dict[obj.id] = 0
 
         comments = Comment.objects.filter(project=project).order_by('-created_time')
-
-        # comments = Comment.objects.filter(
-        #            Q(project=project) &
-        #            Q(reply_to=None)
-        #             ).order_by('created_time')
-        # reply_dict = {}
-        # for obj in comments:
-        #     reply_dict[obj.id] = []
-        #     reply_comments = Comment.objects.filter(
-        #                         Q(project=project) &
-        #                         Q(reply_to=obj)
-        #                         ).order_by('created_time')
-        #     reply_dict[obj.id] = reply_comments
         context['comments'] = comments
-        # context['reply_dict'] = reply_dict
 
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
@@ -159,7 +136,8 @@ class RateUserSkillsAPI(APIView):
                                     Q(job_type=job_type) &
                                     Q(project__id__in=project_ids)
                                 )
-                rating_count = user_rating.values('project').annotate(count=Count('project'))
+                rating_count = user_rating.values('project').annotate(
+                    count=Count('project'))
                 for item in rating_count:
                     if item['count'] >= 10:
                         user_rating_count += 1
@@ -168,7 +146,7 @@ class RateUserSkillsAPI(APIView):
                     user.membership = CustomUser.PRO
                     user.save()
 
-                    #update notification table
+                    # update notification table
                     notification = UserNotification()
                     notification.user = user
                     notification.notification_type = UserNotification.MEMBERSHIP_CHANGE
@@ -236,12 +214,22 @@ class RateUserSkillsAPI(APIView):
                     rating_sum = aggregate_rating['rating__sum']
                     new_rating = rating_sum/count
                     user_rating_combined.rating = new_rating
+                    user_rating_combined.no_of_votes = count
+                    user_rating_combined.no_of_projects = Team.objects.filter(
+                                                        Q(user=user) &
+                                                        Q(job_type=job_type)
+                                                        ).count()
                     user_rating_combined.save()
                 except UserRatingCombined.DoesNotExist:
                     user_rating_combined = UserRatingCombined()
                     user_rating_combined.user = user
                     user_rating_combined.job_type = job_type
                     user_rating_combined.rating = rating
+                    user_rating_combined.no_of_votes = 1
+                    user_rating_combined.no_of_projects = Team.objects.filter(
+                                                        Q(user=user) &
+                                                        Q(job_type=job_type)
+                                                        ).count()
                     user_rating_combined.save()
 
                 # update combined project member rating
@@ -425,7 +413,7 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
             try:
                 project_creator = Team.objects.get(
                                     Q(project=project) &
-                                    Q(job_type=project_creator_job) 
+                                    Q(job_type=project_creator_job)
                                     ).user
                 rating_object = UserRatingCombined.objects.filter(
                             Q(user=project_creator) &
@@ -703,7 +691,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             context['last_date_form'] = last_date_form
             sides = Sides.objects.filter(project=project)
             for obj in sides:
-                sites_dict[obj.character.id] = "Scene 1: "+obj.scene_1+"Scene 2: "+obj.scene_2+"Scene 3: "+obj.scene_3
+                sites_dict[obj.character.id] = obj.scenes_combined
             context['sites_dict'] = sites_dict
         except Project.DoesNotExist:
             context["message"] = "Project not found !!"
@@ -737,7 +725,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
                                 'http://127.0.0.1:8000/project/charater/create/',
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
-                                        'Authorization': token})
+                                         'Authorization': token})
             byte_str = user_response.content
             dict_str = byte_str.decode("UTF-8")
             response = ast.literal_eval(dict_str)
@@ -1224,71 +1212,6 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class EditSidesView(LoginRequiredMixin, TemplateView):
-    template_name = 'project/edit-sides.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        project_id = self.kwargs.get('id')
-        character_id = self.request.GET.get('character_id')
-        project = get_object_or_404(Project, pk=project_id)
-        context['project'] = project
-        try:
-            character = Character.objects.get(
-                            Q(project=project) &
-                            Q(id=character_id)
-                        )
-            context['character'] = character
-            try:
-                sides = Sides.objects.get(
-                            Q(project=project) &
-                            Q(character=character)
-                            )
-                context['sides'] = sides
-                context['form'] = AddSidesForm(instance=sides)
-            except Sides.DoesNotExist:
-                context['form'] = AddSidesForm()
-        except Character.DoesNotExist:
-            pass
-
-        return context
-
-    def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = {}
-        json_response = json.dumps(request.POST)
-        data_dict = ast.literal_eval(json_response)
-        project_id = self.kwargs.get('id')
-        character_id = self.request.POST.get('character_id')
-        data_dict['project'] = project_id
-        data_dict['character'] = character_id
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                    'http://127.0.0.1:8000/project/add-sides-api/',
-                    data=json.dumps(data_dict),
-                    headers={'Content-type': 'application/json',
-                             'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] != 200:
-                if 'errors' in response:
-                    errors = response['errors']
-                    print(errors)
-                    messages.warning(
-                        self.request, "Failed to update scenes !!")
-                    return HttpResponseRedirect(
-                        request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
-        url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
-        return HttpResponseRedirect(url)
-
-
 class AddSceneImagesView(LoginRequiredMixin, TemplateView):
     template_name = 'project/add-scene-images.html'
     login_url = '/hobo_user/user_login/'
@@ -1320,7 +1243,6 @@ class AddSceneImagesView(LoginRequiredMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print(self.request.POST)
         scene = self.request.POST.get('scene')
         project_id = self.request.POST.get('project_id')
         character_id = self.request.POST.get('character_id')
@@ -1449,6 +1371,7 @@ class GenerateSceneImagePDFAPI(APIView):
                     msg = "Scene 3 updated"
                 sides_obj.save()
 
+            generate_combined_pdf(sides_obj)
             messages.success(self.request, msg)
             response = {'message': "Scene Pdf uploaded",
                         'status': status.HTTP_200_OK}
@@ -2194,14 +2117,38 @@ class RemoveAttachedCastAPI(APIView):
                         # remove from team
                         try:
                             actor_actress = JobType.objects.get(slug='actoractress')
-                            team_obj = Team.objects.filter(
-                                        Q(user = old_user) &
-                                        Q(project = character.project) &
-                                        Q(job_type = actor_actress))
-                            team_obj.delete()
+                            character_objs = Character.objects.filter(
+                                                Q(attached_user = old_user) &
+                                                Q(project = character.project)
+                                            )
+                            # if old_user is not attached to any other character in the same film
+                            # then remove from team
+                            if not character_objs:
+                                team_obj = Team.objects.filter(
+                                            Q(user = old_user) &
+                                            Q(project = character.project) &
+                                            Q(job_type = actor_actress))
+                                team_obj.delete()
+
+                                # remove job type
+                                team_objs = Team.objects.filter(
+                                            Q(user=old_user) &
+                                            Q(job_type = actor_actress)
+                                            )
+                                # if this user is not part of any team as actor/actress
+                                # then remove 'actor/actress' from his job type
+                                if not team_objs:
+                                    try:
+                                        old_user_profile = UserProfile.objects.get(user=old_user)
+                                        old_user_profile.job_types.remove(actor_actress)
+                                        old_user_profile.save()
+                                    except UserProfile.DoesNotExist:
+                                        pass
+                                # end
                         except JobType.DoesNotExist:
                             pass
                         # end
+
 
                         #update notification table- for removed user
                         notification = UserNotification()
@@ -2873,73 +2820,73 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
 
         try:
             actoractress = JobType.objects.get(slug='actoractress')
-            actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating')[:5]
+            actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             actoractress_list = []
 
         try:
             director = JobType.objects.get(slug='director')
-            director_list = user_rating_objs.filter(job_type=director).order_by('-rating')[:5]
+            director_list = user_rating_objs.filter(job_type=director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             director_list = []
 
         try:
             writer = JobType.objects.get(slug='writer')
-            writer_list = user_rating_objs.filter(job_type=writer).order_by('-rating')[:5]
+            writer_list = user_rating_objs.filter(job_type=writer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             writer_list = []
 
         try:
             producer = JobType.objects.get(slug='producer')
-            producer_list = user_rating_objs.filter(job_type=producer).order_by('-rating')[:5]
+            producer_list = user_rating_objs.filter(job_type=producer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             producer_list = []
 
         try:
             dp = JobType.objects.get(slug='director-of-photography')
-            dp_list = user_rating_objs.filter(job_type=dp).order_by('-rating')[:5]
+            dp_list = user_rating_objs.filter(job_type=dp).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             dp_list = []
 
         try:
             costume_designer = JobType.objects.get(slug='costume-designer')
-            costume_designer_list = user_rating_objs.filter(job_type=costume_designer).order_by('-rating')[:5]
+            costume_designer_list = user_rating_objs.filter(job_type=costume_designer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             costume_designer_list = []
 
         try:
             art_director = JobType.objects.get(slug='art-director')
-            art_director_list = user_rating_objs.filter(job_type=art_director).order_by('-rating')[:5]
+            art_director_list = user_rating_objs.filter(job_type=art_director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             art_director_list = []
 
         try:
             editor = JobType.objects.get(slug='editor')
-            editor_list = user_rating_objs.filter(job_type=editor).order_by('-rating')[:5]
+            editor_list = user_rating_objs.filter(job_type=editor).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             editor_list = []
 
         try:
             casting_director = JobType.objects.get(slug='casting-director')
-            casting_director_list = user_rating_objs.filter(job_type=casting_director).order_by('-rating')[:5]
+            casting_director_list = user_rating_objs.filter(job_type=casting_director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             casting_director_list = []
 
         try:
             make_up_hair_artist = JobType.objects.get(slug='make-uphair-artist')
-            make_up_hair_artist_list = user_rating_objs.filter(job_type=make_up_hair_artist).order_by('-rating')[:5]
+            make_up_hair_artist_list = user_rating_objs.filter(job_type=make_up_hair_artist).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             make_up_hair_artist_list = []
 
         try:
             sound_designer = JobType.objects.get(slug='sound-designer')
-            sound_designer_list = user_rating_objs.filter(job_type=sound_designer).order_by('-rating')[:5]
+            sound_designer_list = user_rating_objs.filter(job_type=sound_designer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             sound_designer_list = []
 
         try:
             composer = JobType.objects.get(slug='composer')
-            composer_list = user_rating_objs.filter(job_type=composer).order_by('-rating')[:5]
+            composer_list = user_rating_objs.filter(job_type=composer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
         except JobType.DoesNotExist:
             composer_list = []
 
@@ -2959,6 +2906,18 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
                                     'make_up_hair_artist_list': make_up_hair_artist_list,
                                     'sound_designer_list': sound_designer_list,
                                     'composer_list': composer_list,
+                                    'actoractress':actoractress,
+                                    'director':director,
+                                    'writer':writer,
+                                    'producer':producer,
+                                    'dp':dp,
+                                    'costume_designer':costume_designer,
+                                    'art_director':art_director,
+                                    'editor':editor,
+                                    'casting_director':casting_director,
+                                    'make_up_hair_artist':make_up_hair_artist,
+                                    'sound_designer':sound_designer,
+                                    'composer':composer,
                                  })
         context['top_rated_members_html'] = top_rated_members_html
         return self.render_json_response(context)
@@ -2996,7 +2955,6 @@ class GetCastAtachResponseNotificationAjaxView(View, JSONResponseMixin):
                                 })
         context['notification_html'] = notification_html
         return self.render_json_response(context)
-
 
 
 class AddToFavoritesAPI(APIView):
@@ -3046,3 +3004,149 @@ class AddToFavoritesAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class RemoveFromFavoritesAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            favorites_id = data_dict['id']
+            try:
+                favorite_obj = UserProject.objects.filter(pk=favorites_id)
+                favorite_obj.delete()
+                response = {'message': "Project removed from favorites.",
+                            'status': status.HTTP_200_OK}
+            except UserProject.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveCharacterScenesAPI(APIView):
+    serializer_class = SidesPDFSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+            scene = data_dict['scene']
+            try:
+                sides_obj = Sides.objects.get(character=character_id)
+                if scene == 'scene_1':
+                    sides_obj.scene_1_pdf = None
+                if scene == 'scene_2':
+                    sides_obj.scene_2_pdf = None
+                if scene == 'scene_3':
+                    sides_obj.scene_3_pdf = None
+                sides_obj.save()
+                generate_combined_pdf(sides_obj)
+                response = {'message': "Scene removed",
+                            'status': status.HTTP_200_OK}
+            except Sides.DoesNotExist:
+                response = {'errors': 'Invalid character ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+# generate scene 1,2,3 combined pdf
+def generate_combined_pdf(sides):
+    pdfWriter = PyPDF2.PdfFileWriter()
+    origin_url = settings.ORIGIN_URL
+    if sides.scene_1_pdf:
+        url = "static/pdf/scene_1.pdf"
+        pdf1_cover = open(url, 'rb')
+        pdf1CoverReader = PyPDF2.PdfFileReader(pdf1_cover)
+        pageObj = pdf1CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf1File = open(sides.scene_1_pdf.path, 'rb')
+        pdf1Reader = PyPDF2.PdfFileReader(pdf1File)
+        for pageNum in range(pdf1Reader.numPages):
+            pageObj = pdf1Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_2_pdf:
+        url = "static/pdf/scene_2.pdf"
+        pdf2_cover = open(url, 'rb')
+        pdf2CoverReader = PyPDF2.PdfFileReader(pdf2_cover)
+        pageObj = pdf2CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf2File = open(sides.scene_2_pdf.path, 'rb')
+        pdf2Reader = PyPDF2.PdfFileReader(pdf2File)
+        for pageNum in range(pdf2Reader.numPages):
+            pageObj = pdf2Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_3_pdf:
+        url = "static/pdf/scene_3.pdf"
+        pdf3_cover = open(url, 'rb')
+        pdf3CoverReader = PyPDF2.PdfFileReader(pdf3_cover)
+        pageObj = pdf3CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf3File = open(sides.scene_3_pdf.path, 'rb')
+        pdf3Reader = PyPDF2.PdfFileReader(pdf3File)
+        for pageNum in range(pdf3Reader.numPages):
+            pageObj = pdf3Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_1_pdf or sides.scene_2_pdf or sides.scene_3_pdf:
+        output_path = "media/scene/"+"sides_"+str(sides.project.id)+str(sides.character.id)+".pdf"
+        pdfOutputFile = open(output_path, 'wb')
+        pdfWriter.write(pdfOutputFile)
+        # Close all the files - Created as well as opened
+        pdfOutputFile.close()
+        if sides.scene_1_pdf:
+            pdf1File.close()
+        if sides.scene_2_pdf:
+            pdf2File.close()
+        if sides.scene_3_pdf:
+            pdf3File.close()
+
+        origin_url = settings.ORIGIN_URL
+        url = origin_url +"/"+ output_path
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            pass
+        fp = BytesIO()
+        fp.write(resp.content)
+        file_name = url
+        sides.scenes_combined.save(file_name, files.File(fp))
+    else:
+        sides.scenes_combined = None
+        sides.save()
+    return
+
+
+class AllMembersView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/all-members.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_type_id = self.kwargs.get('id')
+        job_type = get_object_or_404(JobType, pk=job_type_id)
+        user_rating_objs = UserRatingCombined.objects.all()
+        members = user_rating_objs.filter(job_type=job_type).order_by('-rating')
+        context['members'] = members
+        context['job_type'] = job_type
+        return context
+
+

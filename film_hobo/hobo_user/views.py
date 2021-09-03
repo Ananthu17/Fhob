@@ -1,40 +1,41 @@
 import ast
 import braintree
-import json
-from os import remove
-from django.contrib.auth.models import User
-import requests
 import datetime
+import json
+import os
+import random
+import requests
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
-from django.core.files import File
-from django.db.models import Sum, Q
-from django.template import loader
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils import timezone
 from django.conf import settings
+from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.mail import send_mail
+from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-from django.http import HttpResponseRedirect
+from django.db.models import Sum, Q
+from django.template import loader
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.http import HttpResponseRedirect, FileResponse
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 # from django_filters import rest_framework as filters
-from rest_framework import serializers
-
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from rest_framework import authentication
 from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework import permissions
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
@@ -49,14 +50,17 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
+from datetime import date
 
 from authemail.views import SignupVerify
+# from rest_framework.filters import SearchFilter
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, CheckoutForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm, ProjectCreationForm, \
+    WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
@@ -69,7 +73,9 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Project, Team, UserProfile, JobType, \
                     UserRating, Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
-                    Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
+                    Feedback, CompanyRating, CompanyRatingCombined, \
+                    VideoRatingCombined, BetaTesterCodes
+from payment.models import Transaction
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -93,18 +99,25 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    RemoveCoWorkerSerializer, AgentManagerSerializer, \
-    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
-    TeamSerializer, VideoRatingSerializer, VideoSerializer, \
-    EditUserInterestSerializer
+    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+from payment.views import IsSuperUser
 
-
-from .utils import notify, get_notifications_time
+from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
+
+
+class AdminAuthenticationPermission(permissions.BasePermission):
+    ADMIN_ONLY_AUTH_CLASSES = [authentication.BasicAuthentication, authentication.SessionAuthentication]
+
+    def has_permission(self, request, view):
+        user = request.user
+        if user and user.is_authenticated():
+            return user.is_superuser or \
+                not any(isinstance(request._authenticator, x) for x in self.ADMIN_ONLY_AUTH_CLASSES)
+        return False
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -277,10 +290,14 @@ class CustomUserSignupHobo(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration/'
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
+            print("eeeeeeeeee")
+            print(user_response.status_code)
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
@@ -346,7 +363,7 @@ class ChooseMembershipPage(APIView):
     template_name = 'user_pages/choose_your_membership.html'
 
     def get(self, request):
-        return Response({})
+        return Response()
 
 
 class CustomUserSignupIndieView(APIView):
@@ -367,8 +384,10 @@ class CustomUserSignupIndieView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_indie/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_indie/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -420,8 +439,10 @@ class CustomUserSignupProView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_pro/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_pro/',
+                complete_url,
                 data=json.dumps(json_dict),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -465,8 +486,10 @@ class CustomUserSignupCompany(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_company/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_company/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
@@ -636,8 +659,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -652,8 +677,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                    complete_url,
                     data=json.dumps(request.POST),
                     headers={'Content-type': 'application/json',
                              'Authorization': token})
@@ -673,8 +700,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -689,8 +718,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -710,8 +741,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         print(user_response)
@@ -727,8 +760,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -779,8 +814,10 @@ class PaymentIndieView(FormView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -919,8 +956,10 @@ class PaymentProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -981,8 +1020,10 @@ class PaymentCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -1161,8 +1202,10 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
         message =""
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/enable-account-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/enable-account-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1306,8 +1349,10 @@ class ForgotPasswordView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/forgot-password-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         # print(user_response)
@@ -1341,9 +1386,10 @@ class PasswordResetTemplateView(TemplateView):
         uid = request.POST.get('uid')
         token = request.POST.get('token')
         email = request.POST.get('email')
-        url = 'http://127.0.0.1:8000/password-reset-confirm/'+uid+"/"+token
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/password-reset-confirm/'+uid+"/"+token
         user_response = requests.post(
-                            url,
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         byte_str = user_response.content
@@ -1480,6 +1526,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
+        context['transaction'] = \
+            Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1600,8 +1648,10 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         json_dict['hide_ratings'] = hide_ratings
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/update-settings-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/update-settings-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1799,8 +1849,10 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
             json_dict['stop_age'] = None
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/personal-details-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2115,8 +2167,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             else:
                 edit_agent_dict['agent_email'] = ""
             # call edit-agent api
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/edit-agent-manager-api/'
             user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/edit-agent-manager-api/',
+                    complete_url,
                     data=json.dumps(edit_agent_dict),
                     headers={'Content-type': 'application/json',
                             'Authorization': token})
@@ -2191,8 +2245,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                         agent_dict['agent_email'] = ""
 
                 # save agents/manager
+                origin_url = settings.ORIGIN_URL
+                complete_url = origin_url + '/hobo_user/add-agent-manager-api/'
                 user_response = requests.post(
-                                    'http://127.0.0.1:8000/hobo_user/add-agent-manager-api/',
+                                    complete_url,
                                     data=json.dumps(agent_dict),
                                     headers={'Content-type': 'application/json',
                                             'Authorization': token})
@@ -2217,8 +2273,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                                     reverse('hobo_user:edit-profile'))
         if remove_agents:
             remove_dict['id'] = remove_agents
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/remove-agent-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/remove-agent-api/',
+                                complete_url,
                                 data=json.dumps(remove_dict),
                                 headers={
                                     'Content-type': 'application/json',
@@ -2237,8 +2295,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                             reverse('hobo_user:edit-profile'))
 
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2341,8 +2401,10 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/production-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/production-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2459,8 +2521,10 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/agency-management-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/agency-management-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2538,7 +2602,7 @@ class EditCoworkerAPI(APIView):
                     if 'position' in data_dict:
                         position = JobType.objects.get(id=data_dict['position'])
                         coworker.position = position
-                    if 'user' in data_dict and data_dict['user']!="":
+                    if 'user' in data_dict and data_dict['user'] != "":
                         user_id = data_dict['user']
                         user = CustomUser.objects.get(id=user_id)
                         coworker.user = user
@@ -2848,9 +2912,9 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             pass
 
         user_projects = UserProject.objects.filter(user=user)
-        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED)
-        favorites = user_projects.filter(relation_type = UserProject.FAVORITE)
-        applied = user_projects.filter(relation_type = UserProject.APPLIED)
+        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
+        favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
+        applied = user_projects.filter(relation_type = UserProject.APPLIED).order_by('-created_time')
         context['my_projects'] = my_projects
         context['favorites'] = favorites
         context['applied'] = applied
@@ -3519,8 +3583,10 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
             json_dict['budget'] = budget[i]
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/add-user-interest-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                         'Authorization': token})
@@ -3664,6 +3730,29 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
                             Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
         notification_html = render_to_string(
                                 'user_pages/get-profile-rating-notification.html',
+                                {'from_user': from_user,
+                                'message':message,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetScreeningProjectInviteNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/get-screening-project-invite.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.INVITE)).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'user_pages/get-screening-project-invite.html',
                                 {'from_user': from_user,
                                 'message':message,
                                 'notification_id':notification_id,
@@ -4038,10 +4127,12 @@ class ListAllFriendsAPI(APIView):
         user = request.user
         try:
             friend_obj = Friend.objects.get(user=user)
+            for ind, obj in enumerate(friend_obj.friends.all()):
+                        individual_friend_data = {'email': obj.email, 'user': obj.first_name +' '+ obj.last_name}
+                        # individual_friend_data = {obj.email, obj.first_name +' '+ obj.last_name}
+                        friends_dict[ind] = individual_friend_data
         except Friend.DoesNotExist:
-            pass
-        for obj in friend_obj.friends.all():
-            friends_dict[obj.id] = obj.email
+            response['friends'] = {}
         response['friends'] = friends_dict
         return Response(response)
 
@@ -4252,6 +4343,101 @@ class FeedbackAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AddBetaTesterCode(APIView):
+    """
+    API endpoint to add a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = AddBetaTesterCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListBetaTesterCode(APIView):
+    """
+    API endpoint to list beta tester codes
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        filter_objs = BetaTesterCodes.objects.all()
+        serialized_results = AddBetaTesterCodeSerializer(filter_objs, many=True)
+        if serialized_results.is_valid:
+            return Response(serialized_results.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serialized_results.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteBetaTesterCode(APIView):
+    """
+    API endpoint to delete a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            delete_obj_id = kwargs['id']
+            delete_obj = BetaTesterCodes.objects.get(id=delete_obj_id)
+            delete_obj.delete()
+            return Response(
+                {'status': 'code deleted successfully'}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {'status': 'code with this id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditBetaTesterCode(APIView):
+    """
+    API endpoint to edit a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['id']
+            testercode_instance = BetaTesterCodes.objects.get(id=unique_id)
+            serializer = AddBetaTesterCodeSerializer(testercode_instance,
+                                             data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.update(BetaTesterCodes.objects.get(id=unique_id),
+                                  request.data)
+                return Response(
+                    {"status": "success",
+                     "message": "beta tester code updated successfully"})
+            else:
+                return Response(serializer.errors)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code record not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class CheckBetaTesterCode(APIView):
+    """
+    API endpoint to check a beta tester code
+    """
+
+    def get(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['code']
+            testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
+            if testercode_instance:
+                return Response(
+                    {"status": "success",
+                     "message": "beta tester code exists"})
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code does not exist"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
 class FeedbackWebView(View):
     # renderer_classes = [TemplateHTMLRenderer]
     # template_name = 'user_pages/feedback.html'
@@ -4271,13 +4457,49 @@ class FeedbackWebView(View):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 3
+
 # Project CRUD
 class ProjectAPIView(ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = '__all__'
+    pagination_class = StandardResultsSetPagination
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+
+class ProjectDateFilterAPI(APIView):
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-"+month+"-01",
+                                                               year+"-"+month+"-30"])
+            project_dict = {}
+            for item in project:
+                project_dict[item.id] = ProjectSerializer(item).data
+            return Response(project_dict)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            project_dict = {}
+            for item in project:
+                project_dict[item.id] = ProjectSerializer(item).data
+            return Response(project_dict)
+
 
 class ProjectCreateAPIView(CreateAPIView):
   permission_classes = (IsAuthenticated,)
@@ -4303,7 +4525,8 @@ class TeamAPIView(ListAPIView):
     serializer_class = TeamSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filterset_fields = ["title", "format", "genre",
+                        "rating", "timestamp"]
 
 class TeamCreateAPIView(CreateAPIView):
   queryset = Team.objects.all()
@@ -4328,8 +4551,11 @@ class TeamDeleteAPIView(DestroyAPIView):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
 #     # permission_classes = (IsAuthenticated,)
-#     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title","format"]
+#     # filter_backends = [filters.SearchFilter]
+#     filter_backends = (SearchFilter, DjangoFilterBackend)
+#     search_fields = ["title", "format", "genre",
+#                      "rating", "timestamp"]
+
 
 # Api to add rating to project video
 class VideoRatingView(APIView):
@@ -4416,6 +4642,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         return context
 
 
+
 class GetAllUsersAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -4431,3 +4658,117 @@ class GetAllUsersAPI(APIView):
             name_list.append(user.get_full_name())
             name_dict[user.get_full_name()]="<a href='"+user.get_profile_url()+"' id='"+str(user.id)+"' class='mention_user'>"+user.get_full_name()+"</a> "
         return Response({"serializer_list": serializer_list, "name_dict": name_dict, "name_list": name_list})
+
+class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/screening_video_page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project_obj = Project.objects.get(id=project_id)
+        context["project"] = project_obj
+        return context
+
+
+class UserHomeProjectInvite(APIView):
+
+    def post(self, request, *args, **kwargs):
+        emails = request.data['emails']
+        content = request.data['project_url']
+
+        subject, from_email, to = 'Subject', 'from@xxx.com', 'to@xxx.com'
+
+        html_content = render_to_string('mail_template.html', {'varname':'value'})
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+
+class CreateProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/new-project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ProjectCreationForm
+        context['writerform'] = WriterForm
+        return context
+
+    def post(self, request):
+        try:
+            projectform = ProjectCreationForm(request.POST or None)
+            writerform = WriterForm(request.POST or None)
+            print("valid ahno project:", projectform.is_valid())
+            print('form error project', projectform.errors)
+            print("valid ahno writer:", writerform.is_valid())
+            print('form error writer', writerform.errors)
+            if projectform.is_valid() and writerform.is_valid():
+                writer = writerform.save()
+                project = projectform.save()
+                writer.project = project
+                writer.save()
+                messages.success(request, "New project added.")
+                return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+            messages.error(request, "Form not valid")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+        except:
+            messages.error(request, "Can't read data")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+
+
+class ScreeningProjectDeatilInviteView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # send notification
+            logged_in_user = request.user
+            to_user = CustomUser.objects.get(email=request.data['to_user_email'])
+            project_url = request.data['project_url']
+            project_id = project_url.rsplit('/', 2)[1]
+            project_obj = Project.objects.get(id=project_id)
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = to_user
+            notification.notification_type = UserNotification.INVITE
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" invited you to check his project titled "+str(project_obj.title)+""
+            notification.invite_url = project_url
+            notification.save()
+            # send notification
+            room_name = "user_"+str(logged_in_user.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(request.user.id),
+                    "event": "INVITE"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
+            if notification_msg:
+                return Response({"status": "invite success"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
+
+class TermsOfService(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'terms_of_service.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+class PrivacyPolicy(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'privacy_policy.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+

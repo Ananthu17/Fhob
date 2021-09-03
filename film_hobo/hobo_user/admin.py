@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
@@ -14,9 +15,12 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     UserRatingCombined, UserRating, UserAgentManager, \
                     Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, CompanyRatingCombined, \
-                    VideoRating,Video, ProjectMemberRating, VideoRatingCombined, \
-                    UserProject
+                    Video, VideoRatingCombined, \
+                    UserProject, GroupUsers, Feedback, CompanyRating, \
+                    CompanyRatingCombined, \
+                    VideoRating, ProjectMemberRating, \
+                    BraintreePromoCode, VideoRatingCombined, BetaTesterCodes
+
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
@@ -32,7 +36,24 @@ class AthleticSkillInlineInline(admin.StackedInline):
     model = AthleticSkillInline
 
 
+class CustomUserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['payment_plan'].required = False
+        self.fields['date_of_birth'].required = False
+        self.fields['phone_number'].required = False
+        self.fields['address'].required = False
+        self.fields['country'].required = False
+        self.fields['company_phone'].required = False
+        self.fields['ethnic_appearance'].required = False
+
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+
 class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
+    form = CustomUserForm
     model = CustomUser
     list_display = ('email', 'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff', 'is_active',)
@@ -91,6 +112,7 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
+admin.site.register(BraintreePromoCode)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)
@@ -223,7 +245,9 @@ admin.site.register(UserRating, UserRatingAdmin)
 
 
 class UserNotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification_type', 'from_user', 'status_type', 'message', 'created_time')
+    list_display = (
+        'user', 'notification_type', 'from_user',
+        'status_type', 'message', 'created_time')
 
 
 admin.site.register(UserNotification, UserNotificationAdmin)
@@ -235,8 +259,10 @@ class UserRatingCombinedAdmin(admin.ModelAdmin):
 
 admin.site.register(UserRatingCombined, UserRatingCombinedAdmin)
 
+
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('project', 'user', 'job_type')
 
 
 admin.site.register(Team, TeamAdmin)
+admin.site.register(BetaTesterCodes)

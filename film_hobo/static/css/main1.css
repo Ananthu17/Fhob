@@ -4640,3 +4640,524 @@ ul.chm-cam-ul-right li{
 
 
 /* Crew Select End  */
+/* Crew Add All  */
+
+.craa-menu-bg{
+   background-color: #f3f3f3;
+   border-radius: 9px;
+   font-weight: 600;
+   margin-right: -15px;
+   margin-left: -15px;
+}
+.craa-attach-sec{
+   padding-right: 20px;
+   padding-left: 20px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+.craa-input-cast-sec{
+   font-size: 12px;
+   display: grid;
+   grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+   column-gap: 30px;
+   row-gap: 5px;
+   width: 100%;
+   align-items: center;
+}
+.craa-add-more-btn{
+   text-decoration: none;
+   padding: 2px 10px;
+   border: 1px solid black;
+   background-color: #f3f3f3;
+   font-size: 12px;
+   font-weight: 700;
+   color: #0627ca;
+}
+.craa-remove-btn{
+   text-decoration: none;
+   padding: 2px 8px;
+   border: 1px solid black;
+   background-color: #f3f3f3;
+   font-size: 12px;
+   font-weight: 700;
+   color: red;
+}
+.craa-plus-minus-btn{
+   text-decoration: none;
+    padding: 0px 3px;
+    font-size: 11px;
+    margin-right: 3px;
+    border: none;
+    background-color: #e6e3e3;
+}
+.craa-plus{
+   color: #009245;
+}
+.craa-minus{
+   color: red;
+}
+.craa-plus-txt{
+   padding-left: 2px;
+   font-weight: 700;
+   font-size: 13px;
+}
+.craa-btn-flex-1{
+   display: flex;
+   flex: 1;
+   flex-direction: row;
+}
+.craa-btn-flex-2{
+   display: flex;
+   flex: 1;
+   justify-content: center;
+   flex-direction: column;
+}
+.craa-save-edit-sec{
+   display: flex;
+   justify-content: flex-end;
+   margin-top: 15px;
+}
+.craa-list-sec-bg{
+   margin-right: -15px;
+   margin-left: -15px;
+   margin-top: 15px;
+   margin-bottom: 15px
+}
+.craa-list-sec{
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+   column-gap: 10px;
+}
+.craa-bg-color-sec{
+   background-color: #f3f3f3;
+   border-radius: 9px;
+}
+.craa-list-sec-head{
+   padding-top: 5px;
+   padding-bottom: 2px;
+   margin-bottom: 15px;
+}
+.craa-list-head-style{
+   font-size: 13px;
+   font-weight: 600;
+   color: #e88b24;
+   margin-bottom: 8px;
+}
+.craa-list-head-style > span{
+   display: flex;
+   justify-content: center;
+}
+.craa-sce-hr{
+   border: 0;
+   border-top: 1px solid #e88b24;
+   margin-top: 1px;
+   margin-bottom: 2px;
+   width: 100%;
+   max-width: 100px;
+}
+.craa-card-sec-align{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin-bottom: 15px;
+}
+.craa-card-sec{
+   width: 100%;
+   max-width: 115px;
+   padding-left: 8px;
+   padding-right: 4px;
+   border-radius: 9px;
+}
+.craa-count-sec-display{
+   display: flex;
+   flex-direction: column;
+   margin-left: 3px;
+   margin-top: 6px;
+}
+.craa-count-sec{
+   font-size: 13px;
+   font-weight: 700;
+}
+.craa-btn-top{
+   margin-top: -13px;
+}
+.craa-plus-minus-list-btn{
+   text-decoration: none;
+   padding: 0px 4px;
+   font-size: 11px;
+   border: none;
+   background-color: transparent;
+}
+.craa-plus-list-btn{
+   text-decoration: none;
+   padding: 0px 4px;
+   font-size: 11px;
+   margin-bottom: 6px;
+   border: none;
+   background-color: #e6e3e3;
+}
+.craa-card-inner-align{
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   padding-top: 1px;
+   padding-bottom: 1px;
+}
+.craa-card-inner-align div:nth-child(2){
+   margin-left: auto;
+}
+.craa-card-name{
+   font-size: 13px;
+   font-weight: 600;
+   width: 78px;
+   word-wrap: break-word;
+   line-height: 16px;
+}
+.craa-card-name-green{
+   color: #26ab52;
+}
+.craa-card-name-blue{
+   color: #0001ff;
+}
+.craa-card-num-black{
+   color: black;
+}
+.craa-card-num-blue{
+   color: #0001ff;
+}
+.craa-btm-add-more-btn{
+   text-decoration: none;
+   padding: 2px 10px;
+   border: 1px solid black;
+   border-radius: 7px;
+   background-color: #f3f3f3;
+   font-size: 12px;
+   font-weight: 700;
+   color: #0627ca;
+}
+.craa-adblock-sec-2 {
+   margin-top: 16px;
+   margin-right: -34px;
+   height: 829px;
+}
+
+/* Media query  */
+
+@media(max-width:1240px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 5px;
+  }
+}
+@media(max-width:1200px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 10px;
+  }
+  .craa-adblock-sec-2 {
+   margin-top: 16px;
+   margin-right: -34px;
+   height: 757px;
+}
+}
+@media(max-width:1080px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+  }
+  .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0px;
+   }
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 5px;
+  }
+}
+@media(max-width:1024px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      column-gap: 10px;
+  }
+}
+@media(max-width:991px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+  }
+  .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+   }
+   .craa-menu-bg{
+      background-color: #f3f3f3;
+      border-radius: 9px;
+      font-weight: 600;
+      margin-right: 0px;
+      margin-left: 0px;
+   }
+   .craa-list-sec-bg {
+      margin-right: 0px;
+      margin-left: 0px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+   }
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 10px;
+  }
+  .craa-adblock-sec-2 {
+   margin-top: 16px;
+   margin-right:0px;
+   height: 274px;
+}
+}
+@media(max-width:915px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 10px;
+  }
+}
+
+@media(max-width:800px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+  }
+  .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0px;
+   }
+}
+@media(max-width:767px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      column-gap: 10px;
+  }
+}
+@media(max-width:700px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr ;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+  }
+  .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0px;
+   }
+}
+@media(max-width:640px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      column-gap: 5px;
+  }
+}
+@media(max-width:620px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr ;
+      column-gap: 10px;
+  }
+}
+@media(max-width:540px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 2fr 1fr  ;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+   }
+   .craa-btn-flex-2 {
+      display: flex;
+      flex: 1;
+      column-gap: 5px;
+      justify-content: flex-start;
+      flex-direction: row;
+   }
+   .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0px;
+   }
+}
+@media(max-width:480px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 10px;
+  }
+}
+@media(max-width:420px){
+   .craa-input-cast-sec {
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 1fr  ;
+      column-gap: 30px;
+      width: 100%;
+      align-items: center;
+   }
+   .craa-btn-flex-2 {
+      display: flex;
+      flex: 1;
+      column-gap: 5px;
+      justify-content: flex-start;
+      flex-direction: row;
+   }
+   .craa-save-edit-sec {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 0px;
+   }
+   .craa-btn-flex-2{
+      grid-row: 4;
+   }
+}
+@media(max-width:320px){
+   .craa-list-sec {
+      display: grid;
+      grid-template-columns: 1fr;
+      column-gap: 10px;
+  }
+}
+
+/* Crew Add All End */
+/* Cast Look Up */
+
+.clu-input-head-display{
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   font-size: 13px;
+   column-gap: 15px;
+}
+.clu-cast-orange{
+   color: #e88b24;
+}
+.clu-top-padding{
+   padding-top: 30px;
+   max-width: 480px;
+   width: 100%;
+}
+.clu-attach-btn{
+   text-decoration: none;
+   padding: 0px 5px;
+   border: 1px solid black;
+   border-radius: 5px;
+   background-color: #efefef;
+   font-size: 12px;
+   font-weight: 700;
+   color: #ec1c27;
+}
+.clu-des-textarea {
+   width: 100%;
+   height: 42px;
+   resize: none;
+   border: solid 1px black;
+   border-radius: 6px;
+   outline: none;
+}
+.clu-des-textarea::placeholder{
+   position: relative;
+   text-align: center;
+   color: #adadad;
+   font-size: 16px;
+}
+.clu-apply-btn {
+   text-decoration: none;
+   padding: 0px 7px;
+   border: 1px solid black;
+   border-radius: 5px;
+   background-color: #efefef;
+   font-size: 11px;
+   font-weight: 700;
+   margin-right: 15px;
+   color: #39b660;
+}
+.clu-input-field-display{
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+}
+.clu-input-field-display span:last-child {
+   margin-left: auto;
+}
+.clu-input-section{   
+   display: grid;
+   grid-template-columns: 3fr 2fr;
+}
+.clu-cast-password{
+   height: 17px;
+   width: 60px;
+   border-radius: 4px;
+   border: solid 1px;
+   padding-bottom: 4px;
+   margin-right: 30px;
+}
+.clu-cast-password::placeholder { 
+   text-align: center;
+   position: relative;
+   top:5px;
+   color: black;
+}
+.clu-input-sec-align{
+   padding-left: 15px;
+   padding-right: 15px;
+   padding-top: 5px;
+   padding-bottom: 414px;
+}
+
+/* Media query  */
+
+@media(max-width:1200px){
+   .clu-input-sec-align {
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: 5px;
+      padding-bottom: 440px;
+  }
+}
+@media(max-width:560px){
+   .clu-input-section {
+      display: grid;
+      grid-template-columns: 1fr;
+  }
+  .clu-apply-btn {
+      margin-right: 0px;
+   }
+   .clu-input-sec-align {
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+  }
+}
+
+/* Cast Look Up End  */

@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+# from urllib.parse import urlparse
 
 from rest_framework import serializers
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -22,11 +22,9 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
-    UserProfile, CoWorker, UserInterest, \
-    UserRating, Photo, CompanyProfile, \
-    CompanyClient, FriendRequest, FriendGroup, Feedback, \
-    Photo, Project, Team, Video, VideoRating
+    UserAgentManager, UserNotification, UserProfile, CoWorker, UserInterest, \
+    UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
+    Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -198,7 +196,7 @@ class RegisterIndieSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate_i_agree(self, i_agree):
-        if i_agree != True:
+        if not i_agree:
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
@@ -293,11 +291,13 @@ class LoginSerializer(serializers.Serializer):
             from allauth.account import app_settings
 
             # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+            if app_settings.AUTHENTICATION_METHOD == \
+                    app_settings.AuthenticationMethod.EMAIL:
                 user = self._validate_email(email, password)
 
             # Authentication through username
-            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            elif app_settings.AUTHENTICATION_METHOD == \
+                    app_settings.AuthenticationMethod.USERNAME:
                 user = self._validate_username(username, password)
 
             # Authentication through either username or email
@@ -316,7 +316,6 @@ class LoginSerializer(serializers.Serializer):
             if username:
                 user = self._validate_username_email(username, '', password)
 
-
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -328,7 +327,8 @@ class LoginSerializer(serializers.Serializer):
 
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
-            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+            if app_settings.EMAIL_VERIFICATION == \
+                    app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
                     raise serializers.ValidationError(
@@ -396,7 +396,7 @@ class RegisterProSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate_i_agree(self, i_agree):
-        if i_agree != True:
+        if not i_agree:
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
@@ -830,6 +830,7 @@ class TrackUserSerializer(serializers.Serializer):
         required=True,
     )
 
+
 class RateCompanySerializer(serializers.ModelSerializer):
     company = serializers.CharField(
         max_length=150,
@@ -1064,13 +1065,18 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = ['email', 'name', 'user_rating', 'user_feedback',
                   'timestamp']
+        extra_kwargs = {"user_rating": {
+            "error_messages": {"required": "Please select the rating"}}}
 
 
 class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['creator', 'title', 'format', 'genre', 'rating', 'video_url',
+                  'video_type', 'last_date', 'location', 'visibility',
+                  'visibility_password', 'cast_attachment', 'cast_pay_rate',
+                  'cast_samr', 'timestamp']
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -1078,6 +1084,7 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ['__all__']
+
 
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -1092,5 +1099,9 @@ class VideoRatingSerializer(serializers.ModelSerializer):
         fields = ['project', 'rating', 'reason']
 
 
+class AddBetaTesterCodeSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = BetaTesterCodes
+        fields = ['id', 'code', 'days']
 

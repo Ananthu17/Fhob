@@ -3,7 +3,6 @@ import json
 import requests
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -11,7 +10,7 @@ from django.views.generic.base import View
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,12 +18,12 @@ from datetimerange import DateTimeRange
 
 from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
-    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser
+    ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
+    BraintreePromoCode
 from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
-from paypal.standard.forms import PayPalPaymentsForm
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersCreateRequest, \
     OrdersCaptureRequest, OrdersGetRequest
@@ -406,7 +405,8 @@ class UpdateMembershipFeeAPI(APIView):
                 if data['tax'] == "":
                     final_result['tax'] = \
                         PaymentOptions.objects.first().__dict__['tax']
-                elif (float(data['tax']) < 0.0) or (float(data['tax']) > 100.0):
+                elif (float(data['tax']) < 0.0) or \
+                     (float(data['tax']) > 100.0):
                     return Response(
                         {"status": "failure",
                          "tax": "please enter a valid number between 0 and 100"
@@ -761,8 +761,13 @@ class CreateUserOrder(APIView):
         if request.data['promocodes_applied'] == "":
             promocodes_applied = None
         else:
-            promocodes_applied = PromoCode.objects.get(
-                promo_code=request.data['promocodes_applied'])
+            try:
+                promocodes_applied = PromoCode.objects.get(
+                    promo_code=request.data['promocodes_applied'])
+            except ObjectDoesNotExist:
+                return Response(
+                            {"status": "promocode does not exist"},
+                            status=status.HTTP_400_BAD_REQUEST)
         if request.data['promotion_amount'] == '':
             promotion_amount = 0
         else:
@@ -786,40 +791,113 @@ class CreateUserOrder(APIView):
             client = PayPalHttpClient(environment)
             create_order = OrdersCreateRequest()
 
-            # order
-            create_order.request_body(
-                {
-                    "intent": "CAPTURE",
-                    "application_context": {
-                        "brand_name": "FILMHOBO INC",
-                        "shipping_preference": "NO_SHIPPING"
-                    },
-                    "purchase_units": [
+            if promocodes_applied:
+                if payment_plan.lower() == 'year' or 'yearly' or 'annually':
+                    payment_plan_time = 'YEAR'
+                else:
+                    payment_plan_time = 'MONTH'
+
+                new_plan_name = membership_type.capitalize() \
+                    + ' Payment - ' + payment_plan.capitalize() \
+                    + ' - ' + promocodes_applied.promo_code
+
+                data_dict = {
+                    "product_id": settings.PRODUCT_ID,
+                    "name": new_plan_name,
+                    "description": new_plan_name,
+                    "status": "ACTIVE",
+                    "billing_cycles": [
                         {
-                            "days_free": transaction.days_free,
-                            "payment_plan": transaction.payment_plan,
-                            "initial_amount": transaction.initial_amount,
-                            "amount": {
-                                "currency_code": "USD",
-                                "value": transaction.final_amount,
-                                "breakdown": {
-                                    "item_total": {
-                                        "currency_code": "USD",
-                                        "value": transaction.final_amount
-                                    }
-                                    },
-                                },
+                            "frequency": {
+                                "interval_unit": payment_plan_time,
+                                "interval_count": 1
+                            },
+                            "tenure_type": "REGULAR",
+                            "sequence": 1,
+                            "total_cycles": 0,
+                            "pricing_scheme": {
+                                "fixed_price": {
+                                    "value": final_amount,
+                                    "currency_code": "USD"
+                                }
+                            }
                         }
                     ],
-                }
-            )
+                    "payment_preferences": {
+                            "auto_bill_outstanding": True,
+                            "setup_fee": {
+                                "value": "0",
+                                "currency_code": "USD"
+                            },
+                            "setup_fee_failure_action": "CONTINUE",
+                            "payment_failure_threshold": 3
+                    },
+                    "taxes": {
+                        "percentage": "0",
+                        "inclusive": False
+                    }
+                    }
 
-            response = client.execute(create_order)
-            data = response.result.__dict__['_dict']
-            Transaction.objects.filter(id=transaction.id).update(
-                paypal_order_id=data['id'])
-            # return JsonResponse(data)
-            return Response(data, status=status.HTTP_201_CREATED)
+                paypal_client_id = settings.PAYPAL_CLIENT_ID
+                paypal_secret = settings.PAYPAL_SECRET_ID
+                data = {'grant_type': 'client_credentials'}
+                token_user_response = requests.post(
+                                    'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                    data=data,
+                                    auth=(paypal_client_id, paypal_secret),
+                                    headers={'Accept': 'application/json',
+                                             'Accept-Language': 'en_US'})
+                if token_user_response.status_code == 200:
+                    access_token = json.loads(token_user_response.content)['access_token']
+                else:
+                    return HttpResponse('Could not save data')
+
+                access_token_strting = 'Bearer ' + access_token
+
+                create_plan_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                                data=json.dumps(data_dict),
+                                headers={'Content-type': 'application/json',
+                                         'Authorization': access_token_strting})
+                if create_plan_user_response.status_code == 201:
+                    plan_id = json.loads(create_plan_user_response.content)['id']
+                else:
+                    return HttpResponse('Could not save data')
+            else:
+                # create_order request for no discount added
+                create_order.request_body(
+                    {
+                        "intent": "CAPTURE",
+                        "application_context": {
+                            "brand_name": "FILMHOBO INC",
+                            "shipping_preference": "NO_SHIPPING"
+                        },
+                        "purchase_units": [
+                            {
+                                "days_free": transaction.days_free,
+                                "payment_plan": transaction.payment_plan,
+                                "initial_amount": transaction.initial_amount,
+                                "amount": {
+                                    "currency_code": "USD",
+                                    "value": transaction.final_amount,
+                                    "breakdown": {
+                                        "item_total": {
+                                            "currency_code": "USD",
+                                            "value": transaction.final_amount
+                                        }
+                                        },
+                                    },
+                            }
+                        ],
+                    }
+                )
+
+                response = client.execute(create_order)
+                data = response.result.__dict__['_dict']
+                Transaction.objects.filter(id=transaction.id).update(
+                    paypal_order_id=data['id'])
+                # return JsonResponse(data)
+                return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(
                         {"status": "transaction record failure"},
@@ -1074,10 +1152,19 @@ class InitialRequest(APIView):
             status=status.HTTP_200_OK)
 
 
-class ManageSubscription(APIView):
+class UpdateSubscription(APIView):
+    """
+    API to update the braintree subscription
+    """
+    permission_classes = (IsAdminUser,)
 
     def post(self, request, *args, **kwargs):
-        new_price = request.data['new_price']
+        new_indie_monthly = request.data['indie_monthly']
+        new_indie_yearly = request.data['indie_yearly']
+        new_pro_monthly = request.data['pro_monthly']
+        new_pro_yearly = request.data['pro_yearly']
+        new_company_monthly = request.data['company_monthly']
+        new_company_yearly = request.data['company_yearly']
 
         gateway = braintree.BraintreeGateway(
             braintree.Configuration(
@@ -1090,7 +1177,7 @@ class ManageSubscription(APIView):
         result = gateway.subscription.update("a_subscription_id", {
             "id": "new_id",
             "payment_method_token": "new_payment_method_token",
-            "price": new_price,
+            "price": "new_price",
             "plan_id": "new_plan",
         })
         if not result.is_success:
@@ -1100,3 +1187,168 @@ class ManageSubscription(APIView):
         return Response(
             {"status": "braintree subscription updation succsessful "},
             status=status.HTTP_200_OK)
+
+
+class GetBraintreeDiscountDetailListAPI(APIView):
+    """
+    API for superuser to get the braintree discount details
+    """
+
+    def get(self, request, *args, **kwargs):
+        gateway = braintree.BraintreeGateway(
+            braintree.Configuration(
+                braintree.Environment.Sandbox,
+                merchant_id=settings.BRAINTREE_MERCHANT_ID,
+                public_key=settings.BRAINTREE_PUBLIC_KEY,
+                private_key=settings.BRAINTREE_PRIVATE_KEY
+            )
+        )
+
+        discounts = gateway.discount.all()
+        final_list = []
+        for discount in discounts:
+            data_dict = {
+                "braintree_id": "",
+                "promo_code": "",
+                "description": "",
+                "duration": "",
+                "billing_cycles": "",
+                "amount": ''
+            }
+            if discount.never_expires:
+                promocode, created = BraintreePromoCode.objects.update_or_create(
+                    braintree_id=discount.id, promo_code=discount.name,
+                    description=discount.description,
+                    duration='full_subscription',
+                    billing_cycles=discount.number_of_billing_cycles,
+                    amount=discount.amount
+                )
+                data_dict['braintree_id'] = discount.id
+                data_dict['promo_code'] = discount.name
+                data_dict['description'] = discount.description
+                data_dict['duration'] = 'full_subscription'
+                data_dict['billing_cycles'] = discount.number_of_billing_cycles
+                data_dict['amount'] = discount.amount
+                final_list.append(data_dict)
+            else:
+                promocode, created = BraintreePromoCode.objects.update_or_create(
+                    braintree_id=discount.id, promo_code=discount.name,
+                    description=discount.description,
+                    duration='billing_cycle_subscription',
+                    billing_cycles=discount.number_of_billing_cycles,
+                    amount=discount.amount
+                )
+                data_dict['braintree_id'] = discount.id
+                data_dict['promo_code'] = discount.name
+                data_dict['description'] = discount.description
+                data_dict['duration'] = 'billing_cycle_subscription'
+                data_dict['billing_cycles'] = discount.number_of_billing_cycles
+                data_dict['amount'] = discount.amount
+                final_list.append(data_dict)
+        if len(discounts) > 0:
+            return JsonResponse(final_list, safe=False)
+        else:
+            return Response({"status": "no content",
+                            "discounts": "no discounts associated with this \
+                            account"
+                             }, status=status.HTTP_204_NO_CONTENT)
+
+
+class BraintreeCalculateDiscountAPI(APIView):
+    """
+    API for calculateing the braintree discount
+    """
+    def post(self, request, format=None):
+        try:
+            data = request.data
+            if data['promocode'] == '':
+                return Response(
+                    {"status": "enter a valid promocode"},
+                    status=status.HTTP_404_NOT_FOUND)
+            else:
+                promocode_obj = PromoCode.objects.get(
+                    promo_code=data['promocode'])
+                initial_amount = float(data['amount'])
+                promotion_amount = float(promocode_obj.amount)
+                temp_amount = initial_amount - promotion_amount
+                if temp_amount < 0:
+                    final_amount = 0
+                else:
+                    final_amount = temp_amount
+                return Response(
+                    {"status": "success",
+                        "promocode": data['promocode'],
+                        "initial_amount": round(initial_amount, 2),
+                        "promotion_amount": round(promotion_amount, 2),
+                        "final_amount": round(final_amount, 2)},
+                    status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "promocode does not exist"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class GetNewPlanDetailsJSON(APIView):
+    """
+    API for getting data to create new plan for discounts
+    """
+    def post(self, request, format=None):
+        plan_type = request.data['plan_type']
+        plan_tenure = request.data['plan_tenure']
+        applied_promocode = request.data['applied_promocode']
+        final_new_amount = request.data['final_new_amount']
+
+        if plan_tenure.lower() == 'year' or 'yearly':
+            plan_tenure_time = 'YEAR'
+        else:
+            plan_tenure_time = 'MONTH'
+
+        new_plan_name = plan_type.capitalize() \
+            + ' Payment - ' + plan_tenure.capitalize() \
+            + ' - ' + applied_promocode
+
+        data_dict = {
+            "product_id": settings.PRODUCT_ID,
+            "name": new_plan_name,
+            "description": new_plan_name,
+            "status": "ACTIVE",
+            "billing_cycles": [
+                {
+                    "frequency": {
+                        "interval_unit": plan_tenure_time,
+                        "interval_count": 1
+                    },
+                    "tenure_type": "REGULAR",
+                    "sequence": 1,
+                    "total_cycles": 0,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": final_new_amount,
+                            "currency_code": "USD"
+                        }
+                    }
+                }
+            ],
+            "payment_preferences": {
+                    "auto_bill_outstanding": True,
+                    "setup_fee": {
+                        "value": "0",
+                        "currency_code": "USD"
+                    },
+                    "setup_fee_failure_action": "CONTINUE",
+                    "payment_failure_threshold": 3
+            },
+            "taxes": {
+                "percentage": "0",
+                "inclusive": False
+            }
+            }
+
+        if plan_type.strip() == '' or \
+           plan_tenure.strip() == '' or \
+           applied_promocode.strip() == '' or \
+           final_new_amount.strip() == '':
+            return Response({"status": "no content"
+                             }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return JsonResponse(data_dict, safe=False)

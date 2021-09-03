@@ -57,7 +57,7 @@
                 <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
                     <ul class="list-inline m-0">
                         <li class="list-inline-item"><a href="{% url 'hobo_user:forgot-password' %}" class="login-link">Forgot Password</a></li>
-                        <li class="list-inline-item"><a href="{% url 'hobo_user:choose-membership' %}" class="login-link">Register</a></li>
+                        <li class="list-inline-item"><a href="{% url 'hobo_user:choose-membership' %}" class="login-link">Join FilmHobo</a></li>
                     </ul>
                 </div>
             </form>
@@ -67,4 +67,9 @@
 {% endblock %}
 {% block extrajs %}
 <script src="{% static 'js/base.js' %}"></script>
+<script>
+$( document ).ready(function() {
+    $("#login_link").addClass('active');
+});
+</script>
 {% endblock %}

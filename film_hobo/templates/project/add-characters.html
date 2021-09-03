@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load user_account_tag %}
+{% load project_rating_tag %}
 
 {% block extracss %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" type="text/css" media="all" rel="stylesheet">
@@ -78,15 +79,9 @@
                             <div class="cas-side-display">
                                 <span>
                                     <span class="cas-cast-side-txt">
-                                        {% if character.id in sites_dict.keys %}
                                         <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}">
                                             SIDES
                                         </a>
-                                        {% else %}
-                                        <a href="{% url 'project:edit-sides' project.id %}?character_id={{character.id}}">
-                                            SIDES
-                                        </a>
-                                        {% endif %}
                                     </span>
                                 </span>
                                 <span>
@@ -97,7 +92,13 @@
                                 </span>
                             </div>
                             <span class="cas-txt-area-align">
-                                <textarea class="cas-input-txtarea" placeholder="Sides" disabled>{% if character.id in sites_dict.keys %}{% get_dict_value sites_dict character.id as sites%}{{sites|striptags | safe}}{% endif %}</textarea>
+                                <!-- <textarea class="cas-input-txtarea" placeholder="Sides" disabled></textarea> -->
+                                <div class="cas-input-txtarea border-cls">
+                                {% get_dict_value_if_exists sites_dict character.id as scene_pdf %}
+                                {% if scene_pdf %}
+                                    <iframe src="{{ scene_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                {% endif %}
+                                </div>
                             </span>
                         </div>
                         {% endfor %}

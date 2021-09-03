@@ -30,6 +30,21 @@ SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+# PROJECT_ENVIRONMENT valid options
+# 1 - LOCAL
+# 2 - DEMO_SERVER
+# 3 - AWS_PRODUCTION
+
+PROJECT_ENVIRONMENT = "LOCAL"
+
+if PROJECT_ENVIRONMENT == "DEMO_SERVER":
+    # ORIGIN_URL = "http://202.88.246.92:8041"
+    ORIGIN_URL = "http://172.22.0.1:8041"
+elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
+    ORIGIN_URL = "http://www.filmhobo.com"
+else:
+    ORIGIN_URL = "http://127.0.0.1:8000"
+
 # # for development
 DEBUG = True
 
@@ -54,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party packages
+    'environ',
     'rest_auth',
     'rest_framework',
     'django.contrib.sites',
@@ -66,6 +82,8 @@ INSTALLED_APPS = [
     'authemail',
     'allauth.socialaccount',
     'django_filters',
+    'django_social_share',
+    # 'subscription',
 
     # project apps
     'initial_user',
@@ -155,6 +173,16 @@ DATABASES = {
     }
 }
 
+# demo server database credentials
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'HOST': os.environ.get('DB_HOST'),
+#     'NAME': os.environ.get('DB_NAME'),
+#     'USER': os.environ.get('DB_USER'),
+#     'PASSWORD': os.environ.get('DB_PASS'),
+#   }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -293,7 +321,9 @@ S3_BUCKET_NAME = "filmhobo-videos"
 CORS_ORIGIN_ALLOW = True
 CORS_ALLOWED_ORIGINS = (
     'http://localhost:8000',
-    "http://127.0.0.1:8000",
+    'http://127.0.0.1:8000',
+    'http://0.0.0.0',
+    'http://202.88.246.92:8041',
 )
 
 
@@ -352,3 +382,12 @@ CKEDITOR_CONFIGS = {
         'margin-left': '10%',
     },
 }
+
+# tijptjik/django-paypal-subscription package settings
+# SUBSCRIPTION_PAYPAL_SETTINGS = {
+#     'bussiness': 'kselivan@filmhobo.com'
+# }
+
+# SUBSCRIPTION_PAYPAL_FORM = 'paypal.standard.forms.PayPalPaymentsForm'
+
+# SUBSCRIPTION_GRACE_PERIOD = 0

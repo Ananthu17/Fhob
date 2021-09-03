@@ -3,11 +3,23 @@
 {% load static %}
 
 {% block extracss %}
+<!-- <link rel="stylesheet" href="{% static 'css/choose_your_membership.css' %}"> -->
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
     <div class="container-fluid memship-f">
+        <div class="box1 signup-form signup-section signup-border">
+            <div class="d-flex justify-content-center">
+              Hello welcome to Filmhobo, you are one amoung the beta testers to use this website,
+            </div>
+            <div class="d-flex justify-content-center">
+                use the following code to avail one free year of any Premium Memberships
+            </div>
+            <div class="d-flex justify-content-center">
+                <button id="beta-tester-modal" type="button">Enter Beta Tester Code</button>
+            </div>
+          </div>
         <div class="row memship-row-head mt-2 ml-2 mr-2">
             <div class="col-4 memship-head">CHOOSE YOUR MEMBERSHIP</div>
             <div class="col-2 memship-pro-font underline" ><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></div>
@@ -114,6 +126,32 @@
         </div>
     </div>
 </div>
+<!-- Modal Start -->
+<div class="modal " id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="notificationModalTitle">Notification</h5>
+            <button id="close-cross" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body notification-modal-content">
+            <form>
+                <div class="form-group">
+                    <label>Beta User Code</label>
+                    <input type="text" class="form-control" id="input_code" placeholder="Enter code">
+                </div>
+                <button id="check-code" type="button" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button id="close-membership-btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
 {% endblock %}
 
 {% block extrajs %}

@@ -120,6 +120,16 @@
                     {{time}} ago.
                 </div>
             </div>
+            {% elif obj.notification_type == 'invite' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message}}<br><a href={{obj.invite_url}}>Click here to view</a>
+                    {{obj.inviteurl}}<br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
             {% elif obj.notification_type == 'membership_change' %}
             <div class="row">
                 <div class="col-10 ">

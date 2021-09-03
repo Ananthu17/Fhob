@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="top-members-head text-center pt-2">Top Rated {{job_type.title}}</div>
+                <div class="row">
+                    {% if members %}
+                    <ol class="mem-list-cont mb-0 ">
+                        {% for obj in members %}
+                        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
+                        {% endfor %}
+                    </ol>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+

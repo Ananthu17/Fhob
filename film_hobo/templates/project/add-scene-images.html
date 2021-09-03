@@ -4,30 +4,7 @@
 
 {% block extracss %}
 <link rel="stylesheet" href="{% static 'css/cropper.min.css' %}">
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-jcrop/0.9.15/css/jquery.Jcrop.css"> -->
-<!-- <link rel="stylesheet" href="{% static 'css/rcrop.min.css' %}"> -->
 <style>
-    /* @media(min-width:300px) and (max-width:400px)
-    {
-        #cke_1_contents
-        {
-        height:200px!important;
-        }
-    }
-    @media(min-width:400px) and (max-width:500px)
-    {
-        #cke_1_contents
-        {
-        height:350px!important;
-        }
-    }
-    @media(min-width:500px) 
-    {
-    #cke_1_contents
-        {
-            height:470px!important;
-        }
-    } */
 </style>
 {% endblock %}
 
@@ -85,7 +62,8 @@
                                             <div class="sds-card-inneralign">
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
-                                                   <iframe src="{{project.script.url}}" class="pdf-style" id="script_id" frameborder="0"></iframe>
+                                                    <input type="hidden" value="{{ project.script.path}}" class="script_path" />
+                                                    <iframe src="{{project.script.url}}" class="pdf-style" id="script_id" frameborder="0"></iframe>
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -140,7 +118,12 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt"></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="sds-side-txt"></span>
+                                            <span class="sds-scene-txt sds-scene-txt-padding">
+                                                {% if request.GET.scene == '1' %} SCENE ONE {% endif %}
+                                                {% if request.GET.scene == '2' %} SCENE TWO {% endif %}
+                                                {% if request.GET.scene == '3' %} SCENE THREE {% endif %}
+                                            </span>
                                         </div>
                                         <div class="row mt-4">
                                             <div class="col-4">
@@ -189,15 +172,11 @@
                                        </div>
                                         <div class="row mt-4">
                                             <div class="col-12">
-                                                {% if scene_image_objs %}
-                                                    {% if request.GET.scene == '1' %}
-                                                    <a class=" btn-simple generate_pdf" id="scene_1">Update Scene 1</a>
-                                                    {% elif request.GET.scene == '2' %}
-                                                    <a class=" btn-simple generate_pdf" id="scene_2">Update Scene 2</a>
-                                                    {% elif request.GET.scene == '3' %}
-                                                    <a class=" btn-simple generate_pdf" id="scene_3">Update Scene 3</a>
-                                                    {% endif %}
-                                                {% endif %}
+                                                    <a class=" btn-simple {% if scene_image_objs %}generate_pdf{% else %}remove_scenes{% endif %}"
+                                                    id="{% if request.GET.scene == '1' %}scene_1
+                                                    {% elif request.GET.scene == '2' %}scene_2
+                                                    {% elif request.GET.scene == '3' %}scene_3
+                                                    {% endif %}">Save</a>
                                             </div>
                                         </div>
                                     </div>
@@ -228,9 +207,6 @@
 {% endblock %}
 
 {% block extrajs %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-
 
  <script type="text/javascript" src="{% static 'js/cropper.min.js' %}"></script>
 <script>
@@ -239,77 +215,77 @@
         var token = $("#token").val();
         var pdf_page_number = $(".pdf_page_number").val();
         var data_dict = {};
-        var path = '{{ project.script.path }}';
+        var path = $(".script_path").val();
         var project_id = '{{ project.id }}';
         var page_no = pdf_page_number;
         data_dict['path'] = path;
         data_dict['project_id'] = project_id;
         data_dict['page_no'] = page_no;
         $(".page_number_error").html('');
-
-        $.ajax
-        ({
-            type: "POST",
-            url: "/project/pdf-to-image-api/",
-            dataType: 'json',
-            async: false,
-            data: data_dict,
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader ("Authorization", token);
-            },
-            success: function (response){
-                if(response['image_path']){
-                    var img_path = "/media/script/project_"+project_id+".jpg"
-                    $(".pdf_img").html('');
-                    $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
-                    $("#modalCrop").modal('show');
-
-
-                        /* SCRIPTS TO HANDLE THE CROPPER BOX */
-                        var $image = $("#pdfimage");
-                        var cropBoxData;
-                        var canvasData;
-                        $("#modalCrop").on("shown.bs.modal", function () {
-                        $image.cropper({
-                            autoCropArea: 1,
-                            viewMode: 1,
-                            aspectRatio: 3/4,
-                            minCropBoxWidth: 200,
-                            minCropBoxHeight: 200,
-                            ready: function () {
-                            $image.cropper("setCanvasData", canvasData);
-                            $image.cropper("setCropBoxData", cropBoxData);
-                            }
-                        });
-                        }).on("hidden.bs.modal", function () {
-                        cropBoxData = $image.cropper("getCropBoxData");
-                        canvasData = $image.cropper("getCanvasData");
-                        $image.cropper("destroy");
-                        });
+        if(path){
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/pdf-to-image-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    if(response['image_path']){
+                        var img_path = "/media/script/project_"+project_id+".jpg"
+                        $(".pdf_img").html('');
+                        $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
+                        $("#modalCrop").modal('show');
 
 
+                            /* SCRIPTS TO HANDLE THE CROPPER BOX */
+                            var $image = $("#pdfimage");
+                            var cropBoxData;
+                            var canvasData;
+                            $("#modalCrop").on("shown.bs.modal", function () {
+                            $image.cropper({
+                                autoCropArea: 1,
+                                viewMode: 1,
+                                aspectRatio: 3/4,
+                                minCropBoxWidth: 200,
+                                minCropBoxHeight: 200,
+                                ready: function () {
+                                $image.cropper("setCanvasData", canvasData);
+                                $image.cropper("setCropBoxData", cropBoxData);
+                                }
+                            });
+                            }).on("hidden.bs.modal", function () {
+                            cropBoxData = $image.cropper("getCropBoxData");
+                            canvasData = $image.cropper("getCanvasData");
+                            $image.cropper("destroy");
+                            });
 
-                        /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
-                        $(".js-crop-and-upload").click(function () {
-                            var cropData = $image.cropper("getData");
-                            console.log(cropData);
-                            var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
-                            var img = document.createElement("img");
-                            img.src = croppedimage;
-                            $("#x").val(cropData['x'])
-                            $("#y").val(cropData['y'])
-                            $("#width").val(cropData['width'])
-                            $("#height").val(cropData['height'])
-                            // document.getElementById("cropped_result").append(img);
-                            $("#sidesform").submit();
 
-                        });
-                }else{
-                    $(".page_number_error").html('Please provide page number !!');
+
+                            /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
+                            $(".js-crop-and-upload").click(function () {
+                                var cropData = $image.cropper("getData");
+                                console.log(cropData);
+                                var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
+                                var img = document.createElement("img");
+                                img.src = croppedimage;
+                                $("#x").val(cropData['x'])
+                                $("#y").val(cropData['y'])
+                                $("#width").val(cropData['width'])
+                                $("#height").val(cropData['height'])
+                                // document.getElementById("cropped_result").append(img);
+                                $("#sidesform").submit();
+
+                            });
+                    }else{
+                        $(".page_number_error").html('Please provide page number !!');
+                    }
                 }
-            }
-        });
-
+            });
+        }
     });
     $('body').on('click' , '.close-modal', function(){
         $("#modalCrop").modal('hide');
@@ -350,6 +326,28 @@
             dataType: 'json',
             async: false,
             data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                var path = "/project/add-sides/"+project_id+"?character_id="+character_id;
+                window.location.href = path;
+            }
+        });
+    });
+
+    $('body').on('click' , '.remove_scenes', function(){
+        var scene = $(this).attr('id') ;
+        var project_id = '{{ project.id }}' ;
+        var character_id = '{{ character.id }}'
+        var token = $("#token").val();
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/remove-character-scenes-api/",
+            dataType: 'json',
+            async: false,
+            data: {'character_id':character_id, 'scene':scene },
             beforeSend: function (xhr) {
                 xhr.setRequestHeader ("Authorization", token);
             },
