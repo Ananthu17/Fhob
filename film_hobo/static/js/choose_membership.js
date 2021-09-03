@@ -84,7 +84,7 @@ $('#check-code').click(function(event){
     debugger
     check_url = origin_url + '/hobo_user/check-beta-tester-code/'
     var check_args = {
-        "code": document.getElementById("input_code").value,
+        "code": $('#input_code').val(),
     }
 
     axios.get(check_url, check_args)

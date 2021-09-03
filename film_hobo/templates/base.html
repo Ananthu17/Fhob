@@ -95,7 +95,7 @@
                                 PROJECTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Start a Project</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
                                 <a class="dropdown-item" href="#">Scenes</a>
                                 <a class="dropdown-item" href="#">Shorts</a>
                                 <a class="dropdown-item" href="#">Pilots/Features</a>
@@ -340,6 +340,7 @@
 
     </script>
 {% block extrajs %}
+<script src="{% static 'js/base_nav.js' %}"></script>
 {% endblock %}
 </body>
 </html>
