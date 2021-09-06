@@ -183,6 +183,14 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user fully completed the registration.'),
     )
+    beta_user = models.BooleanField(
+        _('Beta User'),
+        default=False,
+        help_text=_(
+            'Designates whether the user started as a beta user.'),
+    )
+    beta_user_end = models.DateTimeField(_('Beta User End Date and Time'),
+                                         null=True, blank=True)
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
     # company_address = models.TextField(_("Address"), null=True, blank=True)

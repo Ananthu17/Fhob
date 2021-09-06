@@ -92,6 +92,7 @@ $('#check-code').click(function(event){
     .then((response) => {
 
     if (response.status == 200){
+            localStorage.setItem('beta-code', response.data.code);
             $("#membershipModalForm").hide()
             $("#membershipModalBody").append($('#success-alert-box').html());
         }

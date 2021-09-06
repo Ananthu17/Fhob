@@ -4422,7 +4422,8 @@ class CheckBetaTesterCode(APIView):
             if testercode_instance:
                 return Response(
                     {"status": "success",
-                     "message": "beta tester code exists"})
+                     "message": "beta tester code exists",
+                     "code": unique_id})
         except ObjectDoesNotExist:
             return Response(
                 {"status": "beta tester code does not exist"},
