@@ -2,7 +2,18 @@ import ast
 import io
 import json
 import requests
+import boto3
+import datetime
+from django.utils import timezone
+import mammoth
+import fitz
+import PyPDF2
+import PIL
 
+from fpdf import FPDF
+from django.core import files
+from io import BytesIO
+from pdf2image import convert_from_path
 
 from braces.views import JSONResponseMixin
 from reportlab.lib.units import cm
@@ -33,19 +44,25 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (UpdateAPIView,
                                      get_object_or_404)
 
-from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
+     UserRating, JobType, UserRatingCombined, UserNotification, Project, \
+     VideoRatingCombined
+
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Sides, ProjectTracking, ProjectRating
+    Character, Comment, SceneImages, Sides, ProjectTracking, ProjectRating
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
-      ProjectLastDateSerializer, \
+      ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
-      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer
+      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
+      CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
+      SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
+      CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
+      SidesPDFSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify
-from .forms import VideoSubmissionLastDateForm, AddSidesForm
+from .forms import VideoSubmissionLastDateForm
 
 
 class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
@@ -69,14 +86,6 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
 
         project_members_rating = ProjectMemberRating.objects.filter(
                                  project=project_id)
-        # for obj in project_members_rating:
-        #     team_objs = obj.user.team_user.all()
-        #     key_obj = team_objs.filter(
-        #             Q(project=obj.project) &
-        #             Q(job_type=obj.job_type)
-        #         ).first()
-        #     key = key_obj.id
-        #     rating_dict[key] = obj.rating*20
 
         for obj in team_members:
             rating_dict[obj] = 0
@@ -89,6 +98,9 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
                 rating_dict[obj.id] = project_members_rating.rating*20
             except ProjectMemberRating.DoesNotExist:
                 rating_dict[obj.id] = 0
+
+        comments = Comment.objects.filter(project=project).order_by('-created_time')
+        context['comments'] = comments
 
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
@@ -202,12 +214,22 @@ class RateUserSkillsAPI(APIView):
                     rating_sum = aggregate_rating['rating__sum']
                     new_rating = rating_sum/count
                     user_rating_combined.rating = new_rating
+                    user_rating_combined.no_of_votes = count
+                    user_rating_combined.no_of_projects = Team.objects.filter(
+                                                        Q(user=user) &
+                                                        Q(job_type=job_type)
+                                                        ).count()
                     user_rating_combined.save()
                 except UserRatingCombined.DoesNotExist:
                     user_rating_combined = UserRatingCombined()
                     user_rating_combined.user = user
                     user_rating_combined.job_type = job_type
                     user_rating_combined.rating = rating
+                    user_rating_combined.no_of_votes = 1
+                    user_rating_combined.no_of_projects = Team.objects.filter(
+                                                        Q(user=user) &
+                                                        Q(job_type=job_type)
+                                                        ).count()
                     user_rating_combined.save()
 
                 # update combined project member rating
@@ -268,6 +290,24 @@ class RateUserSkillsAPI(APIView):
                 notify(room_name, notification_msg)
                 # end notification section
 
+                #update notification table - video rating
+                notification = UserNotification()
+                notification.user = project.creator
+                notification.project = project
+                notification.notification_type = UserNotification.VIDEO_RATING
+                notification.message = project.title+" video rating reached "+str(round(new_rating,2))+"/5"
+                notification.save()
+                # send notification - video rating
+                room_name = "user_"+str(project.creator.id)
+                notification_msg = {
+                        'type': 'send_video_rating_notification',
+                        'message': str(notification.message),
+                        'from': 'FilmHobo',
+                        "event": "VIDEO_RATING"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
                 response = {'message': "%s rated sucessfully"%(
                             project_member_obj.user.get_full_name()),
                             'status': status.HTTP_200_OK,
@@ -299,6 +339,57 @@ class GetMembershipChangeNotificationAjaxView(View, JSONResponseMixin):
         notification_html = render_to_string(
                                 'project/membership_change_notification.html',
                                 {'message': message})
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetAuditionStatusNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.AUDITION_STATUS)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetVideoRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.VIDEO_RATING)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetProjectRatingNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/audition_status_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.PROJECT_RATING)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/audition_status_notification.html',
+                                {'notification': notification
+                                })
         context['notification_html'] = notification_html
         return self.render_json_response(context)
 
@@ -335,7 +426,6 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
             except Team.DoesNotExist:
                 project_creator = ""
             context['project_creator_rating'] = project_creator_rating
-
 
         characters = Character.objects.filter(project=project)
         context['characters'] = characters
@@ -601,7 +691,7 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             context['last_date_form'] = last_date_form
             sides = Sides.objects.filter(project=project)
             for obj in sides:
-                sites_dict[obj.character.id] = "Scene 1: "+obj.scene_1+"Scene 2: "+obj.scene_2+"Scene 3: "+obj.scene_3
+                sites_dict[obj.character.id] = obj.scenes_combined
             context['sites_dict'] = sites_dict
         except Project.DoesNotExist:
             context["message"] = "Project not found !!"
@@ -727,6 +817,35 @@ class SidesCreateAPIView(APIView):
                 sides_obj.scene_3 = data_dict['scene_3']
                 sides_obj.save()
 
+            if sides_obj.scene_1:
+                sides_obj.scene_1_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_1)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            if sides_obj.scene_2:
+                sides_obj.scene_2_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_2)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            if sides_obj.scene_3:
+                sides_obj.scene_3_pdf=None
+                scene_img_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=SceneImages.SCENE_3)
+                                )
+                for img_obj in scene_img_objs:
+                    img_obj.delete()
+            sides_obj.save()
+
             response = {'message': "Scenes added",
                         'status': status.HTTP_200_OK}
         else:
@@ -747,15 +866,21 @@ class AddSidesView(LoginRequiredMixin, TemplateView):
         character_id = self.request.GET.get('character_id')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
-        character = get_object_or_404(Character, pk=character_id)
-        context['character'] = character
         try:
-            sides = Sides.objects.get(
-                        Q(project=project) &
-                        Q(character=character)
+            character = Character.objects.get(
+                            Q(project=project) &
+                            Q(id=character_id)
                         )
-            context['sides'] = sides
-        except Sides.DoesNotExist:
+            context['character'] = character
+            try:
+                sides = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                context['sides'] = sides
+            except Sides.DoesNotExist:
+                pass
+        except Character.DoesNotExist:
             pass
         return context
 
@@ -873,6 +998,15 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
         audition_obj.save()
+        # update user-project-table
+        user_project_obj = UserProject()
+        user_project_obj.user = self.request.user
+        user_project_obj.project = project
+        user_project_obj.relation_type = UserProject.APPLIED
+        user_project_obj.audition = audition_obj
+        user_project_obj.character = character
+        user_project_obj.save()
+        # end
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -976,6 +1110,17 @@ class SubmitAuditionAPI(APIView):
             if video_type == 'facebook':
                 audition_obj.video_url = url
             audition_obj.save()
+
+            # update user-project-table
+            user_project_obj = UserProject()
+            user_project_obj.user = self.request.user
+            user_project_obj.project = project
+            user_project_obj.relation_type = UserProject.APPLIED
+            user_project_obj.audition = audition_obj
+            user_project_obj.character = character
+            user_project_obj.save()
+            # end
+
             response = {'message': "Audition Submitted",
                         'status': status.HTTP_200_OK}
         else:
@@ -999,7 +1144,7 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         casting_director_rating = 0
         project_id = self.kwargs.get('id')
         project = get_object_or_404(Project, pk=project_id)
-        characters = Character.objects.filter(project=project)
+        characters = Character.objects.filter(project=project).order_by('created_time')
         audition_list = Audition.objects.filter(project=project)
         casting_director_job = JobType.objects.filter(
                                slug='casting-director'
@@ -1067,8 +1212,8 @@ class AuditionListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class EditSidesView(LoginRequiredMixin, TemplateView):
-    template_name = 'project/edit-sides.html'
+class AddSceneImagesView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/add-scene-images.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
@@ -1076,53 +1221,165 @@ class EditSidesView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         project_id = self.kwargs.get('id')
         character_id = self.request.GET.get('character_id')
+        scene = self.request.GET.get('scene')
         project = get_object_or_404(Project, pk=project_id)
         context['project'] = project
-        character = get_object_or_404(Character, pk=character_id)
-        context['character'] = character
         try:
-            sides = Sides.objects.get(
-                        Q(project=project) &
-                        Q(character=character)
+            character = Character.objects.get(
+                            Q(project=project) &
+                            Q(id=character_id)
                         )
-            context['sides'] = sides
-            context['form'] = AddSidesForm(instance=sides)
-        except Sides.DoesNotExist:
-            context['form'] = AddSidesForm()
+            context['character'] = character
+
+            scene = 'scene_'+scene
+            scene_image_objs = SceneImages.objects.filter(
+                                Q(project=project) &
+                                Q(character=character) &
+                                Q(scene=scene)
+                            ).order_by('created_time')
+            context['scene_image_objs'] = scene_image_objs
+        except Character.DoesNotExist:
+            pass
         return context
 
     def post(self, request, *args, **kwargs):
-        user = self.request.user
-        data_dict = {}
-        json_response = json.dumps(request.POST)
-        data_dict = ast.literal_eval(json_response)
-        project_id = self.kwargs.get('id')
+        scene = self.request.POST.get('scene')
+        project_id = self.request.POST.get('project_id')
         character_id = self.request.POST.get('character_id')
-        data_dict['project'] = project_id
-        data_dict['character'] = character_id
-        key = Token.objects.get(user=user).key
-        token = 'Token '+key
-        user_response = requests.post(
-                    'http://127.0.0.1:8000/project/add-sides-api/',
-                    data=json.dumps(data_dict),
-                    headers={'Content-type': 'application/json',
-                             'Authorization': token})
-        byte_str = user_response.content
-        dict_str = byte_str.decode("UTF-8")
-        response = ast.literal_eval(dict_str)
-        response = dict(response)
-        if 'status' in response:
-            if response['status'] != 200:
-                if 'errors' in response:
-                    errors = response['errors']
-                    print(errors)
-                    messages.warning(
-                        self.request, "Failed to update scenes !!")
-                    return HttpResponseRedirect(
-                        request.META.get('HTTP_REFERER', '/'))
-        messages.success(self.request, "Sides updated successfully")
-        url = "/project/add-sides/"+str(project_id)+"/?character_id="+str(character_id)
-        return HttpResponseRedirect(url)
+        scene_image_obj = SceneImages()
+        scene_image_obj.project = get_object_or_404(
+                                  Project, pk = project_id)
+        scene_image_obj.character = get_object_or_404(
+                                    Character, pk = character_id)
+        if scene == '1':
+            scene_image_obj.scene = SceneImages.SCENE_1
+        if scene == '2':
+            scene_image_obj.scene = SceneImages.SCENE_2
+        if scene == '3':
+            scene_image_obj.scene = SceneImages.SCENE_3
+        # scene_image_obj.image = 'media/script/project_6.jpg'
+        url = "http://localhost:8000/media/script/project_"+project_id+".jpg"
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            pass
+
+        fp = BytesIO()
+        fp.write(resp.content)
+        file_name = url.split("/")[-1]
+        scene_image_obj.image.save(file_name, files.File(fp))
+        scene_image_obj.save()
+
+        x = float(self.request.POST.get('x'))
+        y = float(self.request.POST.get('y'))
+        w = float(self.request.POST.get('width'))
+        h = float(self.request.POST.get('height'))
+
+        image = PIL.Image.open(scene_image_obj.image)
+        cropped_image = image.crop((x, y, w+x, h+y))
+        # resized_image = cropped_image.resize((200, 200), PIL.Image.ANTIALIAS)
+        cropped_image.save(scene_image_obj.image.path)
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class GenerateSceneImagePDFAPI(APIView):
+    serializer_class = SceneImagesSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+
+            project_id = data_dict['project_id']
+            character_id = data_dict['character_id']
+            scene = data_dict['scene']
+
+            project = get_object_or_404(Project, pk=project_id)
+            character = get_object_or_404(Character, pk=character_id)
+
+            scene_image_objs = SceneImages.objects.filter(
+                            Q(project=project) &
+                            Q(character=character) &
+                            Q(scene=scene)
+                        ).order_by('created_time')
+
+            pdf = FPDF()
+            for img_obj in scene_image_objs:
+                img_path = str(img_obj.image.url)[1:]
+                cover = PIL.Image.open(img_path)
+                width, height = cover.size
+                # convert pixel in mm with 1px=0.264583 mm
+                width, height = float(width * 0.264583), float(height * 0.264583)
+                # given we are working with A4 format size
+                pdf_size = {'P': {'w': 210, 'h': 297}, 'L': {'w': 297, 'h': 210}}
+                # get page orientation from image size
+                orientation = 'P' if width < height else 'L'
+                #  make sure image size is not greater than the pdf format size
+                width = width if width < pdf_size[orientation]['w'] else pdf_size[orientation]['w']
+                height = height if height < pdf_size[orientation]['h'] else pdf_size[orientation]['h']
+                pdf.add_page(orientation=orientation)
+                pdf.image(img_path, 0, 0, width, height)
+
+            output_path = "media/scene/"+scene+str(project_id)+str(character_id)+".pdf"
+            pdf.output(output_path, "F")
+
+            # Save PDF to db
+            url = "http://localhost:8000/"+output_path
+            resp = requests.get(url)
+            if resp.status_code != requests.codes.ok:
+                pass
+            fp = BytesIO()
+            fp.write(resp.content)
+            file_name = url
+
+            try:
+                sides_obj = Sides.objects.get(
+                            Q(project=project) &
+                            Q(character=character)
+                            )
+                if scene == 'scene_1':
+                    sides_obj.scene_1 = ""
+                    sides_obj.scene_1_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 1 updated"
+                if scene == 'scene_2':
+                    sides_obj.scene_2 = ""
+                    sides_obj.scene_2_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 2 updated"
+                if scene == 'scene_3':
+                    sides_obj.scene_3 = ""
+                    sides_obj.scene_3_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 3 updated"
+                sides_obj.save()
+            except Sides.DoesNotExist:
+                sides_obj = Sides()
+                sides_obj.project = project
+                sides_obj.character = character
+                if scene == 'scene_1':
+                    sides_obj.scene_1 = ""
+                    sides_obj.scene_1_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 1 updated"
+                if scene == 'scene_2':
+                    sides_obj.scene_2 = ""
+                    sides_obj.scene_2_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 2 updated"
+                if scene == 'scene_3':
+                    sides_obj.scene_3 = ""
+                    sides_obj.scene_3_pdf.save(file_name, files.File(fp))
+                    msg = "Scene 3 updated"
+                sides_obj.save()
+
+            generate_combined_pdf(sides_obj)
+            messages.success(self.request, msg)
+            response = {'message': "Scene Pdf uploaded",
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
 
 
 class ScriptPasswordCheckAPI(APIView):
@@ -1551,11 +1808,100 @@ class UpdateAuditionStatusAPI(APIView):
             audition_status = data_dict['status']
             try:
                 audition = Audition.objects.get(pk=audition_id)
-                audition.status = audition_status
+                audition.audition_status = audition_status
+                audition.status_update_date = timezone.now()
                 audition.save()
                 response = {'message': "Audition status updated",
                             'status': status.HTTP_200_OK}
-                messages.success(self.request, "Audition status updated.")
+
+                if audition_status == 'attached':
+                    character_obj = get_object_or_404(
+                                    Character, pk=audition.character.id)
+                    character_obj.attached_user = audition.user
+                    character_obj.attached_user_name = audition.user.get_full_name()
+                    character_obj.save()
+
+                    # add to user-project table
+                    try:
+                        user_project_obj = UserProject.objects.get(
+                                            Q(user=audition.user) &
+                                            Q(project=audition.project) &
+                                            Q(character=audition.character) &
+                                            Q(relation_type=UserProject.ATTACHED)
+                                            )
+                    except UserProject.DoesNotExist:
+                        user_project_obj = UserProject()
+                        user_project_obj.user = audition.user
+                        user_project_obj.project = audition.project
+                        user_project_obj.character = audition.character
+                        user_project_obj.relation_type = UserProject.ATTACHED
+                        user_project_obj.save()
+                    # end
+
+                    # add to team
+                    team_obj = Team()
+                    team_obj.user = audition.user
+                    team_obj.project = audition.project
+                    team_obj.job_type = JobType.objects.get(slug='actoractress')
+                    team_obj.save()
+                    # end
+
+                    # All other audition's status changed to passed
+                    all_auditions = Audition.objects.filter(
+                                    Q(character=character_obj) &
+                                    ~Q(audition_status=Audition.PASSED)
+                                    ).exclude(pk=audition.id)
+                    for obj in all_auditions:
+                        obj.audition_status = Audition.PASSED
+                        obj.status_update_date = timezone.now()
+                        obj.save()
+                        #update notification table- for removed user
+                        notification = UserNotification()
+                        notification.user = obj.user
+                        notification.project = character_obj.project
+                        notification.notification_type = UserNotification.AUDITION_STATUS
+                        notification.message = "Sorry!! Your audition for "+character_obj.project.title+" has been passed."
+                        notification.save()
+                        # send notification- for removed user
+                        room_name = "user_"+str(obj.user.id)
+                        notification_msg = {
+                                'type': 'send_audition_status_notification',
+                                'message': str(notification.message),
+                                'from': character_obj.project.title,
+                                "event": "AUDITION_STATUS"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+                    # end
+
+                    msg = "Attached "+audition.name+" to "+audition.project.title
+                else:
+                    msg = "Audition status updated to "+audition.get_status_display()
+
+                #update notification table
+                notification = UserNotification()
+                notification.user = audition.user
+                notification.project = audition.project
+                notification.notification_type = UserNotification.AUDITION_STATUS
+                if audition.audition_status == 'attached':
+                    notification.message = "Congratulations!! You have been attached to project "+audition.project.title
+                elif audition.audition_status == 'callback':
+                    notification.message = "Your audition for "+audition.project.title+" has been sent to chemistry room."
+                elif audition.audition_status == 'passed':
+                    notification.message = "Sorry!! Your audition for "+audition.project.title+" has been passed."
+                notification.save()
+                # send notification
+                room_name = "user_"+str(audition.user.id)
+                notification_msg = {
+                        'type': 'send_audition_status_notification',
+                        'message': str(notification.message),
+                        'from': audition.project.title,
+                        "event": "AUDITION_STATUS"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
+                messages.success(self.request, msg)
             except Audition.DoesNotExist:
                 response = {'errors': "Invalid Audition ID", 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -1579,10 +1925,11 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
         project = get_object_or_404(Project, pk=project_id)
         audition_list = Audition.objects.filter(
                         Q(project=project) &
-                        Q(status=Audition.CALLBACK)
+                        Q(audition_status=Audition.CALLBACK)
                         )
         audition_dict = {}
 
+        context['all_audition'] = audition_list
         for audition in audition_list:
             if audition.character in audition_dict:
                 audition_dict[audition.character].append(audition)
@@ -1651,6 +1998,26 @@ class ProjectRatingAPI(APIView):
             project.rating = combined_rating*20
             project.save()
 
+            #update notification table - video rating
+            notification = UserNotification()
+            notification.user = project.creator
+            notification.from_user = user
+            notification.project = project
+            notification.rating = rating
+            notification.notification_type = UserNotification.PROJECT_RATING
+            notification.message = user.get_full_name()+" rated your project "+project.title+" as "+str(rating)+" stars"
+            notification.save()
+            # send notification - video rating
+            room_name = "user_"+str(project.creator.id)
+            notification_msg = {
+                    'type': 'send_project_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(user.id),
+                    "event": "PROJECT_RATING"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
+
             msg = "Rated  "+project.title +" by "+str(rating_obj.rating)+" stars."
             messages.success(self.request, msg)
             response = {'message': "Rating success",
@@ -1661,3 +2028,1125 @@ class ProjectRatingAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class CastAttachRemoveView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/cast-attach-remove.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        characters = Character.objects.filter(project=project).order_by('created_time')
+        context['project'] = project
+        context['characters'] = characters
+
+        try:
+            actoractress = JobType.objects.get(slug='actoractress')
+        except JobType.DoesNotExist:
+            actoractress = ""
+
+        rating_dict = {}
+        for character in characters:
+            if character.attached_user:
+                try:
+                    rating_obj = UserRatingCombined.objects.get(
+                                    Q(user=character.attached_user) &
+                                    Q(job_type=actoractress)
+                                )
+                    rating_dict[character.attached_user.id] = (rating_obj.rating)*20
+                except UserRatingCombined.DoesNotExist:
+                    rating_dict[character.attached_user.id] = 0
+        context['rating_dict'] = rating_dict
+        users = CustomUser.objects.all()
+        context['users'] = users
+        return context
+
+
+class RemoveAttachedCastAPI(APIView):
+    serializer_class = RemoveCastSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        old_user = None
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character']
+            try:
+                character = Character.objects.get(id=character_id)
+                if character.attached_user or character.attached_user_name:
+                    if character.attached_user:
+                        old_user = character.attached_user
+                        msg = "Removed "+character.attached_user.get_full_name()
+                    elif character.attached_user_name:
+                        msg = "Removed "+character.attached_user_name
+                    character.attached_user = None
+                    character.attached_user_name = None
+                    character.save()
+                    response = {'message': msg,
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, msg)
+
+                    if old_user:
+                        audition_obj = Audition.objects.filter(
+                                       Q(character=character) &
+                                       Q(user=old_user)
+                                        ).first()
+                        if audition_obj:
+                            audition_obj.audition_status = Audition.PASSED
+                            audition_obj.status_update_date = timezone.now()
+                            audition_obj.save()
+
+                        # add to user-project table
+                        try:
+                            user_project_obj = UserProject.objects.get(
+                                                Q(user=old_user) &
+                                                Q(project=character.project) &
+                                                Q(character=character) &
+                                                Q(relation_type=UserProject.ATTACHED)
+                                                )
+                            user_project_obj.delete()
+                        except UserProject.DoesNotExist:
+                            pass
+                        # end
+
+                        # remove from team
+                        try:
+                            actor_actress = JobType.objects.get(slug='actoractress')
+                            character_objs = Character.objects.filter(
+                                                Q(attached_user = old_user) &
+                                                Q(project = character.project)
+                                            )
+                            # if old_user is not attached to any other character in the same film
+                            # then remove from team
+                            if not character_objs:
+                                team_obj = Team.objects.filter(
+                                            Q(user = old_user) &
+                                            Q(project = character.project) &
+                                            Q(job_type = actor_actress))
+                                team_obj.delete()
+
+                                # remove job type
+                                team_objs = Team.objects.filter(
+                                            Q(user=old_user) &
+                                            Q(job_type = actor_actress)
+                                            )
+                                # if this user is not part of any team as actor/actress
+                                # then remove 'actor/actress' from his job type
+                                if not team_objs:
+                                    try:
+                                        old_user_profile = UserProfile.objects.get(user=old_user)
+                                        old_user_profile.job_types.remove(actor_actress)
+                                        old_user_profile.save()
+                                    except UserProfile.DoesNotExist:
+                                        pass
+                                # end
+                        except JobType.DoesNotExist:
+                            pass
+                        # end
+
+
+                        #update notification table- for removed user
+                        notification = UserNotification()
+                        notification.user = old_user
+                        notification.project = character.project
+                        notification.notification_type = UserNotification.AUDITION_STATUS
+                        notification.message = "Sorry!! You have been removed from project "+character.project.title
+                        notification.save()
+                        # send notification- for removed user
+                        room_name = "user_"+str(old_user.id)
+                        notification_msg = {
+                                'type': 'send_audition_status_notification',
+                                'message': str(notification.message),
+                                'from': character.project.title,
+                                "event": "AUDITION_STATUS"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+                else:
+                    response = {'message': "No users attached",
+                                'status': status.HTTP_200_OK}
+            except Character.DoesNotExist:
+                response = {'errors': "Invalid ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ReplaceAttachedCastAPI(APIView):
+    serializer_class = ReplaceCastSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            user_id = None
+            old_user = None
+            name = ""
+            data_dict = serializer.data
+            character_id = data_dict['character']
+            if 'user' in data_dict:
+                user_id = data_dict['user']
+            if 'name' in data_dict:
+                name = data_dict['name']
+            try:
+                character = Character.objects.get(id=character_id)
+                all_auditions = Audition.objects.filter(
+                                Q(character=character) &
+                                ~Q(audition_status=Audition.PASSED)
+                                )
+                if user_id:
+                    try:
+                        user = CustomUser.objects.get(id=user_id)
+                        attached_user_audition = Audition.objects.filter(
+                                                    Q(character=character) &
+                                                    Q(user=user)).first()
+
+                        if attached_user_audition:
+                            if character.attached_user:
+                                old_user = character.attached_user
+                            character.attached_user = user
+                            character.attached_user_name = user.get_full_name()
+                            character.save()
+                            response = {'message': "Replaced user",
+                                        'status': status.HTTP_200_OK}
+                            msg = "Attached "+user.get_full_name()+" to character-"+character.name
+                            messages.success(self.request, msg)
+
+                            attached_user_audition.audition_status = Audition.ATTACHED
+                            attached_user_audition.status_update_date = timezone.now()
+                            attached_user_audition.save()
+
+                            # add to user-project table
+                            try:
+                                user_project_obj = UserProject.objects.get(
+                                                        Q(user=attached_user_audition.user) &
+                                                        Q(project=attached_user_audition.project) &
+                                                        Q(character=attached_user_audition.character) &
+                                                        Q(relation_type=UserProject.ATTACHED)
+                                                    )
+                            except UserProject.DoesNotExist:
+                                user_project_obj = UserProject()
+                                user_project_obj.user = attached_user_audition.user
+                                user_project_obj.project = attached_user_audition.project
+                                user_project_obj.character = attached_user_audition.character
+                                user_project_obj.relation_type = UserProject.ATTACHED
+                                user_project_obj.save()
+                            # end
+
+                            # add to team
+                            team_obj = Team()
+                            team_obj.user = attached_user_audition.user
+                            team_obj.project = attached_user_audition.project
+                            team_obj.job_type = JobType.objects.get(slug='actoractress')
+                            team_obj.save()
+                            # end
+
+                            all_auditions = all_auditions.exclude(
+                                            pk=attached_user_audition.id)
+
+
+                            if old_user:
+                                #update notification table- for removed user
+                                notification = UserNotification()
+                                notification.user = old_user
+                                notification.project = character.project
+                                notification.notification_type = UserNotification.AUDITION_STATUS
+                                notification.message = "Sorry!! You have been removed from project "+character.project.title
+                                notification.save()
+                                # send notification- for removed user
+                                room_name = "user_"+str(old_user.id)
+                                notification_msg = {
+                                        'type': 'send_audition_status_notification',
+                                        'message': str(notification.message),
+                                        'from': character.project.title,
+                                        "event": "AUDITION_STATUS"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+
+                            #update notification table
+                            notification = UserNotification()
+                            notification.user = user
+                            notification.project = character.project
+                            notification.notification_type = UserNotification.AUDITION_STATUS
+                            notification.message = "Congratulations!! You have been attached to project "+character.project.title
+                            notification.save()
+                            # send notification
+                            room_name = "user_"+str(character.attached_user.id)
+                            notification_msg = {
+                                    'type': 'send_audition_status_notification',
+                                    'message': str(notification.message),
+                                    'from': character.project.title,
+                                    "event": "AUDITION_STATUS"
+                                }
+                            notify(room_name, notification_msg)
+                            # end notification section
+                        else:
+                            if character.attached_user:
+                                old_user = character.attached_user
+                            character.requested_user = user
+                            character.attached_user = None
+                            character.attached_user_name = ""
+                            character.save()
+
+                            #update notification table
+                            notification = UserNotification()
+                            notification.user = user
+                            notification.project = character.project
+                            notification.character = character
+                            notification.notification_type = UserNotification.CAST_ATTACH_REQUEST
+                            notification.message = str(character.project.creator)+" wants to attach you to character <b>"+str(character.name)+"</b> to his project <b>"+str(character.project.title)+"</b>"
+                            notification.save()
+                            # send attach request notification
+                            room_name = "user_"+str(character.requested_user.id)
+                            notification_msg = {
+                                    'type': 'send_cast_attach_request_notification',
+                                    'message': str(notification.message),
+                                    'from': character.project.creator,
+                                    "event": "CAST_ATTACH_REQUEST"
+                                }
+                            notify(room_name, notification_msg)
+                            # end notification section
+
+                            response = {'message': "Request Sent",
+                                        'status': status.HTTP_200_OK}
+                            msg = "Request sent to "+user.get_full_name()
+                            messages.success(self.request, msg)
+
+                            if old_user:
+                                #update notification table- for removed user
+                                notification = UserNotification()
+                                notification.user = old_user
+                                notification.project = character.project
+                                notification.notification_type = UserNotification.AUDITION_STATUS
+                                notification.message = "Sorry!! You have been removed from project "+character.project.title
+                                notification.save()
+                                # send notification- for removed user
+                                room_name = "user_"+str(old_user.id)
+                                notification_msg = {
+                                        'type': 'send_audition_status_notification',
+                                        'message': str(notification.message),
+                                        'from': character.project.title,
+                                        "event": "AUDITION_STATUS"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+
+                    except CustomUser.DoesNotExist:
+                        response = {'errors': "Invalid user id", 'status':
+                                    status.HTTP_400_BAD_REQUEST}
+                if name:
+                    character.attached_user = None
+                    character.attached_user_name = name
+                    character.save()
+                    response = {'message': "Replaced user",
+                                'status': status.HTTP_200_OK}
+                    msg = "Attached "+name+" to character-"+character.name
+                    messages.success(self.request, msg)
+
+                # All other audition's status changed to passed
+                for obj in all_auditions:
+                    obj.audition_status = Audition.PASSED
+                    obj.status_update_date = timezone.now()
+                    obj.save()
+                    #update notification table- for removed user
+                    notification = UserNotification()
+                    notification.user = obj.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.AUDITION_STATUS
+                    notification.message = "Sorry!! Your audition for "+character.project.title+" has been passed."
+                    notification.save()
+                    # send notification- for removed user
+                    room_name = "user_"+str(obj.user.id)
+                    notification_msg = {
+                            'type': 'send_audition_status_notification',
+                            'message': str(notification.message),
+                            'from': character.project.title,
+                            "event": "AUDITION_STATUS"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+
+            except Character.DoesNotExist:
+                response = {'errors': "Invalid ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CommentAPI(APIView):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print("data_dict", data_dict)
+            try:
+                project = Project.objects.get(id=data_dict['project'])
+                if 'reply_to' in data_dict:
+                    try:
+                        reply_to = Comment.objects.get(pk=data_dict['reply_to'])
+                        comment_obj = Comment()
+                        comment_obj.user = self.request.user
+                        comment_obj.comment_txt = data_dict['comment_txt']
+                        comment_obj.project = project
+                        comment_obj.reply_to = reply_to
+                        comment_obj.save()
+                        response = {'message': "Comment posted",
+                                    'id':comment_obj.id,
+                                    'status': status.HTTP_200_OK}
+
+                        # send mention notifications
+                        if 'mentioned_users' in data_dict:
+                            user_list = json.loads(data_dict['mentioned_users'])
+                            for user_id in user_list:
+                                try:
+                                    user_obj  = CustomUser.objects.get(pk=user_id)
+                                    #update notification table
+                                    notification = UserNotification()
+                                    notification.user = user_obj
+                                    notification.notification_type = UserNotification.COMMENTS_MENTION
+                                    notification.from_user = self.request.user
+                                    notification.project = project
+                                    notification.message = self.request.user.get_full_name()+" mentioned you in "+project.title+"'s post."
+                                    notification.save()
+                                    # send notification
+                                    room_name = "user_"+str(user_obj.id)
+                                    notification_msg = {
+                                            'type': 'send_comments_mention_notification',
+                                            'message': str(notification.message),
+                                            'from': str(self.request.user.id),
+                                            "event": "COMMENTS_MENTION"
+                                        }
+                                    notify(room_name, notification_msg)
+                                    # end notification section
+                                except CustomUser.DoesNotExist:
+                                    pass
+
+
+                        #send reply notification
+                        #update notification table
+                        notification = UserNotification()
+                        notification.user = reply_to.user
+                        notification.notification_type = UserNotification.COMMENTS_REPLY
+                        notification.from_user = self.request.user
+                        notification.project = project
+                        notification.message = self.request.user.get_full_name()+" replied to your comment on your project "+project.title+"'s video."
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(reply_to.user.id)
+                        notification_msg = {
+                                'type': 'send_comments_reply_notification',
+                                'message': str(notification.message),
+                                'from': str(self.request.user.id),
+                                "event": "COMMENTS_REPLY"
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
+
+                        messages.success(self.request, "Reply posted.")
+
+                    except Comment.DoesNotExist:
+                        response = {'errors': 'Invalid reply_to field', 'status':
+                                     status.HTTP_400_BAD_REQUEST}
+                else:
+                    comment_obj = Comment()
+                    comment_obj.user = self.request.user
+                    comment_obj.comment_txt = data_dict['comment_txt']
+                    comment_obj.project = project
+                    comment_obj.reply_to = None
+                    comment_obj.save()
+                    if 'mentioned_users' in data_dict:
+                        user_list = json.loads(data_dict['mentioned_users'])
+                        for user_id in user_list:
+                            try:
+                                user_obj  = CustomUser.objects.get(pk=user_id)
+                                #update notification table
+                                notification = UserNotification()
+                                notification.user = user_obj
+                                notification.notification_type = UserNotification.COMMENTS_MENTION
+                                notification.from_user = self.request.user
+                                notification.project = project
+                                notification.message = self.request.user.get_full_name()+" mentioned you in "+project.title+"'s post."
+                                notification.save()
+                                # send notification
+                                room_name = "user_"+str(user_obj.id)
+                                notification_msg = {
+                                        'type': 'send_comments_mention_notification',
+                                        'message': str(notification.message),
+                                        'from': str(self.request.user.id),
+                                        "event": "COMMENTS_MENTION"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+                            except CustomUser.DoesNotExist:
+                                pass
+                    response = {'message': "Comment posted",
+                                'id':comment_obj.id,
+                                'status': status.HTTP_200_OK}
+                    messages.success(self.request, "Comment posted.")
+
+                #send comment notification to project creator
+                if self.request.user != project.creator:
+                    #update notification table
+                    notification = UserNotification()
+                    notification.user = project.creator
+                    notification.notification_type = UserNotification.COMMENTS
+                    notification.from_user = self.request.user
+                    notification.project = project
+                    notification.message = self.request.user.get_full_name()+" commented on your project "+project.title+"'s video."
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(project.creator.id)
+                    notification_msg = {
+                            'type': 'send_comments_notification',
+                            'message': str(notification.message),
+                            'from': str(self.request.user.id),
+                            "event": "COMMENTS"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeleteCommentAPI(APIView):
+    serializer_class = DeleteCommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['comment_id']
+            try:
+                comment_obj = Comment.objects.get(pk=id)
+                comment_obj.delete()
+                response = {'message': "Comment deleted",
+                            'status': status.HTTP_200_OK}
+            except Comment.DoesNotExist:
+                response = {'errors': "Invalid id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeleteSceneImageAPI(APIView):
+    serializer_class = SceneImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            try:
+                scene_image_obj = SceneImages.objects.get(pk=id)
+                scene_image_obj.delete()
+                response = {'message': "Scene Image deleted",
+                            'status': status.HTTP_200_OK}
+            except SceneImages.DoesNotExist:
+                response = {'errors': "Invalid id", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class GetCommentsMentionNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS_MENTION)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCommentsNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCommentsReplyNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/comment_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.COMMENTS_REPLY)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/comment_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class PdfToImageAPI(APIView):
+    serializer_class = PdfToImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            path = data_dict['path']
+            project_id = data_dict['project_id']
+            page_no = int(data_dict['page_no'])
+            if page_no>0:
+                page_no = page_no-1
+            print("page_no: ", page_no)
+            pdffile = path
+            doc = fitz.open(path)
+            page = doc.loadPage(page_no)  # number of page
+
+            zoom = 2    # zoom factor
+            mat = fitz.Matrix(zoom, zoom)
+            pix = page.getPixmap(matrix = mat)
+
+            # pix = page.getPixmap()
+            output = 'media/script/project_{0}.jpg'.format(str(project_id))
+            pix.writePNG(output)
+
+
+            response = {'message': "Image generated",
+                        'image_path': output,
+                        'status': status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CancelCastAttachRequestAPI(APIView):
+    serializer_class = CancelCastRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+
+            try:
+                character = Character.objects.get(pk=character_id)
+                notification_obj =UserNotification.objects.filter(
+                                    Q(user = character.requested_user) &
+                                    Q(character = character) &
+                                    Q(notification_type = UserNotification.CAST_ATTACH_REQUEST)
+                                )
+                notification_obj.delete()
+                character.requested_user = None
+                character.save()
+                if data_dict['type'] == 'decline':
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = character.project.creator
+                    notification.from_user = self.request.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.CAST_ATTACH_RESPONSE
+                    notification.message = self.request.user.get_full_name()+" declined your attach request for character <b>"+character.name+"</b> of the project <b>"+str(character.project.title)+"</b>"
+                    notification.character = character
+                    notification.save()
+                    # send notification to project creator
+                    room_name = "user_"+str(character.project.creator.id)
+                    notification_msg = {
+                            'type': 'send_cast_attach_response_notification',
+                            'message': str(notification.message),
+                            'from': notification.from_user.get_full_name(),
+                            "event": "CAST_ATTACH_RESPONSE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+                response = {'message': "Cast Attach Request Removed",
+                            'character': character.name,
+                            'project': character.project.title,
+                            'status': status.HTTP_200_OK}
+            except Character.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AcceptCastAttachRequestAPI(APIView):
+    serializer_class = CastRequestSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+
+            try:
+                character = Character.objects.get(pk=character_id)
+                if  character.requested_user == self.request.user:
+                    character.attached_user = character.requested_user
+                    character.attached_user_name = character.requested_user.get_full_name()
+                    character.requested_user = None
+                    character.save()
+
+                    # update user project table
+                    user_project_obj = UserProject()
+                    user_project_obj.user = self.request.user
+                    user_project_obj.project = character.project
+                    user_project_obj.character = character
+                    user_project_obj.relation_type = UserProject.ATTACHED
+                    user_project_obj.save()
+                    # end
+
+                    # add to team
+                    team_obj = Team()
+                    team_obj.user = self.request.user
+                    team_obj.project = character.project
+                    team_obj.job_type = JobType.objects.get(slug='actoractress')
+                    team_obj.save()
+                    # end
+
+                    notification_obj = UserNotification.objects.filter(
+                                        Q(user=self.request.user) &
+                                        Q(notification_type=UserNotification.CAST_ATTACH_REQUEST) &
+                                        Q(character=character)
+                                       ).first()
+                    notification_obj.delete()
+
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = character.project.creator
+                    notification.from_user = self.request.user
+                    notification.project = character.project
+                    notification.notification_type = UserNotification.CAST_ATTACH_RESPONSE
+                    notification.message = self.request.user.get_full_name()+" accepted your attach request for character <b>"+character.name+"</b> of the project <b>"+str(character.project.title)+"</b>"
+                    notification.character = character
+                    notification.save()
+                    # send notification to project creator
+                    room_name = "user_"+str(character.project.creator.id)
+                    notification_msg = {
+                            'type': 'send_cast_attach_response_notification',
+                            'message': str(notification.message),
+                            'from': notification.from_user.get_full_name(),
+                            "event": "CAST_ATTACH_RESPONSE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+                    response = {'message': "Cast Attach Request Accepted",
+                                'character': character.name,
+                                'project': character.project.title,
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': 'Invalid user', 'status':
+                                 status.HTTP_400_BAD_REQUEST}
+            except Character.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class TopRatedMembersAjaxView(View, JSONResponseMixin):
+    template_name = 'project/top-rated-members.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user_list = []
+        user_rating_objs = UserRatingCombined.objects.all()
+
+        try:
+            actoractress = JobType.objects.get(slug='actoractress')
+            actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            actoractress_list = []
+
+        try:
+            director = JobType.objects.get(slug='director')
+            director_list = user_rating_objs.filter(job_type=director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            director_list = []
+
+        try:
+            writer = JobType.objects.get(slug='writer')
+            writer_list = user_rating_objs.filter(job_type=writer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            writer_list = []
+
+        try:
+            producer = JobType.objects.get(slug='producer')
+            producer_list = user_rating_objs.filter(job_type=producer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            producer_list = []
+
+        try:
+            dp = JobType.objects.get(slug='director-of-photography')
+            dp_list = user_rating_objs.filter(job_type=dp).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            dp_list = []
+
+        try:
+            costume_designer = JobType.objects.get(slug='costume-designer')
+            costume_designer_list = user_rating_objs.filter(job_type=costume_designer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            costume_designer_list = []
+
+        try:
+            art_director = JobType.objects.get(slug='art-director')
+            art_director_list = user_rating_objs.filter(job_type=art_director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            art_director_list = []
+
+        try:
+            editor = JobType.objects.get(slug='editor')
+            editor_list = user_rating_objs.filter(job_type=editor).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            editor_list = []
+
+        try:
+            casting_director = JobType.objects.get(slug='casting-director')
+            casting_director_list = user_rating_objs.filter(job_type=casting_director).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            casting_director_list = []
+
+        try:
+            make_up_hair_artist = JobType.objects.get(slug='make-uphair-artist')
+            make_up_hair_artist_list = user_rating_objs.filter(job_type=make_up_hair_artist).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            make_up_hair_artist_list = []
+
+        try:
+            sound_designer = JobType.objects.get(slug='sound-designer')
+            sound_designer_list = user_rating_objs.filter(job_type=sound_designer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            sound_designer_list = []
+
+        try:
+            composer = JobType.objects.get(slug='composer')
+            composer_list = user_rating_objs.filter(job_type=composer).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
+        except JobType.DoesNotExist:
+            composer_list = []
+
+
+        top_rated_members_html = render_to_string(
+                                'project/top-rated-members.html',
+                                {
+                                    'actoractress_list': actoractress_list,
+                                    'director_list': director_list,
+                                    'writer_list': writer_list,
+                                    'producer_list': producer_list,
+                                    'dp_list': dp_list,
+                                    'costume_designer_list': costume_designer_list,
+                                    'art_director_list': art_director_list,
+                                    'editor_list': editor_list,
+                                    'casting_director_list': casting_director_list,
+                                    'make_up_hair_artist_list': make_up_hair_artist_list,
+                                    'sound_designer_list': sound_designer_list,
+                                    'composer_list': composer_list,
+                                    'actoractress':actoractress,
+                                    'director':director,
+                                    'writer':writer,
+                                    'producer':producer,
+                                    'dp':dp,
+                                    'costume_designer':costume_designer,
+                                    'art_director':art_director,
+                                    'editor':editor,
+                                    'casting_director':casting_director,
+                                    'make_up_hair_artist':make_up_hair_artist,
+                                    'sound_designer':sound_designer,
+                                    'composer':composer,
+                                 })
+        context['top_rated_members_html'] = top_rated_members_html
+        return self.render_json_response(context)
+
+
+class GetCastAtachRequestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_request_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.CAST_ATTACH_REQUEST)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_request_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetCastAtachResponseNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_response_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.CAST_ATTACH_RESPONSE)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_response_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class AddToFavoritesAPI(APIView):
+    serializer_class = UserProjectSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['project']
+            character_id = data_dict['character']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    character = Character.objects.get(pk=character_id)
+                    try:
+                        user_project_obj = UserProject.objects.get(
+                                                Q(user=user) &
+                                                Q(project=project) &
+                                                Q(character=character) &
+                                                Q(relation_type=UserProject.FAVORITE)
+                                            )
+                        response = {'message': "Already added to favorites!!",
+                                    'status': status.HTTP_200_OK}
+                    except UserProject.DoesNotExist:
+                        user_project_obj = UserProject()
+                        user_project_obj.user = user
+                        user_project_obj.project = project
+                        user_project_obj.character = character
+                        user_project_obj.relation_type = UserProject.FAVORITE
+                        user_project_obj.save()
+                        response = {'message': "Project added to favorites.",
+                                    'status': status.HTTP_200_OK}
+
+                except Character.DoesNotExist:
+                    response = {'errors': 'Invalid Character ID', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid Project ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveFromFavoritesAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            favorites_id = data_dict['id']
+            try:
+                favorite_obj = UserProject.objects.filter(pk=favorites_id)
+                favorite_obj.delete()
+                response = {'message': "Project removed from favorites.",
+                            'status': status.HTTP_200_OK}
+            except UserProject.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveCharacterScenesAPI(APIView):
+    serializer_class = SidesPDFSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            character_id = data_dict['character_id']
+            scene = data_dict['scene']
+            try:
+                sides_obj = Sides.objects.get(character=character_id)
+                if scene == 'scene_1':
+                    sides_obj.scene_1_pdf = None
+                if scene == 'scene_2':
+                    sides_obj.scene_2_pdf = None
+                if scene == 'scene_3':
+                    sides_obj.scene_3_pdf = None
+                sides_obj.save()
+                generate_combined_pdf(sides_obj)
+                response = {'message': "Scene removed",
+                            'status': status.HTTP_200_OK}
+            except Sides.DoesNotExist:
+                response = {'errors': 'Invalid character ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+# generate scene 1,2,3 combined pdf
+def generate_combined_pdf(sides):
+    pdfWriter = PyPDF2.PdfFileWriter()
+    origin_url = settings.ORIGIN_URL
+    if sides.scene_1_pdf:
+        url = "static/pdf/scene_1.pdf"
+        pdf1_cover = open(url, 'rb')
+        pdf1CoverReader = PyPDF2.PdfFileReader(pdf1_cover)
+        pageObj = pdf1CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf1File = open(sides.scene_1_pdf.path, 'rb')
+        pdf1Reader = PyPDF2.PdfFileReader(pdf1File)
+        for pageNum in range(pdf1Reader.numPages):
+            pageObj = pdf1Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_2_pdf:
+        url = "static/pdf/scene_2.pdf"
+        pdf2_cover = open(url, 'rb')
+        pdf2CoverReader = PyPDF2.PdfFileReader(pdf2_cover)
+        pageObj = pdf2CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf2File = open(sides.scene_2_pdf.path, 'rb')
+        pdf2Reader = PyPDF2.PdfFileReader(pdf2File)
+        for pageNum in range(pdf2Reader.numPages):
+            pageObj = pdf2Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_3_pdf:
+        url = "static/pdf/scene_3.pdf"
+        pdf3_cover = open(url, 'rb')
+        pdf3CoverReader = PyPDF2.PdfFileReader(pdf3_cover)
+        pageObj = pdf3CoverReader.getPage(0)
+        pdfWriter.addPage(pageObj)
+
+        pdf3File = open(sides.scene_3_pdf.path, 'rb')
+        pdf3Reader = PyPDF2.PdfFileReader(pdf3File)
+        for pageNum in range(pdf3Reader.numPages):
+            pageObj = pdf3Reader.getPage(pageNum)
+            pdfWriter.addPage(pageObj)
+
+    if sides.scene_1_pdf or sides.scene_2_pdf or sides.scene_3_pdf:
+        output_path = "media/scene/"+"sides_"+str(sides.project.id)+str(sides.character.id)+".pdf"
+        pdfOutputFile = open(output_path, 'wb')
+        pdfWriter.write(pdfOutputFile)
+        # Close all the files - Created as well as opened
+        pdfOutputFile.close()
+        if sides.scene_1_pdf:
+            pdf1File.close()
+        if sides.scene_2_pdf:
+            pdf2File.close()
+        if sides.scene_3_pdf:
+            pdf3File.close()
+
+        origin_url = settings.ORIGIN_URL
+        url = origin_url +"/"+ output_path
+        resp = requests.get(url)
+        if resp.status_code != requests.codes.ok:
+            pass
+        fp = BytesIO()
+        fp.write(resp.content)
+        file_name = url
+        sides.scenes_combined.save(file_name, files.File(fp))
+    else:
+        sides.scenes_combined = None
+        sides.save()
+    return
+
+
+class AllMembersView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/all-members.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        job_type_id = self.kwargs.get('id')
+        job_type = get_object_or_404(JobType, pk=job_type_id)
+        user_rating_objs = UserRatingCombined.objects.all()
+        members = user_rating_objs.filter(job_type=job_type).order_by('-rating')
+        context['members'] = members
+        context['job_type'] = job_type
+        return context
+
+

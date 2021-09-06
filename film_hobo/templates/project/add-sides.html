@@ -67,9 +67,10 @@
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
                                                     <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
+                                                    <!-- <iframe src="/media/script/{{project.id}}.html" class="pdf-style" frameborder="0"></iframe> -->
                                                     <!-- <iframe src="https://docs.google.com/gview?url=https://docs.google.com/document/d/1YfXflnjxQj4xabpoyNaqrLG3BhzaSHoTXhG5dxCL1W4/&embedded=true" class="pdf-style" frameborder="0"></iframe> -->
                                                     <!-- <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=http://localhost:8000{{project.script.url}}"></iframe> -->
-                                                   
+
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -79,32 +80,47 @@
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt"><a >SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style ">{{sides.scene_1|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_1" id="scene_1" {% if sides.scene_1 %} disabled {% endif %}>{{sides.scene_1|striptags|safe}}</textarea> -->
+                                            {% if sides.scene_1_pdf %}
+                                            <iframe src="{{ sides.scene_1_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
                                             <span class="sds-scene-txt">SCENE TWO</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_2|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_2" {% if sides.scene_2 %} disabled {% endif %}>{{sides.scene_2|striptags|safe}}</textarea> -->
+                                            {% if sides.scene_2_pdf %}
+                                            <iframe src="{{ sides.scene_2_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
                                             <span class="sds-scene-txt">SCENE THREE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">Edit</a>
+                                            </span>
                                         </div>
                                         <div>
-                                            <div class="sides-textbox scenes sides-font-style">{{sides.scene_3|safe}}</div>
-                                            <!-- <textarea class="sds-input-textarea scenes" placeholder="Paste Here"
-                                            name="scene_3" {% if sides.scene_3 %} disabled {% endif %}>{{sides.scene_3|striptags|safe}}</textarea> -->
+                                            {% if sides.scene_3_pdf %}
+                                            <iframe src="{{ sides.scene_3_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -113,8 +129,6 @@
                                 <div class="sds-card-btn-align">
                                     <span class="sds-input-card-btn">
                                         <!-- <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/> -->
-                                        <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration"
-                                        href="{% url 'project:edit-sides' project.id %}?character_id={{character.id}}">EDIT</a>
                                         <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
                                     </span>
                                 </div>
@@ -128,58 +142,7 @@
             <p class="all-p">Invalid page</p>
             {% endif %}
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                <div class="left-mode-sec right-sec-height">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0 ">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Sound Designers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
             </div>
         </div>
     </div>
@@ -188,18 +151,7 @@
 {% endblock %}
 
 {% block extrajs %}
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-<script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
-<script>
-    // $(function(){
-    //     $('#sidesform').on('click','.edit-sides',function(){ 
-    //         $(".scenes").prop("disabled", false) 
-    //     });
-    // });
-</script>
-<script>
-    // CKEDITOR.replace( 'scene_1' );
-</script>
+
 {% endblock %}
 
 

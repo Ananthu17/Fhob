@@ -28,7 +28,9 @@ def get_notifications_time(time_posted):
     hours = int(seconds // 3600)
     minutes = int((seconds % 3600) // 60)
     seconds = int(seconds % 60)
-    if timediff.days != 0:
+    if timediff.days > 7:
+        return str(timediff.days) + " weeks"
+    elif((timediff.days >= 1) and (timediff.days <= 7)):
         return str(timediff.days) + " days"
     else:
         if hours != 0:

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load user_account_tag %}
+{% load project_rating_tag %}
 
 {% block extracss %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" type="text/css" media="all" rel="stylesheet">
@@ -72,21 +73,15 @@
                                 name="name" autocomplete="off" value="{{character.name}}"  disabled >
                             </span>
                             <span class="cas-txt-area-align">
-                                <textarea class="cas-input-txtarea" placeholder="Description" name="description"
+                                <textarea class="cas-input-txtarea " placeholder="Description" name="description"
                                 autocomplete="off" disabled>{{character.description}}</textarea>
                             </span>
                             <div class="cas-side-display">
                                 <span>
                                     <span class="cas-cast-side-txt">
-                                        {% if character.id in sites_dict.keys %}
                                         <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}">
                                             SIDES
                                         </a>
-                                        {% else %}
-                                        <a href="{% url 'project:edit-sides' project.id %}?character_id={{character.id}}">
-                                            SIDES
-                                        </a>
-                                        {% endif %}
                                     </span>
                                 </span>
                                 <span>
@@ -97,7 +92,13 @@
                                 </span>
                             </div>
                             <span class="cas-txt-area-align">
-                                <textarea class="cas-input-txtarea" placeholder="Sides" disabled>{% if character.id in sites_dict.keys %}{% get_dict_value sites_dict character.id as sites%}{{sites|striptags | safe}}{% endif %}</textarea>
+                                <!-- <textarea class="cas-input-txtarea" placeholder="Sides" disabled></textarea> -->
+                                <div class="cas-input-txtarea border-cls">
+                                {% get_dict_value_if_exists sites_dict character.id as scene_pdf %}
+                                {% if scene_pdf %}
+                                    <iframe src="{{ scene_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                {% endif %}
+                                </div>
                             </span>
                         </div>
                         {% endfor %}
@@ -155,58 +156,8 @@
             <!-- Left section End -->
             <!-- Right section  -->
 
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                <div class="left-mode-sec right-sec-height">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0 ">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Sound Designers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+
             </div>
 
             <!-- Right section  End-->

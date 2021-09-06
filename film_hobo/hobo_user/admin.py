@@ -15,10 +15,12 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     UserRatingCombined, UserRating, UserAgentManager, \
                     Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    GroupUsers, Feedback, CompanyRating, \
+                    Video, VideoRatingCombined, \
+                    UserProject, GroupUsers, Feedback, CompanyRating, \
                     CompanyRatingCombined, \
                     VideoRating, ProjectMemberRating, \
                     BraintreePromoCode, VideoRatingCombined, BetaTesterCodes
+
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
@@ -129,6 +131,7 @@ admin.site.register(NewJobType)
 admin.site.register(FriendGroup)
 admin.site.register(CompanyRating)
 admin.site.register(CompanyRatingCombined)
+admin.site.register(UserProject)
 
 
 @admin.register(EthnicAppearance)

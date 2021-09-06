@@ -35,7 +35,7 @@ SECRET_KEY = env("SECRET_KEY")
 # 2 - DEMO_SERVER
 # 3 - AWS_PRODUCTION
 
-PROJECT_ENVIRONMENT = "DEMO_SERVER"
+PROJECT_ENVIRONMENT = "LOCAL"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     # ORIGIN_URL = "http://202.88.246.92:8041"
@@ -162,27 +162,27 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 # }
 
 # local database credentials
-# DATABASES = {
-#     'default': {
-#         'ENGINE': env("DATABASE_ENGINE"),
-#         'NAME': env("DATABASE_NAME"),
-#         'USER': env("DATABASE_USER"),
-#         'PASSWORD': env("DATABASE_PASSWORD"),
-#         'HOST': env("DATABASE_HOST"),
-#         'PORT': env("DATABASE_PORT"),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': env("DATABASE_ENGINE"),
+        'NAME': env("DATABASE_NAME"),
+        'USER': env("DATABASE_USER"),
+        'PASSWORD': env("DATABASE_PASSWORD"),
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
+    }
+}
 
 # demo server database credentials
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'HOST': os.environ.get('DB_HOST'),
-    'NAME': os.environ.get('DB_NAME'),
-    'USER': os.environ.get('DB_USER'),
-    'PASSWORD': os.environ.get('DB_PASS'),
-  }
-}
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'HOST': os.environ.get('DB_HOST'),
+#     'NAME': os.environ.get('DB_NAME'),
+#     'USER': os.environ.get('DB_USER'),
+#     'PASSWORD': os.environ.get('DB_PASS'),
+#   }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -373,11 +373,9 @@ CKEDITOR_CONFIGS = {
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
-             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['RemoveFormat', ],
-            ['Cut', 'Copy', 'Paste', 'PasteText'],
+            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
             ['Undo', 'Redo'],
-            ['Format', 'Styles', 'Image'],
+            ['Format', 'Styles', 'Font'],
         ],
         'width': 'auto',
         'height': 140,

@@ -1,6 +1,7 @@
-from hobo_user.models import UserRating, Project
-from project.models import Audition, AuditionRating, Character, Sides, \
-    ProjectRating
+from hobo_user.models import UserProject, UserRating, Project, \
+    UserRatingCombined, UserProject
+from project.models import Audition, AuditionRating, Character, Comment, \
+    SceneImages, Sides, ProjectRating, Comment
 from rest_framework import serializers
 
 
@@ -187,3 +188,147 @@ class ProjectRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectRating
         fields = ['project', 'rating', 'reason']
+
+
+class RemoveCastSerializer(serializers.Serializer):
+    character = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class ReplaceCastSerializer(serializers.Serializer):
+    character = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    user = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    name = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    reply_to = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    mentioned_users = serializers.CharField(
+                        max_length=150,
+                        required=False,
+                    )
+
+    class Meta:
+        model = Comment
+        fields = ['project', 'comment_txt', 'reply_to', 'mentioned_users']
+        extra_kwargs = {'comment_txt': {'required': True}}
+
+
+class DeleteCommentSerializer(serializers.Serializer):
+    comment_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+
+
+class PdfToImageSerializer(serializers.Serializer):
+    path = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    project_id = serializers.CharField(
+                    max_length=150,
+                    required=True,
+                )
+    page_no = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class SceneImageSerializer(serializers.Serializer):
+    id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class SceneImagesSerializer(serializers.ModelSerializer):
+    scene = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    project_id = serializers.CharField(
+                    max_length=150,
+                    required=True,
+                )
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+    class Meta:
+        model = SceneImages
+        fields = ['scene', 'project_id', 'character_id', 'image']
+
+
+class CastRequestSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class IdSerializer(serializers.Serializer):
+    id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class SidesPDFSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    scene = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class CancelCastRequestSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    type = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class UserProjectSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    character = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+    class Meta:
+        model = UserProject
+        fields = ['project', 'character']
+
+
+

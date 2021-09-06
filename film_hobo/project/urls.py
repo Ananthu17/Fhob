@@ -5,11 +5,22 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
-     SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
+     SubmitAuditionAPI, AuditionListView, AddProjectVideoView, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
      TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
-     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI
+     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI, \
+     GetAuditionStatusNotificationAjaxView, GetVideoRatingNotificationAjaxView, \
+     GetProjectRatingNotificationAjaxView, CastAttachRemoveView, \
+     RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
+     DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
+     GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
+     PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
+     DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
+     GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
+     GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI, \
+     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView
+
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -39,8 +50,6 @@ urlpatterns = [
           name='add-video-submit-last-date'),
      path('add-sides/<int:id>/', AddSidesView.as_view(),
           name='add-sides'),
-     path('edit-sides/<int:id>/', EditSidesView.as_view(),
-          name='edit-sides'),
      path('add-sides-api/', SidesCreateAPIView.as_view(),
           name='add-sides-api'),
      path('cast-apply-audition/<int:id>/', CastApplyAuditionView.as_view(),
@@ -79,4 +88,65 @@ urlpatterns = [
           name='chemistry-room'),
      path('project-rating-api/', ProjectRatingAPI.as_view(),
           name='project-rating-api'),
+     path('get-audition-status-notification/',
+          GetAuditionStatusNotificationAjaxView.as_view(),
+          name='get-audition-status-notification'),
+     path('get-video-rating-notification-html/',
+          GetVideoRatingNotificationAjaxView.as_view(),
+          name='get-video-rating-notification-html'),
+     path('get-project-rating-notification-html/',
+          GetProjectRatingNotificationAjaxView.as_view(),
+          name='get-project-rating-notification-html'),
+     path('cast-attach-remove/<int:id>/',
+          CastAttachRemoveView.as_view(),
+          name='cast-attach-remove'),
+     path('remove-attached-cast-api/',
+          RemoveAttachedCastAPI.as_view(),
+          name='remove-attached-cast-api'),
+     path('replace-attached-cast-api/',
+          ReplaceAttachedCastAPI.as_view(),
+          name='replace-attached-cast-api'),
+     path('post-comment-api/', CommentAPI.as_view(),
+          name='post-comment-api'),
+     path('delete-comment-api/', DeleteCommentAPI.as_view(),
+          name='delete-comment-api'),
+     path('get-comments-mention-notification-html/',
+          GetCommentsMentionNotificationAjaxView.as_view(),
+          name='get-comments-mention-notification-html'),
+     path('get-comments-notification-html/',
+          GetCommentsNotificationAjaxView.as_view(),
+          name='get-comments-notification-html'),
+     path('get-comments-reply-notification-html/',
+          GetCommentsReplyNotificationAjaxView.as_view(),
+          name='get-comments-reply-notification-html'),
+     path('pdf-to-image-api/', PdfToImageAPI.as_view(),
+          name='pdf-to-image-api'),
+     path('add-scene-images/<int:id>/', AddSceneImagesView.as_view(),
+          name='add-scene-images'),
+     path('generate-scene-image-pdf-api/', GenerateSceneImagePDFAPI.as_view(),
+          name='generate-scene-image-pdf-api'),
+     path('delete-scene-image-api/', DeleteSceneImageAPI.as_view(),
+          name='delete-scene-image-api'),
+     path('show-top-rated-member/', TopRatedMembersAjaxView.as_view(),
+          name='show-top-rated-member'),
+     path('get-cast-attach-request-notification-html/',
+          GetCastAtachRequestNotificationAjaxView.as_view(),
+          name='get-cast-attach-request-notification-html'),
+     path('get-cast-attach-response-notification-html/',
+          GetCastAtachResponseNotificationAjaxView.as_view(),
+          name='get-cast-attach-response-notification-html'),
+     path('cancel-cast-attach-request-api/',
+          CancelCastAttachRequestAPI.as_view(),
+          name='cancel-cast-attach-request-api'),
+     path('accept-cast-attach-request-api/',
+          AcceptCastAttachRequestAPI.as_view(),
+          name='accept-cast-attach-request-api'),
+     path('add-to-favorites-api/', AddToFavoritesAPI.as_view(),
+          name='add-to-favorites-api'),
+     path('remove-from-favorites-api/', RemoveFromFavoritesAPI.as_view(),
+          name='remove-from-favorites-api'),
+     path('remove-character-scenes-api/', RemoveCharacterScenesAPI.as_view(),
+          name='remove-character-scenes-api'),
+     path('all-members/<int:id>/', AllMembersView.as_view(),
+          name='all-members'),
     ]

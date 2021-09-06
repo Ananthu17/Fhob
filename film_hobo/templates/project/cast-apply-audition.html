@@ -115,6 +115,12 @@
                                         </span>
                                     </span>
                                 </div>
+                                <div>
+                                    <span class="">
+                                        <a class="video-menu-head cursor-pointer add_to_favorites favorites-btn remove-decoration"
+                                        id="{{project.id}}">Add to Favorites</a>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <!-- col-2   -->
@@ -212,14 +218,65 @@
                                     <div class="caa-submit-sec">
                                         <span class="caa-submit-txt">Submit Video by: <span class="caa-date-span">{{project.last_date}}</span></span>
                                         <span class="caa-upload-tag">
-                                            <input type="submit" value="save" class="caa-upload-save-btn"
-                                            {% if samr_data.1 >= logged_user_rating or request.user.membership not in samr_data.2 %}
-                                            disabled
-                                            {% endif %}
-                                            >
+                                            <a data-toggle="modal" data-target="#form_submission_modal"
+                                            class="caa-upload-save-btn cursor-pointer">Submit</a>
+
                                         </span>
                                     </div>
-                                </form>
+<!-- The Modal -->
+<div class="modal fade" id="form_submission_modal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Submit Audition</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <p>
+                        <span class="all-p-light">By FilmHobo Terms of Service you have agreed to, you acknowledge here that by applying to
+                        any Project on the website as a Cast, Filmmaker or Crew, you agree and irrevocably give
+                        permission to FilmHobo to use and display Your name, voice, performance, and likeness in
+                        such Project and/or Content created and being posted on the FilmHobo website, as well as the
+                        right to use Your Name, voice, performance, and likeness in FilmHobo marketing campaigns.
+                        (Terms of Service, Paragraph 6</span> <span class="all-p">“Representations and Warranties”</span>,
+                        <span class="all-p-light">Item (d)</span>
+                        <span class="all-p">“Your release for participation in Projects and Content created on the website”</span>
+                        <span class="all-p-light">).</span>
+                        <p class="alert-style">If you disagree with the statement above, please do not apply for any roles
+                        or positions on the FilmHobo website!</p>
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3 ">
+                    <span class="">
+                        <input type="checkbox" name="i_agree" required/> 
+                        <span class="all-p">I Agree</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <input type="submit" class='btn btn-outline-danger btn-sm cursor-pointer save_logline'
+        id='{{project.id}}' value="Submit"/>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+</form>
+
 <!-- The Modal -->
 <div class="modal fade" id="cannotapply">
     <div class="modal-dialog">
@@ -264,29 +321,35 @@
                                </div>
                                <div id="sides">
                                 {% if sides%}
-                                   <div class="caa-download-display">
+                                   <div class="caa-download-display mt-1">
                                        <span>
-                                           <a class="download_sides cursor-pointer" id="download_sides">
+                                        <!-- {% if sides.scenes_combined %}
+                                           <a class="download_sides cursor-pointer" id="download_sides"
+                                           href="{{sides.scenes_combined.url}}">
                                                Download</a>
+                                        {% endif %} -->
                                         </span>
                                         <span>
-                                            <a class="cursor-pointer" id="print_sides"
+                                            <!-- <a class="cursor-pointer" id="print_sides"
                                             onclick="PrintElem('#printableArea')">Print</a>
-                                            <div id="editor"></div>
+                                            <div id="editor"></div> -->
                                         </span>
                                    </div>
                                    <div class="caa-script-sec-frame">
-                                        <div class="caa-script-sec-frame-inner scroll-section">
-                                            <div id="printableArea" class="ml-3">
-                                                <b>Scene 1:</b><p>{{sides.scene_1|safe}}</p>
-                                                <b>Scene 2:</b><p>{{sides.scene_2|safe}}</p>
-                                                <b>Scene 3:</b><p>{{sides.scene_3|safe}}</p>
-                                            </div>
-                                        </div>
+                                   <div class="caa-script-sec-pdf-frame-inner">
+                                        {% if sides.scenes_combined %}
+                                        <iframe src="{{ sides.scenes_combined.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        <!-- {% if sides.scene_2_pdf %}
+                                        <iframe src="{{ sides.scene_2_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        {% if sides.scene_3_pdf %}
+                                        <iframe src="{{ sides.scene_3_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}-->
+                                    </div>
                                     </div>
                                 {% endif %}
                                </div>
-                               
                            </div>
                         </div>
                     </div>
@@ -297,58 +360,7 @@
 
                 
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                <div class="caa-sec-bg right-sec-height">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0 ">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Sound Designers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
             </div>
         </div>
     </div>
@@ -366,37 +378,37 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
 <script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
 <script>
-    var doc = new jsPDF();
-    var specialElementHandlers = {
-        '#editor': function (element, renderer) {
-            return true;
-        }
-    };
+    // var doc = new jsPDF();
+    // var specialElementHandlers = {
+    //     '#editor': function (element, renderer) {
+    //         return true;
+    //     }
+    // };
 
-    $('body').on('click' , '#download_sides', function(){
-        console.log("hsdakjd")
-        doc.fromHTML($('#printableArea').html(), 15, 15, {
-            'width': 170,
-                'elementHandlers': specialElementHandlers
-        });
-        doc.save('sides.pdf');
-    });
+    // $('body').on('click' , '#download_sides', function(){
+    //     console.log("hsdakjd")
+    //     doc.fromHTML($('#printableArea').html(), 15, 15, {
+    //         'width': 170,
+    //             'elementHandlers': specialElementHandlers
+    //     });
+    //     doc.save('sides.pdf');
+    // });
 </script>
 <script type="text/javascript">
 
-    function PrintElem(elem)
-    {
-        var data = $(elem).html();
-        var mywindow = window.open('', 'new div', 'height=400,width=800');
-        mywindow.document.write('<html><head><title>Sides</title>');
-        mywindow.document.write('<h1>Sides</h1>');
-        mywindow.document.write('</head><body >');
-        mywindow.document.write(data);
-        mywindow.document.write('</body></html>');
-        mywindow.print();
-        mywindow.close();
-        return true;
-    }
+    // function PrintElem(elem)
+    // {
+    //     var data = $(elem).html();
+    //     var mywindow = window.open('', 'new div', 'height=400,width=800');
+    //     mywindow.document.write('<html><head><title>Sides</title>');
+    //     mywindow.document.write('<h1>Sides</h1>');
+    //     mywindow.document.write('</head><body >');
+    //     mywindow.document.write(data);
+    //     mywindow.document.write('</body></html>');
+    //     mywindow.print();
+    //     mywindow.close();
+    //     return true;
+    // }
 
 </script>
 <script>
@@ -445,7 +457,34 @@
     });
 
 </script>
+<script>
+    $('body').on('click' , '.add_to_favorites', function(){
+       var project_id = $(this).attr("id");
+       var token = $("#token").val();
+       data_dict = {};
+       data_dict['project']=project_id;
+       data_dict['character']= '{{ character.id }}';
 
+       $.ajax
+       ({
+           type: "POST",
+           url: "/project/add-to-favorites-api/",
+           dataType: 'json',
+           async: false,
+           data: data_dict,
+           beforeSend: function (xhr) {
+               xhr.setRequestHeader ("Authorization", token);
+           },
+           success: function(response){
+               console.log(response)
+               $('#success_message').fadeIn().html(response['message']);
+               setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+           }
+       });
+
+     });
+
+</script>
 {% endblock %}
 
 

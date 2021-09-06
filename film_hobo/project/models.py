@@ -1,3 +1,9 @@
+import PyPDF2
+import datetime
+import requests
+from io import BytesIO
+from django.core import files
+from django.conf import settings
 from ckeditor.widgets import CKEditorWidget
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -5,6 +11,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 class Character(models.Model):
     name = models.CharField(max_length=1000)
@@ -19,6 +26,17 @@ class Character(models.Model):
                                       related_name='attached_user',
                                       on_delete=models.SET_NULL, null=True,
                                       blank=True)
+    requested_user = models.ForeignKey('hobo_user.CustomUser',
+                                       verbose_name=_("Requested User"),
+                                       related_name='requested_user',
+                                       on_delete=models.SET_NULL, null=True,
+                                       blank=True)
+    attached_user_name = models.CharField(_("Attached User Name"),
+                                          max_length=1000,
+                                          null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'),
+                                        default=datetime.datetime.now,
+                                        blank=False)
 
     def __str__(self):
         return self.project.title+" - "+self.name
@@ -35,12 +53,16 @@ class Sides(models.Model):
     character = models.ForeignKey(Character,
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE)
-    scene_1 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
-    scene_2 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
-    scene_3 = RichTextUploadingField(_("Scene Description"),
-                            null=True, blank=True)
+    # scene_1 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
+    # scene_2 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
+    # scene_3 = RichTextUploadingField(_("Scene Description"),
+    #                                  null=True, blank=True)
+    scene_1_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scene_2_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scene_3_pdf = models.FileField(upload_to='script/', null=True, blank=True)
+    scenes_combined = models.FileField(upload_to='script/', null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"
@@ -99,13 +121,21 @@ class Audition(models.Model):
                                   choices=VIDEO_TYPE_CHOICES,
                                   max_length=150, null=True,
                                   default=VIMEO)
-    status = models.CharField(_("Status"),
-                              choices=STATUS_CHOICES,
-                              max_length=150,
-                              default=APPLIED)
+    audition_status = models.CharField(_("Status"),
+                                       choices=STATUS_CHOICES,
+                                       max_length=150,
+                                       default=APPLIED)
     cover_image = models.ImageField(upload_to='thumbnail/',
                                     blank=True, null=True,
                                     help_text="Image size:370 X 248.")
+    status_update_date = models.DateField(_("Status updated on"),
+                                          null=True, blank=True,)
+    i_agree = models.BooleanField(
+                _('I Agree'),
+                default=True,
+                help_text=_(
+                    'Designates whether the user accepted the terms and conditions.'),
+            )
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+"-"+self.name
@@ -197,3 +227,69 @@ class ProjectRating(models.Model):
     class Meta:
         verbose_name = 'Project Rating'
         verbose_name_plural = 'Project Ratings'
+
+
+class Comment(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='commented_user',
+                             verbose_name=_("User"),
+                             null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_comment',
+                                verbose_name=_("Project"),
+                                null=True)
+    comment_txt = models.TextField(_("Comment"), null=True, blank=True)
+    reply_to = models.ForeignKey("self",
+                                 on_delete=models.SET_NULL,
+                                 related_name='comment_reply',
+                                 verbose_name=_("Reply"),
+                                 null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.project.title+" commented by "+self.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+
+class SceneImages(models.Model):
+    SCENE_1 = 'scene_1'
+    SCENE_2 = 'scene_2'
+    SCENE_3 = 'scene_3'
+
+    SCENE_CHOICES = [
+        (SCENE_1, 'Scene 1'),
+        (SCENE_2, 'Scene 2'),
+        (SCENE_3, 'Scene 3'),
+    ]
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='project_scene_image',
+                                verbose_name=_("Project"),
+                                null=True)
+    character = models.ForeignKey("project.Character",
+                                  on_delete=models.CASCADE,
+                                  related_name='character_scene_image',
+                                  verbose_name=_("Character"),
+                                  null=True)
+    image = models.ImageField(upload_to='scene/',
+                              null=True,
+                              help_text="Image size:370 X 248.")
+    scene = models.CharField(_("Video Type"),
+                             choices=SCENE_CHOICES,
+                             max_length=150, null=True,
+                             default=SCENE_1)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                        blank=False)
+
+    def __str__(self):
+        return str(self.project.title+" - "+str(self.get_scene_display()))
+
+    class Meta:
+        verbose_name = 'Scene Image'
+        verbose_name_plural = 'Scene Images'

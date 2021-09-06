@@ -1,6 +1,11 @@
 
 import datetime
 
+from django.db.models import Q
+from autoslug import AutoSlugField
+from django.contrib.auth.hashers import make_password
+from phonenumber_field.modelfields import PhoneNumberField
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -672,7 +677,9 @@ class Project(models.Model):
                                               null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
+
     timestamp = models.DateField(auto_now_add=True)
+
 
     def __str__(self):
         return self.title
@@ -819,6 +826,15 @@ class Team(models.Model):
 
     def __str__(self):
         return self.project.title +" - "+ self.job_type.title
+
+    def save(self, *args, **kwargs):
+        try:
+            profile_obj = UserProfile.objects.get(user=self.user)
+            profile_obj.job_types.add(self.job_type)
+            profile_obj.save()
+        except UserProfile.DoesNotExist:
+            pass
+        super(Team, self).save(*args, **kwargs)
 
 
 class Country(models.Model):
@@ -1338,6 +1354,8 @@ class UserRatingCombined(models.Model):
                                  verbose_name=_("Job Types")
                                  )
     rating = models.FloatField(_("Rating"), null=True, blank=True)
+    no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
+    no_of_projects = models.IntegerField(_("No of Projects"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1635,6 +1653,14 @@ class UserNotification(models.Model):
     MEMBERSHIP_CHANGE = 'membership_change'
     INVITE = 'invite'
     PROJECT_TRACKING = 'project_tracking'
+    AUDITION_STATUS = 'audition_status'
+    VIDEO_RATING = 'video_rating'
+    PROJECT_RATING = 'project_rating'
+    COMMENTS = 'comments'
+    COMMENTS_REPLY = 'comments_reply'
+    COMMENTS_MENTION = 'comments_mention'
+    CAST_ATTACH_REQUEST = 'cast_attach_request'
+    CAST_ATTACH_RESPONSE = 'cast_attach_response'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1648,6 +1674,14 @@ class UserNotification(models.Model):
                                  'Invite'),
                                 (PROJECT_TRACKING,
                                  'Project Tracking'),
+                                (AUDITION_STATUS, 'Audition Status'),
+                                (VIDEO_RATING, 'Video Rating'),
+                                (PROJECT_RATING, 'Project Rating'),
+                                (COMMENTS, 'Comments'),
+                                (COMMENTS_REPLY, 'Comments Reply'),
+                                (COMMENTS_MENTION, 'Comments Mention'),
+                                (CAST_ATTACH_REQUEST, 'Cast Attach Request'),
+                                (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1678,6 +1712,11 @@ class UserNotification(models.Model):
                                 related_name='project_notification',
                                 verbose_name=_("Project"),
                                 null=True, blank=True)
+    rating = models.FloatField(_("Rating"), null=True, blank=True)
+    character = models.ForeignKey('project.Character',
+                                  verbose_name=_("Character"),
+                                  on_delete=models.CASCADE,
+                                  null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1743,6 +1782,49 @@ class Feedback(models.Model):
         verbose_name_plural = 'Feedbacks'
 
 
+class UserProject(models.Model):
+    FAVORITE = 'favorite'
+    APPLIED = 'applied'
+    ATTACHED = 'attached'
+    RELATION_TYPE_CHOICES = [
+                (FAVORITE, 'Favorite'),
+                (APPLIED, 'Applied'),
+                (ATTACHED, 'Attached'),
+                ]
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_project_user',
+                             verbose_name=_("User"),
+                             null=True)
+    project = models.ForeignKey("hobo_user.Project",
+                                on_delete=models.CASCADE,
+                                related_name='user_project_project',
+                                verbose_name=_("Project"),
+                                null=True)
+    relation_type = models.CharField(_("Status Type"),
+                                     choices=RELATION_TYPE_CHOICES,
+                                     max_length=150, default=ATTACHED)
+    audition = models.ForeignKey("project.Audition",
+                                 on_delete=models.CASCADE,
+                                 related_name='user_project_audition',
+                                 verbose_name=_("Audition"),
+                                 null=True, blank=True)
+    character = models.ForeignKey("project.Character",
+                                  on_delete=models.CASCADE,
+                                  related_name='user_project_character',
+                                  verbose_name=_("Character"),
+                                  null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                    blank=True)
+
+    def __str__(self):
+        return str(self.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'User Project'
+        verbose_name_plural = 'User Projects'
+
+
 class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
@@ -1750,3 +1832,4 @@ class BetaTesterCodes(models.Model):
     class Meta:
         verbose_name = 'Beta Tester Code'
         verbose_name_plural = 'Beta Tester Codes'
+

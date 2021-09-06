@@ -64,18 +64,19 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, UserProject, Video, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    Location, UserRatingCombined, \
-                    UserTracking, CompanyProfile, \
-                    CompanyRating, CompanyRatingCombined, \
+                    UserRating, Location, UserRatingCombined, \
+                    UserTracking, CompanyProfile, UserProject, \
+                    Feedback, CompanyRating, CompanyRatingCombined, \
                     VideoRatingCombined, BetaTesterCodes
 from payment.models import Transaction
+
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
     SignupCodeSerializer, PaymentPlanSerializer, IndiePaymentSerializer, \
@@ -2909,6 +2910,14 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        user_projects = UserProject.objects.filter(user=user)
+        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
+        favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
+        applied = user_projects.filter(relation_type = UserProject.APPLIED).order_by('-created_time')
+        context['my_projects'] = my_projects
+        context['favorites'] = favorites
+        context['applied'] = applied
         return context
 
 
@@ -4634,6 +4643,23 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         return context
 
 
+
+class GetAllUsersAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        super_users = CustomUser.objects.filter(is_superuser=True).values_list('id')
+        all_users = CustomUser.objects.exclude(id__in=super_users)
+        all_users = all_users.exclude(id=self.request.user.id)
+        serializer_list = []
+        name_list = []
+        name_dict = {}
+        for user in all_users:
+            serializer_list.append(user.get_full_name())
+            name_list.append(user.get_full_name())
+            name_dict[user.get_full_name()]="<a href='"+user.get_profile_url()+"' id='"+str(user.id)+"' class='mention_user'>"+user.get_full_name()+"</a> "
+        return Response({"serializer_list": serializer_list, "name_dict": name_dict, "name_list": name_list})
+
 class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/screening_video_page.html'
     login_url = '/hobo_user/user_login/'
@@ -4746,3 +4772,4 @@ class PrivacyPolicy(View):
     def get(self, request, *args, **kwargs):
         filepath = os.path.join('media', 'privacy_policy.pdf')
         return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+

@@ -60,7 +60,8 @@
                                     <span class="">CHARACTER: </span>
                                     <span class="video-menu-head txt-uppercase">{{audition.character.name}}</span>
                                 </li>
-                                <li><span class="">ACTOR: </span><span class="cva-menu-tag"><a href="" class="txt-uppercase">{{audition.name}}</a></span>
+                                <li><span class="">ACTOR: </span><span class="cva-menu-tag">
+                                    <a href="{{audition.user.get_profile_url}}" class="txt-uppercase">{{audition.name}}</a></span>
                                     <span class="caa-rate-star">
                                         <div class="cta-stars-outer">
                                             <div class="cta-stars-inner" style="width:{{audition_user_rating}}%;"></div>
@@ -109,7 +110,7 @@
                                             {% for obj in casting_directors %}
                                             <div>
                                                 <span class="cva-tag-txt-align" title="{{obj.user.get_full_name}}">
-                                                    <a href="" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
+                                                    <a href="{{obj.user.get_profile_url}}" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
                                                 </span>
                                             </div>
                                             <div>
@@ -204,7 +205,7 @@
                                             {% for obj in directors %}
                                             <div>
                                                 <span class="cva-tag-txt-align" title="{{obj.user.get_full_name}}">
-                                                    <a href="" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
+                                                    <a href="{{obj.user.get_profile_url}}" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
                                                 </span>
                                             </div>
                                             <div>
@@ -299,7 +300,7 @@
                                             {% for obj in producers %}
                                             <div>
                                                 <span class="cva-tag-txt-align" title="{{obj.user.get_full_name}}">
-                                                    <a href="" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
+                                                    <a href="{{obj.user.get_profile_url}}" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
                                                 </span>
                                             </div>
                                             <div>
@@ -394,7 +395,7 @@
                                             {% for obj in writers %}
                                             <div>
                                                 <span class="cva-tag-txt-align" title="{{obj.user.get_full_name}}">
-                                                    <a href="" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
+                                                    <a href="{{obj.user.get_profile_url}}" class="cva-img-info-tag">{{obj.user.get_full_name}}</a>
                                                 </span>
                                             </div>
                                             <div>
@@ -546,9 +547,9 @@
                                     <span class="cva-msg-txt">
                                         <span class="txt-capitalize float-right">Status:
                                         <span class="txt-capitalize
-                                        {% if audition.status == 'passed' %}cva-info-txt-black{% endif %}
-                                        {% if audition.status == 'attached' %}cva-info-txt-green{% endif %}
-                                        {% if audition.status == 'callback' %}cva-info-txt-red{% endif %}
+                                        {% if audition.audition_status == 'passed' %}cva-info-txt-black{% endif %}
+                                        {% if audition.audition_status == 'attached' %}cva-info-txt-green{% endif %}
+                                        {% if audition.audition_status == 'callback' %}cva-info-txt-red{% endif %}
                                         ">
                                             {{audition.get_status_display}}
                                         </span>
@@ -573,58 +574,7 @@
             <!-- Center section  End-->
             <!-- Right section  -->
 
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                <div class="caa-sec-bg right-sec-height">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0 ">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Sound Designers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
             </div>
         </div>
     </div>

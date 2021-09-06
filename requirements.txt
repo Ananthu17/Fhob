@@ -41,6 +41,8 @@ zappa-django-utils==0.4.1
 reportlab==3.5.68
 django-autoslug==1.9.8
 django-ckeditor==6.1.0
+mammoth==1.4.16
+PyDocX==0.9.10
 
 
 

@@ -595,6 +595,175 @@
                     </div>
                     {% endif %}
 
+                    <!-- my projects -->
+                    {% if my_projects %}
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">My Projects</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in my_projects %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:single-film-project' obj.project.id %}"  title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+                                            <div>
+                                                <div class="cta-rate-txt-align">
+                                                    <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'15'}}</span>
+                                                </div>
+                                            </div>
+                                            <!-- <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-txt">Audition</span>
+
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- end my projects -->
+                    {% if profile.user.id == request.user.id  %}{% endif %}
+                    {% if favorites %}
+                    <!-- Favorites -->
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">Favorites</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in favorites %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:cast-apply-audition' obj.project.id %}?character_id={{obj.character.id}}"
+                                            title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+                                            <div>
+                                                <div class="cta-rate-txt-align">
+
+                                                </div>
+                                            </div>
+                                            <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'10'}}</span>
+                                                        <span class="float-right" title="Delete" >
+                                                            <i class="fa fa-times" aria-hidden="true" data-toggle="modal" data-target="#delete_favorites_modal_{{obj.id}}"></i>
+                                                        </span>
+                                                        <br>
+                                                        <span class="cta-rate-name-txt" title="{{obj.character.name}}">Character: {{obj.character.name|truncatechars:'6'}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+{% for obj in favorites %}
+<!-- The Modal -->
+<div class="modal fade" id="delete_favorites_modal_{{obj.id}}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Remove From Favorites</h6>
+                <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                        <p>Do you want to remove {{obj.project.title}} from favorite projects ?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm remove_from_favorites"
+                id="{{obj.id}}">Remove</button>
+                <button type="button" class="btn btn-outline-danger btn-sm close-modal"
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+{% endfor %}
+
+                    {% endif %}
+                    <!-- end Favorites -->
+
+                    <!-- applied -->
+                    {% if applied %}
+                    <div class="row mt-4">
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12  mb-1">
+                            <div>
+                                <p class="form-title mem-setup-blu-f">Applied Projects</p>
+                            </div>
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for obj in applied %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame">
+                                            <a href="{% url 'project:audition-list' obj.project.id  %}"  title="{{obj.project.title}}">
+                                            {% if obj.project.video_cover_image %}
+                                            <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
+                                            {% else %}
+                                            <img src="{% static 'images/photograph.PNG' %}" class="cta-rate-image">
+                                            {% endif %}
+                                            </a>
+                                            </div>
+
+                                            <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'15'}}</span><br>
+                                                        <span class="cta-rate-name-txt" title="{{obj.character.name}}">Character: {{obj.character.name|truncatechars:'6'}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                   {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!-- end applied -->
+                    
                 </div>
                 <div class="left-mode-sec p-2 mt-3">
                     <div class="row mem-white-bg">
@@ -615,58 +784,8 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                <div class="left-mode-sec">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Editors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
+
 
             </div>
         </div>
@@ -680,6 +799,72 @@
 
 {% block extrajs %}
 <!-- <script src="{% static 'js/user-rating.js' %}"></script> -->
+<script>
+        $('.cast-owl').owlCarousel({
+        loop:false,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            444:{
+                items:2,
+                nav:true
+            },
+            611:{
+                items:3,
+                nav:true
+            },
+            810:{
+                items:4,
+                nav:true
+            },
+            992:{
+                items:3,
+                nav:true
+            },
+            1045:{
+                items:4,
+                nav:true
+            },
+            1320:{
+                items:5,
+                nav:true,
+                loop:false
+            }
+        }
+    })
+
+</script>
+<script>
+    $('body').on('click' , '.remove_from_favorites', function(){
+        var favorites_id = $(this).attr("id");
+        var token = $("#token").val();
+
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/remove-from-favorites-api/",
+            dataType: 'json',
+            async: false,
+            data: {"id":favorites_id},
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+
+    });
+</script>
 {% endblock %}
 
 

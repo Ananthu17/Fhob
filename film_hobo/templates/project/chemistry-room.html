@@ -51,7 +51,43 @@
                                             <li class="chm-char-txt">
                                                 <span class="attach-link-1">
                                                         {% if audition_list.0 %}
-                                                        <a id="{{audition_list.0.id}}" class="chm-green-tag attach cursor-pointer">ATTACH</a>
+                                                        <a data-toggle="modal" data-target="#attach-{{audition_list.0.id}}" class="chm-green-tag cursor-pointer">ATTACH</a>
+                    <!-- The Modal -->
+                    <div class="modal fade" id="attach-{{audition_list.0.id}}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h6 class="modal-title mem-setup-blu-f">Attach {{audition_list.0.name}}</h6>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 ">
+                                                <div class="row" >
+                                                    <div class="col-12" >
+                                                        <p clss="all-p">Do yo want to attach {{audition_list.0.name}} to character {{audition_list.0.character.name}}?</p>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-danger btn-sm attach"
+                                    id="{{audition_list.0.id}}">Yes</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Cancel</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal End -->
                                                         {% endif %}
                                                 </span>
                                             </li>
@@ -88,7 +124,44 @@
                                             <li class="chm-char-txt">
                                                 <span class="attach-link-2">
                                                         {% if audition_list.1 %}
-                                                        <a id="{{audition_list.1.id}}" class="chm-green-tag attach cursor-pointer">ATTACH</a>
+                                                        <a  class="chm-green-tag  cursor-pointer" data-toggle="modal"
+                                                        data-target="#attach-{{audition_list.1.id}}">ATTACH</a>
+                    <!-- The Modal -->
+                    <div class="modal fade" id="attach-{{audition_list.1.id}}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h6 class="modal-title mem-setup-blu-f">Attach {{audition_list.1.name}}</h6>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 ">
+                                                <div class="row" >
+                                                    <div class="col-12" >
+                                                        <p clss="all-p">Do yo want to attach {{audition_list.1.name}} to character {{audition_list.1.character.name}}?</p>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-danger btn-sm attach"
+                                    id="{{audition_list.1.id}}">Yes</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Cancel</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal End -->
                                                         {% endif %}
                                                 </span>
                                             </li>
@@ -128,7 +201,7 @@
                                     <div class="chm-char-div-bg">
                                         <div class="chm-char-name-padding">
                                             <span class="chm-char-txt-orange"><a href="" class="txt-uppercase">{{character.name}} </a></span><span
-                                                class="chm-char-txt-num">(3)</span>
+                                                class="chm-char-txt-num">({{audition_list|length}})</span>
                                         </div>
                                         <div class="chm-frame-flex">
                                             <div>
@@ -154,7 +227,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="chm-rate-txt-align">
-                                                        <span class="chm-rate-name-main" title="Mark Stonom">{{ audition.name }}</span>
+                                                        <span class="chm-rate-name-main" title="{{audition.name}}">{{ audition.name }}</span>
                                                         {% get_dict_value rating_dict audition.user.id as rating %}
                                                         <span class="chm-log-star">
                                                             <div class="cta-stars-outer">
@@ -177,6 +250,8 @@
                                                 </div>
 
                                                 <!-- Image frame 1 End-->
+
+
                                                 {% endfor %}
                                             </div>
                                         </div>
@@ -195,62 +270,50 @@
                     <!-- carousel Section  End-->
                 </div>
                 <!-- Video player column -->
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                    <div class="chm-sec-bg right-sec-height">
-                        <div class="mem-list-head">Top Actors</div>
-                        <ol class="mem-list-cont mb-0 ">
-                            <li class="mt-1">John Smith</li>
-                            <li class="mt-1">John Dow</li>
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Aaron McCarty</li>
-                            <li class="mt-1">Toli Chew</li>
-                        </ol>
-                        <div class="mem-list-head">Top Writers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Tom Saint</li>
-                            <li class="mt-1">Lola Carola</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Jamal Smith</li>
-                            <li class="mt-1">Nikita Selivan</li>
-                        </ol>
-                        <div class="mem-list-head">Top Directors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Ivan Drago</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Kendra Shulman</li>
-                            <li class="mt-1">Sandra O’brian</li>
-                        </ol>
-                        <div class="mem-list-head">Top Producers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top DPs</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top Sound Designers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head underline">TopTalent/Crew</div>
-                    </div>
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
                 </div>
             </div>
         </div>
     </div>
+
+    {% for audition in all_audition %}
+    <!-- The Modal -->
+    <div class="modal fade" id="attach-{{audition.id}}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h6 class="modal-title mem-setup-blu-f">Attach {{audition.name}}</h6>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12 ">
+                                <div class="row" >
+                                    <div class="col-12" >
+                                        <p clss="all-p">Do yo want to attach {{audition.name}} to character {{audition.character.name}}?</p>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger btn-sm attach"
+                    id="{{audition.id}}">Yes</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm "
+                    data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Modal End -->
+    {% endfor %}
 {% endblock %}
 
 {% block extrajs %}
@@ -301,6 +364,8 @@
 <script>
         $('body').on('click' , '.screen_1', function(){
                 var audition_id = $(this).attr("id");
+                $(".screen_1").removeClass('chm-border-tag-bg-orange');
+                $(this).addClass('chm-border-tag-bg-orange');
                 var token = $("#token").val();
                 var video_url_id = '#video_url-'+audition_id;
                 var video_type_id = '#video_type-'+audition_id;
@@ -314,7 +379,7 @@
 
                 $(".audition-character-1").html(character)
                 $(".audition-name-1").html(audition_name)
-                $(".attach-link-1").html('<a id="'+audition_id+'" class="chm-green-tag attach cursor-pointer">ATTACH</a>')
+                $(".attach-link-1").html('<a  class="chm-green-tag  cursor-pointer" data-toggle="modal" data-target="#attach-'+audition_id+'">ATTACH</a>')
                 if(video_type=="vimeo"){
                         $(".screen_1_div").html('<iframe class="chm-cam-img" src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
                 }else{
@@ -323,6 +388,8 @@
         });
         $('body').on('click' , '.screen_2', function(){
                 var audition_id = $(this).attr("id");
+                $(".screen_2").removeClass('chm-border-tag-bg-orange');
+                $(this).addClass('chm-border-tag-bg-orange');
                 var token = $("#token").val();
                 var video_url_id = '#video_url-'+audition_id;
                 var video_type_id = '#video_type-'+audition_id;
@@ -337,7 +404,7 @@
 
                 $(".audition-character-2").html(character)
                 $(".audition-name-2").html(audition_name)
-                $(".attach-link-2").html('<a id="'+audition_id+'" class="chm-green-tag attach cursor-pointer">ATTACH</a>')
+                $(".attach-link-2").html('<a  class="chm-green-tag  cursor-pointer" data-toggle="modal" data-target="#attach-'+audition_id+'">ATTACH</a>')
 
                 if(video_type=="vimeo"){
                         $(".screen_2_div").html('<iframe class="chm-cam-img" src=https://player.vimeo.com/video/'+video_url+'?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250" data-show-text="false" frameborder="0" fullscreen; picture-in-picture" allowfullscreen></iframe>');
