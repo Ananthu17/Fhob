@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {{ form.media.css }}
@@ -213,17 +213,23 @@
                             {% endif %}
                           </div>
                       </div>
-                      <!-- <div class="row mt-2">
+                      <div id="beta-user-div" class="row mt-2">
                         <div class="col-2">
                             <label class="form-title">Beta User Code</label>
                         </div>
                         <div class="col-4 form-group">
-                          <input type="password"
-                          name="form.password2.name"
+                          <input type="text"
+                          name=""
                           class="form-control form-control-input"
-                          id="form.password2.id_for_label"
+                          id="beta-user-input"
+                          value=""
+                          maxlength=""
                           autocomplete="off">
-                        </div> -->
+                          {% if form.errors.password2 %}
+                            <p style="color: red">{{form.errors.password2}}</p>
+                          {% endif %}
+                        </div>
+                    </div>
                       <div class="row mt-2">
                           <div class="col-12 tos">
                               By creating this account, you agree to the<span class="tos-t"> TERMS OF
@@ -266,6 +272,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/signup_indie.js' %}"></script>
 {{ form.media.js }}
 <script>
   $(document).ready(function() {

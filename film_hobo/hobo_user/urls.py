@@ -67,7 +67,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamDeleteAPIView, VideoRatingView, \
                    FindVideoRatingAPI, VideoListAPI, ProjectView, \
                    CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
-                   ProjectDateFilterAPI
+                   ProjectDateFilterAPI, RefundPolicy, \
+                   IntellectualPropertyRights
 
 
 app_name = "hobo_user"
@@ -205,6 +206,9 @@ urlpatterns = [
     path('how_to/', HowTo.as_view(), name='how_to'),
     path('terms_of_service/', TermsOfService.as_view(), name='terms_of_service'),
     path('privacy_policy/', PrivacyPolicy.as_view(), name='privacy_policy'),
+    path('refund_policy/', RefundPolicy.as_view(), name='refund_policy'),
+    path('intellectual_property_rights/', IntellectualPropertyRights.as_view(),
+         name='intellectual_property_rights'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),

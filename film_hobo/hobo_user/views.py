@@ -386,6 +386,7 @@ class CustomUserSignupIndieView(APIView):
             request.POST['username'] = customuser_username
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/hobo_user/registration_indie/'
+            import pdb;pdb.set_trace();
             user_response = requests.post(
                 complete_url,
                 data=json.dumps(request.POST),
@@ -4773,3 +4774,16 @@ class PrivacyPolicy(View):
         filepath = os.path.join('media', 'privacy_policy.pdf')
         return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
 
+
+class RefundPolicy(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'refund_policy.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+class IntellectualPropertyRights(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'intellectual_property_rights.pdf')
+        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
