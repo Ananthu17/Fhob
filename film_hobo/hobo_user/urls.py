@@ -68,7 +68,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    FindVideoRatingAPI, VideoListAPI, ProjectView, \
                    CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
                    ProjectDateFilterAPI, RefundPolicy, \
-                   IntellectualPropertyRights
+                   IntellectualPropertyRights, GetBetaTesterCodeId
 
 
 app_name = "hobo_user"
@@ -200,7 +200,8 @@ urlpatterns = [
          name='edit-beta-tester-code'),
     path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
          name='check-beta-tester-code'),
-
+    path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
+          name='get-beta-tester-code-id'),
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),

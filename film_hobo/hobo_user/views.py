@@ -7,6 +7,7 @@ import random
 import requests
 from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
+from datetime import timedelta, date
 
 from django.conf import settings
 from django.core import serializers
@@ -386,7 +387,6 @@ class CustomUserSignupIndieView(APIView):
             request.POST['username'] = customuser_username
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/hobo_user/registration_indie/'
-            import pdb;pdb.set_trace();
             user_response = requests.post(
                 complete_url,
                 data=json.dumps(request.POST),
@@ -4787,3 +4787,27 @@ class IntellectualPropertyRights(View):
     def get(self, request, *args, **kwargs):
         filepath = os.path.join('media', 'intellectual_property_rights.pdf')
         return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+
+
+class GetBetaTesterCodeId(APIView):
+    """
+    API endpoint to get a beta tester code id
+    """
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['code']
+            testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
+            final_date = date.today() + timedelta(days=testercode_instance.days)
+            if testercode_instance:
+                return Response(
+                    {"status": "success",
+                     "code_id": testercode_instance.id,
+                     "code": testercode_instance.code,
+                     "days": testercode_instance.days,
+                     "final_day": final_date})
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code does not exist"},
+                status=status.HTTP_404_NOT_FOUND)

@@ -194,7 +194,12 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user started as a beta user.'),
     )
-    beta_user_end = models.DateTimeField(_('Beta User End Date and Time'),
+    beta_user_code = models.ForeignKey("hobo_user.BetaTesterCodes",
+                            on_delete=models.SET_NULL,
+                            related_name='user_betatestercode',
+                            verbose_name=_("BetaTesterCode"),
+                            null=True)
+    beta_user_end = models.DateField(_('Beta User End Date and Time'),
                                          null=True, blank=True)
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
@@ -1828,6 +1833,9 @@ class UserProject(models.Model):
 class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
+
+    def __str__(self):
+        return str(self.code)
 
     class Meta:
         verbose_name = 'Beta Tester Code'

@@ -61,7 +61,8 @@ class SignUpIndieForm(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'beta_user', 'i_agree', 'date_of_birth', 'country')
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country')
         widgets = {
             'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
         }
@@ -70,6 +71,8 @@ class SignUpIndieForm(UserCreationForm):
         super(SignUpIndieForm, self).__init__(*args, **kwargs)
         self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
         self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['i_agree'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -92,6 +95,12 @@ class SignUpIndieForm(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'

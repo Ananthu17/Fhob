@@ -215,21 +215,40 @@
                       </div>
                       <div id="beta-user-div" class="row mt-2">
                         <div class="col-2">
+                            <label class="form-title">Beta User</label>
+                        </div>
+                        <div class="col-4 form-group">
+                          <input type="text"
+                          name="beta_user"
+                          class="form-control form-control-input"
+                          id="id_beta_user"
+                          autocomplete="off">
+                        </div>
+                    </div>
+                      <div id="beta-user-code-div" class="row mt-2">
+                        <div class="col-2">
                             <label class="form-title">Beta User Code</label>
                         </div>
                         <div class="col-4 form-group">
                           <input type="text"
-                          name=""
+                          name="beta_user_code"
                           class="form-control form-control-input"
-                          id="beta-user-input"
-                          value=""
-                          maxlength=""
+                          id="id_beta_user_code"
                           autocomplete="off">
-                          {% if form.errors.password2 %}
-                            <p style="color: red">{{form.errors.password2}}</p>
-                          {% endif %}
                         </div>
                     </div>
+                    <div id="beta-user-code-lastdate-div" class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Beta User Final Day</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <input type="text"
+                        name="beta_user_end"
+                        class="form-control form-control-input"
+                        id="id_beta_user_end"
+                        autocomplete="off">
+                      </div>
+                  </div>
                       <div class="row mt-2">
                           <div class="col-12 tos">
                               By creating this account, you agree to the<span class="tos-t"> TERMS OF

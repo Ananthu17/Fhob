@@ -62,7 +62,7 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
                              'email', 'password', 'date_of_joining')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Registration Process', {'fields': ('registration_complete',)}),
-        ('Beta User', {'fields': ('beta_user', 'beta_user_end')}),
+        ('Beta User', {'fields': ('beta_user', 'beta_user_code', 'beta_user_end')}),
         ('Membership', {'fields': ('membership', 'guild_membership',
                                    'payment_plan')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),

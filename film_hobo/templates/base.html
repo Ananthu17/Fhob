@@ -179,7 +179,7 @@
                                     </div>
                                     <a class="dropdown-item" href="#">Membership</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
-                                    <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
+                                    <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% else %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
                                     <a class="dropdown-item" href="#">Edit Profile</a>
@@ -330,14 +330,12 @@
     </script>
     <script>
     /*
-    code to clear token info from local storage on logout
+    code to clear data from local storage on logout
     */
-    logout_element = $("[id=logout_link]")
-    if (login_element.length != 0){
-        document.getElementById("logout_link").addEventListener("click", function() {
-            localStorage.removeItem("token");
-        });
-    }
+    document.getElementById("logout_link").addEventListener("click", function() {
+        localStorage.clear();
+    });
+
 
 
     </script>
