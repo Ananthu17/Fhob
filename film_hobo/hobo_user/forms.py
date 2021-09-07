@@ -167,7 +167,8 @@ class SignUpFormCompany(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'i_agree', 'date_of_birth', 'country',
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country',
                   'title', 'company_name', 'company_address',
                   'company_phone', 'company_website', 'company_type')
 
@@ -207,6 +208,12 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['address'].widget.attrs['class'] = 'inp-line'
         self.fields['address'].widget.attrs['placeholder'] = 'Address'
         self.fields['title'].widget.attrs['class'] = 'inp-line'
