@@ -172,13 +172,16 @@ class RegisterIndieSerializer(serializers.Serializer):
     address = serializers.CharField(required=True)
     country = serializers.CharField(required=True)
     i_agree = serializers.BooleanField(required=False)
+    beta_user = serializers.BooleanField(required=False)
+    beta_user_code = serializers.CharField(required=False)
+    beta_user_end = serializers.DateField(required=False)
 
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
                   'last_name', 'password1', 'password2', 'phone_number',
                   'address', 'date_of_birth', 'membership', 'i_agree',
-                  'country']
+                  'country', 'beta_user', 'beta_user_code', 'beta_user_end']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -200,6 +203,12 @@ class RegisterIndieSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
+
+    def validate_beta_user(self, beta_user):
+        if beta_user == 'True':
+            return True
+        else:
+            return False
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -224,6 +233,9 @@ class RegisterIndieSerializer(serializers.Serializer):
             'country': self.validated_data.get('country', ''),
             'membership': self.validated_data.get('membership', ''),
             'i_agree': self.validated_data.get('i_agree', ''),
+            'beta_user': self.validated_data.get('beta_user', ''),
+            'beta_user_code': self.validated_data.get('beta_user_code', ''),
+            'beta_user_end': self.validated_data.get('beta_user_end', ''),
         }
 
     def save(self, request):
