@@ -1,6 +1,6 @@
 from hobo_user.models import UserProject, UserRating, Project, \
     UserRatingCombined, UserProject
-from project.models import Audition, AuditionRating, Character, Comment, \
+from project.models import Audition, AuditionRating, Character, Comment, CrewApplication, \
     SceneImages, Sides, ProjectRating, Comment
 from rest_framework import serializers
 
@@ -323,12 +323,66 @@ class UserProjectSerializer(serializers.ModelSerializer):
             )
     character = serializers.CharField(
                 max_length=150,
-                required=True,
+                required=False,
+            )
+    crew = serializers.CharField(
+                max_length=150,
+                required=False,
             )
 
     class Meta:
         model = UserProject
-        fields = ['project', 'character']
+        fields = ['project', 'character', 'crew']
 
 
+class AttachProjectCrewSerializer(serializers.Serializer):
+    application_id = serializers.CharField(
+                        max_length=150,
+                        required=True,
+                    )
 
+
+class JobTypeSerializer(serializers.Serializer):
+    title = serializers.CharField(
+                        max_length=150,
+                        required=True,
+                    )
+    label = serializers.CharField(
+                        max_length=150,
+                        required=True,
+                    )
+
+
+class CrewApplicationSerializer(serializers.ModelSerializer):
+    project = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    crew = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    location = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+    class Meta:
+        model = CrewApplication
+        fields = ['project', 'crew', 'name', 'agent_email', 'agent_name',
+                  'location', 'phone_number', 'cover_letter']
+
+
+class ProjectCrewSerializer(serializers.Serializer):
+    job_type = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    count = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    project_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )

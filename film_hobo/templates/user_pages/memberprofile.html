@@ -616,19 +616,20 @@
                                             {% endif %}
                                             </a>
                                             </div>
-                                            <div>
-                                                <div class="cta-rate-txt-align">
-                                                    <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'15'}}</span>
-                                                </div>
-                                            </div>
-                                            <!-- <div class="cta-rate-txt-frame">
+                                            <div class="cta-rate-txt-frame">
                                                 <div class="cta-rate-txt-align">
                                                     <div>
-                                                        <span class="cta-rate-name-txt">Audition</span>
-
+                                                        <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'10'}}</span>
+                                                        
+                                                        <br>
+                                                        {% if obj.character %}
+                                                        <span class="cta-rate-name-txt" title="{{obj.character.name}}">Character: {{obj.character.name|truncatechars:'6'}}</span>
+                                                        {% elif obj.crew %}
+                                                        <span class="cta-rate-name-txt" title="{{obj.crew.job_type}}">Crew: {{obj.crew.job_type|truncatechars:'6'}}</span>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
-                                            </div> -->
+                                            </div>
                                         </div>
                                     </div>
                                    {% endfor %}
@@ -652,7 +653,12 @@
                                     <div class="item ">
                                         <div class="cta-rate-div-align">
                                             <div class="cta-rate-image-frame">
-                                            <a href="{% url 'project:cast-apply-audition' obj.project.id %}?character_id={{obj.character.id}}"
+                                            <a
+                                            {% if obj.character %}
+                                            href="{% url 'project:cast-apply-audition' obj.project.id %}?character_id={{obj.character.id}}"
+                                            {% elif obj.crew %}
+                                            href="{% url 'project:crew-apply-audition' obj.project.id %}?crew_id={{obj.crew.id}}"
+                                            {% endif %}
                                             title="{{obj.project.title}}">
                                             {% if obj.project.video_cover_image %}
                                             <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
@@ -661,11 +667,7 @@
                                             {% endif %}
                                             </a>
                                             </div>
-                                            <div>
-                                                <div class="cta-rate-txt-align">
-
-                                                </div>
-                                            </div>
+          
                                             <div class="cta-rate-txt-frame">
                                                 <div class="cta-rate-txt-align">
                                                     <div>
@@ -674,7 +676,11 @@
                                                             <i class="fa fa-times" aria-hidden="true" data-toggle="modal" data-target="#delete_favorites_modal_{{obj.id}}"></i>
                                                         </span>
                                                         <br>
+                                                        {% if obj.character %}
                                                         <span class="cta-rate-name-txt" title="{{obj.character.name}}">Character: {{obj.character.name|truncatechars:'6'}}</span>
+                                                        {% elif obj.crew %}
+                                                        <span class="cta-rate-name-txt" title="{{obj.crew.job_type}}">Crew: {{obj.crew.job_type|truncatechars:'6'}}</span>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             </div>
@@ -702,7 +708,11 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 ">
-                        <p>Do you want to remove {{obj.project.title}} from favorite projects ?</p>
+                        {% if obj.character %}
+                        <p>Do you want to remove {{obj.project.title}}-Character {{obj.character.name}} from favorite projects ?</p>
+                        {% elif obj.crew %}
+                        <p>Do you want to remove {{obj.project.title}}-{{obj.crew.job_type}} from favorite projects ?</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -737,7 +747,13 @@
                                     <div class="item ">
                                         <div class="cta-rate-div-align">
                                             <div class="cta-rate-image-frame">
-                                            <a href="{% url 'project:audition-list' obj.project.id  %}"  title="{{obj.project.title}}">
+                                            <a
+                                            {% if obj.character %}
+                                            href="{% url 'project:cast-apply-audition' obj.project.id %}?character_id={{obj.character.id}}"
+                                            {% elif obj.crew %}
+                                            href="{% url 'project:crew-apply-audition' obj.project.id %}?crew_id={{obj.crew.id}}"
+                                            {% endif %}
+                                            >
                                             {% if obj.project.video_cover_image %}
                                             <img src="{{ obj.project.video_cover_image.url }}" class="cta-rate-image">
                                             {% else %}
@@ -750,7 +766,11 @@
                                                 <div class="cta-rate-txt-align">
                                                     <div>
                                                         <span class="cta-rate-name-main top-members-head" title="{{obj.project.title}}">{{obj.project.title|truncatechars:'15'}}</span><br>
+                                                        {% if obj.character %}
                                                         <span class="cta-rate-name-txt" title="{{obj.character.name}}">Character: {{obj.character.name|truncatechars:'6'}}</span>
+                                                        {% elif obj.crew %}
+                                                        <span class="cta-rate-name-txt" title="{{obj.crew.job_type}}">Crew: {{obj.crew.job_type|truncatechars:'6'}}</span>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             </div>

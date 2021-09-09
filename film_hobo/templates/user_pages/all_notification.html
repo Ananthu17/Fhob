@@ -151,7 +151,7 @@
             {% elif obj.notification_type == 'audition_status' %}
             <div class="row">
                 <div class="col-10 ">
-                    {{obj.message}}<br>
+                    {{obj.message|safe}}<br>
                     {% get_notifications_time obj.created_time as time %}
                     {{time}} ago.
                 </div>

@@ -64,8 +64,11 @@
                                     {% endif %}
                                 </i>
                             </li>
-                            <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
-                                    class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
+                            <li class="list-inline-item m-0">
+                                <a href="{{ request.user.get_profile_url }}">
+                                <img src="{% static 'images/man-user.png' %}"
+                                    class="img-fluid header-user-img">
+                                </a><span class="header-icon-pos pro-font">Pro</span></li>
                         </ul>
                     </div>
                 </div>

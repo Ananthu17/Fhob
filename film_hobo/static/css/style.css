@@ -676,3 +676,24 @@ input.pw {
 .grey-bg{
     background-color: #f3f3f3;
 }
+.required-star
+{
+ color:red;
+}
+.right-txt
+  {
+    text-align:right;
+  }
+.help_text
+  {
+    color:#656565;
+    font-size:12px;
+    font-family:Myraid Pro;
+  }
+.help_txt_title
+  {
+    color:#000;
+    font-size:12px;
+    font-family:Myraid Pro;
+
+  }

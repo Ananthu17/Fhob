@@ -39,7 +39,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (UpdateAPIView,
                                      get_object_or_404)
@@ -49,7 +49,8 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, Us
      VideoRatingCombined
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Comment, SceneImages, Sides, ProjectTracking, ProjectRating
+    Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
+    ProjectRating, ProjectCrew, CrewApplication, AttachedCrewMember
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
@@ -59,7 +60,8 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
       SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
       CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
-      SidesPDFSerializer
+      SidesPDFSerializer, CrewApplicationSerializer, JobTypeSerializer, \
+      AttachProjectCrewSerializer, ProjectCrewSerializer
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify
 from .forms import VideoSubmissionLastDateForm
@@ -937,10 +939,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
                                ).first()
         if project_creator_job:
             try:
-                project_creator = Team.objects.get(
-                                    Q(project=project) &
-                                    Q(job_type=project_creator_job)
-                                    ).user
+                project_creator = project.creator
                 rating_object = UserRatingCombined.objects.filter(
                             Q(user=project_creator) &
                             Q(job_type=project_creator_job)
@@ -968,7 +967,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         audition_obj.project = project
         audition_obj.character = character
         audition_obj.name = data_dict['name']
-        audition_obj.user = self.request.user
+        audition_obj.user = user
         location_id = data_dict['location']
         audition_obj.location = get_object_or_404(Location, pk=location_id)
         audition_obj.agent_name = data_dict['agent_name']
@@ -1258,7 +1257,8 @@ class AddSceneImagesView(LoginRequiredMixin, TemplateView):
         if scene == '3':
             scene_image_obj.scene = SceneImages.SCENE_3
         # scene_image_obj.image = 'media/script/project_6.jpg'
-        url = "http://localhost:8000/media/script/project_"+project_id+".jpg"
+        origin_url = settings.ORIGIN_URL
+        url = origin_url+"/media/script/project_"+project_id+".jpg"
         resp = requests.get(url)
         if resp.status_code != requests.codes.ok:
             pass
@@ -1327,7 +1327,8 @@ class GenerateSceneImagePDFAPI(APIView):
             pdf.output(output_path, "F")
 
             # Save PDF to db
-            url = "http://localhost:8000/"+output_path
+            origin_url = settings.ORIGIN_URL
+            url = origin_url+"/"+output_path
             resp = requests.get(url)
             if resp.status_code != requests.codes.ok:
                 pass
@@ -1876,7 +1877,7 @@ class UpdateAuditionStatusAPI(APIView):
 
                     msg = "Attached "+audition.name+" to "+audition.project.title
                 else:
-                    msg = "Audition status updated to "+audition.get_status_display()
+                    msg = "Audition status updated to "+audition.get_audition_status_display()
 
                 #update notification table
                 notification = UserNotification()
@@ -1884,7 +1885,7 @@ class UpdateAuditionStatusAPI(APIView):
                 notification.project = audition.project
                 notification.notification_type = UserNotification.AUDITION_STATUS
                 if audition.audition_status == 'attached':
-                    notification.message = "Congratulations!! You have been attached to project "+audition.project.title
+                    notification.message = "Congratulations!! You have been attached to project <b>"+audition.project.title +"</b> as character <b>"+str(audition.character.name)+"</b>"
                 elif audition.audition_status == 'callback':
                     notification.message = "Your audition for "+audition.project.title+" has been sent to chemistry room."
                 elif audition.audition_status == 'passed':
@@ -2967,34 +2968,64 @@ class AddToFavoritesAPI(APIView):
         if serializer.is_valid():
             data_dict = serializer.data
             project_id = data_dict['project']
-            character_id = data_dict['character']
             user = self.request.user
+            print(data_dict)
+
             try:
                 project = Project.objects.get(pk=project_id)
-                try:
-                    character = Character.objects.get(pk=character_id)
+                if 'crew' in data_dict:
+                    crew_id = data_dict['crew']
                     try:
-                        user_project_obj = UserProject.objects.get(
-                                                Q(user=user) &
-                                                Q(project=project) &
-                                                Q(character=character) &
-                                                Q(relation_type=UserProject.FAVORITE)
-                                            )
-                        response = {'message': "Already added to favorites!!",
-                                    'status': status.HTTP_200_OK}
-                    except UserProject.DoesNotExist:
-                        user_project_obj = UserProject()
-                        user_project_obj.user = user
-                        user_project_obj.project = project
-                        user_project_obj.character = character
-                        user_project_obj.relation_type = UserProject.FAVORITE
-                        user_project_obj.save()
-                        response = {'message': "Project added to favorites.",
-                                    'status': status.HTTP_200_OK}
+                        crew = ProjectCrew.objects.get(pk=crew_id)
+                        try:
+                            user_project_obj = UserProject.objects.get(
+                                                    Q(user=user) &
+                                                    Q(project=project) &
+                                                    Q(crew=crew) &
+                                                    Q(relation_type=UserProject.FAVORITE)
+                                                )
+                            response = {'message': "Already added to favorites!!",
+                                        'status': status.HTTP_200_OK}
+                        except UserProject.DoesNotExist:
+                            user_project_obj = UserProject()
+                            user_project_obj.user = user
+                            user_project_obj.project = project
+                            user_project_obj.crew = crew
+                            user_project_obj.relation_type = UserProject.FAVORITE
+                            user_project_obj.save()
+                            response = {'message': "Project added to favorites.",
+                                        'status': status.HTTP_200_OK}
 
-                except Character.DoesNotExist:
-                    response = {'errors': 'Invalid Character ID', 'status':
-                                status.HTTP_400_BAD_REQUEST}
+                    except Character.DoesNotExist:
+                        response = {'errors': 'Invalid Character ID', 'status':
+                                    status.HTTP_400_BAD_REQUEST}
+
+                if 'character' in data_dict:
+                    character_id = data_dict['character']
+                    try:
+                        character = Character.objects.get(pk=character_id)
+                        try:
+                            user_project_obj = UserProject.objects.get(
+                                                    Q(user=user) &
+                                                    Q(project=project) &
+                                                    Q(character=character) &
+                                                    Q(relation_type=UserProject.FAVORITE)
+                                                )
+                            response = {'message': "Already added to favorites!!",
+                                        'status': status.HTTP_200_OK}
+                        except UserProject.DoesNotExist:
+                            user_project_obj = UserProject()
+                            user_project_obj.user = user
+                            user_project_obj.project = project
+                            user_project_obj.character = character
+                            user_project_obj.relation_type = UserProject.FAVORITE
+                            user_project_obj.save()
+                            response = {'message': "Project added to favorites.",
+                                        'status': status.HTTP_200_OK}
+
+                    except Character.DoesNotExist:
+                        response = {'errors': 'Invalid Character ID', 'status':
+                                    status.HTTP_400_BAD_REQUEST}
 
             except Project.DoesNotExist:
                 response = {'errors': 'Invalid Project ID', 'status':
@@ -3021,6 +3052,7 @@ class RemoveFromFavoritesAPI(APIView):
                 favorite_obj.delete()
                 response = {'message': "Project removed from favorites.",
                             'status': status.HTTP_200_OK}
+                messages.success(self.request, "Project removed from favorites.")
             except UserProject.DoesNotExist:
                 response = {'errors': 'Invalid ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -3150,3 +3182,494 @@ class AllMembersView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/crew-apply-audition.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project_creator_rating = 0
+        crew_id = self.request.GET.get('crew_id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        crew = ProjectCrew.objects.filter(
+                    Q(project=project) &
+                    Q(id=crew_id)
+                ).first()
+
+        context['crew'] = crew
+        context['locations'] = Location.objects.all()
+
+        # check if logged user can apply for audition
+        if crew:
+            crew_job_type = crew.job_type
+            logged_user = self.request.user
+            try:
+                logged_user_rating_obj = UserRatingCombined.objects.get(
+                                        Q(user=logged_user) &
+                                        Q(job_type=crew_job_type)
+                                    )
+                logged_user_rating = logged_user_rating_obj.rating
+            except UserRatingCombined.DoesNotExist:
+                logged_user_rating = 0
+            context['logged_user_rating'] = logged_user_rating
+        # end
+
+        project_creator_job = JobType.objects.filter(
+                               slug='project-creator'
+                               ).first()
+        if project_creator_job:
+            try:
+                project_creator = project.creator
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=project_creator) &
+                            Q(job_type=project_creator_job)
+                        ).first()
+                if rating_object:
+                    project_creator_rating = rating_object.rating*20
+                else:
+                    project_creator_rating = 0
+            except Team.DoesNotExist:
+                project_creator = ""
+            context['project_creator_rating'] = project_creator_rating
+
+
+        try:
+            producer_dict = {}
+            producer = JobType.objects.get(slug='producer')
+            producer_objs = Team.objects.filter(
+                            Q(project=project) &
+                            Q(job_type=producer)
+                            )
+            for obj in producer_objs:
+                rating_object = UserRatingCombined.objects.filter(
+                            Q(user=obj.user) &
+                            Q(job_type=producer)
+                        ).first()
+                if rating_object:
+                    rating = rating_object.rating*20
+                else:
+                    rating = 0
+                producer_dict[obj.user.get_full_name()] = rating
+            context['producer_dict'] = producer_dict
+        except JobType.DoesNotExist:
+            producer_objs = []
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        data_dict = {}
+        json_response = json.dumps(request.POST)
+        data_dict = ast.literal_eval(json_response)
+        project_id = self.kwargs.get('id')
+        crew_id = data_dict['crew_id']
+        project = get_object_or_404(Project, pk=project_id)
+        project_crew = get_object_or_404(ProjectCrew, pk=crew_id)
+        cover_letter = self.request.FILES['cover_letter']
+        crew_apply_obj = CrewApplication()
+        crew_apply_obj.project = project
+        crew_apply_obj.crew = project_crew
+        crew_apply_obj.name = data_dict['name']
+        crew_apply_obj.user = user
+        location_id = data_dict['location']
+        crew_apply_obj.location = get_object_or_404(Location, pk=location_id)
+        crew_apply_obj.agent_name = data_dict['agent_name']
+        crew_apply_obj.agent_email = data_dict['agent_email']
+        crew_apply_obj.phone_number = data_dict['phone_number']
+        crew_apply_obj.cover_letter = cover_letter
+        try:
+            agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+            crew_apply_obj.agent = agent_user
+        except CustomUser.DoesNotExist:
+            pass
+        crew_apply_obj.save()
+
+        # update user-project-table
+        user_project_obj = UserProject()
+        user_project_obj.user = self.request.user
+        user_project_obj.project = project
+        user_project_obj.relation_type = UserProject.APPLIED
+        user_project_obj.crew_application = crew_apply_obj
+        user_project_obj.crew = project_crew
+        user_project_obj.save()
+        # end
+        messages.success(self.request, "Application submitted successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class CrewApplyAPI(APIView):
+    serializer_class = CrewApplicationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            print(data_dict)
+            crew_apply_obj = CrewApplication()
+            crew_id = data_dict['crew']
+            project_id = data_dict['project']
+
+            project = get_object_or_404(Project, pk=project_id)
+            project_crew = get_object_or_404(ProjectCrew, pk=crew_id)
+            crew_apply_obj = CrewApplication()
+            crew_apply_obj.project = project
+            crew_apply_obj.crew = project_crew
+            crew_apply_obj.name = data_dict['name']
+            crew_apply_obj.user = self.request.user
+            location_id = data_dict['location']
+            crew_apply_obj.location = get_object_or_404(Location, pk=location_id)
+            crew_apply_obj.agent_name = data_dict['agent_name']
+            crew_apply_obj.agent_email = data_dict['agent_email']
+            crew_apply_obj.phone_number = data_dict['phone_number']
+            try:
+                agent_user = CustomUser.objects.get(email=data_dict['agent_email'])
+                crew_apply_obj.agent = agent_user
+            except CustomUser.DoesNotExist:
+                pass
+
+            try:
+                cover_letter = request.data['cover_letter']
+                crew_apply_obj.cover_letter = cover_letter
+            except KeyError:
+                raise ParseError('Request has no cover image attached')
+            crew_apply_obj.save()
+            # update user-project-table
+            user_project_obj = UserProject()
+            user_project_obj.user = self.request.user
+            user_project_obj.project = project
+            user_project_obj.relation_type = UserProject.APPLIED
+            user_project_obj.crew_application = crew_apply_obj
+            user_project_obj.crew = project_crew
+            user_project_obj.save()
+            # end
+            response = {'message': "Application submitted",
+                        'status': status.HTTP_200_OK}
+
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CrewApplicationListingView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/crew-application-listing.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rating_dict = {}
+        count_dict = {}
+        crew_dict = {}
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+        crew_applications = CrewApplication.objects.filter(project=project)
+        context['crew_applications'] = crew_applications
+
+        for crew_application_obj in crew_applications:
+            try:
+                rating_obj = UserRatingCombined.objects.get(
+                                Q(user=crew_application_obj.user) &
+                                Q(job_type=crew_application_obj.crew.job_type)
+                            )
+                rating_dict[crew_application_obj.user.id] = (rating_obj.rating)*20
+            except UserRatingCombined.DoesNotExist:
+                rating_dict[crew_application_obj.user.id] = 0
+
+        for obj in crew_applications:
+            if obj.crew in count_dict:
+                count_dict[obj.crew] += 1
+            else:
+                count_dict[obj.crew] = 1
+            if obj.crew in crew_dict:
+                crew_dict[obj.crew].append(obj)
+            else:
+                crew_dict[obj.crew] = []
+                crew_dict[obj.crew].append(obj)
+
+        context['project'] = project
+        context['count_dict'] = count_dict
+        context['crew_dict'] = crew_dict
+        context['rating_dict'] = rating_dict
+        return context
+
+
+class AttachCrewMemberAPI(APIView):
+    serializer_class = AttachProjectCrewSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            application_id = data_dict['application_id']
+            try:
+                application = CrewApplication.objects.get(pk=application_id)
+
+                # check if we have required number of specified crew members
+                attached_members_count = AttachedCrewMember.objects.filter(crew=application.crew).count()
+                if attached_members_count < application.crew.count:
+                    # update AttachedCrewMember table
+                    attached_crew_member_obj = AttachedCrewMember()
+                    attached_crew_member_obj.user = application.user
+                    attached_crew_member_obj.crew = application.crew
+                    attached_crew_member_obj.crew_status = AttachedCrewMember.ATTACHED
+                    attached_crew_member_obj.save()
+
+                    # update Application status
+                    application.application_status = CrewApplication.ATTACHED
+                    application.save()
+
+                    # update Team
+                    team_obj = Team()
+                    team_obj.project = application.project
+                    team_obj.user = application.user
+                    team_obj.job_type = application.crew.job_type
+                    team_obj.save()
+                    # end
+                    messages.success(self.request, "Crew member attached")
+                    response = {'message': 'Crew member attached', 'status':
+                                status.HTTP_200_OK}
+
+                    #update notification table
+                    notification = UserNotification()
+                    notification.user = application.user
+                    notification.project = application.project
+                    notification.notification_type = UserNotification.AUDITION_STATUS
+                    if application.application_status == 'attached':
+                        notification.message = "Congratulations!! You have been attached to project "+application.project.title+" as "+str(application.crew.job_type)
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(application.user.id)
+                    notification_msg = {
+                            'type': 'send_audition_status_notification',
+                            'message': str(notification.message),
+                            'from': application.project.title,
+                            "event": "AUDITION_STATUS"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+                else:
+                    msg = "Cannot attach!! "+str(attached_members_count)+" members already attached/requested."
+                    messages.success(self.request, msg)
+                    response = {'message': msg, 'status':
+                                status.HTTP_200_OK}
+            except CrewApplication.DoesNotExist:
+                response = {'message': 'Invalid ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class RemoveCrewMemberAPI(APIView):
+    serializer_class = AttachProjectCrewSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            application_id = data_dict['application_id']
+            try:
+                application = CrewApplication.objects.get(pk=application_id)
+                # update AttachedCrewMember table
+                try:
+                    attached_crew_member_obj = AttachedCrewMember.objects.get(
+                        Q(user = application.user) &
+                        Q(crew = application.crew) &
+                        Q(crew_status = AttachedCrewMember.ATTACHED)
+                    )
+                    attached_crew_member_obj.delete()
+                except AttachedCrewMember.DoesNotExist:
+                    pass
+
+                # update Application status
+                application.application_status = CrewApplication.PASSED
+                application.save()
+
+                # update Team
+                try:
+                    team_obj = Team.objects.get(
+                        Q(project = application.project) &
+                        Q(user = application.user) &
+                        Q(job_type = application.crew.job_type)
+                    )
+                    team_obj.delete()
+                except Team.DoesNotExist:
+                    pass
+                # end
+                messages.success(self.request, "Crew member removed")
+                response = {'message': 'Crew member removed', 'status':
+                            status.HTTP_200_OK}
+
+                #update notification table
+                notification = UserNotification()
+                notification.user = application.user
+                notification.project = application.project
+                notification.notification_type = UserNotification.AUDITION_STATUS
+                if application.application_status == 'passed':
+                    notification.message = "Sorry!! You have been removed from project "+application.project.title+" as "+str(application.crew.job_type)
+                notification.save()
+                # send notification
+                room_name = "user_"+str(application.user.id)
+                notification_msg = {
+                        'type': 'send_audition_status_notification',
+                        'message': str(notification.message),
+                        'from': application.project.title,
+                        "event": "AUDITION_STATUS"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+
+            except CrewApplication.DoesNotExist:
+                response = {'message': 'Invalid ID', 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+class SaveJobTypeAPI(APIView):
+    serializer_class = JobTypeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            obj = JobType()
+            obj.title = data_dict['title']
+            obj.label = data_dict['label']
+            obj.save()
+            messages.success(self.request, "Job Type Added")
+            response = {'message': 'Job Type Added', 'status':
+                        status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+class AddProjectCrewAPI(APIView):
+    serializer_class = ProjectCrewSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            job_type = JobType.objects.filter(slug=data_dict['job_type']).first()
+            project = Project.objects.filter(pk=data_dict['project_id']).first()
+            try:
+                crew_obj = ProjectCrew.objects.get(
+                    Q(project=project) &
+                    Q(job_type=job_type)
+                )
+                crew_obj.project = project
+                crew_obj.job_type = job_type
+                crew_obj.count = data_dict['count']
+                crew_obj.save()
+            except ProjectCrew.DoesNotExist:
+                crew_obj = ProjectCrew()
+                crew_obj.project = project
+                crew_obj.job_type = job_type
+                crew_obj.count = data_dict['count']
+                crew_obj.save()
+            response = {'message': 'Project Crew Added', 'status':
+                        status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddJobTypeView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/add-all-job-types.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        job_dict = {}
+        project_crew_dict = {}
+        attached_crew_dict = {}
+        project = get_object_or_404(Project, pk=project_id)
+        job_types = JobType.objects.order_by("id")
+        job_types_count = job_types.count()
+        each_column_count = int(job_types_count/6)
+        context['each_column_count'] = each_column_count
+        for job in job_types:
+            if job.label in  job_dict:
+                job_dict[job.label].append(job)
+            else:
+                job_dict[job.label]=[]
+                job_dict[job.label].append(job)
+        project_crew_objs = ProjectCrew.objects.filter(project=project)
+        for obj in project_crew_objs:
+            project_crew_dict[obj.job_type.id] = obj.count
+
+        attached_crew_members = AttachedCrewMember.objects.filter(crew__project=project)
+        for obj in attached_crew_members:
+            if obj.crew.job_type.id in attached_crew_dict:
+                attached_crew_dict[obj.crew.job_type.id]+=1
+            else:
+                attached_crew_dict[obj.crew.job_type.id]=1
+
+        context['project'] = project
+        context['job_dict'] = job_dict
+        # context['job_dict_1'] = dict(list(job_dict.items())[0:each_column_count])
+        # context['job_dict_1'] = dict(list(job_dict.items())[each_column_count:(each_column_count*2)])
+        context['project_crew_dict'] = project_crew_dict
+        context['attached_crew_dict'] = attached_crew_dict
+        print("attached_crew_dict", attached_crew_dict)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        project_id = self.kwargs.get('id')
+        json_response = json.dumps(request.POST)
+        all_crew_list = ast.literal_eval(json_response)
+        key = Token.objects.get(user=user).key
+        token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        for key,value in all_crew_list.items():
+            if value != "0" and key != 'csrfmiddlewaretoken':
+                data_dict = {}
+                data_dict["job_type"] = key
+                data_dict["count"] = value
+                data_dict["project_id"] = project_id
+                complete_url = origin_url + '/project/add-project-crew-api/'
+                user_response = requests.post(
+                                    complete_url,
+                                    data=json.dumps(data_dict),
+                                    headers={'Content-type': 'application/json',
+                                            'Authorization': token})
+                byte_str = user_response.content
+                dict_str = byte_str.decode("UTF-8")
+                response = ast.literal_eval(dict_str)
+                response = dict(response)
+                if 'status' in response:
+                    if response['status'] != 200:
+                        if 'errors' in response:
+                            errors = response['errors']
+                            print(errors)
+                            messages.warning(self.request, errors)
+                            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        messages.success(self.request, "Project crew added successfully")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

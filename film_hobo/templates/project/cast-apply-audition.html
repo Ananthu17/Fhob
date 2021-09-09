@@ -143,7 +143,7 @@
                         <!-- col-3  -->
                         <div class="caa-sec-bg">
                             <div class="caa-audition-info-align"
-                            {% if samr_data.1 >= logged_user_rating or request.user.membership not in samr_data.2 %}
+                            {% if samr_data.1 > logged_user_rating or request.user.membership not in samr_data.2 %}
                             data-toggle="modal" data-target="#cannotapply"
                             {% endif %}>
                                 <form  method="post"
@@ -156,7 +156,7 @@
                                     </div>
                                     <div class="cas-input-display-align">
                                         <div class="caa-input-display mt-2">
-                                            <span class="caa-input-name">Name:</span>
+                                            <span class="caa-input-name">Name</span>
                                             <span class="caa-input-align">
                                                 <input name="name" class="caa-input-field" autocomplete='off'
                                                 required></span>
@@ -218,7 +218,10 @@
                                     <div class="caa-submit-sec">
                                         <span class="caa-submit-txt">Submit Video by: <span class="caa-date-span">{{project.last_date}}</span></span>
                                         <span class="caa-upload-tag">
-                                            <a data-toggle="modal" data-target="#form_submission_modal"
+                                            <a
+                                            {% if samr_data.1 <= logged_user_rating and request.user.membership in samr_data.2 %}
+                                            data-toggle="modal" data-target="#form_submission_modal"
+                                            {% endif %}
                                             class="caa-upload-save-btn cursor-pointer">Submit</a>
 
                                         </span>

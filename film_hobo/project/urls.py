@@ -19,7 +19,10 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
      GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
      GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI, \
-     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView
+     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView, \
+     CrewApplyAuditionView, CrewApplyAPI, CrewApplicationListingView, \
+     AttachCrewMemberAPI, RemoveCrewMemberAPI, AddJobTypeView, SaveJobTypeAPI, \
+     AddProjectCrewAPI
 
 
 urlpatterns = [
@@ -149,4 +152,20 @@ urlpatterns = [
           name='remove-character-scenes-api'),
      path('all-members/<int:id>/', AllMembersView.as_view(),
           name='all-members'),
+     path('crew-apply-audition/<int:id>/', CrewApplyAuditionView.as_view(),
+          name='crew-apply-audition'),
+     path('crew-apply-api/', CrewApplyAPI.as_view(),
+          name='crew-apply-api'),
+     path('crew-application-listing/<int:id>/', CrewApplicationListingView.as_view(),
+          name='crew-application-listing'),
+     path('attach-crew-member-api/', AttachCrewMemberAPI.as_view(),
+          name='attach-crew-member-api'),
+     path('remove-crew-member-api/', RemoveCrewMemberAPI.as_view(),
+          name='remove-crew-member-api'),
+     path('add-project-crew/<int:id>', AddJobTypeView.as_view(),
+          name='add-project-crew'),
+     path('add-project-crew-api/', AddProjectCrewAPI.as_view(),
+          name='add-project-crew-api'),
+     path('save-job-type-api/', SaveJobTypeAPI.as_view(),
+          name='save-job-type-api'),
     ]

@@ -1083,6 +1083,7 @@ class CustomUserSettings(models.Model):
 
 class JobType(models.Model):
     title = models.CharField(max_length=1000)
+    label = models.CharField(max_length=1000, null=True, blank=True)
     slug = models.SlugField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -1806,8 +1807,18 @@ class UserProject(models.Model):
                                   related_name='user_project_character',
                                   verbose_name=_("Character"),
                                   null=True, blank=True)
+    crew_application = models.ForeignKey("project.CrewApplication",
+                                         on_delete=models.CASCADE,
+                                         related_name='user_crew_application',
+                                         verbose_name=_("Cast Application"),
+                                         null=True, blank=True)
+    crew = models.ForeignKey("project.ProjectCrew",
+                             on_delete=models.CASCADE,
+                             related_name='project_crew',
+                             verbose_name=_("Project Crew"),
+                             null=True, blank=True)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
-                                    blank=True)
+                                        blank=True)
 
     def __str__(self):
         return str(self.user.get_full_name())

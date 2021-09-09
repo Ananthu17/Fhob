@@ -2374,6 +2374,7 @@ ul.sds-side-setup-menu li{
    font-size: 12px;
    text-align: center;
    padding-bottom: 4px;
+   margin-top: 25px;
 }
 .sds-scene-head-1{
    font-size: 14px;
@@ -2388,6 +2389,16 @@ ul.sds-side-setup-menu li{
    justify-content: center;
    padding-bottom: 3px;
 }
+.sds-side-txt-flex{
+   display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    width: 100%;
+}
+.sds-scene-edit{
+   display: flex;
+   justify-content: flex-end;
+   color: #0e62b5;
+}
 .sds-side-txt{
    font-size: 14px;
    font-weight: 700;
@@ -2395,10 +2406,9 @@ ul.sds-side-setup-menu li{
 .sds-side-txt a{
    color: black;
 }
-.sds-scene-txt-padding{
-   padding-left: 35%;
-}
 .sds-scene-txt{
+   display: flex;
+   justify-content: center;
    color: #0e62b5;
 }
 .sds-script-card{
@@ -2946,6 +2956,21 @@ ul.caa-side-setup-menu li{
    cursor: pointer;  
    height: 15px;
    font-size: 12px;
+}
+.caa-input-email-field{
+   width: 100%;
+   background: none;
+   border:none !important;
+   outline: none;
+   padding: 4px 5px;
+   border-bottom:1px solid#000000 !important;
+   cursor: pointer;  
+   height: 15px;
+   font-size: 12px;
+}
+.caa-input-email-field:focus{
+   outline: none;
+
 }
 .caa-img-field{
    width: 100%;
@@ -4219,11 +4244,46 @@ ul.chm-cam-ul-right li{
 }
 .crw-input-sec{
    display: grid;
-   grid-template-columns: 1fr 6fr;
+   grid-template-columns: 4fr 9fr;
 }
 .crw-cover-tag{
    font-size: 12px;
    font-weight: 500;
+}
+.crw-cover-tag a{
+   color: #0e62b5;
+   text-decoration: none;
+}
+.crw-pdf-txt{
+   color: black;
+}
+.crw-upload-sec{
+   font-size: 12px;
+   font-weight: 500;
+}
+.crw-upload-tag {
+	color: #0e62b5;
+	overflow: hidden;
+	position: relative;
+   cursor: pointer; 
+}
+.crw-upload-tag:hover, .crw-upload-tag:active, .crw-upload-tag:focus {
+   text-decoration: underline;
+   cursor: pointer;
+}
+.crw-input-upload{
+   position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    width: 148px;
+    height: 46px;
+   cursor: pointer;
 }
 .crw-display-grid{
    display: grid;
@@ -4231,6 +4291,7 @@ ul.chm-cam-ul-right li{
    margin-top: 8px;
    margin-left: 4px;
    margin-right: 4px;
+   margin-bottom: 5px;
 }
 .crw-tag-flex{
    display: flex;
@@ -4514,6 +4575,18 @@ ul.chm-cam-ul-right li{
    padding: 0px 3px;
    border: 1px solid;
    font-weight: 600;
+}
+.crs-modal-head{
+   color: red;
+}
+.crs-modal-hght{
+   height: 400px;
+   margin: 2px;
+}
+.crs-modal-inner{
+   width: 100%;
+   height: 100%;
+   border: 1px solid #dee2e6;
 }
 .crs-remove-btn{
    font-size: 11px;

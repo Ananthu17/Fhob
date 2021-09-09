@@ -56,34 +56,46 @@
                             {% csrf_token %}
                             <input type="hidden" name="character_id" value="{{character.id}}" />
                             <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <p class="help_text"><span class="help_txt_title">How to create sides:</span>
+                                        1) Click on the Edit button;
+                                        2) Type the number of the chosen page of the script 
+                                        (you can crop that page to your specifications);
+                                        3) If the scene has more than one page, then 
+                                        choose other pages one at the time, the same way as 
+                                        you did the first page;
+                                        4) When you're done, click "Save".
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-input-right-info">
-                                        Copy each Scene and Paste to the right
-                                    </div>
-                                    <div>
-                                        </iframe>
                                         <div class="card sds-script-card">
                                             <div class="sds-card-inneralign">
                                                 <div class="sds-inner-pdf-align">
                                                     {% if project.script %}
                                                     <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
-                                                    <!-- <iframe src="/media/script/{{project.id}}.html" class="pdf-style" frameborder="0"></iframe> -->
-                                                    <!-- <iframe src="https://docs.google.com/gview?url=https://docs.google.com/document/d/1YfXflnjxQj4xabpoyNaqrLG3BhzaSHoTXhG5dxCL1W4/&embedded=true" class="pdf-style" frameborder="0"></iframe> -->
-                                                    <!-- <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=http://localhost:8000{{project.script.url}}"></iframe> -->
-
                                                     {% endif %}
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-12">
                                     <div class="sds-side-input-align-mob">
                                         <div class="sds-scene-head-1">
-                                            <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"><a href="">SIDES</a></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">EDIT</a>
+                                                </span>
+                                            </div>      
+                                            <!-- <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
                                             <span class="pl-4" >
                                                 <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">Edit</a>
-                                            </span>
+                                            </span> -->
                                         </div>
                                         <div>
                                             {% if sides.scene_1_pdf %}
@@ -95,10 +107,17 @@
                                     </div>
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
-                                            <span class="sds-scene-txt">SCENE TWO</span>
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">EDIT</a>
+                                                </span>
+                                            </div>
+                                            <!-- <span class="sds-scene-txt">SCENE TWO</span>
                                             <span class="pl-4" >
                                                 <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">Edit</a>
-                                            </span>
+                                            </span> -->
                                         </div>
                                         <div>
                                             {% if sides.scene_2_pdf %}
@@ -110,10 +129,17 @@
                                     </div>
                                     <div class="sds-textarea-padding">
                                         <div class="sds-scene-head">
-                                            <span class="sds-scene-txt">SCENE THREE</span>
+                                            <!-- <span class="sds-scene-txt">SCENE THREE</span>
                                             <span class="pl-4" >
                                                 <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">Edit</a>
-                                            </span>
+                                            </span> -->
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">EDIT</a>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div>
                                             {% if sides.scene_3_pdf %}
