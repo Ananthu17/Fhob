@@ -1840,4 +1840,3 @@ class BetaTesterCodes(models.Model):
     class Meta:
         verbose_name = 'Beta Tester Code'
         verbose_name_plural = 'Beta Tester Codes'
-

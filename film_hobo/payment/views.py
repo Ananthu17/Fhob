@@ -34,6 +34,68 @@ class IsSuperUser(IsAdminUser):
         return bool(request.user and request.user.is_superuser)
 
 
+class UpdateMembershipFeeDetailsAPI(APIView):
+    """
+    API for superuser to update the membership fee details to film_hobo backend
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        token_generation_url = \
+            'https://api.sandbox.paypal.com/v1/oauth2/token'
+
+        token_generation_url_username = settings.PAYPAL_CLIENT_ID
+        token_generation_url_password = settings.PAYPAL_SECRET_ID
+        full_user = token_generation_url_username + ':' +\
+            token_generation_url_password
+
+        token_generation_url_response = requests.get(
+            token_generation_url,
+            headers={'Accept': 'application/json',
+                     'Accept-Language': 'en_US'},
+            params={'grant_type': 'client_credentials'},
+            auth=(token_generation_url_username, token_generation_url_password))
+        import pdb;pdb.set_trace()
+        if indie_monthly_user_response.status_code == 200:
+            passindie_monthly_user_response
+        else:
+            pass
+
+        # details_url_origin = \
+        #     'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+        # indie_monthly_details_url = \
+        #     details_url_origin + settings.INDIE_PAYMENT_MONTHLY
+        # indie_yearly_details_url = \
+        #     details_url_origin + settings.INDIE_PAYMENT_YEARLY
+        # pro_monthly_details_url = \
+        #     details_url_origin + settings.PRO_PAYMENT_MONTHLY
+        # pro_yearly_details_url = \
+        #     details_url_origin + settings.PRO_PAYMENT_YEARLY
+        # company_monthly_details_url = \
+        #     details_url_origin + settings.COMPANY_PAYMENT_MONTHLY
+        # company_yearly_details_url = \
+        #     details_url_origin + settings.COMPANY_PAYMENT_YEARLY
+
+        # indie_monthly_user_response = requests.get(
+        #     indie_monthly_details_url,
+        #     headers={'Content-type': 'application/json',
+        #              'Authorization': ''})
+        # if indie_monthly_user_response.status_code == 200:
+        #     new_user = CustomUser.objects.get(
+        #                 email=request.POST['email'])
+        #     if must_validate_email:
+        #         ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+        #         signup_code = SignupCode.objects.create_signup_code(
+        #                 new_user, ipaddr)
+        #         signup_code.send_signup_email()
+
+        #     return render(request,
+        #                     'user_pages/user_email_verification.html',
+        #                     {'user': new_user})
+        # else:
+        #     return HttpResponse('Could not save data')
+
+
 class GetMembershipFeeDetailsAPI(APIView):
     """
     API for superuser to get the membership fee details

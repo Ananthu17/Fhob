@@ -65,6 +65,22 @@
                                 </i>
                             </li>
                             <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
+                                    class="img-fluid header-user-img">
+                                    {% if user.membership == 'HOB' %}
+                                        <span class="header-icon-pos pro-font">Hobo</span>
+                                    {% elif user.membership == 'IND' %}
+                                        <span class="header-icon-pos pro-font">Indie</span>
+                                    {% elif user.membership == 'PRO' %}
+                                        <span class="header-icon-pos pro-font">Pro</span>
+                                    {% elif user.membership == 'COM' %}
+                                        <span class="header-icon-pos pro-font">Company</span>
+                                    {% elif user.membership == 'ADMIN' %}
+                                        <span class="header-icon-pos pro-font">Admin</span>
+                                    {% else %}
+                                        <span class="header-icon-pos pro-font"></span>
+                                    {% endif %}
+                            </li>
+                            <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img"><span class="header-icon-pos pro-font">Pro</span></li>
                         </ul>
                     </div>
@@ -170,7 +186,7 @@
                                     <a class="dropdown-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
                                     <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
                                     <a class="dropdown-item" href="#">Settings & Privacy</a>
-                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
                                         <a class="dropdown-item" href="#">Support</a>
@@ -182,7 +198,7 @@
                                     <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% else %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
-                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
                                         <a class="dropdown-item" href="#">Support</a>
