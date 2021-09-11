@@ -33,7 +33,11 @@ RUN apk --update add \
     jpeg-dev \
     zlib-dev
 
-RUN pip install -r /requirements.txt
+RUN apk --update add gfortran py-pip build-base wget freetype-dev \
+    libpng-dev openblas-dev g++ cmake make mupdf-dev jbig2dec jbig2dec-dev \
+    openjpeg-dev libxml2-dev libxslt-dev harfbuzz-dev && pip3 install --upgrade pip
+
+RUN pip3 install -r /requirements.txt
 
 # Remove dependencies
 RUN apk del .tmp-build-deps
