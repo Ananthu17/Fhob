@@ -1,0 +1,22 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+  <div class="container mt-3 mb-3">
+      <div class="row align-items-center pt-4 pb-4">
+        <img class="img-fluid content-page-logo" src="{% static 'images/404-error.png' %}">
+      </div>
+      <div class="row m-2 d-flex justify-content-center">
+        <h3>404 - PAGE NOT FOUND.</h3>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}

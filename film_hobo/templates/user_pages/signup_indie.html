@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {{ form.media.css }}
@@ -12,26 +12,26 @@
           <!-- Nav pills -->
           <ul class="nav nav-pills nav-justified" role="tablist">
               <li class="nav-item">
-                  <a class="nav-link active" data-toggle="pill" href="#account">Account</a>
+                  <a class="nav-link active" href="#account">Account</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" data-toggle="pill" href="#paymentplan">Payment Plan</a>
+                  <a class="nav-link" href="#paymentplan">Payment Plan</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" data-toggle="pill" href="#payment">Payment</a>
+                  <a class="nav-link" href="#payment">Payment</a>
               </li>
           </ul>
           <hr class="m-0 signup-border-hr">
           <div class="row mt-2">
               <div class="col-4 d-flex justify-content-center">
+                  <a id="indie_btn"></a>
+              </div>
+              <div class="col-4 d-flex justify-content-center">
                   <a href="" class="btn btn-account">Indie</a>
               </div>
-              <div class="col-4 d-flex justify-content-center">
-                  <a href="" class="btn btn-account">Pro</a>
-              </div>
-              <div class="col-4 d-flex justify-content-center">
+              <!-- <div class="col-4 d-flex justify-content-center">
                   <a href="" class="btn btn-account">Company</a>
-              </div>
+              </div> -->
           </div>
           <!-- Tab panes -->
           <div class="tab-content">
@@ -213,10 +213,46 @@
                             {% endif %}
                           </div>
                       </div>
+                      <div id="beta-user-div" class="row mt-2">
+                        <div class="col-2">
+                            <label class="form-title">Beta User</label>
+                        </div>
+                        <div class="col-4 form-group">
+                          <input type="text"
+                          name="beta_user"
+                          class="form-control form-control-input"
+                          id="id_beta_user"
+                          autocomplete="off">
+                        </div>
+                    </div>
+                      <div id="beta-user-code-div" class="row mt-2">
+                        <div class="col-2">
+                            <label class="form-title">Beta User Code</label>
+                        </div>
+                        <div class="col-4 form-group">
+                          <input type="text"
+                          name="beta_user_code"
+                          class="form-control form-control-input"
+                          id="id_beta_user_code"
+                          autocomplete="off">
+                        </div>
+                    </div>
+                    <div id="beta-user-code-lastdate-div" class="row mt-2">
+                      <div class="col-2">
+                          <label class="form-title">Beta User Final Day</label>
+                      </div>
+                      <div class="col-4 form-group">
+                        <input type="text"
+                        name="beta_user_end"
+                        class="form-control form-control-input"
+                        id="id_beta_user_end"
+                        autocomplete="off">
+                      </div>
+                  </div>
                       <div class="row mt-2">
                           <div class="col-12 tos">
                               By creating this account, you agree to the<span class="tos-t"> TERMS OF
-                                  SERVICE</span> of Film Hobo
+                                  SERVICE</span> of Filmhobo
                               Corporation and acknowledge that your credit card will be charged for the
                               selected subscription amount plus any applicable taxes, at the time of purchase
                               or at the end of any promotional discount period. Your subscription will renew
@@ -241,8 +277,10 @@
           </div>
           <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
               <ul class="list-inline m-0">
-                  <li class="list-inline-item fb">Back</li>
-                  <li class="list-inline-item"><button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button></li>
+                  <li class="list-inline-item "><button type="button" class="btn btn-link-b fb p-0">Back</button></li>
+                  <li class="list-inline-item">
+                    <button type="submit" class="btn btn-link p-0">Next</button>
+                  </li>
               </ul>
           </div>
         </form>
@@ -253,6 +291,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/add_beta_user_details.js' %}"></script>
 {{ form.media.js }}
 <script>
   $(document).ready(function() {

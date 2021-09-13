@@ -18,9 +18,11 @@ full_requirements.txt
 film_hobo/hobo_user/migrations/
 film_hobo/initial_user/migrations/
 film_hobo/payment/migrations/
+film_hobo/general/migrations/
+film_hobo/project/migrations/
 
 # ignore static files
-film_hobo/static/
+film_hobo/film_hobo/static/
 
 # ignore env files
 local.env

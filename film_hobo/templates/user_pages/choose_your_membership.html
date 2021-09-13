@@ -1,25 +1,175 @@
+{% extends 'base.html' %}
 {% load rest_framework %}
+{% load static %}
 
-<html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_indie' %}">Indie</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_pro' %}">Pro</a></h3>
-                </div>
-                <div class="col-sm-3">
-                    <h3><a href = "{% url 'hobo_user:signup_company' %}">Company</a></h3>
-                </div>
+{% block extracss %}
+<!-- <link rel="stylesheet" href="{% static 'css/choose_your_membership.css' %}"> -->
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid memship-f">
+        <div class="box1 signup-form signup-section signup-border">
+            <div class="d-flex justify-content-center">
+                Beta testing is in progress.
+            </div>
+            <div class="d-flex justify-content-center">
+                If you were invited, please enter the code below
+            </div>
+            <div class="d-flex justify-content-center">
+                <button id="beta-tester-modal" type="button">Enter Beta Tester Code</button>
+            </div>
+          </div>
+        <div class="row memship-row-head mt-2 ml-2 mr-2">
+            <div class="col-4 memship-head">CHOOSE YOUR MEMBERSHIP</div>
+            <div class="col-2 memship-pro-font underline" ><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_hobo' %}">Hobo</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_indie' %}">Indie</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_pro' %}">Pro *</a></div>
+            <div class="col-2 memship-pro-font underline"><a class="memship-pro-font underline" href = "{% url 'hobo_user:signup_company' %}">Company</a></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">COST (YEARLY/MONTHLY)</div>
+            <div class="col-2 ">FREE</div>
+            <div class="col-2 ">$<span id="annual_indie">120</span>/$<span id="monthly_indie">15</span></div>
+            <div class="col-2 ">$<span id="annual_pro">120</span>/$<span id="monthly_pro">15</span></div>
+            <div class="col-2 ">$<span id="annual_company">250</span>/$<span id="monthly_company">30</span></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">FIRST MONTH FREE</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">VOTING</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">PERSONAL PAGE</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">INTERNAL COMMUNICATION</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">SHOWCASE VIDEOS (Watch and like)</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">START A PROJECT (Scenes and Short Films)</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">START A PROJECT (Pilots and Features)</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">ATTACHMENT TO A PROJECT (Any) </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">RATE TALENT, CREW AND PROJECTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">INDUSTRY GUILD REQUIREMENTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row mt-3 ml-2 mr-2">
+            <div class="col-4 ">ADMIN ACCOUNTS </div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 ">-</div>
+            <div class="col-2 "><img src="{% static 'images/check.png' %}" class="img-fluid memship-check"></div>
+        </div>
+        <div class="row memship-row-btm mt-3 ml-2 mr-2 mb-4">
+            <div class="col-1 memship-pro-font">Pro *</div>
+            <div class="col-11 memship-btm-f pl-0">
+                You can become <span class="memship-btm-pro-f">Pro</span> only if You belong to any of the Film Industry Guilds, or you must advance from
+                your <span class="memship-btm-pro-f">Indie </span>Membership, by building up your Talent and/or Crew Rating. You have to have
+                five gigs rated  <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star orng-icon" aria-hidden="true"></i>
+                <i class="fa fa-star-o" aria-hidden="true"></i> or higher. to advance. After you achive the requirement your account will become <span class="memship-btm-pro-f">Pro </span>
+                automatically.
             </div>
         </div>
-    </body>
-</html>
+    </div>
+</div>
+<!-- Modal Start -->
+<div class="modal " id="membershipModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="notificationModalTitle">Notification</h5>
+            <button id="close-cross" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="membershipModalBody" class="modal-body notification-modal-content">
+            <form id="membershipModalForm">
+                <div class="form-group">
+                    <label>Beta User Code</label>
+                    <input type="text" class="form-control" id="input_code" placeholder="Enter code">
+                    <div id="invlid-error" class="invalid-feedback">
+                        Please provide a valid code.
+                    </div>
+                </div>
+                <button id="check-code" type="button" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button id="close-membership-btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+<!-- Alert Box Start -->
+<div id="success-alert-box" class="alert-box">
+    <div class="alert alert-success">
+        <div class="alert-icon text-center">
+            <i class="fa fa-check-square-o  fa-3x" aria-hidden="true"></i>
+        </div>
+        <div class="alert-message text-center">
+            <strong>Success!</strong> Beta User Code Activated.
+        </div>
+    </div>
+</div>
+<!-- Alert Box End -->
+
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/choose_membership.js' %}"></script>
+{% endblock %}

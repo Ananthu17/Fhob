@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load user_account_tag %}
+{% load static %}
+
+{% block extracss %}
+
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <!-- project menu  -->
+
+                <div class="sds-menu-bg">
+                    <div class="cta-menu-align">
+                        <ul class="sds-menu sds-menu-padding">
+                            <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                            <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
+                            <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- project menu  End-->
+                <!-- Audition menu  -->
+                <div class="sds-menu-bg">
+                    <div class="cta-menu-align">
+                        <form>
+                            <ul class="cta-side-setup-menu sds-menu-padding">
+                                <li><span class="video-menu-head">AUDITION</span></li>
+                                <li><span><a href="{% url 'project:chemistry-room' project.id %}" class="cta-tag-black">Chemistry Room</a></span></li>
+                                <li>
+                                    <span class="">Casting Director: </span><a href="{{casting_director.get_profile_url}}" class="cta-menu-blue"> {{casting_director.get_full_name}}</a>
+                                    <span class="cta-log-star">
+                                        <div class="">
+                                            <div class="cta-stars-outer">
+                                                <div class="cta-stars-inner" style="width:{{casting_director_rating}}%;"></div>
+                                              </div>
+                                        </div>
+                                    </span>
+                                </li>
+                                <li><span><a href="{% url 'project:cast-attach-remove' project.id %}" class="cta-tag-black">Cast Attach/Remove</a></span></li>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Audition menu End -->
+
+                {% for character,audition_list in character_dict.items %}
+                <!-- Rating section 1 -->
+
+                <div class="cta-rating-menu-bg {% if not forloop.first %} mt-2 {% endif %}">
+                    <div class="row ml-2">
+                        <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-2 mb-1">
+                            <div class="cta-left-name-display ">
+                                {% get_dict_value count_dict character as count %}
+                                <span class="cta-name-orange">{{character.name}}</span><span class="cta-name-orange-num">({{count}})</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-11 col-md-12 col-sm-12 col-xs-12 mt-3 mb-1">
+                            <div class="cta-owl-align">
+                                <div class="cast-owl owl-carousel owl-theme">
+                                    {% for audition_obj in audition_list %}
+                                    <div class="item ">
+                                        <div class="cta-rate-div-align">
+                                            <div class="cta-rate-image-frame
+                                            {% if audition_obj.audition_status == 'applied' %}cta-rate-image-frame-color-grey-thin{% endif %}
+                                            {% if audition_obj.audition_status == 'passed' %}cta-rate-image-frame-color-grey{% endif %}
+                                            {% if audition_obj.audition_status == 'attached' %}cta-rate-image-frame-color-green{% endif %}
+                                            {% if audition_obj.audition_status == 'callback' %}cta-rate-image-frame-color-orange{% endif %}"
+                                            {% if audition_obj.audition_status == 'applied' %}title="Applied"{% endif %}
+                                            {% if audition_obj.audition_status == 'passed' %}title="Passed"{% endif %}
+                                            {% if audition_obj.audition_status == 'attached' %}title="Attached"{% endif %}
+                                            {% if audition_obj.audition_status == 'callback' %}title="Chemistry Room"{% endif %}
+                                            >
+                                            <a href="{% url 'project:cast-video-audition' audition_obj.id %}">
+                                            <img src="{{audition_obj.cover_image.url}}" class="cta-rate-image">
+                                            </a>
+                                            </div>
+                                            <div>
+                                                <div class="cta-rate-txt-align">
+                                                    <span class="cta-rate-name-main" title="{{audition_obj.status}}">{{audition_obj.name}}</span>
+                                                    <span class="cta-log-star">
+                                                        {% get_dict_value rating_dict audition_obj.user.id as rating%}
+                                                        <div class="">
+                                                            <div class="cta-stars-outer">
+                                                                <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
+                                                              </div>
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="cta-rate-txt-frame">
+                                                <div class="cta-rate-txt-align">
+                                                    <div>
+                                                        <span class="cta-rate-name-txt">Audition</span>
+                                                        <span class="cta-log-star">
+                                                            {% get_dict_value audition_rating_dict audition_obj.id as audition_rating %}
+                                                            <div class="">
+                                                                <div class="cta-stars-outer">
+                                                                    <div class="cta-stars-inner" style="width:{{audition_rating}}%;"></div>
+                                                                  </div>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    <!-- End -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rating section End  1-->
+                {% endfor %}
+
+
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+        $('.cast-owl').owlCarousel({
+        loop:false,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            444:{
+                items:2,
+                nav:true
+            },
+            611:{
+                items:3,
+                nav:true
+            },
+            810:{
+                items:4,
+                nav:true
+            },
+            992:{
+                items:3,
+                nav:true
+            },
+            1045:{
+                items:4,
+                nav:true
+            },
+            1320:{
+                items:5,
+                nav:true,
+                loop:false
+            }
+        }
+    })
+
+</script>
+{% endblock %}
+
+

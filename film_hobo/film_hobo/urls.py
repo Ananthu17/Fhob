@@ -15,20 +15,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.conf.urls import url
-
-from hobo_user.views import ExtendedSignupVerify, PasswordResetConfirmView
+from django.conf.urls.static import static
+from django.conf.urls import handler404
+from django.conf import settings
+from hobo_user.views import ExtendedSignupVerify, \
+    PasswordResetConfirmView
 
 from rest_framework_simplejwt import views as jwt_views
-from initial_user.views import InitialUserDetailSavePage
+from initial_user import views as initial_user_views
+# from initial_user.views import InitialUserDetailSavePage
+from hobo_user.views import HowTo
 
 urlpatterns = [
-    path('', InitialUserDetailSavePage.as_view(),
-         name='landing_home'),
+    # path('', InitialUserDetailSavePage.as_view(),
+    #      name='landing_home'),
+    path('', HowTo.as_view(), name='how_to'),
     path('admin/', admin.site.urls),
     path('initial_user/', include('initial_user.urls')),
     path('payment/', include('payment.urls')),
     path('hobo_user/', include('hobo_user.urls')),
+    path('general/', include(('general.urls', 'general'), namespace='general')),
+    path('project/', include(('project.urls', 'project'), namespace='project')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(),
@@ -41,4 +48,7 @@ urlpatterns = [
     path('password-reset-confirm/<str:uidb64>/<str:token>',
          PasswordResetConfirmView.as_view(),
          name='password_reset_confirm'),
-]
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = initial_user_views.notfound

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="container wrapper flex-grow-1">
+    <div class="row help-sec-outer mt-3 mb-4">
+        <div class="col-11 mt-4 mb-2">
+            <a class="help-blu-link float-left ml-3">Surfing Film Hobo</a>
+            <button class="btn help-top-btn float-right">Report a Problem</button>
+        </div>
+        <div class="bg-light-help">
+            <div class="col-12 mt-1">
+            <a class="help-links">Getting started</a>
+            <hr class="help-hr">
+            <a class="help-links">Projects</a>
+            <hr class="help-hr">
+            <a class="help-links">Rating</a>
+            <hr class="help-hr">
+            <a class="help-links">Showcase</a>
+            <hr class="help-hr">
+            <a class="help-links">SAMR</a>
+            <hr class="help-hr">
+            <a class="help-links">Networking</a>
+            <hr class="help-hr">
+            <a class="help-links">Community Rules</a>
+            <hr class="help-hr">
+            <a href="{% url 'hobo_user:choose-membership'  %}" class="help-links">Membership</a>
+            <hr class="help-hr-btm">
+        </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+{% block extrajs %}
+{% endblock %}

@@ -6,185 +6,254 @@
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-    <div class="container">
-        <div class = "row">
-        <div class = "col-12">
-                <b>Personal Details</b>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Gender</label>
-                        </div>
-                        <div class="col-6">
-                            <select class="form-control" name="{{ form.gender.name }}"
-                                id="{{ form.gender.id_for_label }}"
-                                placeholder="Gender"
-                                required>
-                                {% for item in form.gender %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                            {% if form.errors.gender %}
-                            <p style="color: red">{{form.errors.gender}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
+    <div class="container member-form">
+        <form method="post">
+            {% csrf_token %}
+        <div class="row mt-4">
+            <div class="col-12 d-flex">
+                <hr class="member-hr"><span class="member-edit ml-2"> Edit</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Gender</label></div>
+            <div class="col-6">
+                <div class="form-group">
+                        <select class="form-control form-control-member" name="{{ form.gender.name }}"
+                        id="{{ form.gender.id_for_label }}"
+                        placeholder="Gender"
+                        required>
+                        {% for item in form.gender %}
+                            {{item}}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if errors.gender %}
+                {% for err in errors.gender %}
+                <p style="color: red">{{err}}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Height</label></div>
+            <div class="col-3">
+                <div class="input-group mb-2">
+                    <input class="form-control form-control-member"
+                    name="{{ form.feet.name }}"
+                    value="{% if user.feet %}{{ user.feet}}{% endif%}"
+                    required>
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">ft</div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Height</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="" name="{{ form.feet.name }}" value="{% if user.feet %}{{ user.feet}}{% endif%}" />
-                            <input class="" name="{{ form.inch.name }}" value="{% if user.inch %}{{ user.inch}}{% endif%}" />
-                            {% if form.errors.feet %}
-                            <p style="color: red">{{form.errors.feet}}</p>
-                            {% endif %}
-                            {% if form.errors.inch %}
-                            <p style="color: red">{{form.errors.inch}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
+                </div>
+                {% if errors.feet %}
+                {% for err in errors.feet %}
+                <p style="color: red">{{err}}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-3">
+                <div class="input-group mb-2">
+                    <input type="text"
+                    class="form-control form-control-member"
+                    name="{{ form.inch.name }}"
+                    value="{% if user.inch %}{{ user.inch}}{% endif%}" required>
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">inch</div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Weight</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="form-control" name="{{ form.lbs.name }}" value="{% if user.lbs %}{{ user.lbs}}{% endif%}" />
-                            {% if form.errors.lbs %}
-                            <p style="color: red">{{form.errors.lbs}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
+                </div>
+                {% if errors.inch %}
+                {% for err in errors.inch %}
+                <p style="color: red">{{err}}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Weight</label></div>
+            <div class="col-6">
+                <div class="input-group mb-2">
+                    <input class="form-control form-control-member"
+                    name="{{ form.lbs.name }}"
+                    value="{% if user.lbs %}{{ user.lbs}}{% endif%}">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">lbs</div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Age-playing range</label>
-                        </div>
-                        <div class="col-6">
-                            <input class="" name="{{ form.start_age.name }}" value="{% if user.start_age %}{{ user.start_age}}{% endif%}" />
-                            <input class="" name="{{ form.stop_age.name }}" value="{% if user.stop_age %}{{ user.stop_age}}{% endif%}" />
-                            {% if form.errors.start_age %}
-                            <p style="color: red">{{form.errors.start_age}}</p>
-                            {% endif %}
-                            {% if form.errors.stop_age %}
-                            <p style="color: red">{{form.errors.stop_age}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
+                </div>
+                {% if errors.lbs %}
+                {% for err in errors.lbs %}
+                <p style="color: red">{{err}}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Age-playing range</label></div>
+            <div class="col-3">
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">from</div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Physique</label>
-                        </div>
-                        <div class="col-6">
-                            <select class="form-control" name="{{ form.physique.name }}"
-                                id="{{ form.physique.id_for_label }}"
-                                placeholder="Physique"
-                                required>
-                                {% for item in form.physique %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                            {% if form.errors.physique %}
-                            <p style="color: red">{{form.errors.physique}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
+                    <input class="form-control form-control-member" name="{{ form.start_age.name }}"
+                    value="{% if user.start_age %}{{ user.start_age}}{% endif%}">
+                </div>
+                {% if errors.start_age %}
+                    {% for err in errors.start_age %}
+                        <p style="color: red">{{err}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-3">
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">to</div>
                     </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Hair Color</label>
-                        </div>
-                        <div class="col-6">
-                            <select class="form-control" name="{{ form.hair_color.name }}"
-                            id="{{ form.hair_color.id_for_label }}"
-                            placeholder="Hair color"
-                            required>
-                            {% for item in form.hair_color %}
-                                {{item}}
-                            {% endfor %}
-                        </select>
-                            {% if form.errors.hair_color %}
-                            <p style="color: red">{{form.errors.hair_color}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Hair Length</label>
-                        </div>
-                        <div class="col-6">
-                            <select class="form-control" name="{{ form.hair_length.name }}"
-                            id="{{ form.hair_length.id_for_label }}"
-                            placeholder="Hair Length"
-                            required>
+                    <input class="form-control form-control-member"
+                    name="{{ form.stop_age.name }}"
+                    value="{% if user.stop_age %}{{ user.stop_age}}{% endif%}">
+                </div>
+                {% if errors.stop_age %}
+                    {% for err in errors.stop_age %}
+                        <p style="color: red">{{err}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Physique</label></div>
+            <div class="col-6">
+                <div class="form-group">
+                    <select class="form-control form-control-member" name="{{ form.physique.name }}"
+                        id="{{ form.physique.id_for_label }}"
+                        placeholder="Physique"
+                        required>
+                        {% for item in form.physique %}
+                            {{item}}
+                        {% endfor %}
+                    </select>
+                    {% if errors.physique %}
+                        {% for err in errors.physique %}
+                            <p style="color: red">{{err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Hair color</label></div>
+            <div class="col-6">
+                <div class="form-group">
+                    <select class="form-control form-control-member"
+                    name="{{ form.hair_color.name }}"
+                    id="{{ form.hair_color.id_for_label }}"
+                    placeholder="Hair color">
+                        {% for item in form.hair_color %}
+                            {{item}}
+                        {% endfor %}
+                    </select>
+                    {% if errors.hair_color %}
+                    {% for err in errors.hair_color %}
+                    <p style="color: red">{{err}}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Hair length</label></div>
+            <div class="col-6">
+                <div class="form-group">
+                    <select class="form-control form-control-member" name="{{ form.hair_length.name }}"
+                    id="{{ form.hair_length.id_for_label }}"
+                    placeholder="Hair Length">
                             {% for item in form.hair_length %}
                                 {{item}}
                             {% endfor %}
-                        </select>
-                            {% if form.errors.hair_length %}
-                            <p style="color: red">{{form.errors.hair_length}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <label class="form-title">Eyes</label>
-                        </div>
-                        <div class="col-6">
-                            <select class="form-control" name="{{ form.eyes.name }}"
-                            id="{{ form.eyes.id_for_label }}"
-                            placeholder="Eyes"
-                            required>
-                            {% for item in form.eyes %}
-                                {{item}}
-                            {% endfor %}
-                        </select>
-                            {% if form.errors.eyes %}
-                            <p style="color: red">{{form.errors.eyes}}</p>
-                            {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <b>Ethnic Appearance</b>
-                        </div>
-                        <div class="col-6">
-                            
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-2">
-                            <b>ATHLETIC SKILSS</b>
-                        </div>
-                        <div class="col-6">
-                            {% for item in all_athletic_skills %}
-                            <div class="">
-                                <input type="checkbox"  name="{{item}}" 
-                                class="form-check-input"
-                                {% if item.id in athletic_skills %} checked {% endif %}>
-                                {{item}}
-                            </div>
-                            {% endfor %}
-
-                        </div>
-                    </div>
-                    <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Save</button>
-                </form>
-            </div>
+                    </select>
+                    {% if errors.hair_length %}
+                        {% for err in errors.hair_length %}
+                            <p style="color: red">{{err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-4"><label class="bold-label" for="">Eyes</label></div>
+            <div class="col-6">
+                <div class="form-group">
+                    <select class="form-control form-control-member" name="{{ form.eyes.name }}"
+                    id="{{ form.eyes.id_for_label }}"
+                    placeholder="Eyes">
+                        {% for item in form.eyes %}
+                            {{item}}
+                        {% endfor %}
+                    </select>
+                    {% if errors.eyes %}
+                        {% for err in errors.eyes %}
+                            <p style="color: red">{{err}}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <h6>ETHNIC APPEARENCE</h6>
+        <hr class="member-hr mt-0 mb-0">
+        <div class="row">
+            <div class="col-6 mt-2">
+                {% for item in all_ethnic_appearances %}
+                <div class="form-check mt-2">
+                    <input type="radio" class="form-check-input"
+                    name="ethnic_appearance"
+                    value="{{item.id}}"
+                    {% if user.ethnic_appearance == item %}Checked{% endif %}
+                    required>
+                    <label class="form-check-label" for="">{{item.ethnic_appearance}}</label>
+                </div>
+                {% endfor %}
+                {% if errors.ethnic_appearance %}
+                    {% for err in errors.ethnic_appearance %}
+                        <p style="color: red">{{err}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <h6 class="mt-4">ATHLETIC SKILLS</h6>
+        <hr class="member-hr mt-0 mb-0">
+        <div class="row">
+            <div class="col-6 mt-2">
+                {% for item in all_athletic_skills_set1 %}
+                <div class="form-check mt-2">
+                    <input type="checkbox"  name="checks[]"
+                    class="form-check-input" value="{{item.id}}"
+                    {% if item.id in athletic_skills %} checked {% endif %} />
+                    <label class="form-check-label" for="">{{item}}</label>
+                </div>
+                {% endfor %}
+                {% if errors.athletic_skills %}
+                    {% for err in errors.athletic_skills %}
+                     <p style="color: red">{{err}}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-6 mt-2">
+                {% for item in all_athletic_skills_set2 %}
+                <div class="form-check mt-2">
+                    <input type="checkbox"  name="checks[]"
+                    class="form-check-input" value="{{item.id}}"
+                    {% if item.id in athletic_skills %} checked {% endif %}>
+                    <label class="form-check-label" for="">{{item}}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="btn mem-btn-save mt-3 mb-3">SAVE</button>
+    </form>
     </div>
 </div>
 {% endblock %}
 
 {% block extrajs %}
 {% endblock %}
-
 

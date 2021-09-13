@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/cropper.min.css' %}">
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1"  >
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                {% if request.user == project.creator %}
+                <!-- project menu  -->
+
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <ul class="sds-menu sds-menu-padding">
+                            <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                            <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
+                            <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- project menu  End-->
+                <!-- Cast menu  -->
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <form>
+                            <ul class="sds-side-setup-menu sds-menu-padding">
+                                <li><span class="video-menu-head">SIDES SETUP</span></li>
+                                <li><span class="sds-blue-name">CHARACTER: </span><span class="video-menu-head">{{character.name}}</span></li>
+                                <li>
+                                    <!-- <span class="sds-side-menu-btn">
+                                        <a href="" class="cas-cast-menu-save">SAVE</a>
+                                        <a href="" class="cas-cast-menu-edit">EDIT</a>
+                                    </span> -->
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cast menu End -->
+                <!-- side input area  -->
+
+                <div class="sds-input-bg">
+                    <div class="sds-input-padding">
+                            <div class="row">
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-input-right-info">
+                                    </div>
+                                    <div>
+                                        <div class="card sds-script-card" >
+                                            <div class="sds-card-inneralign">
+                                                <div class="sds-inner-pdf-align">
+                                                    {% if project.script %}
+                                                    <input type="hidden" value="{{ project.script.path}}" class="script_path" />
+                                                    <iframe src="{{project.script.url}}" class="pdf-style" id="script_id" frameborder="0"></iframe>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+
+<!-- The Modal -->
+<div class="modal fade" id="modalCrop">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Crop the photo</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+        </div>
+        <form  method="post"
+        action="{% url 'project:add-scene-images' project.id %}"
+        id="sidesform" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="project_id" id="project_id" value="{{project.id}}" />
+            <input type="hidden" name="character_id" id="character_id" value="{{character.id}}" />
+            <input type="hidden" name="scene" id="scene" value="{{ request.GET.scene }}" />
+
+            <input type="hidden" name="x" id="x" />
+            <input type="hidden" name="y" id="y" />
+            <input type="hidden" name="width" id="width" />
+            <input type="hidden" name="height" id="height"/>
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="pdf_img">
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button type="button"
+        class="btn btn-outline-danger btn-sm js-crop-and-upload">
+        Crop and upload</button>
+        <button class="btn btn-outline-danger btn-sm close-modal"
+        data-dismiss="modal" type="button">Close</button>
+
+        </div>
+    </form>
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-side-input-align-mob">
+                                        <div class="sds-scene-head-1">
+                                            <span class="sds-side-txt"></span>
+                                            <span class="sds-scene-txt sds-scene-txt-padding">
+                                                {% if request.GET.scene == '1' %} SCENE ONE {% endif %}
+                                                {% if request.GET.scene == '2' %} SCENE TWO {% endif %}
+                                                {% if request.GET.scene == '3' %} SCENE THREE {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-4">
+                                                <input class="inp-line pdf_page_number" placeholder="Page Number" />
+                                            </div>
+                                            <div class="col-8">
+                                                <a class="cursor-pointer crop_img_btn btn-simple ">Crop Image</a>
+                                            </div>
+                                            <div class="col-12">
+                                                <p class="page_number_error all-p-light"></p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4" >
+                                        {% for obj in scene_image_objs %}
+                                        {% if forloop.first or forloop.counter0|divisibleby:4 %}
+                                        <div class="row mt-2">
+                                        {% endif %}
+                                            <div class="col-12 col-md-3">
+                                                <img src = {{obj.image.url}} class="screenshot-img"
+                                                data-toggle="modal" data-target="#modal_img_view_{{obj.id}}"/>
+                                                <div class="text-center">
+                                                    <a class=" all-p-light cursor-pointer delete_screenshots" id="{{obj.id}}">
+                                                        <i class="fa fa-trash-o" aria-hidden="true" title="Delete"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        {% if forloop.last or forloop.counter|divisibleby:4 %}
+                                        </div>
+                                        {% endif %}
+<!-- The Modal -->
+<div class="modal fade" id="modal_img_view_{{obj.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+        <div class="modal-body">
+            <img src = {{obj.image.url}} class="" style="max-width: 100%;"/>
+        </div>
+    </form>
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                                        {% endfor %}
+                                       </div>
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                    <a class=" btn-simple {% if scene_image_objs %}generate_pdf{% else %}remove_scenes{% endif %}"
+                                                    id="{% if request.GET.scene == '1' %}scene_1
+                                                    {% elif request.GET.scene == '2' %}scene_2
+                                                    {% elif request.GET.scene == '3' %}scene_3
+                                                    {% endif %}">Save</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="sds-card-btn-align">
+                                    <span class="sds-input-card-btn">
+                                        <!-- <a class="edit-sides cas-cast-menu-edit cursor-pointer remove-decoration">EDIT</a> -->
+                                        <a href="{% url 'project:add-sides' project.id %}?character_id={{character.id}}" class="remove-decoration cas-cast-menu-edit">BACK</a>
+                                    </span>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+                <!-- side input area  End-->
+            {% else %}
+            <p class="all-p">Invalid page</p>
+            {% endif %}
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+ <script type="text/javascript" src="{% static 'js/cropper.min.js' %}"></script>
+<script>
+    $('body').on('click' , '.crop_img_btn', function(){
+        var comment_id = $(this).attr("id");
+        var token = $("#token").val();
+        var pdf_page_number = $(".pdf_page_number").val();
+        var data_dict = {};
+        var path = $(".script_path").val();
+        var project_id = '{{ project.id }}';
+        var page_no = pdf_page_number;
+        data_dict['path'] = path;
+        data_dict['project_id'] = project_id;
+        data_dict['page_no'] = page_no;
+        $(".page_number_error").html('');
+        if(path){
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/pdf-to-image-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    if(response['image_path']){
+                        var img_path = "/media/script/project_"+project_id+".jpg"
+                        $(".pdf_img").html('');
+                        $(".pdf_img").html('<img src="'+img_path+'" id="pdfimage" style="max-width: 100%;"/>');
+                        $("#modalCrop").modal('show');
+
+
+                            /* SCRIPTS TO HANDLE THE CROPPER BOX */
+                            var $image = $("#pdfimage");
+                            var cropBoxData;
+                            var canvasData;
+                            $("#modalCrop").on("shown.bs.modal", function () {
+                            $image.cropper({
+                                autoCropArea: 1,
+                                viewMode: 1,
+                                aspectRatio: 3/4,
+                                minCropBoxWidth: 200,
+                                minCropBoxHeight: 200,
+                                ready: function () {
+                                $image.cropper("setCanvasData", canvasData);
+                                $image.cropper("setCropBoxData", cropBoxData);
+                                }
+                            });
+                            }).on("hidden.bs.modal", function () {
+                            cropBoxData = $image.cropper("getCropBoxData");
+                            canvasData = $image.cropper("getCanvasData");
+                            $image.cropper("destroy");
+                            });
+
+
+
+                            /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER */
+                            $(".js-crop-and-upload").click(function () {
+                                var cropData = $image.cropper("getData");
+                                console.log(cropData);
+                                var croppedimage = $image.cropper('getCroppedCanvas').toDataURL("image/png");
+                                var img = document.createElement("img");
+                                img.src = croppedimage;
+                                $("#x").val(cropData['x'])
+                                $("#y").val(cropData['y'])
+                                $("#width").val(cropData['width'])
+                                $("#height").val(cropData['height'])
+                                // document.getElementById("cropped_result").append(img);
+                                $("#sidesform").submit();
+
+                            });
+                    }else{
+                        $(".page_number_error").html('Please provide page number !!');
+                    }
+                }
+            });
+        }
+    });
+    $('body').on('click' , '.close-modal', function(){
+        $("#modalCrop").modal('hide');
+    });
+
+    $('body').on('click' , '.delete_screenshots', function(){
+        var scene_obj_id = $(this).attr('id') ;
+        var token = $("#token").val();
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/delete-scene-image-api/",
+            dataType: 'json',
+            async: false,
+            data: {'id':scene_obj_id},
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+
+    $('body').on('click' , '.generate_pdf', function(){
+        var scene = $(this).attr('id') ;
+        var project_id = '{{ project.id }}' ;
+        var character_id = '{{ character.id }}' ;
+        var token = $("#token").val();
+        data_dict = {};
+        data_dict['project_id'] = project_id;
+        data_dict['character_id'] = character_id;
+        data_dict['scene'] = scene;
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/generate-scene-image-pdf-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                var path = "/project/add-sides/"+project_id+"?character_id="+character_id;
+                window.location.href = path;
+            }
+        });
+    });
+
+    $('body').on('click' , '.remove_scenes', function(){
+        var scene = $(this).attr('id') ;
+        var project_id = '{{ project.id }}' ;
+        var character_id = '{{ character.id }}'
+        var token = $("#token").val();
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/remove-character-scenes-api/",
+            dataType: 'json',
+            async: false,
+            data: {'character_id':character_id, 'scene':scene },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                var path = "/project/add-sides/"+project_id+"?character_id="+character_id;
+                window.location.href = path;
+            }
+        });
+    });
+
+</script>
+{% endblock %}

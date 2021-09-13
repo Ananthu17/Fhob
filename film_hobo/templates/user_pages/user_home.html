@@ -1,25 +1,875 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
+    <div class="wrapper flex-grow-1">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                    <div class="left-mode-search lft-li">
+                        <div class="mt-2 search-txt">
+                            <label class="d-flex justify-content-center ">Search by:</label>
+                        </div>
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Year</label>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div>
+                                <a href=""><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
+                            </div>
+                            <div class="ml-2">
+                                <label class="d-flex justify-content-center year">2021</label>
+                            </div>
+                            <div class="ml-2">
+                                <a href=""><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
 
-        <h3>Home Page</h3>
-        {% if user.is_authenticated %}
-            <p>Welcome, {{ user.email }}. Thanks for logging in.</p>
-            <p>{{ user.get_full_name }}</p>
-            <a id="logout_link" href="{% url 'hobo_user:user_logout' %}" >Logout</a><br>
-            <a href="{% url 'hobo_user:settings' %}">Settings</a>
-        {% else %}
-            <p>Welcome, new user. Please log in.</p>
-        {% endif %}
-        </form>
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Month</label>
+                        </div>
 
+                        <div class="d-flex justify-content-center left-mode-sec">
+                            <ul class="list-group home-month">
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">January</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">February</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">March</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">April</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">May</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">June</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">July</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">August</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">September</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">October</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">November</li>
+                                </a>
+                                <a class="text-dark" href="">
+                                    <li class="list-group-item border-0 month-algn">December</li>
+                                </a>
+                            </ul>
+                        </div>
+                        <div>
+                            <label class="d-flex justify-content-center txt-orange">Day</label>
+                        </div>
+                        <!-- <div > -->
+                        <table class="table borderless d-flex justify-content-center home-date">
+                            <tbody>
+                                <tr>
+                                    <td><a class="text-dark " href="">1</a></td>
+                                    <td><a class="text-dark" href="">2</a></td>
+                                    <td><a class="text-dark" href="">3</a></td>
+                                    <td><a class="text-dark" href="">4</a></td>
+                                    <td><a class="text-dark" href="">5</a></td>
+                                    <td><a class="text-dark" href="">6</a></td>
+                                    <td><a class="text-dark" href="">7</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a class="text-dark " href="">8</a></td>
+                                    <td><a class="text-dark " href="">9</a></td>
+                                    <td><a class="text-dark " href="">10</a></td>
+                                    <td><a class="text-dark " href="">11</a></td>
+                                    <td><a class="text-dark " href="">12</a></td>
+                                    <td><a class="text-dark " href="">13</a></td>
+                                    <td><a class="text-dark " href="">14</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">15</a></td>
+                                    <td><a class="text-dark " href="">16</a></td>
+                                    <td><a class="text-dark " href="">17</a></td>
+                                    <td><a class="text-dark " href="">18</a></td>
+                                    <td><a class="text-dark " href="">19</a></td>
+                                    <td><a class="text-dark " href="">20</a></td>
+                                    <td><a class="text-dark " href="">21</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">22</a></td>
+                                    <td><a class="text-dark " href="">23</a></td>
+                                    <td><a class="text-dark " href="">24</a></td>
+                                    <td><a class="text-dark " href="">25</a></td>
+                                    <td><a class="text-dark " href="">26</a></td>
+                                    <td><a class="text-dark " href="">27</a></td>
+                                    <td><a class="text-dark " href="">28</a></td>
+                                </tr>
+
+                                <tr>
+                                    <td><a class="text-dark " href="">29</a></td>
+                                    <td><a class="text-dark " href="">30</a></td>
+                                    <td><a class="text-dark " href="">31</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- </div>    -->
+                    </div>
+                    <div class="left-mode-sec  p-2  blank-left-alg-hgt ">
+                        <div class="add-space d-flex justify-content-center">
+                            Ad Space
+                        </div>
+                    </div>
+                </div>
+                <!-- center -->
+                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
+                    <!-- row 1 -->
+                    <div class="row left-mode-search p-2 text-center mt-2 ">
+                        <div class="cnt-menu">
+                            <label class=" txt-orange float-left">New Scenes</label>
+                            <ul class="cnt-menu-li float-left ml-2">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- image -->
+                        <!-- row -->
+                        <div class="owl-carousel owl-theme">
+                            <div class="item home-item">
+                                <img src="{% static 'images/1.jpeg' %}" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="{% static 'images/2.jpeg' %}" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/3.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/4.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/5.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/6.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/7.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/8.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End row 1 -->
+                    <div class="row left-mode-search p-2 text-center mt-2 ">
+                        <div class="cnt-menu">
+                            <label class=" txt-orange float-left">Top Rated</label>
+                            <ul class="cnt-menu-li float-left ml-2">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- image -->
+                        <!-- row -->
+                        <div class="owl-carousel owl-theme">
+                            <div class="item home-item">
+                                <img src="static/img/1.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/2.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/3.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/4.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/5.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/6.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/7.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/8.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href="">Olympian </a></span>
+                                    <span>Format:<a href=""> Scene </a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End row 1 -->
+                    <div class="row left-mode-search p-2 text-center mt-2 ">
+                        <div class="cnt-menu">
+                            <label class=" txt-orange float-left">New Films</label>
+                            <ul class="cnt-menu-li float-left ml-2">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+                        <!-- image -->
+                        <!-- row -->
+                        <div class="owl-carousel owl-theme">
+                            <div class="item home-item">
+                                <img src="static/img/1.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/2.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/3.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/4.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/5.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/6.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/7.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/8.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End row 1 -->
+
+                    <div class="row left-mode-search p-2 text-center mt-2 mb-2 ">
+                        <div class="cnt-menu">
+                            <label class=" txt-orange float-left">Top Rated</label>
+                            <ul class="cnt-menu-li float-left ml-2">
+                                <li><a href="">Drama</a></li>
+                                <li><a href="">Comedy</a></li>
+                                <li><a href="">Musical</a></li>
+                                <li><a href="">Horror</a></li>
+                                <li><a href="">Sport</a></li>
+                                <li><a href="">Action</a></li>
+                                <li><a href="">Fantasy</a></li>
+                                <li><a href="">LGBTQ</a></li>
+                                <li><a href="">Family</a></li>
+                                <li><a href="">Sci-Fi</a></li>
+                                <li><a href="">Crime</a></li>
+                                <li><a href="">Thriller</a></li>
+                                <li><a href="">Military</a></li>
+                                <li><a href="">Romance</a></li>
+                                <li><a href="">Animation</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- image -->
+                        <!-- row -->
+                        <div class="owl-carousel owl-theme">
+                            <div class="item home-item">
+                                <img src="static/img/1.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/2.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/3.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/4.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/5.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/6.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/7.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                            <div class="item home-item">
+                                <img src="static/img/8.jpeg" class="home-video ">
+                                <div class="row cnt-txt ">
+                                    <span>Project<a href=""> #224 </a></span>
+                                    <span>Team<a href=""> #4 </a></span>
+                                    <span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star checked "></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </div>
+                                <div class="row cnt-txt  ">
+                                    <span>Name:<a href=""> DollHouse </a></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End row 1 -->
+                </div>
+                <!-- End center -->
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-4 mb-2">
+                    <div class="left-mode-sec right-sec-height">
+                        <div class="mem-list-head">Top Actors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">John Smith</li>
+                            <li class="mt-1">John Dow</li>
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Aaron McCarty</li>
+                            <li class="mt-1">Toli Chew</li>
+                        </ol>
+                        <div class="mem-list-head">Top Writers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Tom Saint</li>
+                            <li class="mt-1">Lola Carola</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Jamal Smith</li>
+                            <li class="mt-1">Nikita Selivan</li>
+                        </ol>
+                        <div class="mem-list-head">Top Directors</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Karen Do</li>
+                            <li class="mt-1">Ivan Drago</li>
+                            <li class="mt-1">Ken Track</li>
+                            <li class="mt-1">Kendra Shulman</li>
+                            <li class="mt-1">Sandra O’brian</li>
+                        </ol>
+                        <div class="mem-list-head">Top Producers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top DPs</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head">Top Sound Designers</div>
+                        <ol class="mem-list-cont mb-0">
+                            <li class="mt-1">Sarah Lee</li>
+                            <li class="mt-1">Colle Ace</li>
+                            <li class="mt-1">Duran Duran</li>
+                            <li class="mt-1">Char Hendrix</li>
+                            <li class="mt-1">Oleg Smirnov</li>
+                        </ol>
+                        <div class="mem-list-head underline">TopTalent/Crew</div>
+                    </div>
+
+                </div>
+
+                <!-- End row div    -->
+            </div>
+            <!-- container div -->
+        </div>
+    </div>
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/user_home.js' %}"></script>
 {% endblock %}
-
-
