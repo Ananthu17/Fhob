@@ -214,6 +214,12 @@ class ExtendedRegisterCompanyView(RegisterView):
     def create(self, request, *args, **kwargs):
         user_input_data = request.data
         user_input_data['membership'] = CustomUser.PRODUCTION_COMPANY
+        if user_input_data['beta_user'] == '':
+            user_input_data['beta_user'] = False
+        if user_input_data['beta_user_code'] == '':
+            user_input_data['beta_user_code'] = None
+        if user_input_data['beta_user_end'] == '':
+            user_input_data['beta_user_end'] = None
         serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
