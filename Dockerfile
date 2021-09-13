@@ -47,6 +47,6 @@ WORKDIR /film_hobo
 COPY ./film_hobo /film_hobo
 
 # [Security] Limit the scope of user who run the docker image
-RUN adduser -D user
+#RUN adduser -D user
 
-USER user
+#USER user
