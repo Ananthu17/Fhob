@@ -201,7 +201,7 @@ urlpatterns = [
     path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
          name='check-beta-tester-code'),
     path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
-          name='get-beta-tester-code-id'),
+         name='get-beta-tester-code-id'),
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),

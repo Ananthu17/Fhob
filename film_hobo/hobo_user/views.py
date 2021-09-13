@@ -3,16 +3,13 @@ import braintree
 import datetime
 import json
 import os
-import random
 import requests
-from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
+from braces.views import JSONResponseMixin
 from datetime import timedelta, date
 
 from django.conf import settings
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
@@ -38,8 +35,8 @@ from rest_framework import permissions
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
+from rest_auth.registration.views import RegisterView
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
@@ -51,7 +48,6 @@ from rest_framework.generics import (ListAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
 # from rest_framework import filters
-from datetime import date
 
 from authemail.views import SignupVerify
 # from rest_framework.filters import SearchFilter
@@ -60,12 +56,13 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, CheckoutForm, ProjectCreationForm, \
-    WriterForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm, \
+    ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, UserProject, Video, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, \
+                    UserProject, Video, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
@@ -117,7 +114,8 @@ class AdminAuthenticationPermission(permissions.BasePermission):
         user = request.user
         if user and user.is_authenticated():
             return user.is_superuser or \
-                not any(isinstance(request._authenticator, x) for x in self.ADMIN_ONLY_AUTH_CLASSES)
+                not any(isinstance(
+                    request._authenticator, x) for x in self.ADMIN_ONLY_AUTH_CLASSES)
         return False
 
 
@@ -404,7 +402,8 @@ class CustomUserSignupIndieView(APIView):
                               'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
-                return HttpResponse('Could not save data')
+                return render(request, 'user_pages/signup_indie.html',
+                              {'form': form})
         return render(request, 'user_pages/signup_indie.html',
                       {'form': form})
 
@@ -4795,19 +4794,24 @@ class GetBetaTesterCodeId(APIView):
     """
 
     def post(self, request, *args, **kwargs):
-        try:
-            data = request.data
-            unique_id = request.data['code']
-            testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
-            final_date = date.today() + timedelta(days=testercode_instance.days)
-            if testercode_instance:
+        if request.data['code'] != None:
+            try:
+                data = request.data
+                unique_id = request.data['code']
+                testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
+                final_date = date.today() + timedelta(days=testercode_instance.days)
+                if testercode_instance:
+                    return Response(
+                        {"status": "success",
+                        "code_id": testercode_instance.id,
+                        "code": testercode_instance.code,
+                        "days": testercode_instance.days,
+                        "final_day": final_date})
+            except ObjectDoesNotExist:
                 return Response(
-                    {"status": "success",
-                     "code_id": testercode_instance.id,
-                     "code": testercode_instance.code,
-                     "days": testercode_instance.days,
-                     "final_day": final_date})
-        except ObjectDoesNotExist:
+                    {"status": "beta tester code does not exist"},
+                    status=status.HTTP_404_NOT_FOUND)
+        else:
             return Response(
-                {"status": "beta tester code does not exist"},
-                status=status.HTTP_404_NOT_FOUND)
+            {"status": "no content"},
+            status=status.HTTP_204_NO_CONTENT)
