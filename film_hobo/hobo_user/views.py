@@ -301,12 +301,11 @@ class CustomUserSignupHobo(APIView):
                             complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
-            print("eeeeeeeeee")
-            print(user_response.status_code)
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-
+                new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -398,6 +397,8 @@ class CustomUserSignupIndieView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -454,6 +455,8 @@ class CustomUserSignupProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -501,6 +504,8 @@ class CustomUserSignupCompany(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
