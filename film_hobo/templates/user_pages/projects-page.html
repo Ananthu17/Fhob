@@ -175,7 +175,7 @@
                                 </ul>
                             </div>
                             <div class="proj-owl-right-margin">
-                                <div class="owl-carousel owl-theme " id="project-owl" id="scene">
+                                <div class="owl-carousel owl-theme " id="scene">
                                     {% for project in scenes %}
                                     <div class="item">
                                         <div class="card proj-card" >
@@ -263,7 +263,7 @@
                                 </ul>
                             </div>
                             <div class="proj-owl-right-margin">
-                                <div class="owl-carousel owl-theme " id="project-owl" id="topscene">
+                                <div class="owl-carousel owl-theme " id="topscene">
                                     {% for project in toprated_scenes %}
                                     <div class="item">
                                         <div class="card proj-card" >
@@ -352,7 +352,7 @@
                                 </ul>
                             </div>
                             <div class="proj-owl-right-margin">
-                                <div class="owl-carousel owl-theme " id="project-owl" id="filims">
+                                <div class="owl-carousel owl-theme " id="filims">
                                     {% for project in filims %}
                                     <div class="item">
                                         <div class="card proj-card" >
@@ -441,7 +441,7 @@
                                 </ul>
                             </div>
                             <div class="proj-owl-right-margin">
-                                <div class="owl-carousel owl-theme " id="project-owl" id="topfilims">
+                                <div class="owl-carousel owl-theme" id="topfilims">
                                     {% for project in toprated_filims %}
                                     <div class="item">
                                         <div class="card proj-card" >
@@ -571,7 +571,7 @@
     <style>
         .jquery-btn{
             /* position: relative; */
-            left: -38px;
+            left: 0px;
             border: none;
             font: caption;
             margin: 5px;
@@ -582,6 +582,9 @@
             border-radius: 3px;
             font-size: 36px;
             color: #e5e5e5;
+        }
+        .jquery-btn:hover{
+            color: orange;
         }
         .act .sel {
             color: orange !important;
@@ -1115,79 +1118,82 @@
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
         console.log('post url :',post_url)
         parent = data.parentNode.parentNode.getAttribute("for");
+        console.log("parent:",parent)
         axios.get(post_url)
         .then((response) => {
             localStorage.setItem('token', response.data.key);
             console.log("data is :",response.data.results)
             let count = 0
             $(`#${parent}`).empty();
-            $(`#${parent}`).prepend("<div class='owl-stage' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; display:flex;flex-direction:row;align-items:center;'></div>")
+            let span = `<div class='owl-stage-outer'><div class='owl-stage d-flex flex-row align-items-center' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 1708px;'>`
+            $(`#${parent}`).append(span);
             jQuery.each(response.data.results, function() {
                 console.log(this.title)
                 count += 1
-                let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-                                <div class='card proj-card'>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-no'>\
-                                            Project<a href=''>${this.id}</a>\
-                                        </span>\
-                                        <span class='proj-pay'>\
-                                            $<a href=''>0</a>\
-                                        </span>\
-                                        <span class='proj-gener-align'>\
-                                            <a href=''>${this.genre}</a>\
-                                        </span>\
-                                        <span class='proj-symb'>\
-                                            <span class='fa fa-star checked'></span>\
-                                            <span class='fa fa-star checked'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-title'>\
-                                            Title:<a href=''>${this.title}</a>\
-                                        </span>\
-                                        <span class='proj-page-no'>\
-                                            Page:<a href=''>4</a>\
-                                        </span>\
-                                        <span class='proj-public'>\
-                                            <a href=''>Public</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Creator:<a href=''>${this.creator}</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Format:<a href=''>${this.format}</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Team:<a href=''>Actor,Director +</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Cast:<a href=''>Female(27),Female(35)</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1 mb-1'>\
-                                        <span class='proj-format'>\
-                                            Location:<a href=''>${this.location}</a>\
-                                        </span>\
-                                    </div>\
-                                </div>\
-                            </div></div>`
-                $(`#${parent}`).children().append(div);
+                let div = `<div class='owl-item active' style='width: 417px; margin-right: 10px;'>\
+                            <div class='item'>\
+                        <div class='card proj-card' >\
+                        <div class='project-line'>\
+                            <span class='proj-no'>\
+                                Project<a href=''>#${this.id}</a>\
+                            </span>\
+                            <span class='proj-pay'>\
+                                $<a href=''>0</a>\
+                            </span>\
+                            <span class='proj-gener-align'>\
+                                <a href=''>${this.genre}</a>\
+                            </span>\
+                            <span  class='proj-symb'>\
+                                <span class='fa fa-star checked'></span>\
+                                <span class='fa fa-star checked'></span>\
+                                <span class='fa fa-star-o'></span>\
+                                <span class='fa fa-star-o'></span>\
+                                <span class='fa fa-star-o'></span>\
+                            </span>\
+                        </div>\
+                        <div class='project-line2'>\
+                            <span class='proj-title'>\
+                                Title:<a href=''>${this.title}</a>\
+                            </span>\
+                            <span class='proj-page-no'>\
+                                Page:<a href=''>4</a>\
+                            </span>\
+                            <span class='proj-public'>\
+                                <span><a href=''>Public</a></span>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Creator:<a href=''>${this.creator}</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Format:<a href=''>${this.format}</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Team:<a href=''>Actor,Director +</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line'>\
+                            <span class='proj-format'>\
+                                Cast:<a href=''>Female(27),Female(35)</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line'>\
+                            <span class='proj-format'>\
+                                Location:<a href=''>${this.location}</a>\
+                            </span>\
+                        </div>\
+                    </div>\
+                </div></div>`
+                $(`#${parent}`).children().children().append(div);
                 // courousel next block
                 if(count >= 3){
                     let btn = "<button type='button' role='presentation' class='jquery-btn'><i class='fa fa-caret-right' aria-hidden='true'></i></button>"
-                    $(`#${parent}`).children().append(btn);
+                    $(`#${parent}`).children().children().append(btn);
                 }
             });
             // owl corousel next operation
@@ -1275,33 +1281,136 @@
 </script>
 <!-- Project filter API END -->
 <script>
-    $('.owl-carousel').owlCarousel({
-        loop: true,
-        margin: 10,
-        responsiveClass: true,
+   $('#scene').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
         nav: true,
         navText: [
-            "<i class='fa fa-caret-left'></i>",
-            "<i class='fa fa-caret-right'></i>"
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
         ],
-        responsive: {
-            0: {
-                items: 1,
-                nav: true
+        responsive:{
+            0:{
+                items:1,
+                nav:true
             },
-            767: {
-                items: 2,
-                nav: true
+            641:{
+                items:2,
+                nav:true
             },
-            991: {
-                items: 2,
-                nav: true
+            885:{
+                items:3,
+                nav:true
             },
-            1320: {
-                items: 3,
-                nav: true,
-                loop: false
-            }
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#topscene').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#filims').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#topfilims').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
         }
     })
 </script>
