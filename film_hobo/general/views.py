@@ -86,8 +86,31 @@ class BetaUserAdmin(View):
         return render(request, 'beta_user/beta_user_admin.html')
 
 
-class AddBetaUserCode(APIView):
+# class AddBetaUserCode(APIView):
 
-    def post(self, request):
-        
-        return Response(response)
+#     def post(self, request):
+#         return Response(response)
+
+
+class HelpProject(View):
+    """
+    Web URL View to load the project help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_project.html')
+
+
+class HelpGettingStarted(View):
+    """
+    Web URL View to load the getting started help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_getting_started.html')
+
+
+class HelpRating(View):
+    """
+    Web URL View to load the rating help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_rating.html')
