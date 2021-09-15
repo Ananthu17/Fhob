@@ -9,7 +9,7 @@ from braces.views import JSONResponseMixin
 from authemail.models import SignupCode
 
 from django.core.files import File
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, query
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -18,7 +18,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, request
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -4361,14 +4361,28 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-# Api to search in project
-class ProjectSearchView(ListAPIView):
+class ProjectSearchView(TemplateView, ListAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    # permission_classes = (IsAuthenticated,)
     filter_backends = [filters.SearchFilter]
     search_fields = ["title", "format", "genre",
                      "rating", "timestamp"]
+    template_name = 'user_pages/projects-page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        query = self.list(request)
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = query.filter(format="SCH").order_by('-id')
+        context["toprated_scenes"] = query.filter(format="SCH").order_by('-rating')
+        context["filims"] = query.filter(format="SHO").order_by('-id')
+        context["toprated_filims"] = query.filter(format="SHO").order_by('-rating')
+        return context
 
 
 # Api to add rating to project video

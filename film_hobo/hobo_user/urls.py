@@ -287,8 +287,6 @@ urlpatterns = [
     path('get-profile-rating-notification-html/',
          GetProfileRatingNotificationAjaxView.as_view(),
          name='get-profile-rating-notification-html'),
-#     path('projects/rating', UserRatingAPI.as_view(),
-#          name="rate-api"),
     path('projects/search/',  ProjectSearchView.as_view(),
          name="project-search"),
     path('video/rate/',  VideoRatingView.as_view(),
@@ -302,5 +300,5 @@ urlpatterns = [
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
-         name="date_filter")
+         name="date_filter"),
 ]
