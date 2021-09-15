@@ -2817,7 +2817,7 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
         context = dict()
         user_list = []
         user_rating_objs = UserRatingCombined.objects.all()
-
+        
         try:
             actoractress = JobType.objects.get(slug='actoractress')
             actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
