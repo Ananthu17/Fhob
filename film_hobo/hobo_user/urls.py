@@ -344,5 +344,5 @@ urlpatterns = [
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
-         name="date_filter")
+         name="date_filter"),
 ]

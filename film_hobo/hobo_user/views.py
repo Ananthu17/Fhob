@@ -8,21 +8,20 @@ from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
 
+from django.core.files import File
+from django.db.models import Sum, Q, query
+from django.template import loader
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils import timezone
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-from django.db.models import Sum, Q
-from django.template import loader
-from django.template.loader import render_to_string
-from django.utils import timezone
-from django.http import HttpResponseRedirect, FileResponse
-from django.http.response import HttpResponse
+
 from django.shortcuts import get_object_or_404, render, redirect
-from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 # from django_filters import rest_framework as filters
@@ -4758,16 +4757,28 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-# Search API for project
-# Api to search in project
-# class ProjectSearchView(ListAPIView):
+# class ProjectSearchView(TemplateView, ListAPIView):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
-#     # permission_classes = (IsAuthenticated,)
-#     # filter_backends = [filters.SearchFilter]
-#     filter_backends = (SearchFilter, DjangoFilterBackend)
+#     filter_backends = [filters.SearchFilter]
 #     search_fields = ["title", "format", "genre",
 #                      "rating", "timestamp"]
+#     template_name = 'user_pages/projects-page.html'
+#     login_url = '/hobo_user/user_login/'
+#     redirect_field_name = 'login_url'
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.filter_queryset(self.get_queryset())
+#         return queryset
+
+#     def get_context_data(self, **kwargs):
+#         query = self.list(request)
+#         context = super().get_context_data(**kwargs)
+#         context["scenes"] = query.filter(format="SCH").order_by('-id')
+#         context["toprated_scenes"] = query.filter(format="SCH").order_by('-rating')
+#         context["filims"] = query.filter(format="SHO").order_by('-id')
+#         context["toprated_filims"] = query.filter(format="SHO").order_by('-rating')
+#         return context
 
 
 # Api to add rating to project video
