@@ -195,12 +195,12 @@ class CustomUser(AbstractUser):
             'Designates whether the user started as a beta user.'),
     )
     beta_user_code = models.ForeignKey("hobo_user.BetaTesterCodes",
-                            on_delete=models.SET_NULL,
-                            related_name='user_betatestercode',
-                            verbose_name=_("BetaTesterCode"),
-                            null=True)
+                                       on_delete=models.SET_NULL,
+                                       related_name='user_betatestercode',
+                                       verbose_name=_("BetaTesterCode"),
+                                       null=True)
     beta_user_end = models.DateField(_('Beta User End Date and Time'),
-                                         null=True, blank=True)
+                                     null=True, blank=True)
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
     # company_address = models.TextField(_("Address"), null=True, blank=True)
@@ -684,7 +684,6 @@ class Project(models.Model):
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
     timestamp = models.DateField(auto_now_add=True)
-
 
     def __str__(self):
         return self.title
@@ -1360,7 +1359,8 @@ class UserRatingCombined(models.Model):
                                  )
     rating = models.FloatField(_("Rating"), null=True, blank=True)
     no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
-    no_of_projects = models.IntegerField(_("No of Projects"), null=True, blank=True)
+    no_of_projects = models.IntegerField(
+        _("No of Projects"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1819,8 +1819,9 @@ class UserProject(models.Model):
                                   related_name='user_project_character',
                                   verbose_name=_("Character"),
                                   null=True, blank=True)
-    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
-                                    blank=True)
+    created_time = models.DateTimeField(_('Created Time'),
+                                        auto_now_add=True,
+                                        blank=True)
 
     def __str__(self):
         return str(self.user.get_full_name())

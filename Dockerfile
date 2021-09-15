@@ -1,4 +1,4 @@
-FROM python:3.8.11-alpine
+FROM python:3.8.11-alpine3.13
 
 ENV PYTHONUNBUFFERED 1
 
@@ -47,6 +47,6 @@ WORKDIR /film_hobo
 COPY ./film_hobo /film_hobo
 
 # [Security] Limit the scope of user who run the docker image
-RUN adduser -D user
+#RUN adduser -D user
 
-USER user
+#USER user

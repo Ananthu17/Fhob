@@ -96,7 +96,7 @@ class CustomCompanyUserAccountAdapter(DefaultAccountAdapter):
         user_field(
             user, 'membership', request.data.get('membership', ''))
         user_field(
-            user, 'beta_user_end', request.data.get('beta_user_end', ''))
+            user, 'beta_user_end', request.data.get('beta_user_end', None))
         user_field(
             user, 'company_type', request.data.get('company_type', ''))
         user.save()

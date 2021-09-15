@@ -346,12 +346,12 @@
     /*
     code to clear data from local storage on logout
     */
-    document.getElementById("logout_link").addEventListener("click", function() {
-        localStorage.clear();
-    });
-
-
-
+    var logout_element = document.getElementById("logout_link")
+    if (logout_element){
+        document.getElementById("logout_link").addEventListener("click", function() {
+            localStorage.clear();
+        });
+    }
     </script>
 {% block extrajs %}
 <script src="{% static 'js/base_nav.js' %}"></script>

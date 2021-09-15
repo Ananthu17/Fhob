@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+    <div class="container wrapper flex-grow-1">
+        <div class="row help-sec-outer mt-3 mb-4">
+            <div class="col-12 mt-4 mb-2">
+                <div class="help-top-get-sec">
+                    <div>
+                        <a class="help-blu-link ">Getting started</a>
+                    </div>
+                    <div>
+                        <button class="btn help-top-btn ">Report a Problem</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-light-help">
+                <div class="col-12 mt-3 mb-3">
+                    <div class="help-profile-sec">
+                        <div class="help-profile-head">
+                            Indie and Pro Members
+                        </div>
+                        <div class="mt-2">
+                            Complete your profile:
+                        </div>
+                        <div class="mt-2">
+                            <ol class="help-ol-margin">
+                                <li>
+                                    Please post your professional experiences and achievements in your Bio; you can link
+                                    your IMDB account, and/or share a link to your
+                                    website, but to get offcial credits on your FilmHobo page you need to participate in
+                                    a FilmHobo related project.(<a href="" class="help-profile-tag">Credits and
+                                        Rating</a>)
+                                </li>
+                                <li>
+                                    Upload your pictures.
+                                </li>
+                                <li>
+                                    Use Settings to set up your preferences for communication, tracking, contact
+                                    policies, rating visibility and billing.
+                                </li>
+                                <li>
+                                    Set up your interests such as: roles and/or projects you are looking for. When a
+                                    project or a role with your interest(s) gets posted
+                                    on the FilmHobo platform you will get a notification so you can apply for cast or
+                                    crew.
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="help-profile-head">
+                            Company Members
+                        </div>
+                        <div class="mt-2">
+                            Complete Company profile:
+                        </div>
+                        <div class="mt-2">
+                            <ol class="help-ol-margin">
+                                <li>
+                                    Please post Company’s professional experiences and achievements in the Bio; you can
+                                    link your IMDB account, and/or share a link to
+                                    the Company’s website.
+                                </li>
+                                <li>
+                                    Attach Company’s employees.
+                                </li>
+                                <li>
+                                    Attach Company’s clients.
+                                </li>
+                                <li>
+                                    Upload pictures.
+                                </li>
+                                <li>
+                                    Use Settings to set up Company’s preferences for communication, tracking, contact
+                                    policies and billing.
+                                </li>
+                                <li>
+                                    Set up Company’s interests.
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="help-profile-head">
+                            Projects
+                        </div>
+                        <div class="mt-2">
+                            <a href="" class="help-profile-project-tag">Existing Videos:</a> If you have made a film
+                            outside of FilmHobo, you may post this film or a scene from your film on the FilmHobo
+                            platform
+                            by creating a new project related to this film or scene. You will need to fill out the
+                            project’s form, and then attach every actor and all
+                            members of your team so they will get the related credits. To get ratings for each
+                            team-member and ratings for the whole film, you will
+                            need to post the video onto the Screening Room, where premium members can see it, rate it,
+                            and give suggestions or feedback.
+                        </div>
+                        <div class="mt-2">
+                            <a href="" class="help-profile-project-tag">New Projects:</a>To start a new project you must
+                            own a script or have rights to the script. Then, you must fill out the project’s form,
+                            creating
+                            cast and team roles description, set up sides and passwords, and then post that project onto
+                            the project page for FilmHobo members to
+                            find your project and apply for available positions. If you have members already committed
+                            to your project you can attach them manually
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            Membership
+                        </div>
+                        <div class="mt-2">
+                            If you have an Indie membership and you want to start a Feature film or Pilot project, you
+                            have two options: (1) Become a Pro member
+                            by building up your rating over time, or by joining any of the appropriate Guilds. (2) Get a
+                            Production Company membership. You can
+                            have two memberships, personal and company (Membership).
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            Your Network/Friends
+                        </div>
+                        <div class="mt-2">
+                            Your Network/Friends are important for your success. When you post a project or get attached
+                            to a project, you want people to see and
+                            rate it. You will rely on your peers in your network to support you.
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            Activity
+                        </div>
+                        <div class="mt-2">
+                            This site is for collaborating, learning, inspiring and advancing in the film-making
+                            industry. Watch and rate other peers and give them
+                            constructive and positive feedback if you wish to receive the same.
+                            <p class="mt-2">
+                                Be active if you want to succeed.
+                            </p>
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            How do I find Gigs?
+                        </div>
+                        <div class="mt-2">
+                            There are three ways to find a project: (1) Set up your interests and when a certain project
+                            is posted, you will get a notification so you
+                            can apply. (2) Go to the Projects page and search for projects posted near your location.
+                            (3) Create a project, attach yourself and let other
+                            professionals join you.
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            Screening Room
+                        </div>
+                        <div class="mt-2">
+                            This is where the produced videos of all projects are posted, and where the premium members
+                            can rate, critique and give suggestions
+                            to their peers involved in those projects. Nonmembers have no access to this page, it’s only
+                            for internal use.
+                            <p class="mt-2">
+                                (Producers don’t have to post their videos for ratings. They can use the platform just
+                                to manage their projects.)
+                            </p>
+                        </div>
+                        <div class="help-profile-head mt-3">
+                            Project Page
+                        </div>
+                        <div class="mt-2">
+                            It is where writers, producers, or companies create and post their projects (script, cast
+                            and team, location, genre, format, etc.) for
+                            members to apply and audition. On this page, members can search projects and see their
+                            details if they click on the project’s box.
+                            Members can also rate projects to help other members find the most popular ones.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extrajs %}
+{% endblock %}

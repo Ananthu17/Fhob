@@ -3,7 +3,6 @@ from hobo_user.models import CustomUser
 from django.utils.translation import ugettext_lazy as _
 
 
-
 class Help(models.Model):
     user = models.ForeignKey("hobo_user.CustomUser",
                              on_delete=models.CASCADE,

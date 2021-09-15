@@ -35,11 +35,12 @@ SECRET_KEY = env("SECRET_KEY")
 # 2 - DEMO_SERVER
 # 3 - AWS_PRODUCTION
 
-PROJECT_ENVIRONMENT = "LOCAL"
+PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     # ORIGIN_URL = "http://202.88.246.92:8041"
-    ORIGIN_URL = "http://172.22.0.1:8041"
+    #ORIGIN_URL = "http://172.22.0.1:8041"
+    ORIGIN_URL ="http://0.0.0.0:8041/"
 elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
     ORIGIN_URL = "http://www.filmhobo.com"
 else:
@@ -162,27 +163,27 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 # }
 
 # local database credentials
-# DATABASES = {
-#     'default': {
-#         'ENGINE': env("DATABASE_ENGINE"),
-#         'NAME': env("DATABASE_NAME"),
-#         'USER': env("DATABASE_USER"),
-#         'PASSWORD': env("DATABASE_PASSWORD"),
-#         'HOST': env("DATABASE_HOST"),
-#         'PORT': env("DATABASE_PORT"),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': env("DATABASE_ENGINE"),
+        'NAME': env("DATABASE_NAME"),
+        'USER': env("DATABASE_USER"),
+        'PASSWORD': env("DATABASE_PASSWORD"),
+        'HOST': env("DATABASE_HOST"),
+        'PORT': env("DATABASE_PORT"),
+    }
+}
 
 # demo server database credentials
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'HOST': os.environ.get('DB_HOST'),
-    'NAME': os.environ.get('DB_NAME'),
-    'USER': os.environ.get('DB_USER'),
-    'PASSWORD': os.environ.get('DB_PASS'),
-  }
-}
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'HOST': os.environ.get('DB_HOST'),
+#     'NAME': os.environ.get('DB_NAME'),
+#     'USER': os.environ.get('DB_USER'),
+#     'PASSWORD': os.environ.get('DB_PASS'),
+#   }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
