@@ -188,6 +188,9 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
+        self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True
@@ -233,7 +236,6 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
 
 
-
 # class SignUpFormCompany(forms.Form):
 #     """
 #     company details
@@ -276,7 +278,6 @@ class SignUpFormCompany(UserCreationForm):
 #         self.fields['company_address'].widget.attrs['placeholder'] = 'Address'
 #         self.fields['user_address'].widget.attrs['class'] = 'inp-line'
 #         self.fields['user_address'].widget.attrs['placeholder'] = 'Address'
-
 
 
 class ChangePasswordForm(forms.Form):

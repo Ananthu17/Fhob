@@ -172,9 +172,6 @@ class RegisterIndieSerializer(serializers.Serializer):
     address = serializers.CharField(required=True)
     country = serializers.CharField(required=True)
     i_agree = serializers.BooleanField(required=False)
-    beta_user = serializers.BooleanField(required=False)
-    beta_user_code = serializers.CharField(required=False)
-    beta_user_end = serializers.DateField(required=False)
 
     class Meta:
         model = CustomUser
@@ -204,11 +201,14 @@ class RegisterIndieSerializer(serializers.Serializer):
                 _("You must accept our terms and conditions!!"))
         return i_agree
 
-    def validate_beta_user(self, beta_user):
-        if beta_user == 'True':
-            return True
-        else:
-            return False
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterIndieSerializer, self).to_internal_value(data)
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -392,6 +392,15 @@ class RegisterProSerializer(serializers.Serializer):
                   'address', 'date_of_birth', 'membership', 'i_agree',
                   'country', 'guild_membership_id']
 
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterProSerializer, self).to_internal_value(data)
+
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
         return username
@@ -503,14 +512,17 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
+    beta_user_end = serializers.DateField(allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
                   'last_name', 'password1', 'password2', 'phone_number',
                   'date_of_birth', 'address', 'country',
+                  'beta_user', 'beta_user_code', 'beta_user_end',
                   'company_name', 'company_address', 'company_website',
-                  'company_phone', 'title', 'membership', 'company_type']
+                  'company_phone', 'title', 'membership', 'company_type',
+                  ]
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)

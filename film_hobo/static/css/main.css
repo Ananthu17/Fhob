@@ -3,30 +3,37 @@
 @font-face {
     font-family: "Caliban Std";
     src:url("../fonts/CalibanStd.otf") format("truetype");
+    font-display: swap;
 }
 @font-face {
     font-family: "Satisfy-Regular";
     src:url("../fonts/Satisfy-Regular.ttf") format("truetype");
+    font-display: swap;
 }
 @font-face {
     font-family: "Myriad Pro";
     src:url("../fonts/Myriad-Pro-Regular.ttf") format("truetype");
+    font-display: swap;
 }
 @font-face {
     font-family: "Courier Bold";
     src:url("../fonts/Courier-Bold.otf") format("truetype");
+    font-display: swap;
 }
 @font-face {
    font-family: "Courier";
    src:url("../fonts/COURIER.TTF") format("truetype");
+   font-display: swap;
 }
 @font-face {
     font-family: "Arial Rounded Bold";
     src:url("../fonts/ARLRDBD.ttf") format("truetype");
+    font-display: swap;
 }
 @font-face {
     font-family: "Pooper Black Pro";
     src:url("../fonts/P22-Pooper-Black-Regular.ttf") format("truetype");
+    font-display: swap;
 }
 /*fonts-end*/
 /*header section*/
