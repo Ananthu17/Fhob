@@ -90,6 +90,7 @@ onApprove: function(data, actions) {
         body: JSON.stringify(transaction_args),
     }).then(function(res) {
         alert('You have successfully created subscription ' + data.subscriptionID);
+        sendSuccessEmail(data)
         var delay = 1000;
         setTimeout(function(){ window.location = success_redirect; }, delay);
     }).then(function(data) {
@@ -105,3 +106,8 @@ onApprove: function(data, actions) {
     // }
 
 }).render('#paypal-div'); // Display payment options on your web page
+
+function sendSuccessEmail()
+{
+    alert('hi');
+}

@@ -93,13 +93,10 @@ $("#modal_delete").click(function(){
   delete_url = origin_url + '/hobo_user/delete-beta-tester-code/' + obj_id + '/'
   axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
   .then((response) => {
-  debugger
   if (response.status == 200){
-    debugger
           location.reload();
       }
   }, (error) => {
-    debugger
       console.log(error);
   });
 });

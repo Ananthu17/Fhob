@@ -4361,6 +4361,207 @@ class AddBetaTesterCode(APIView):
     permission_classes = (IsSuperUser,)
 
     def post(self, request, *args, **kwargs):
+        # function to get value of a key in json
+        def find_values(id, json_repr):
+            results = []
+
+            def _decode_dict(a_dict):
+                try:
+                    results.append(a_dict[id])
+                except KeyError:
+                    pass
+                return a_dict
+
+            json.loads(json_repr, object_hook=_decode_dict)
+            return results
+
+        # get paypal access_token
+        paypal_client_id = settings.PAYPAL_CLIENT_ID
+        paypal_secret = settings.PAYPAL_SECRET_ID
+        data = {'grant_type': 'client_credentials'}
+        token_user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                            data=data,
+                            auth=(paypal_client_id, paypal_secret),
+                            headers={'Accept': 'application/json',
+                                        'Accept-Language': 'en_US'})
+        if token_user_response.status_code == 200:
+            access_token = json.loads(token_user_response.content)['access_token']
+        else:
+            return Response(
+                {"status": "error in fetching paypal access token"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        access_token_strting = 'Bearer ' + access_token
+
+        #get the current plan details
+        paypal_get_plan_details_api = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
+
+        #1
+        indie_monthly_plan_details_api = paypal_get_plan_details_api + settings.INDIE_PAYMENT_MONTHLY
+        indie_monthly_plan_details_api_response = requests.get(
+                            indie_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_monthly_plan_details_api_response.status_code == 200:
+            indie_monthly_plan_value = find_values('value', indie_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #2
+        indie_yearly_plan_details_api = paypal_get_plan_details_api + settings.INDIE_PAYMENT_YEARLY
+        indie_yearly_plan_details_api_response = requests.get(
+                            indie_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_yearly_plan_details_api_response.status_code == 200:
+            indie_yearly_plan_value = find_values('value', indie_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #3
+        pro_monthly_plan_details_api = paypal_get_plan_details_api + settings.PRO_PAYMENT_MONTHLY
+        pro_monthly_plan_details_api_response = requests.get(
+                            pro_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_monthly_plan_details_api_response.status_code == 200:
+            pro_monthly_plan_value = find_values('value', pro_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #4
+        pro_yearly_plan_details_api = paypal_get_plan_details_api + settings.PRO_PAYMENT_YEARLY
+        pro_yearly_plan_details_api_response = requests.get(
+                            pro_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_yearly_plan_details_api_response.status_code == 200:
+            pro_yearly_plan_value = find_values('value', pro_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #5
+        company_monthly_plan_details_api = paypal_get_plan_details_api + settings.COMPANY_PAYMENT_MONTHLY
+        company_monthly_plan_details_api_response = requests.get(
+                            company_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_monthly_plan_details_api_response.status_code == 200:
+            company_monthly_plan_value = find_values('value', company_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #6
+        company_yearly_plan_details_api = paypal_get_plan_details_api + settings.COMPANY_PAYMENT_YEARLY
+        company_yearly_plan_details_api_response = requests.get(
+                            company_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_yearly_plan_details_api_response.status_code == 200:
+            company_yearly_plan_value = find_values('value', company_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        # create plans based on the input
+        paypal_create_plan_api = "https://api-m.sandbox.paypal.com/v1/billing/plans"
+
+        plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+        for plan_type in plan_types:
+            plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + request.data['code']
+
+            if plan_type.find('Monthly'):
+                plan_interval_unit = 'MONTH'
+            else:
+                plan_interval_unit = 'YEAR'
+
+            if plan_type == 'Indie Payment Monthly':
+                plan_interval_count = indie_monthly_plan_value
+            elif plan_type == 'Indie Payment Yearly':
+                plan_interval_count = indie_yearly_plan_value
+            elif plan_type == 'Pro Payment Monthly':
+                plan_interval_count = pro_monthly_plan_value
+            elif plan_type == 'Pro Payment Yearly':
+                plan_interval_count = pro_yearly_plan_value
+            elif plan_type == 'Company Payment Monthly':
+                plan_interval_count = company_monthly_plan_value
+            elif plan_type == 'Company Payment Yearly':
+                plan_interval_count = company_yearly_plan_value
+            else:
+                pass
+
+            create_plan_json = {
+                "product_id": settings.PRODUCT_ID,
+                "name": plan_name,
+                "description": plan_name,
+                "status": "ACTIVE",
+                "billing_cycles": [
+                {
+                    "frequency": {
+                        "interval_unit": "DAY",
+                        "interval_count": request.data['days']
+                    },
+                    "tenure_type": "TRIAL",
+                    "sequence": 1,
+                    "total_cycles": 1,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": "0",
+                            "currency_code": "USD"
+                        }
+                    }
+                },
+                {
+                    "frequency": {
+                        "interval_unit": plan_interval_unit,
+                        "interval_count": plan_interval_count
+                    },
+                    "tenure_type": "REGULAR",
+                    "sequence": 2,
+                    "total_cycles": 0,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": "15",
+                            "currency_code": "USD"
+                        }
+                    }
+                }
+            ],
+                "payment_preferences": {
+                    "auto_bill_outstanding": True,
+                    "setup_fee": {
+                    "value": "0",
+                    "currency_code": "USD"
+                    },
+                    "setup_fee_failure_action": "CONTINUE",
+                    "payment_failure_threshold": 3
+                },
+                "taxes": {
+                    "percentage": "0",
+                    "inclusive": False
+                }
+            }
+        import pdb;pdb.set_trace()
+        create_plan_user_response = requests.post(
+                        'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                        data=json.dumps(create_plan_json),
+                        headers={'Content-type': 'application/json',
+                                 'Authorization': access_token_strting})
+        plan_ids = []
+        if create_plan_user_response.status_code == 201:
+            plan_id = json.loads(create_plan_user_response.content)['id']
+        else:
+            return HttpResponse('Could not save data')
+
         serializer = AddBetaTesterCodeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -4826,3 +5027,24 @@ class GetBetaTesterCodeId(APIView):
             return Response(
             {"status": "no content"},
             status=status.HTTP_204_NO_CONTENT)
+
+
+class SentPaymentMail(APIView):
+
+    def post(self, request):
+        must_validate_email = getattr(settings,
+                                        'AUTH_EMAIL_VERIFICATION', True)
+        # key = request.POST['key']
+        if must_validate_email:
+            user_token = Token.objects.get(key=key)
+            user = user_token.user
+            ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+            signup_code = SignupCode.objects.create_signup_code(
+                        user, ipaddr)
+            signup_code.send_signup_email()
+            response = {'message': 'Email send', 'signup_code':
+                        signup_code.code}
+
+        else:
+            response = {'message': 'Invalid data'}
+        return Response(response)

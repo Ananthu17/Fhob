@@ -5,8 +5,8 @@
     <div class="wrapper flex-grow-1">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                    <div class="left-mode-search lft-li">
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
+                    <div class="proj-calender-sec mt-3">
                         <div class="mt-2 search-txt">
                             <label class="d-flex justify-content-center ">Search by:</label>
                         </div>
@@ -30,7 +30,7 @@
                             <label class="d-flex justify-content-center txt-orange">Month</label>
                         </div>
 
-                        <div class="d-flex justify-content-center left-mode-sec">
+                        <div class="d-flex justify-content-center proj-calender-sec  ">
                             <ul class="list-group home-month" id="month" style="list-style-type: none;">
                                 <a class="text-dark" href="javascript:void(0)">
                                     <li class="list-group-item border-0 month-algn" onclick="add_select(this)" id="selected">January</li>
@@ -126,19 +126,19 @@
                         </table>
                         <!-- </div>    -->
                     </div>
-                    <div class="left-mode-sec  p-2 mb-3 ">
+                    <div class="proj-calender-sec p-2 mb-3 ">
                         <div class="add-space d-flex justify-content-center">
                             <a href="{% url 'hobo_user:new-project' %}" class="create-a-project">Create a Project</a>
                         </div>
                     </div>
-                    <div class="left-mode-sec  p-2  blank-left-alg-hgt-project ">
+                    <div class="proj-calender-sec p-2  blank-left-alg-hgt-project ">
                         <div class="add-space d-flex justify-content-center add-space-align">
                             Ad Space
                         </div>
                     </div>
                 </div>
                 <!-- center -->
-                <div class="col-lg-8 col-md-12 col-sm-12 mt-3 col-xs-12 d-none" id="searchblock">
+                <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin d-none" id="searchblock">
                     <div class="row searchresult">
                         <div class="mb-3"><label class='txt-red float-left top-head-align'>Search Results</label></div>
                         <div id=emptysearch>
@@ -149,386 +149,367 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3" id="initialblock">
+                <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin" id="initialblock">
 
                     <!-- row 1 -->
-                    <div class="row left-mode-search p-2 text-center mt-2 left-mode-search-height">
-                        <div class="cnt-menu">
-                            <label class=" txt-red float-left top-head-align">New Scenes</label>
-                            <ul class="cnt-menu-li float-left ml-2" for="scene">
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                        <div class="owl-carousel owl-theme owl-algin" id="scene">
-                        <!-- owl-carousel  -->
-                        {% for project in scenes %}
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card pointer">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href=""> #{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">0</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
+                    <div class="proj-input-sec-bg">
+                        <div class="proj-menu-align">
+                            <div class="proj-menu-display">
+                                <span class=" txt-red  top-head-align proj-head-margin">New Scenes</span>
+                                <ul class="proj-cnt-menu-li" for="scene">
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
+                                </ul>
+                            </div>
+                            <div class="proj-owl-right-margin">
+                                <div class="owl-carousel owl-theme " id="scene">
+                                    {% for project in scenes %}
+                                    <div class="item">
+                                        <div class="card proj-card" >
+                                            <div class="project-line">
+                                                <span class="proj-no">
+                                                    Project<a href="">#{{project.id}}</a>
+                                                </span>
+                                                <span class="proj-pay">
+                                                    $<a href="">0</a>
+                                                </span>
+                                                <span class="proj-gener-align">
+                                                    <a href="">{{project.get_genre_display}}</a>
+                                                </span>
+                                                <span  class="proj-symb">
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                </span>
+                                            </div>
+                                            <div class="project-line2">
+                                                <span class="proj-title">
+                                                    Title:<a href="">{{project.title}}</a>
+                                                </span>
+                                                <span class="proj-page-no">
+                                                    Page:<a href="">4</a>
+                                                </span>
+                                                <span class="proj-public">
+                                                    <span><a href="">Public</a></span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Creator:<a href="">{{project.creator}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Format:<a href="">{{project.get_format_display}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Team:<a href="">Actor,Director +</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Cast:<a href="">Female(27),Female(35)</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Location:<a href="">{{project.location}}</a>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">4</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(27),Female(35)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">{{project.location}}</a>
-                                        </span>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
-                            <!-- carousel column End -->
-                            {% endfor %}
-                            </div>
                         </div>
-
-                        <!-- owl-carousel End -->
-                    <!-- End row 1 -->
+                    </div>
                     <!-- row 2 -->
-
-                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
-                        <div class="cnt-menu">
-                            <label class=" txt-red float-left top-head-align">Top Rated</label>
-                            <ul class="cnt-menu-li float-left ml-2" for="topscene">
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                        <div class="owl-carousel owl-theme owl-algin" id="topscene">
-                        <!-- owl-carousel  -->
-                        {% for project in toprated_scenes %}
-                        <div class="item pro-item">
-                            <div class="card proj-card pointer">
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-no">
-                                        Project<a href=""> #{{project.id}}</a>
-                                    </span>
-                                    <span class="proj-pay">
-                                        $<a href="">N</a>
-                                    </span>
-                                    <span class="proj-gener-align">
-                                        <a href="">{{project.get_genre_display}}</a>
-                                    </span>
-                                    <span class="proj-symb">
-                                        <span class="fa fa-star checked "></span>
-                                        <span class="fa fa-star checked "></span>
-                                        <span class="fa fa-star-o"></span>
-                                        <span class="fa fa-star-o"></span>
-                                        <span class="fa fa-star-o"></span>
-
-                                    </span>
-                                </div>
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-title">
-                                        Title:<a href="">{{project.title}}</a>
-                                    </span>
-                                    <span class="proj-page-no">
-                                        Page:<a href="">16</a>
-                                    </span>
-                                    <span class="proj-public">
-                                        <a href="">Public</a>
-                                    </span>
-
-                                </div>
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-format">
-                                        Creator:<a href="">{{project.creator}}</a>
-                                    </span>
-                                </div>
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-format">
-                                        Format:<a href="">{{project.get_format_display}}</a>
-                                    </span>
-                                </div>
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-format">
-                                        Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                    </span>
-                                </div>
-                                <div class="project-line mt-1 ml-1">
-                                    <span class="proj-format">
-                                        Cast:<a href="">Female(27),Female(35)</a>
-                                    </span>
-                                </div>
-                                <div class="project-line mt-1 ml-1 mb-1">
-                                    <span class="proj-format">
-                                        Location:<a href="">{{project.location}}</a>
-                                    </span>
+                    <div class="proj-input-sec-bg">
+                        <div class="proj-menu-align">
+                            <div class="proj-menu-display">
+                                <span class=" txt-red  top-head-align proj-head-margin">Top Scenes</span>
+                                <ul class="cnt-menu-li float-left ml-2" for="topscene">
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
+                                </ul>
+                            </div>
+                            <div class="proj-owl-right-margin">
+                                <div class="owl-carousel owl-theme " id="topscene">
+                                    {% for project in toprated_scenes %}
+                                    <div class="item">
+                                        <div class="card proj-card" >
+                                            <div class="project-line">
+                                                <span class="proj-no">
+                                                    Project<a href="">#{{project.id}}</a>
+                                                </span>
+                                                <span class="proj-pay">
+                                                    $<a href="">0</a>
+                                                </span>
+                                                <span class="proj-gener-align">
+                                                    <a href="">{{project.get_genre_display}}</a>
+                                                </span>
+                                                <span  class="proj-symb">
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                </span>
+                                            </div>
+                                            <div class="project-line2">
+                                                <span class="proj-title">
+                                                    Title:<a href="">{{project.title}}</a>
+                                                </span>
+                                                <span class="proj-page-no">
+                                                    Page:<a href="">4</a>
+                                                </span>
+                                                <span class="proj-public">
+                                                    <span><a href="">Public</a></span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Creator:<a href="">{{project.creator}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Format:<a href="">{{project.get_format_display}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Team:<a href="">Actor,Director +</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Cast:<a href="">Female(27),Female(35)</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Location:<a href="">{{project.location}}</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-                        </div>
-
-                        </div>
-                        <!-- owl-carousel End -->
-
-                    <!-- End row 2 -->
+                    </div>
+                    <!-- row2end -->
                     <!-- row 3 -->
-
-                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
-                        <div class="cnt-menu">
-                            <label class=" txt-red float-left top-head-align">New Films</label>
-                            <ul class="cnt-menu-li float-left ml-2" for="filims">
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                        <!-- owl-carousel  -->
-                        <div class="owl-carousel owl-theme owl-algin" id="filims">
-                         <!-- carousel column  -->
-                         {% for project in filims %}
-                         <div class="item pro-item">
-                             <div class="card proj-card pointer">
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-no">
-                                         Project<a href=""> #{{project.id}}</a>
-                                     </span>
-                                     <span class="proj-pay">
-                                         $<a href="">MLB</a>
-                                     </span>
-                                     <span class="proj-gener-align">
-                                         <a href="">{{project.get_genre_display}}</a>
-                                     </span>
-                                     <span class="proj-symb">
-                                         <span class="fa fa-star checked "></span>
-                                         <span class="fa fa-star checked "></span>
-                                         <span class="fa fa-star-o"></span>
-                                         <span class="fa fa-star-o"></span>
-                                         <span class="fa fa-star-o"></span>
-
-                                     </span>
-                                 </div>
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-title">
-                                         Title:<a href="">{{project.title}}</a>
-                                     </span>
-                                     <span class="proj-page-no">
-                                         Page:<a href="">105</a>
-                                     </span>
-                                     <span class="proj-public">
-                                         <a href="">Public</a>
-                                     </span>
-
-                                 </div>
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-format">
-                                         Creator:<a href="">{{project.creator}}</a>
-                                     </span>
-                                 </div>
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-format">
-                                         Format:<a href="">{{project.get_format_display}}</a>
-                                     </span>
-                                 </div>
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-format">
-                                         Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                     </span>
-                                 </div>
-                                 <div class="project-line mt-1 ml-1">
-                                     <span class="proj-format">
-                                         Cast:<a href="">Female(27),Male(35)</a>
-                                     </span>
-                                 </div>
-                                 <div class="project-line mt-1 ml-1 mb-1">
-                                     <span class="proj-format">
-                                         Location:<a href="">{{project.location}}</a>
-                                     </span>
-                                 </div>
-                             </div>
-                         </div>
-                         <!-- carousel column End -->
-                         {% endfor %}
-                        </div>
-                        <!-- owl-carousel End -->
-
-                    </div>
-                    <!-- End row 3 -->
-                    <!-- row 4 -->
-
-                    <div class="row left-mode-search p-2 text-center mt-4 left-mode-search-height">
-                        <div class="cnt-menu">
-                            <label class=" txt-red float-left top-head-align">New Films</label>
-                            <ul class="cnt-menu-li float-left ml-2" for="topfilims">
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                        <!-- owl-carousel  -->
-                        <div class="owl-carousel owl-theme owl-algin" id="topfilims">
-                        {% for project in toprated_filims %}
-                            <!-- carousel column  -->
-                            <div class="item pro-item">
-                                <div class="card proj-card pointer">
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-no">
-                                            Project<a href=""> #{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">ThB</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span class="proj-symb">
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-
-                                        </span>
+                    <div class="proj-input-sec-bg">
+                        <div class="proj-menu-align">
+                            <div class="proj-menu-display">
+                                <span class=" txt-red  top-head-align proj-head-margin">New Filims</span>
+                                <ul class="cnt-menu-li float-left ml-2" for="filims">
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
+                                </ul>
+                            </div>
+                            <div class="proj-owl-right-margin">
+                                <div class="owl-carousel owl-theme " id="filims">
+                                    {% for project in filims %}
+                                    <div class="item">
+                                        <div class="card proj-card" >
+                                            <div class="project-line">
+                                                <span class="proj-no">
+                                                    Project<a href="">#{{project.id}}</a>
+                                                </span>
+                                                <span class="proj-pay">
+                                                    $<a href="">0</a>
+                                                </span>
+                                                <span class="proj-gener-align">
+                                                    <a href="">{{project.get_genre_display}}</a>
+                                                </span>
+                                                <span  class="proj-symb">
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                </span>
+                                            </div>
+                                            <div class="project-line2">
+                                                <span class="proj-title">
+                                                    Title:<a href="">{{project.title}}</a>
+                                                </span>
+                                                <span class="proj-page-no">
+                                                    Page:<a href="">4</a>
+                                                </span>
+                                                <span class="proj-public">
+                                                    <span><a href="">Public</a></span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Creator:<a href="">{{project.creator}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Format:<a href="">{{project.get_format_display}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Team:<a href="">Actor,Director +</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Cast:<a href="">Female(27),Female(35)</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Location:<a href="">{{project.location}}</a>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a href="">105</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <a href="">Public</a>
-                                        </span>
-
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Team:<a href="">Actor,Director,DP,Sound D +</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1">
-                                        <span class="proj-format">
-                                            Cast:<a href="">Female(50),Male(60)</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line mt-1 ml-1 mb-1">
-                                        <span class="proj-format">
-                                            Location:<a href="">{{project.location}}</a>
-                                        </span>
-                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
-                            <!-- carousel column End -->
-                            {% endfor %}
                         </div>
-                        <!-- owl-carousel End -->
-
                     </div>
-                    <!-- End row 4 -->
+                    <!-- row3end  -->
+                    <!-- row four  -->
+                    <div class="proj-input-sec-bg">
+                        <div class="proj-menu-align">
+                            <div class="proj-menu-display">
+                                <span class=" txt-red  top-head-align proj-head-margin">Top Filims</span>
+                                <ul class="cnt-menu-li float-left ml-2" for="topfilims">
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Drama</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Comedy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Musical</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Horror</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sport</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Action</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Fantasy</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">LGBTQ</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Family</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Sci-Fi</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Crime</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Thriller</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Military</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Romance</a></li>
+                                    <li><a href="javascript:void(0)" onclick="cate_filter(this)">Animation</a></li>
+                                </ul>
+                            </div>
+                            <div class="proj-owl-right-margin">
+                                <div class="owl-carousel owl-theme" id="topfilims">
+                                    {% for project in toprated_filims %}
+                                    <div class="item">
+                                        <div class="card proj-card" >
+                                            <div class="project-line">
+                                                <span class="proj-no">
+                                                    Project<a href="">#{{project.id}}</a>
+                                                </span>
+                                                <span class="proj-pay">
+                                                    $<a href="">0</a>
+                                                </span>
+                                                <span class="proj-gener-align">
+                                                    <a href="">{{project.get_genre_display}}</a>
+                                                </span>
+                                                <span  class="proj-symb">
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star checked "></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                    <span class="fa fa-star-o"></span>
+                                                </span>
+                                            </div>
+                                            <div class="project-line2">
+                                                <span class="proj-title">
+                                                    Title:<a href="">{{project.title}}</a>
+                                                </span>
+                                                <span class="proj-page-no">
+                                                    Page:<a href="">4</a>
+                                                </span>
+                                                <span class="proj-public">
+                                                    <span><a href="">Public</a></span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Creator:<a href="">{{project.creator}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Format:<a href="">{{project.get_format_display}}</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line-single-span">
+                                                <span class="proj-format">
+                                                    Team:<a href="">Actor,Director +</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Cast:<a href="">Female(27),Female(35)</a>
+                                                </span>
+                                            </div>
+                                            <div class="project-line">
+                                                <span class="proj-format">
+                                                    Location:<a href="">{{project.location}}</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- row four end  -->
                 </div>
                 <!-- End center -->
                 <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-4 mb-2">
-                    <div class="left-mode-sec right-sec-height">
+                    <div class="proj-calender-sec right-sec-height">
                         <div class="mem-list-head">Top Actors</div>
                         <ol class="mem-list-cont mb-0">
                             <li class="mt-1">John Smith</li>
@@ -590,7 +571,7 @@
     <style>
         .jquery-btn{
             /* position: relative; */
-            left: -38px;
+            left: 0px;
             border: none;
             font: caption;
             margin: 5px;
@@ -601,6 +582,9 @@
             border-radius: 3px;
             font-size: 36px;
             color: #e5e5e5;
+        }
+        .jquery-btn:hover{
+            color: orange;
         }
         .act .sel {
             color: orange !important;
@@ -1134,79 +1118,82 @@
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
         console.log('post url :',post_url)
         parent = data.parentNode.parentNode.getAttribute("for");
+        console.log("parent:",parent)
         axios.get(post_url)
         .then((response) => {
             localStorage.setItem('token', response.data.key);
             console.log("data is :",response.data.results)
             let count = 0
             $(`#${parent}`).empty();
-            $(`#${parent}`).prepend("<div class='owl-stage' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; display:flex;flex-direction:row;align-items:center;'></div>")
+            let span = `<div class='owl-stage-outer'><div class='owl-stage d-flex flex-row align-items-center' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 1708px;'>`
+            $(`#${parent}`).append(span);
             jQuery.each(response.data.results, function() {
                 console.log(this.title)
                 count += 1
-                let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-                                <div class='card proj-card pointer'>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-no'>\
-                                            Project<a href=''>${this.id}</a>\
-                                        </span>\
-                                        <span class='proj-pay'>\
-                                            $<a href=''>0</a>\
-                                        </span>\
-                                        <span class='proj-gener-align'>\
-                                            <a href=''>${this.genre}</a>\
-                                        </span>\
-                                        <span class='proj-symb'>\
-                                            <span class='fa fa-star checked'></span>\
-                                            <span class='fa fa-star checked'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                            <span class='fa fa-star-o'></span>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-title'>\
-                                            Title:<a href=''>${this.title}</a>\
-                                        </span>\
-                                        <span class='proj-page-no'>\
-                                            Page:<a href=''>4</a>\
-                                        </span>\
-                                        <span class='proj-public'>\
-                                            <a href=''>Public</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Creator:<a href=''>${this.creator}</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Format:<a href=''>${this.format}</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Team:<a href=''>Actor,Director +</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1'>\
-                                        <span class='proj-format'>\
-                                            Cast:<a href=''>Female(27),Female(35)</a>\
-                                        </span>\
-                                    </div>\
-                                    <div class='project-line mt-1 ml-1 mb-1'>\
-                                        <span class='proj-format'>\
-                                            Location:<a href=''>${this.location}</a>\
-                                        </span>\
-                                    </div>\
-                                </div>\
-                            </div></div>`
-                $(`#${parent}`).children().append(div);
+                let div = `<div class='owl-item active' style='width: 417px; margin-right: 10px;'>\
+                            <div class='item'>\
+                        <div class='card proj-card' >\
+                        <div class='project-line'>\
+                            <span class='proj-no'>\
+                                Project<a href=''>#${this.id}</a>\
+                            </span>\
+                            <span class='proj-pay'>\
+                                $<a href=''>0</a>\
+                            </span>\
+                            <span class='proj-gener-align'>\
+                                <a href=''>${this.genre}</a>\
+                            </span>\
+                            <span  class='proj-symb'>\
+                                <span class='fa fa-star checked'></span>\
+                                <span class='fa fa-star checked'></span>\
+                                <span class='fa fa-star-o'></span>\
+                                <span class='fa fa-star-o'></span>\
+                                <span class='fa fa-star-o'></span>\
+                            </span>\
+                        </div>\
+                        <div class='project-line2'>\
+                            <span class='proj-title'>\
+                                Title:<a href=''>${this.title}</a>\
+                            </span>\
+                            <span class='proj-page-no'>\
+                                Page:<a href=''>4</a>\
+                            </span>\
+                            <span class='proj-public'>\
+                                <span><a href=''>Public</a></span>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Creator:<a href=''>${this.creator}</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Format:<a href=''>${this.format}</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line-single-span'>\
+                            <span class='proj-format'>\
+                                Team:<a href=''>Actor,Director +</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line'>\
+                            <span class='proj-format'>\
+                                Cast:<a href=''>Female(27),Female(35)</a>\
+                            </span>\
+                        </div>\
+                        <div class='project-line'>\
+                            <span class='proj-format'>\
+                                Location:<a href=''>${this.location}</a>\
+                            </span>\
+                        </div>\
+                    </div>\
+                </div></div>`
+                $(`#${parent}`).children().children().append(div);
                 // courousel next block
                 if(count >= 3){
                     let btn = "<button type='button' role='presentation' class='jquery-btn'><i class='fa fa-caret-right' aria-hidden='true'></i></button>"
-                    $(`#${parent}`).children().append(btn);
+                    $(`#${parent}`).children().children().append(btn);
                 }
             });
             // owl corousel next operation
@@ -1221,7 +1208,7 @@
                         console.log(this.title)
                         count += 1
                         let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-                                <div class='card proj-card pointer'>\
+                                <div class='card proj-card'>\
                                     <div class='project-line mt-1 ml-1'>\
                                         <span class='proj-no'>\
                                             Project<a href=''>${this.id}</a>\
@@ -1294,46 +1281,139 @@
 </script>
 <!-- Project filter API END -->
 <script>
-    $('.owl-carousel').owlCarousel({
-        loop: true,
-        margin: 10,
-        responsiveClass: true,
+   $('#scene').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
         nav: true,
         navText: [
-            "<i class='fa fa-caret-left'></i>",
-            "<i class='fa fa-caret-right'></i>"
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
         ],
-        responsive: {
-            0: {
-                items: 1,
-                nav: true
+        responsive:{
+            0:{
+                items:1,
+                nav:true
             },
-            767: {
-                items: 2,
-                nav: true
+            641:{
+                items:2,
+                nav:true
             },
-            991: {
-                items: 2,
-                nav: true
+            885:{
+                items:3,
+                nav:true
             },
-            1320: {
-                items: 3,
-                nav: true,
-                loop: false
-            }
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#topscene').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#filims').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#topfilims').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
         }
     })
 </script>
 
-<script>
-$(".proj-card").click(function(){
-    var proj_card_ele = $(this)
-    var project_obj = proj_card_ele[0].children[0].children[0].innerText
-    var project_id = project_obj.split("#").pop();
-    origin_url = window.location.origin
-    var redirect_url = origin_url + '/project/single-film-project/' + project_id + '/'
-    window.location.replace(redirect_url);
-});
-</script>
 
 {% endblock %}
