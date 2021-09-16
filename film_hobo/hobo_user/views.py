@@ -4603,9 +4603,91 @@ class DeleteBetaTesterCode(APIView):
         try:
             delete_obj_id = kwargs['id']
             delete_obj = BetaTesterCodes.objects.get(id=delete_obj_id)
-            delete_obj.delete()
-            return Response(
-                {'status': 'code deleted successfully'}, status=status.HTTP_200_OK)
+
+            # get paypal access_token
+            paypal_client_id = settings.PAYPAL_CLIENT_ID
+            paypal_secret = settings.PAYPAL_SECRET_ID
+            data = {'grant_type': 'client_credentials'}
+            token_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                data=data,
+                                auth=(paypal_client_id, paypal_secret),
+                                headers={'Accept': 'application/json',
+                                            'Accept-Language': 'en_US'})
+            if token_user_response.status_code == 200:
+                access_token = json.loads(token_user_response.content)['access_token']
+            else:
+                return Response(
+                    {"status": "error in fetching paypal access token"},
+                    status=status.HTTP_404_NOT_FOUND)
+
+            access_token_strting = 'Bearer ' + access_token
+
+            plan_ids = []
+            deactivate_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+            deactivate_indie_monthly_plan_url = deactivate_plan_base_url + delete_obj.indie_monthly_plan_id + '/deactivate'
+            deactivate_indie_monthly_plan_url_response = requests.post(
+                    deactivate_indie_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_indie_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.indie_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_indie_yearly_plan_url = deactivate_plan_base_url + delete_obj.indie_yearly_plan_id + '/deactivate'
+            deactivate_indie_yearly_plan_url_response = requests.post(
+                    deactivate_indie_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_indie_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.indie_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_pro_monthly_plan_url = deactivate_plan_base_url + delete_obj.pro_monthly_plan_id + '/deactivate'
+            deactivate_pro_monthly_plan_url_response = requests.post(
+                    deactivate_pro_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_pro_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.pro_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_pro_yearly_plan_url = deactivate_plan_base_url + delete_obj.pro_yearly_plan_id + '/deactivate'
+            deactivate_pro_yearly_plan_url_response = requests.post(
+                    deactivate_pro_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_pro_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.pro_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_company_monthly_plan_url = deactivate_plan_base_url + delete_obj.company_monthly_plan_id + '/deactivate'
+            deactivate_company_monthly_plan_url_response = requests.post(
+                    deactivate_company_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_company_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.company_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_company_yearly_plan_url = deactivate_plan_base_url + delete_obj.company_yearly_plan_id + '/deactivate'
+            deactivate_company_yearly_plan_url_response = requests.post(
+                    deactivate_company_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_company_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.company_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            if len(plan_ids) >= 1:
+                delete_obj.delete()
+                final_response = 'successfully deleted the plans associated with the beta_user_code' + delete_obj.code
+                return Response(
+                    {'status': final_response}, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {'status': 'error in deleteing the beta-user-plan'}, status=status.HTTP_400_BAD_REQUEST)
         except ObjectDoesNotExist:
             return Response(
                 {'status': 'code with this id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
