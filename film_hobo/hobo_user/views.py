@@ -4359,6 +4359,7 @@ class AddBetaTesterCode(APIView):
     permission_classes = (IsSuperUser,)
 
     def post(self, request, *args, **kwargs):
+        initial_data = request.data
         # function to get value of a key in json
         def find_values(id, json_repr):
             results = []
@@ -4474,9 +4475,14 @@ class AddBetaTesterCode(APIView):
         plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
                       'Pro Payment Monthly','Pro Payment Yearly',
                       'Company Payment Monthly','Company Payment Yearly']
+        plan_ids = {'indie_monthly_plan_id': '',
+                    'indie_yearly_plan_id': '',
+                    'pro_monthly_plan_id': '',
+                    'pro_yearly_plan_id': '',
+                    'company_monthly_plan_id': '',
+                    'company_yearly_plan_id': ''}
         for plan_type in plan_types:
             plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + request.data['code']
-
             if plan_type.find('Monthly'):
                 plan_interval_unit = 'MONTH'
             else:
@@ -4538,20 +4544,33 @@ class AddBetaTesterCode(APIView):
                     "payment_failure_threshold": 1
                 }
             }
-        create_plan_user_response = requests.post(
-                        'https://api-m.sandbox.paypal.com/v1/billing/plans',
-                        data=json.dumps(create_plan_json),
-                        headers={'Accept': 'application/json',
-                                 'Authorization': access_token_strting,
-                                 'Content-type': 'application/json'
-                                 })
-        plan_ids = []
-        if create_plan_user_response.status_code == 201:
-            plan_id = json.loads(create_plan_user_response.content)['id']
-        else:
-            return HttpResponse('Could not save data')
-
-        serializer = AddBetaTesterCodeSerializer(data=request.data)
+            create_plan_user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                            data=json.dumps(create_plan_json),
+                            headers={'Accept': 'application/json',
+                                        'Authorization': access_token_strting,
+                                        'Content-type': 'application/json'
+                                        })
+            if create_plan_user_response.status_code == 201:
+                plan_id = json.loads(create_plan_user_response.content)['id']
+                if plan_type == 'Indie Payment Monthly':
+                    plan_ids['indie_monthly_plan_id'] = plan_id
+                elif plan_type == 'Indie Payment Yearly':
+                    plan_ids['indie_yearly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Monthly':
+                    plan_ids['pro_monthly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Yearly':
+                    plan_ids['pro_yearly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Monthly':
+                    plan_ids['company_monthly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Yearly':
+                    plan_ids['company_yearly_plan_id'] = plan_id
+                else:
+                    pass
+            else:
+                return HttpResponse('Could not save data')
+        initial_data.update(plan_ids)
+        serializer = AddBetaTesterCodeSerializer(data=initial_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -1127,5 +1127,7 @@ class AddBetaTesterCodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BetaTesterCodes
-        fields = ['id', 'code', 'days']
-
+        fields = ['id', 'code', 'days',
+                  'indie_monthly_plan_id', 'indie_yearly_plan_id',
+                  'pro_monthly_plan_id', 'pro_yearly_plan_id',
+                  'company_monthly_plan_id', 'company_yearly_plan_id']

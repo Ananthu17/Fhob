@@ -1835,17 +1835,17 @@ class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=20, unique=True)
+        _("Indie Monthly Plan ID"), max_length=40, unique=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=20, unique=True)
+        _("Indie Yearly Plan ID"), max_length=40, unique=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=20, unique=True)
+        _("Pro Monthly Plan ID"), max_length=40, unique=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=20, unique=True)
+        _("Pro Yearly Plan ID"), max_length=40, unique=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=20, unique=True)
+        _("Company Monthly Plan ID"), max_length=40, unique=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=20, unique=True)
+        _("Company Yearly Plan ID"), max_length=40, unique=True)
 
     def __str__(self):
         return str(self.code)
