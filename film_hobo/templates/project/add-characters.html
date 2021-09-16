@@ -18,7 +18,8 @@
                 <!-- Project menu  -->
                 <div class="cas-menu-bg">
                     <ul class="cas-menu cas-menu-padding">
-                        <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                        <li><span class="video-menu-head">PROJECT </span>
+                            <a href="{% url 'project:single-film-project' project.id %}" class="video-menu-head-tag" >#{{project.id}}</a></li>
                         <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
                         <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
                         <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>

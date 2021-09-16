@@ -6,13 +6,14 @@
         <a href="{% url 'project:single-film-project' notification.project.id %}"
          target="_blank" id ="{{notification_id}}" class="notification_link">
             {% if notification.project.video_cover_image %}
-            <img src="{{ notification.project.video_cover_image }}" class="notification_img"/>
+            <img src="{{ notification.project.video_cover_image.url }}" class="notification_img"/>
             {% elif notification.project.creator.get_profile_photo %}
             <img src="{{ notification.project.creator.get_profile_photo }}" class="notification_img"/>
             {% else %}
             <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
             {% endif %}</a>
     </div>
+    {% if notification.notification_type == 'cast_attach_request' %}
     <div class="col-10 " id="cast-attach-req-btns-{{notification.character.id}}">
         {{ notification.project.creator.get_full_name}} wants to attach you to character
         <b>{{notification.character.name}}</b> of his project
@@ -20,9 +21,17 @@
         <b>{{ notification.project.creator.get_membership_display }}</b><br>
         <span class="btn-blue cursor-pointer accept_cast_attach_request" id="{{notification.character.id}}">Accept</span>
         <span class="btn-grey  cursor-pointer decline_cast_request" id="{{notification.character.id}}">Delete</span>
-
-
     </div>
+    {% elif notification.notification_type == 'crew_attach_request' %}
+    <div class="col-10 " id="crew-attach-req-btns-{{notification.crew.id}}">
+        {{ notification.project.creator.get_full_name}} wants to attach you as
+        <b>{{notification.crew.job_type}}</b> to his project
+        <b><a href="{% url 'project:single-film-project' notification.project.id %}" >{{notification.project.title}}</a></b><br>
+        <b>{{ notification.project.creator.get_membership_display }}</b><br>
+        <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{notification.crew.id}}">Accept</span>
+        <span class="btn-grey  cursor-pointer decline_crew_request" id="{{notification.crew.id}}">Delete</span>
+    </div>
+    {% endif %}
 </div>
 
 

@@ -386,3 +386,29 @@ class ProjectCrewSerializer(serializers.Serializer):
                 max_length=150,
                 required=True,
             )
+
+
+class CharacterPasswordSerializer(serializers.Serializer):
+    character_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    password = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+
+
+class AttachCrewSerializer(serializers.Serializer):
+    crew_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    user = serializers.CharField(
+                max_length=150,
+                required=False,
+            )
+    name = serializers.CharField(
+                max_length=150,
+                required=False,
+            )

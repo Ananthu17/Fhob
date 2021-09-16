@@ -72,6 +72,18 @@ notificationSocket.onmessage = function (e) {
                     }
             });
             break;
+        case "CREW_ATTACH_REQUEST":
+            // get friend request notification html
+            data_dict = {}
+            data_dict['from_user'] = user_id
+            $.get('/project/get-crew-attach-request-notification-html/', data_dict)
+            .done(function(data) {
+                if(data.results!='')
+                    {
+                        $('.notification-modal-content').prepend(data['notification_html'])
+                    }
+            });
+            break;
         case "FRIEND_REQUEST_ACCEPT":
              // get friend request accept notification html
              data_dict = {}

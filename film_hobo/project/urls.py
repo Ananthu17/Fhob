@@ -22,7 +22,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView, \
      CrewApplyAuditionView, CrewApplyAPI, CrewApplicationListingView, \
      AttachCrewMemberAPI, RemoveCrewMemberAPI, AddJobTypeView, SaveJobTypeAPI, \
-     AddProjectCrewAPI
+     AddProjectCrewAPI, CastPasswordCheckView, CastApplyPasswordCheckAPI, \
+     CrewAttachReplaceView, RemoveAttachedCrewAPI, AttachCrewAPI, \
+     GetCrewAtachRequestNotificationAjaxView
 
 
 urlpatterns = [
@@ -135,6 +137,9 @@ urlpatterns = [
      path('get-cast-attach-request-notification-html/',
           GetCastAtachRequestNotificationAjaxView.as_view(),
           name='get-cast-attach-request-notification-html'),
+     path('get-crew-attach-request-notification-html/',
+          GetCrewAtachRequestNotificationAjaxView.as_view(),
+          name='get-crew-attach-request-notification-html'),
      path('get-cast-attach-response-notification-html/',
           GetCastAtachResponseNotificationAjaxView.as_view(),
           name='get-cast-attach-response-notification-html'),
@@ -160,12 +165,22 @@ urlpatterns = [
           name='crew-application-listing'),
      path('attach-crew-member-api/', AttachCrewMemberAPI.as_view(),
           name='attach-crew-member-api'),
+     path('attach-crew-api/', AttachCrewAPI.as_view(),
+          name='attach-crew-api'),
      path('remove-crew-member-api/', RemoveCrewMemberAPI.as_view(),
           name='remove-crew-member-api'),
-     path('add-project-crew/<int:id>', AddJobTypeView.as_view(),
+     path('add-project-crew/<int:id>/', AddJobTypeView.as_view(),
           name='add-project-crew'),
      path('add-project-crew-api/', AddProjectCrewAPI.as_view(),
           name='add-project-crew-api'),
      path('save-job-type-api/', SaveJobTypeAPI.as_view(),
           name='save-job-type-api'),
+     path('cast-password-check/<int:id>/', CastPasswordCheckView.as_view(),
+          name='cast-password-check'),
+     path('cast-apply-password-check-api/', CastApplyPasswordCheckAPI.as_view(),
+          name='cast-apply-password-check-api'),
+     path('crew-attach-replace/<int:id>/', CrewAttachReplaceView.as_view(),
+          name='crew-attach-replace'),
+     path('remove-attached-crew-api/',RemoveAttachedCrewAPI.as_view(),
+          name='remove-attached-crew-api'),
     ]

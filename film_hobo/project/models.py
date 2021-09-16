@@ -322,11 +322,10 @@ class ProjectCrew(models.Model):
 
 class CrewApplication(models.Model):
     ATTACHED = 'attached'
-    PASSED = 'passed'
+    # PASSED = 'passed'
     APPLIED = 'applied'
     STATUS_CHOICES = [
         (ATTACHED, 'Attached'),
-        (PASSED, 'Passed'),
         (APPLIED, 'Applied'),
     ]
     project = models.ForeignKey('hobo_user.Project',
@@ -344,7 +343,7 @@ class CrewApplication(models.Model):
     agent_email = models.EmailField(_('Email'), null=True, blank=True)
     agent = models.ForeignKey('hobo_user.CustomUser',
                               verbose_name=_("Agent"),
-                              on_delete=models.CASCADE,
+                              on_delete=models.SET_NULL,
                               null=True, blank=True,
                               related_name='crew_apply_user_agent')
     location = models.ForeignKey("hobo_user.Location",
@@ -386,7 +385,8 @@ class AttachedCrewMember(models.Model):
     user = models.ForeignKey('hobo_user.CustomUser',
                              verbose_name=_("User"),
                              on_delete=models.CASCADE,
-                             related_name='attached_crew_member')
+                             related_name='attached_crew_member',
+                             null=True, blank=True)
     crew = models.ForeignKey('project.ProjectCrew',
                              verbose_name=_("Crew"),
                              on_delete=models.CASCADE)
@@ -394,9 +394,14 @@ class AttachedCrewMember(models.Model):
                                    choices=STATUS_CHOICES,
                                    max_length=150,
                                    default=ATTACHED)
+    name = models.CharField(_("Non FilmHobo member Name"),
+                            max_length=150, null=True, blank=True)
 
     def __str__(self):
-        return str(self.user.get_full_name())
+        if self.user:
+            return str(self.user.get_full_name())
+        else:
+            return str(self.name)
 
     class Meta:
         verbose_name = 'Attached Crew Member'

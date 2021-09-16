@@ -630,9 +630,9 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
-                                  related_name='project_team',
-                                  blank=True)
+    # team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
+    #                               related_name='project_team',
+    #                               blank=True)
     script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
@@ -648,6 +648,10 @@ class Project(models.Model):
                                  choices=CAST_PAY_RATE_CHOICES,
                                  max_length=150, default=NEGOTIABLE)
     cast_samr = models.CharField(_("Cast SAMR"),
+                                 choices=CAST_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    crew_samr = models.CharField(_("Crew SAMR"),
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
@@ -1654,6 +1658,8 @@ class UserNotification(models.Model):
     COMMENTS_MENTION = 'comments_mention'
     CAST_ATTACH_REQUEST = 'cast_attach_request'
     CAST_ATTACH_RESPONSE = 'cast_attach_response'
+    CREW_ATTACH_REQUEST = 'crew_attach_request'
+    CREW_ATTACH_RESPONSE = 'crew_attach_response'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1675,6 +1681,8 @@ class UserNotification(models.Model):
                                 (COMMENTS_MENTION, 'Comments Mention'),
                                 (CAST_ATTACH_REQUEST, 'Cast Attach Request'),
                                 (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
+                                (CREW_ATTACH_REQUEST, 'Crew Attach Request'),
+                                (CREW_ATTACH_RESPONSE, 'Crew Attach Response'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1710,6 +1718,10 @@ class UserNotification(models.Model):
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE,
                                   null=True, blank=True)
+    crew = models.ForeignKey('project.ProjectCrew',
+                             verbose_name=_("Crew"),
+                             on_delete=models.CASCADE,
+                             null=True, blank=True)
 
     def __str__(self):
         return str(self.user)

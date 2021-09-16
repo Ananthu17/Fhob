@@ -3,7 +3,7 @@
 {% load project_rating_tag %}
 {% block extracss %}
 <style>
-    .cancel_btn, .save_btn, .attach_btn, .remove_btn
+    .cancel_btn, .save_btn, .attach_btn, .remove_btn, .plus_minus_btn
         {
         visibility:hidden;
         }
@@ -37,7 +37,7 @@
                     <div class="sds-menu-bg">
                         <div class="cta-menu-align">
                             <ul class="cva-menu ">
-                                <li><span class="video-menu-head">PROJECT </span><a href=""
+                                <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}"
                                         class="video-menu-head-tag">#{{project.id}}</a></li>
                                 <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
                                 <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
@@ -48,7 +48,7 @@
                     </div>
                     <!-- project menu  End-->
                     <!-- Attach section  -->
-
+{% if request.user == project.creator or request.user.is_superuser %}
                     <div class="craa-menu-bg">
                         <div class="craa-attach-sec">
                             <div class="craa-input-cast-sec">
@@ -74,7 +74,7 @@
                                 <div class="craa-btn-flex-1">
                                     <button class="craa-add-more-btn attach_all attach_btn">ATTACH ALL</button>
                                 </div>
-                                <div class="craa-btn-flex-2">
+                                <div class="craa-btn-flex-2 plus_minus_btn">
                                     <div>
                                         <button class="craa-plus-minus-btn">
                                             <i class="fa fa-plus craa-plus"></i>
@@ -200,7 +200,7 @@
                     <span class="all-p"> Heading Label</span>
                 </div>
                 <div class="col-7">
-                    <input class="form-control" name="label" id="label" />
+                    <input class="form-control" name="label" id="label" autocomplete="off"/>
                     <span class="help_text">Eg:- Production, Visual Effects, Post Production etc</span>
                     <div class="all-error-msg" id="label_error"></div>
                 </div>
@@ -210,7 +210,7 @@
                     <span class="all-p"> Crew Title</span>
                 </div>
                 <div class="col-7">
-                    <input class="form-control" name="title" id="title" />
+                    <input class="form-control" name="title" id="title" autocomplete="off"/>
                     <div class="all-error-msg" id="title_error"></div>
                 </div>
             </div>
@@ -228,6 +228,10 @@
 </div>
 <!-- end of modal -->
                     <!-- Attach section End  -->
+
+{% else %}
+<p class="all-p-light">Invalid Page</p>
+{% endif %}
                 </div>
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
@@ -326,6 +330,7 @@
         $(".cancel_btn").css('visibility', 'visible');
         $(".save_btn").css('visibility', 'visible');
         $(".attach_btn").css('visibility', 'visible');
+        $(".plus_minus_btn").css('visibility', 'visible');
         $(".remove_btn").css('visibility', 'visible');
         $(".add").addClass('add_count cursor-pointer');
         $(".minus").addClass('minus_count cursor-pointer');

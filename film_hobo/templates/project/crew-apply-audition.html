@@ -44,7 +44,7 @@
                 <div class="sds-menu-bg">
                     <div class="cta-menu-align">
                         <ul class="cva-menu ">
-                            <li><span class="video-menu-head">PROJECT </span><a href=""
+                            <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}"
                                     class="video-menu-head-tag">#{{project.id}}</a></li>
                             <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
                             <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="mt-2">
                                     <span class="sgl-black-txt">Crew SAMR:</span>
-                                    {% get_samr_display_value project.id as samr_data %}
+                                    {% get_crew_samr_display_value project.id as samr_data %}
                                     <span class="crw-pro-txt">{{ samr_data.0 }}</span>
                                     <span class="crw-log-star">
                                         <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>

@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load samr_display_tag %}
+{% load static %}
+{% load user_account_tag %}
+
+{% block extracss %}
+<style>
+    .cancel_btn, .save_btn
+        {
+        visibility:hidden;
+        }
+    .select2-container--default .select2-selection--single {
+        background-color:transparent!important;
+        border:none!important;
+        border-radius:0!important;
+        border-bottom:1px solid #000!important;
+        font-size:12px!important;
+        font-family:Myraid Pro!important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg car-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-center-section-align">
+                    <!-- project menu  -->
+
+                    <div class="sds-menu-bg">
+                        <div class="cta-menu-align">
+                            <ul class="cva-menu ">
+                                <li><span class="video-menu-head">PROJECT </span>
+                                    <a href="{% url 'project:single-film-project' project.id %}"
+                                        class="video-menu-head-tag ">#{{project.id}}</a></li>
+                                <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
+                                <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
+                                <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
+                                <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+{% if request.user == project.creator %}
+                    <form method="post" action="{% url 'project:crew-attach-replace' project.id %}">
+                        {% csrf_token %}
+                    <!-- project menu  End-->
+                    <div class="car-input-sec-bg ">
+                        <div class="crr-input-sec-align">
+                            <div class="crr-input-head">
+                                <span>
+                                    FILMMAKERS / CREW
+                                </span>
+                            </div>
+                            <div class="crr-input-cast-sec">
+                                <div>
+                                    <span>Team SAMR: </span>
+                                    {% get_crew_samr_display_value project.id as samr_data %}
+                                    <span class="car-pro-txt">{{ samr_data.0 }}</span>
+                                    <span class="car-input-rate-star">
+                                        <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <a class="crr-add-more-btn remove-decoration" href="{% url 'project:add-project-crew' project.id %}">ADD MORE</a>
+                                </div>
+                                <div>
+                                    <span>
+                                        <input type="submit" value="Save" class="crr-save-btn save_btn">
+                                    </span>
+                                    <span>
+                                        <a class="crr-save-btn cancel_btn cursor-pointer remove-decoration">Cancel</a>
+                                    </span>
+                                    <span>
+                                        <a class="crr-save-btn edit_btn cursor-pointer remove-decoration">Edit</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for crew in crew_objs %}
+                    <!-- Input Section 2 -->
+                    <div class="car-input-sec-bg crr-margin-top">
+                        <div class="crr-input-sec-align">
+                            <div class="crr-input-section">
+                                <div  class="crr-input-name-sec">
+                                    <div>
+                                        
+                                        <span class="crr-char-sec-txt txt-uppercase">{{crew.job_type.title}}:</span>
+                                        <span class="car-char-sec-green-txt">Available</span>
+                                        <!-- <span><a href="" class="car-char-sec-blue-txt">Tom Smith</a></span>
+                                        <span class="car-input-rate-star">
+                                            <span class="fa fa-star checked"></span>
+                                            <span class="fa fa-star checked"></span>
+                                            <span class="fa fa-star checked"></span>
+                                            <span class="fa fa-star checked"></span>
+                                            <span class="fa fa-star-o"></span>
+                                        </span> -->
+                                    </div>
+                                    <div>
+                                        <textarea class="crr-des-textarea qualification" id="{{crew.id}}" name="qualification_{{crew.id}}"
+                                            placeholder="Info/Qualification" disabled>{% if crew.qualification %}{{crew.qualification}}{% endif%}</textarea>
+                                    </div>
+                                </div>
+                                {% get_range_value crew.count as count_range %}
+                                {% get_dict_value attached_members_dict crew.id as attached_members %}
+                                <div class="crr-input-field-sec">
+                                    {% for obj in attached_members %}
+                                    <!-- Input and remove - replace  -->
+                                    <div class="crr-input-grid-display">
+                                        <div class="crr-input-field-display">
+                                            <span class="car-name-label">Name:</span>
+                                            <span class="car-name-field-width replace_user" id="select2-div-{{crew.id}}-{{forloop.counter}}">
+                                                {% if obj is not None and obj.crew_status == 'requested' %}
+                                                <input class="car-input-field car-char-sec-green-txt"
+                                                value="Request send to {% if obj.user %}{{obj.user.get_full_name}}{%else%}{{obj.name}}{%endif%}" disabled/>
+                                                {% elif obj is not None and obj.crew_status == 'attached' %}
+                                                <select class="car-input-field replaced_user" id="user-{{crew.id}}-{{forloop.counter}}">
+                                                    <option value="" selected disabled hidden ></option>
+                                                    {% if obj.user is none and obj.name is not none %}
+                                                    <option value="" selected disabled hidden >{{obj.name}}</option>
+                                                    {% endif %}
+                                                    <option value="0">Attach a Non FilmHobo Member</option>
+                                                    {% for user in users %}
+                                                    <option {%if obj.user == user %} selected {% endif %} value="{{user.id}}">{{user.get_full_name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% else %}
+                                                <select class="car-input-field attached_user" id="user-{{crew.id}}-{{forloop.counter}}">
+                                                    <option value="" selected disabled hidden ></option>
+                                                    <option value="0">Attach a Non FilmHobo Member</option>
+                                                    {% for user in users %}
+                                                    <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="crr-input-grid-display2">
+                                        <div class="crr-input-field-display">
+                                            {% if obj is not None and obj.crew_status == 'requested' %}
+                                                <span>
+                                                    <a href="" class="crr-input-remove-tag " id="{{obj.id}}"
+                                                    data-toggle="modal" data-target="#cancel_request_{{obj.id}}">Cancel Request</a>
+                                                </span>
+                                            {% elif obj is not None and obj.crew_status == 'attached' %}
+                                                <span>
+                                                    <a href="" class="crr-input-remove-tag " id="{{obj.id}}"
+                                                    data-toggle="modal" data-target="#remove_crew_{{obj.id}}">Remove</a>
+                                                </span>
+                                                <span>
+                                                    <a href="" class="crr-input-replace-tag replace_crew" id="{{obj.id}}">Replace</a>
+                                                </span>
+                                            {% else %}
+                                                <span>
+                                                    <a class="crr-input-attach-tag attach-modal cursor-pointer"
+                                                    id="attach-{{crew.id}}-{{forloop.counter}}">Attach</a>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <!-- Input and remove - replace End -->
+<!-- The Modal -->
+<div class="modal fade" id="remove_crew_{{obj.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Remove Attached Crew Member</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt">
+                        {% if obj.user %}
+                        Do you want to remove {{obj.user.get_full_name}} ?
+                        {% elif obj.name %}
+                        Do you want to remove {{obj.name}} ?
+                        {% else %}
+                        No users attached !!
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        {% if obj.user or obj.name %}
+        <a class='btn btn-outline-danger btn-sm cursor-pointer remove_crew' id="{{obj.id}}">Remove</a>
+        {% endif %}
+        <a class="cursor-pointer btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Cancel</a>
+        </div>
+
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+<!-- The Modal -->
+<div class="modal fade" id="attach_{{crew.id}}_{{forloop.counter}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Attach Crew Member</h5>
+        <button type="button" class="close close-modal" id="cancel_{{crew.id}}_{{forloop.counter}}" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12">
+                    <p class="samr-modal-txt " id="attach-modal-fulltxt-{{crew.id}}-{{forloop.counter}}">
+                        Do you want to attach  <span id="attach-modal-txt-{{crew.id}}-{{forloop.counter}}"></span> as {{crew.job_type}}?
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <a class='btn btn-outline-danger btn-sm cursor-pointer attach_crew'
+        id="attach_{{crew.id}}_{{forloop.counter}}">Attach</a>
+        <a class="btn btn-outline-danger btn-sm cursor-pointer close-modal"
+        data-dismiss="modal" id="cancel_{{crew.id}}_{{forloop.counter}}">Cancel</a>
+        </div>
+
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+
+                                {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Input Section 2 End  -->
+                    {% endfor %}
+
+                    <div class="crr-btm-save-display">
+                        <input type="submit" value="Save" class="crr-save-btn save_btn">
+                    </div>
+                    </form>
+{% else %}
+<p class="all-p-light">Invalid page</p>
+{% endif %}
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+    $(document).ready(function() {
+        $('.attached_user').select2();
+        $('.replaced_user').select2();
+    });
+</script>
+<script>
+    $('body').on('click' , '.edit_btn', function(){
+        $(".edit_btn").css('display', 'none');
+        $(".cancel_btn").css('visibility', 'visible');
+        $(".save_btn").css('visibility', 'visible');
+        $(".qualification").prop("disabled", false);
+     });
+
+    $('body').on('click' , '.cancel_btn', function(){
+        window.location.reload();
+     });
+
+    $('body').on('click' , '.remove_crew', function(){
+        var attached_user_id = $(this).attr("id");
+        var token = $("#token").val();
+        var data_dict = {};
+        data_dict['id'] = attached_user_id;
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/remove-attached-crew-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+
+    $('body').on('change' , '.attached_user', function(){
+        var id = $(this).attr("id");
+        var user = $(this).find("option:selected").val();
+        var crew_id = id.split("-")[1];
+        var loop_count = id.split("-")[2];
+        var select2_div_id = "#select2-div-"+crew_id+"-"+loop_count;
+        if(user==0){
+            $(select2_div_id).html("");
+            $(select2_div_id).html('<input class="car-input-field" value="" id="name-'+crew_id+"-"+loop_count+'"/>');
+        }
+    });
+
+    $('body').on('click' , '.attach-modal', function(){
+        var id = $(this).attr("id");
+        var crew_id = id.split("-")[1];
+        var loopcount = id.split("-")[2];
+
+        var user_option_id = "#user-"+crew_id+"-"+loopcount;
+        var user = $(user_option_id).find("option:selected").text();
+
+        var name_id = "#name-"+crew_id+"-"+loopcount;
+        var name = $(name_id).val();
+
+        var attach_modal_div_id = "#attach-modal-txt-"+crew_id+"-"+loopcount;
+        var attach_modal_fulltxt_id = "#attach-modal-fulltxt-"+crew_id+"-"+loopcount;
+        var modal_id = "#attach_"+crew_id+"_"+loopcount;
+        console.log(name)
+        console.log(user)
+        if(name){
+            $(attach_modal_div_id).html(name);
+            $(modal_id).modal('show');
+        }else if(user){
+            $(attach_modal_div_id).html(user);
+            $(modal_id).modal('show');
+        }else{
+        }
+    });
+
+    $('body').on('click' , '.close-modal', function(){
+        var id = $(this).attr("id");
+        var crew_id = id.split("_")[1];
+        var loopcount = id.split("_")[2];
+        var modal_id = "#attach_"+crew_id+"_"+loopcount;
+        $(modal_id).modal('hide');
+    });
+
+
+    $('body').on('click' , '.attach_crew', function(){
+        var id = $(this).attr("id");
+        var crew_id = id.split("_")[1];
+        var loopcount = id.split("_")[2];
+        var token = $("#token").val();
+        var data_dict = {};
+
+        var user_option_id = "#user-"+crew_id+"-"+loopcount;
+        var name_id = "#name-"+crew_id+"-"+loopcount;
+        var user = $(user_option_id).find("option:selected").val();
+        var name = $(name_id).val();
+        var token = $("#token").val();
+        var data_dict = {};
+        if(name!=""){
+            data_dict['name']=name;
+        }
+        if(user!=""){
+            data_dict['user']=user;
+        }
+        data_dict['crew_id'] = crew_id;
+        console.log(data_dict)
+        $.ajax
+        ({
+            type: "POST",
+            url: "/project/attach-crew-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+</script>
+{% endblock %}

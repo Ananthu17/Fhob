@@ -531,6 +531,36 @@ input.pw {
 	border-radius: 10px;
 }
    /* end scroll bar */
+   #style-crew::-webkit-scrollbar-track
+   {
+     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+     background-color: #f3f3f3;
+   }
+   
+   #style-crew::-webkit-scrollbar
+   {
+     background-color: #f3f3f3;
+   }
+   
+   #style-crew::-webkit-scrollbar-thumb
+   {
+     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+     background-color: orange;
+   }
+   #style-crew::-webkit-scrollbar-track
+   {
+     border-radius: 10px;
+   }
+   
+   #style-crew::-webkit-scrollbar
+   {
+     width: 5px;
+   }
+   
+   #style-crew::-webkit-scrollbar-thumb
+   {
+     border-radius: 10px;
+   }
 
 .logline-edit-div
   {
@@ -696,4 +726,8 @@ input.pw {
     font-size:12px;
     font-family:Myraid Pro;
 
+  }
+.hover_color:hover
+  {
+    color:#39b660;
   }

@@ -32,7 +32,7 @@
                     <div class="sds-menu-bg">
                         <div class="cta-menu-align">
                             <ul class="cva-menu ">
-                                <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                                <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}" class="video-menu-head-tag" >#{{project.id}}</a></li>
                                 <li><span >Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
                                 <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
                                 <li><span>Genre: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_genre_display}}</span></li>
@@ -51,7 +51,7 @@
                                     TEAM SELECT
                                 </div>
                                 <div class="crs-attach-remove">
-                                    Team Attach/Remove
+                                    <a href="{% url 'project:crew-attach-replace' project.id %}" class="cursor-pointer " >Team Attach/Remove</a>
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                         <div class="crs-name-star-sec">
                                             <div class="crs-name-star-flex">
                                                 <div class="crs-star-name">
-                                                    <a href="{{application_obj.user.get_profile_url}}}"
+                                                    <a href="{{application_obj.user.get_profile_url}}"
                                                     class="
                                                     {% if application_obj.application_status == 'attached' %}
                                                     crs-tag-red
@@ -150,7 +150,7 @@
         <div class="modal-body">
             <div class="row">
                 <div class="col-12">
-                    <p class="all-p-light">Do yo want to attach {{application_obj.user.get_full_name}}
+                    <p class="all-p-light">Do you want to attach {{application_obj.user.get_full_name}}
                         as {{application_obj.crew.job_type}} ?
                     </p>
                     </p>
