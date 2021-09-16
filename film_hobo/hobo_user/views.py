@@ -2089,6 +2089,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        
         profile = UserProfile.objects.get(user=user)
         all_agents = UserAgentManager.objects.filter(user=self.request.user)
         context['all_agents'] = all_agents
@@ -2346,6 +2347,8 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         profile = get_object_or_404(CompanyProfile, user=user)
+        print(profile)
+        print(user)
         context['user'] = user
         context['profile'] = profile
         pos_list = [2, 3, 4]
@@ -2371,11 +2374,14 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['tracking_list'] = tracking_list[:6]
 
         try:
-            friend_obj = Friend.objects.get(user=user)
-            friends = friend_obj.friends.all()
-            context['friends'] = friends[:8]
+            friend=Friend.objects.all()
+            if(friend):
+                friend_obj = Friend.objects.get(user=user)
+                friends = friend_obj.friends.all()
+                context['friends'] = friends[:8]
+                context['friends_list_count']=friends.count()
         except FriendRequest.DoesNotExist:
-            pass
+            context['friends'] = 0
         return context
 
     def post(self, request, *args, **kwargs):
