@@ -23,7 +23,7 @@ class SegregatorMixin():
     def project_to_json(self, project):
         project_dict = {}
         for item in project:
-            project_dict[item.id] = ProjectSerializer(item).data
+            project_dict["A"+str(item.id)] = ProjectSerializer(item).data
         return project_dict
 
 
