@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load range %}
 
 {% block content %}
 <style>
@@ -164,11 +165,12 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -258,11 +260,12 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -352,11 +355,12 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -446,11 +450,12 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -743,9 +748,8 @@
             console.log(`#demo${id}`)
             let rows = {'1':data.scene,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
             $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
-
             jQuery.each(rows[id], function() {
-                let div = `<div class='item'>\
+                let div1 = `<div class='item'>\
                         <div class='card proj-card' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
@@ -757,14 +761,16 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                </span>\
-                            </div>\
+                                <span  class='proj-symb'>`
+                let div2 = ""
+                for (let i = 0; i < this.rating; i++) {
+                    div2 += "<span class='fa fa-star checked'></span>"
+                }
+                let div3 = ""
+                for (let i = 0; i < 5-this.rating; i++) {
+                    div3 += "<span class='fa fa-star-o'></span>"
+                }
+                let div4 = `</span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -803,6 +809,7 @@
                             </div>\
                         </div>\
                     </div></div>`
+                let div = div1+div2+div3+div4
                 // appending div to results
                 $(`#project-owl${id}`).append(div);
             })
@@ -816,7 +823,7 @@
             $('#demo4').html("<div class='owl-carousel owl-theme ' id='project-owl4'>");
             // Scenes
             jQuery.each(data.scenes, function() {
-                let div = `<div class='item'>\
+                let div1 = `<div class='item'>\
                         <div class='card proj-card' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
@@ -828,14 +835,16 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                </span>\
-                            </div>\
+                                <span  class='proj-symb'>`
+                let div2 = ""
+                for (let i = 0; i < this.rating; i++) {
+                    div2 += "<span class='fa fa-star checked'></span>"
+                }
+                let div3 = ""
+                for (let i = 0; i < 5-this.rating; i++) {
+                    div3 += "<span class='fa fa-star-o'></span>"
+                }
+                let div4 = `</span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -874,6 +883,7 @@
                             </div>\
                         </div>\
                     </div></div>`
+                let div = div1+div2+div3+div4
                 // appending div to results
                 $('#project-owl1').append(div);
             })
@@ -881,7 +891,7 @@
             owlSettings(owl);
             // Top scenes
             jQuery.each(data.top_scenes, function() {
-                let div = `<div class='item'>\
+                let div1 = `<div class='item'>\
                         <div class='card proj-card' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
@@ -893,14 +903,16 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                </span>\
-                            </div>\
+                                <span  class='proj-symb'>`
+                let div2 = ""
+                for (let i = 0; i < this.rating; i++) {
+                    div2 += "<span class='fa fa-star checked'></span>"
+                }
+                let div3 = ""
+                for (let i = 0; i < 5-this.rating; i++) {
+                    div3 += "<span class='fa fa-star-o'></span>"
+                }
+                let div4 = `</span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -939,6 +951,7 @@
                             </div>\
                         </div>\
                     </div></div>`
+                let div = div1+div2+div3+div4
                 // appending div to results
                 $('#project-owl2').append(div);
             })
@@ -946,7 +959,7 @@
             owlSettings(owl);
             // Filims
             jQuery.each(data.filims, function() {
-                let div = `<div class='item'>\
+                let div1 = `<div class='item'>\
                         <div class='card proj-card' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
@@ -958,14 +971,16 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                </span>\
-                            </div>\
+                                <span  class='proj-symb'>`
+                let div2 = ""
+                for (let i = 0; i < this.rating; i++) {
+                    div2 += "<span class='fa fa-star checked'></span>"
+                }
+                let div3 = ""
+                for (let i = 0; i < 5-this.rating; i++) {
+                    div3 += "<span class='fa fa-star-o'></span>"
+                }
+                let div4 = `</span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1004,6 +1019,7 @@
                             </div>\
                         </div>\
                     </div></div>`
+                let div = div1+div2+div3+div4
                 // appending div to results
                 $('#project-owl3').append(div);
             })
@@ -1011,7 +1027,7 @@
             owlSettings(owl);
             // Top filims
             jQuery.each(data.top_filims, function() {
-                let div = `<div class='item'>\
+                let div1 = `<div class='item'>\
                         <div class='card proj-card' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
@@ -1023,14 +1039,16 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star checked'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                    <span class='fa fa-star-o'></span>\
-                                </span>\
-                            </div>\
+                                <span  class='proj-symb'>`
+                let div2 = ""
+                for (let i = 0; i < this.rating; i++) {
+                    div2 += "<span class='fa fa-star checked'></span>"
+                }
+                let div3 = ""
+                for (let i = 0; i < 5-this.rating; i++) {
+                    div3 += "<span class='fa fa-star-o'></span>"
+                }
+                let div4 = `</span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1069,6 +1087,7 @@
                             </div>\
                         </div>\
                     </div></div>`
+                let div = div1+div2+div3+div4
                 // appending div to results
                 $('#project-owl4').append(div);
             })

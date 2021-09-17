@@ -26,6 +26,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -47,10 +48,7 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework import filters
-
 from authemail.views import SignupVerify
-# from rest_framework.filters import SearchFilter
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
@@ -100,7 +98,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
 from payment.views import IsSuperUser
 
-from .mixins import SegregatorMixin
+from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -4859,12 +4857,12 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-# class ProjectSearchView(ListAPIView, SegregatorMixin):
-#     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-#     filter_backends = [filters.SearchFilter]
-#     search_fields = ["title", "format", "genre",
-#                      "rating", "timestamp"]
+class ProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
 
 #     def list(self, request, *args, **kwargs):
 #         queryset = self.filter_queryset(self.get_queryset())
