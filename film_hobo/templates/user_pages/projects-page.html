@@ -2,6 +2,14 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .list-group a li{
+        list-style: none;
+    }
+    .clicked{
+        color: orange !important;
+    }
+</style>
 <div class="wrapper flex-grow-1">
     <div class="container-fluid">
         <div class="row">
@@ -16,13 +24,13 @@
                     </div>
                     <div class="row justify-content-center">
                         <div>
-                            <a href=""><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
+                            <a href="javascript:void(0)" id="decreseyear" ><i class="fa fa-play prv-button nxt-btn" aria-hidden="true"></i></a>
                         </div>
                         <div class="ml-2">
-                            <label class="d-flex justify-content-center year">2021</label>
+                            <label class="d-flex justify-content-center year" id="year" >2021</label>
                         </div>
                         <div class="ml-2">
-                            <a href=""><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
+                            <a href="javascript:void(0)" id="increseyear" ><i class="fa fa-play nxt-btn" aria-hidden="true"></i></a>
                         </div>
                     </div>
 
@@ -31,18 +39,18 @@
                     </div>
                     <div class="d-flex justify-content-center left-mode-sec">
                         <ul class="list-group home-month">
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">January</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">February</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">March</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">April</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">May</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">June</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">July</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">August</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">September</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">October</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">November</li></a>
-                            <a class="text-dark" href=""><li class="list-group-item border-0 month-algn">December</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">January</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">February</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">March</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">April</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">May</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">June</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">July</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">August</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">September</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">October</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">November</li></a>
+                            <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">December</li></a>
                           </ul>
                     </div>
                     <div>
@@ -51,48 +59,48 @@
                     <!-- <div > -->
                         <table class="table borderless d-flex justify-content-center home-date proj-table-font">
                             <tbody><tr>
-                            <td><a class="text-dark " href="">1</a></td>
-                            <td><a class="text-dark" href="">2</a></td>
-                            <td><a class="text-dark" href="">3</a></td>
-                            <td><a class="text-dark" href="">4</a></td>
-                            <td><a class="text-dark" href="">5</a></td>
-                            <td><a class="text-dark" href="">6</a></td>
-                            <td><a class="text-dark" href="">7</a></td>
+                            <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">1</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">2</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">3</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">4</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">5</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">6</a></td>
+                            <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">7</a></td>
                             </tr>
                             <tr>
-                                <td><a class="text-dark " href="">8</a></td>
-                                <td><a class="text-dark " href="">9</a></td>
-                                <td><a class="text-dark " href="">10</a></td>
-                                <td><a class="text-dark " href="">11</a></td>
-                                <td><a class="text-dark " href="">12</a></td>
-                                <td><a class="text-dark " href="">13</a></td>
-                                <td><a class="text-dark " href="">14</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">8</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">9</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">10</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">11</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">12</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">13</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">14</a></td>
                                 </tr>
 
                                 <tr>
-                                <td><a class="text-dark " href="">15</a></td>
-                                <td><a class="text-dark " href="">16</a></td>
-                                <td><a class="text-dark " href="">17</a></td>
-                                <td><a class="text-dark " href="">18</a></td>
-                                <td><a class="text-dark " href="">19</a></td>
-                                <td><a class="text-dark " href="">20</a></td>
-                                <td><a class="text-dark " href="">21</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">15</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">16</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">17</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">18</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">19</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">20</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">21</a></td>
                                 </tr>
 
                                 <tr>
-                                <td><a class="text-dark " href="">22</a></td>
-                                <td><a class="text-dark " href="">23</a></td>
-                                <td><a class="text-dark " href="">24</a></td>
-                                <td><a class="text-dark " href="">25</a></td>
-                                <td><a class="text-dark " href="">26</a></td>
-                                <td><a class="text-dark " href="">27</a></td>
-                                <td><a class="text-dark " href="">28</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">22</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">23</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">24</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">25</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">26</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">27</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">28</a></td>
                                 </tr>
 
                                 <tr>
-                                <td><a class="text-dark " href="">29</a></td>
-                                <td><a class="text-dark " href="">30</a></td>
-                                <td><a class="text-dark " href="">31</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">29</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">30</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">31</a></td>
                                 </tr>
 
                             </tbody>
@@ -119,27 +127,28 @@
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
                             <span class=" txt-red  top-head-align proj-head-margin">New Scenes</span>
-                            <ul class="proj-cnt-menu-li">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="proj-cnt-menu-li" id="1">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
                             </ul>
                         </div>
                        <div class="proj-owl-right-margin">
                             <!-- owl-carousel  -->
-                        <div class="owl-carousel owl-theme " id="project-owl">
+                        <div id="demo1">
+                        <div class="owl-carousel owl-theme " id="project-owl1">
                             {% for project in scenes %}
                             <!-- item 1  -->
                             <div class="item">
@@ -170,7 +179,7 @@
                                             Page:<a href="">4</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -202,6 +211,7 @@
                             </div>
                             {% endfor %}
                         </div>
+                        </div>
                         <!-- owl-carousel End -->
                        </div>
                     </div>
@@ -211,26 +221,27 @@
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
                             <span class=" txt-red  top-head-align proj-head-margin">Top Rated</span>
-                            <ul class="proj-cnt-menu-li">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="proj-cnt-menu-li" id="2">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
                             </ul>
                         </div>
                        <div class="proj-owl-right-margin">
                             <!-- owl-carousel  -->
+                        <div id="demo2">
                         <div class="owl-carousel owl-theme " id="project-owl2">
                             {% for project in toprated_scenes %}
                             <!-- item 1  -->
@@ -262,7 +273,7 @@
                                             Page:<a href="">4</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -294,6 +305,7 @@
                             </div>
                             {% endfor %}
                         </div>
+                        </div>
                         <!-- owl-carousel End -->
                        </div>
                     </div>
@@ -303,26 +315,27 @@
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
                             <span class=" txt-red  top-head-align proj-head-margin">New Films</span>
-                            <ul class="proj-cnt-menu-li">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
                             </ul>
                         </div>
                        <div class="proj-owl-right-margin">
                         <!-- owl-carousel  -->
+                        <div id="demo3">
                         <div class="owl-carousel owl-theme " id="project-owl3">
                             {% for project in filims %}
                             <!-- item 1  -->
@@ -354,7 +367,7 @@
                                             Page:<a href="">4</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -386,6 +399,7 @@
                             </div>
                             {% endfor %}
                         </div>
+                        </div>
                         <!-- owl-carousel End -->
                        </div>
                     </div>
@@ -395,26 +409,27 @@
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
                             <span class=" txt-red  top-head-align proj-head-margin">Top Rated</span>
-                            <ul class="proj-cnt-menu-li">
-                                <li><a href="">Drama</a></li>
-                                <li><a href="">Comedy</a></li>
-                                <li><a href="">Musical</a></li>
-                                <li><a href="">Horror</a></li>
-                                <li><a href="">Sport</a></li>
-                                <li><a href="">Action</a></li>
-                                <li><a href="">Fantasy</a></li>
-                                <li><a href="">LGBTQ</a></li>
-                                <li><a href="">Family</a></li>
-                                <li><a href="">Sci-Fi</a></li>
-                                <li><a href="">Crime</a></li>
-                                <li><a href="">Thriller</a></li>
-                                <li><a href="">Military</a></li>
-                                <li><a href="">Romance</a></li>
-                                <li><a href="">Animation</a></li>
+                            <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
                             </ul>
                         </div>
                        <div class="proj-owl-right-margin">
                         <!-- owl-carousel  -->
+                        <div id="demo4">
                         <div class="owl-carousel owl-theme " id="project-owl4">
                             {% for project in toprated_filims %}
                             <!-- item 1  -->
@@ -446,7 +461,7 @@
                                             Page:<a href="">4</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -477,6 +492,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                        </div>
                         </div>
                         <!-- owl-carousel End -->
                        </div>
@@ -549,697 +565,8 @@
 
 {% block extrajs %}
 <script>
-    const origin_url = window.location.origin
-
-    // Script for search functionality
-    $('#search').on('change',()=>{
-        let action = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
-        if (performance.navigation.type == 2) {
-            window.location = origin_url + `/hobo_user/projectview/`
-        }
-        else{
-            window.location = action
-        }
-    })
-
-    // let date = ''
-    // let months = {'January':'01','February':'02','March':'03','April':'04','May':'05','June':'06',
-    //           'July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'}
-
-    // // Filter My_Projects according to the whole date (Whole Date Filter)
-    // function date_filter(data){
-    //     if (data.parentNode.parentNode.parentNode.getAttribute("id")=='day'){
-    //         date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
-    //         console.log(date)
-    //         data.setAttribute("class", "text-primary");
-    //         // axios posting data
-    //         origin_url = window.location.origin
-    //         post_url = origin_url + `/hobo_user/projects/?timestamp=${date}`
-    //         axios.get(post_url)
-    //         .then((response) => {
-    //             // Hiding already existing corousel
-    //             $('#initialblock').addClass('d-none')
-    //             // Appearing Search result box
-    //             $('#searchblock').removeClass('d-none')
-    //             $('#searchrow').empty()
-    //             $('#emptysearch').empty()
-    //             // In case of empty search results
-    //             if(response.data.results.length == 0){
-    //                 let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
-    //                 $('#emptysearch').append(div);
-    //             }
-    //             else{
-    //                 $('#emptysearch').empty();
-    //             }
-    //             let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
-    //             $('#searchrow').append();
-    //             // Iterrating through data results of api call  and adding to results box
-    //             jQuery.each(response.data.results, function() {
-    //                 let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
-    //                                 <div class='item pro-item'> \
-    //                                 <div class='card proj-card'>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-no'>\
-    //                                             Project<a href=''>${this.id}</a>\
-    //                                         </span>\
-    //                                         <span class='proj-pay'>\
-    //                                             $<a href=''>0</a>\
-    //                                         </span>\
-    //                                         <span class='proj-gener-align'>\
-    //                                             <a href=''>${this.genre}</a>\
-    //                                         </span>\
-    //                                         <span class='proj-symb'>\
-    //                                             <span class='fa fa-star checked'></span>\
-    //                                             <span class='fa fa-star checked'></span>\
-    //                                             <span class='fa fa-star-o'></span>\
-    //                                             <span class='fa fa-star-o'></span>\
-    //                                             <span class='fa fa-star-o'></span>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-title'>\
-    //                                             Title:<a href=''>${this.title}</a>\
-    //                                         </span>\
-    //                                         <span class='proj-page-no'>\
-    //                                             Page:<a href=''>4</a>\
-    //                                         </span>\
-    //                                         <span class='proj-public'>\
-    //                                             <a href=''>Public</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-format'>\
-    //                                             Creator:<a href=''>${this.creator}</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-format'>\
-    //                                             Format:<a href=''>${this.format}</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-format'>\
-    //                                             Team:<a href=''>Actor,Director +</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1'>\
-    //                                         <span class='proj-format'>\
-    //                                             Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                     <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                         <span class='proj-format'>\
-    //                                             Location:<a href=''>${this.location}</a>\
-    //                                         </span>\
-    //                                     </div>\
-    //                                 </div>\
-    //                             </div></div>`;
-    //                 $('#searchrow').append(div);
-    //             })
-    //         }, (error) => {
-    //             console.log(error);
-    //         })
-    //     }
-    // }
-
-    // // Filter according to the month selected and with year (Date filter with Month and Year)
-    // function add_select(data){
-    //     // Adding selected class to selected month
-    //     $('.list-group a li').removeClass('text-primary selected');
-    //     $('.list-group a li').removeAttr('id');
-    //     data.setAttribute("class", "text-primary");
-    //     data.setAttribute("id", "selected");
-    //     // axios posting data
-    //     origin_url = window.location.origin
-    //     post_url = origin_url + `/hobo_user/projects/date/`
-    //     console.log('post url :',post_url)
-    //     axios({
-    //         method: 'post',
-    //         url: post_url,
-    //         headers: {},
-    //         data: {
-    //             year : document.getElementById('year').innerHTML,
-    //             month : months[document.getElementById('selected').innerHTML]
-    //         }
-    //     })
-    //     .then((response) => {
-    //             console.log("data is :",response.data)
-    //             // Hiding already existing corousel
-    //             $('#initialblock').addClass('d-none')
-    //             // Appearing Search result box
-    //             $('#searchblock').removeClass('d-none')
-    //             $('#searchrow').empty()
-    //             $('#emptysearch').empty()
-    //             // In case of empty search results
-    //             if(Object.keys(response.data).length == 0){
-    //                 let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
-    //                 $('#emptysearch').append(div);
-    //             }
-    //             else{
-    //                 $('#emptysearch').empty();
-    //             }
-    //             let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
-    //             $('#searchrow').append();
-    //             // Iterrating through data results of api call  and adding to results box
-    //             jQuery.each(response.data, function() {
-    //                 let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
-    //                             <div class='item pro-item'> \
-    //                             <div class='card proj-card'>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-no'>\
-    //                                         Project<a href=''>${this.id}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-pay'>\
-    //                                         $<a href=''>0</a>\
-    //                                     </span>\
-    //                                     <span class='proj-gener-align'>\
-    //                                         <a href=''>${this.genre}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-symb'>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-title'>\
-    //                                         Title:<a href=''>${this.title}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-page-no'>\
-    //                                         Page:<a href=''>4</a>\
-    //                                     </span>\
-    //                                     <span class='proj-public'>\
-    //                                         <a href=''>Public</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Creator:<a href=''>${this.creator}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Format:<a href=''>${this.format}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Team:<a href=''>Actor,Director +</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Location:<a href=''>${this.location}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                             </div>\
-    //                         </div></div>`;
-    //                 $('#searchrow').append(div);
-    //             })
-    //         }, (error) => {
-    //             console.log(error);
-    //         })
-    // }
-
-    // // Script for filtering  data with year selected.Runs when decrease year button clicked.(Date filter with only year)
-    // $('#decreseyear').on('click',()=>{
-    //     // Year decresing
-    //     document.getElementById('year').innerHTML = document.getElementById('year').innerHTML-1
-    //     // axios post
-    //     origin_url = window.location.origin
-    //     post_url = origin_url + `/hobo_user/projects/date/`
-    //     console.log('post url :',post_url)
-    //     axios({
-    //         method: 'post',
-    //         url: post_url,
-    //         headers: {},
-    //         data: {
-    //             year : document.getElementById('year').innerHTML
-    //         }
-    //     }).then((response) => {
-    //             // Hiding already existing corousel
-    //             $('#initialblock').addClass('d-none')
-    //             // Appearing Search result box
-    //             $('#searchblock').removeClass('d-none')
-    //             $('#searchrow').empty()
-    //             $('#emptysearch').empty()
-    //             // In case of empty search results
-    //             if(Object.keys(response.data).length == 0){
-    //                 let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
-    //                 $('#emptysearch').append(div);
-    //             }
-    //             else{
-    //                 $('#emptysearch').empty();
-    //             }
-    //             // Iterrating through data results of api call  and appending  data to results box
-    //             let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
-    //             jQuery.each(response.data, function() {
-    //                 let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
-    //                             <div class='item pro-item'> \
-    //                             <div class='card proj-card'>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-no'>\
-    //                                         Project<a href=''>${this.id}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-pay'>\
-    //                                         $<a href=''>0</a>\
-    //                                     </span>\
-    //                                     <span class='proj-gener-align'>\
-    //                                         <a href=''>${this.genre}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-symb'>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-title'>\
-    //                                         Title:<a href=''>${this.title}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-page-no'>\
-    //                                         Page:<a href=''>4</a>\
-    //                                     </span>\
-    //                                     <span class='proj-public'>\
-    //                                         <a href=''>Public</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Creator:<a href=''>${this.creator}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Format:<a href=''>${this.format}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Team:<a href=''>Actor,Director +</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Location:<a href=''>${this.location}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                             </div>\
-    //                         </div></div>`;
-    //                 // appending div to results
-    //                 $('#searchrow').append(div);
-    //             })
-    //         }, (error) => {
-    //             console.log(error);
-    //     })
-    // })
-
-    // // Projects filtering according to year.Runs when increase year arrow clicked. (Date filter with only year)
-    // $('#increseyear').on('click',()=>{
-    //     // Incresing year when Incresing arrow clicked
-    //     document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)+1
-    //     // axios
-    //     origin_url = window.location.origin
-    //     post_url = origin_url + `/hobo_user/projects/date/`
-    //     console.log('post url :',post_url)
-    //     axios({
-    //         method: 'post',
-    //         url: post_url,
-    //         headers: {},
-    //         data: {
-    //             year : document.getElementById('year').innerHTML
-    //         }
-    //     }).then((response) => {
-    //             // Hiding old corosel block
-    //             $('#initialblock').addClass('d-none')
-    //             // Appearing new results box
-    //             $('#searchblock').removeClass('d-none')
-    //             $('#searchrow').empty()
-    //             $('#emptysearch').empty()
-    //             // In case of empty search results
-    //             if(Object.keys(response.data).length == 0){
-    //                 let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
-    //                 $('#emptysearch').append(div);
-    //             }
-    //             else{
-    //                 $('#emptysearch').empty();
-    //             }
-    //             // Iterating throgh api results .
-    //             let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
-    //             jQuery.each(response.data, function() {
-    //                 let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
-    //                             <div class='item pro-item'> \
-    //                             <div class='card proj-card'>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-no'>\
-    //                                         Project<a href=''>${this.id}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-pay'>\
-    //                                         $<a href=''>0</a>\
-    //                                     </span>\
-    //                                     <span class='proj-gener-align'>\
-    //                                         <a href=''>${this.genre}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-symb'>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-title'>\
-    //                                         Title:<a href=''>${this.title}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-page-no'>\
-    //                                         Page:<a href=''>4</a>\
-    //                                     </span>\
-    //                                     <span class='proj-public'>\
-    //                                         <a href=''>Public</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Creator:<a href=''>${this.creator}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Format:<a href=''>${this.format}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Team:<a href=''>Actor,Director +</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Location:<a href=''>${this.location}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                             </div>\
-    //                         </div></div>`;
-    //                 // appending div to results
-    //                 $('#searchrow').append(div);
-    //             })
-    //         }, (error) => {
-    //             console.log(error);
-    //     })
-    // })
-
-    // // Search Api. Appearing when Search box changes with an input (Search Filter Api)
-    // $('#search').on('change',()=>{
-    //         // axios
-    //         origin_url = window.location.origin
-    //         post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
-    //         console.log('post url :',post_url)
-    //         axios.get(post_url).then((response) => {
-    //             console.log("data is :",response.data)
-    //             $('#initialblock').addClass('d-none')
-    //             $('#searchblock').removeClass('d-none')
-    //             $('#searchrow').empty()
-    //             $('#emptysearch').empty()
-    //             // In case of empty search results
-    //             if(Object.keys(response.data).length == 0){
-    //                 let div = "<div><i class='far fa-frown'></i><h2>NO RESULTS FOUND</h2></div>"
-    //                 $('#emptysearch').append(div);
-    //             }
-    //             else{
-    //                 $('#emptysearch').empty();
-    //             }
-    //             // Iterating through search results
-    //             let span = "<div><label class='txt-red float-left top-head-align'>Search Results</label></div>"
-    //             jQuery.each(response.data, function() {
-    //                 let div = `<div class="col-lg-4 col-md-4 col-sm-6">\
-    //                             <div class='item pro-item'> \
-    //                             <div class='card proj-card'>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-no'>\
-    //                                         Project<a href=''>${this.id}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-pay'>\
-    //                                         $<a href=''>0</a>\
-    //                                     </span>\
-    //                                     <span class='proj-gener-align'>\
-    //                                         <a href=''>${this.genre}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-symb'>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-title'>\
-    //                                         Title:<a href=''>${this.title}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-page-no'>\
-    //                                         Page:<a href=''>4</a>\
-    //                                     </span>\
-    //                                     <span class='proj-public'>\
-    //                                         <a href=''>Public</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Creator:<a href=''>${this.creator}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Format:<a href=''>${this.format}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Team:<a href=''>Actor,Director +</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Location:<a href=''>${this.location}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                             </div>\
-    //                         </div></div>`;
-    //                 // appending div to results
-    //                 $('#searchrow').append(div);
-    //             })
-    //         }, (error) => {
-    //             console.log(error);
-    //     })
-    // })
-
-    // let genre = { 'ACTION':'ACT', 'ADVENTURE':'ADV', 'ANIMATION':'ANI', 'BIOGRAPHY':'BIO', 'COMEDY':'COM',
-    //              'CRIME':'CRI', 'DOCUMENTARY':'DOC', 'DRAMA':'DRA', 'FAMILY':'FAM', 'FANTASY':'FAN', 'FILM_NOIR':'FIL',
-    //              'GAME_SHOW':'GAM', 'HISTORY':'HIS', 'HORROR':'HOR', 'LGBTQ':'LGB', 'MILITARY':'MIL', 'MUSICAL':'MUS','MYSTERY':'MYS',
-    //              'REALITY_TV':'REA','ROMANCE':'ROM', 'SCIENCE_FICTION':'SCI', 'SPORT':'SPO', 'TALK_SHOW':'TAL','THRILLER':'THR',
-    //              'WESTERN':'WES'}
-
-    // // Filter projects with genre selected (Genre Filter)
-    // function cate_filter(data){
-    //     $('ul.cnt-menu-li a').removeClass('act')
-    //     let keyword = data.innerHTML.toUpperCase()
-    //     data.setAttribute("class", "act");
-    //     parent = data.parentNode.parentNode.getAttribute("for");
-
-    //     origin_url = window.location.origin
-    //     post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
-
-    //     axios.get(post_url)
-    //     .then((response) => {
-    //         localStorage.setItem('token', response.data.key);
-    //         let count = 0
-    //         $(`#${parent}`).empty();
-
-    //         jQuery.each(response.data.results, function() {
-    //             count += 1
-    //             let div = `<div class='item'>\
-    //                     <div class='card proj-card' >\
-    //                     <div class='project-line'>\
-    //                         <span class='proj-no'>\
-    //                             Project<a href=''>#${this.id}</a>\
-    //                         </span>\
-    //                         <span class='proj-pay'>\
-    //                             $<a href=''>0</a>\
-    //                         </span>\
-    //                         <span class='proj-gener-align'>\
-    //                             <a href=''>${this.genre}</a>\
-    //                         </span>\
-    //                         <span  class='proj-symb'>\
-    //                             <span class='fa fa-star checked'></span>\
-    //                             <span class='fa fa-star checked'></span>\
-    //                             <span class='fa fa-star-o'></span>\
-    //                             <span class='fa fa-star-o'></span>\
-    //                             <span class='fa fa-star-o'></span>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line2'>\
-    //                         <span class='proj-title'>\
-    //                             Title:<a href=''>${this.title}</a>\
-    //                         </span>\
-    //                         <span class='proj-page-no'>\
-    //                             Page:<a href=''>4</a>\
-    //                         </span>\
-    //                         <span class='proj-public'>\
-    //                             <span><a href=''>Public</a></span>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line-single-span'>\
-    //                         <span class='proj-format'>\
-    //                             Creator:<a href=''>${this.creator}</a>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line-single-span'>\
-    //                         <span class='proj-format'>\
-    //                             Format:<a href=''>${this.format}</a>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line-single-span'>\
-    //                         <span class='proj-format'>\
-    //                             Team:<a href=''>Actor,Director +</a>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line'>\
-    //                         <span class='proj-format'>\
-    //                             Cast:<a href=''>Female(27),Female(35)</a>\
-    //                         </span>\
-    //                     </div>\
-    //                     <div class='project-line'>\
-    //                         <span class='proj-format'>\
-    //                             Location:<a href=''>${this.location}</a>\
-    //                         </span>\
-    //                     </div>\
-    //                 </div>\
-    //             </div></div>`
-
-    //             $(`#${parent}`).append(div);
-    //             $(`#${parent}`).addClass('flex-between');
-
-    //             // If there is more than 3 projects next button will appear
-    //             if(count >= 3){
-    //                 let btn = "<button type='button' role='presentation' class='jquery-btn'><i class='fa fa-caret-right' aria-hidden='true'></i></button>"
-    //                 $(`#${parent}`).append(btn);
-    //             }
-    //         });
-
-
-    //         // On clicking next button first 3 data disappears and new set of data appears as corousel
-    //         $('.jquery-btn').on("click" ,()=>{
-    //             count = 0
-    //             // Api is paginated and calling next set of data
-    //             axios.get(response.data.next)
-    //             .then((response) => {
-    //                 $(`#${parent}`).empty();
-    //                 $(`#${parent}`).prepend("<div class='owl-stage' style='transform: translate3d(0px, 0px, 0px); transition: all 0s ease 0s; width: 2027px;display:flex;flex-direction:row;align-items:center;'></div>")
-
-    //                 // Iterating through api results
-    //                 jQuery.each(response.data.results, function() {
-    //                     console.log(this.title)
-    //                     count += 1
-    //                     let div = `<div class="owl-item active" style="width: 395.327px; margin-right: 10px;"><div class='item pro-item'> \
-    //                             <div class='card proj-card'>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-no'>\
-    //                                         Project<a href=''>${this.id}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-pay'>\
-    //                                         $<a href=''>0</a>\
-    //                                     </span>\
-    //                                     <span class='proj-gener-align'>\
-    //                                         <a href=''>${this.genre}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-symb'>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star checked'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                         <span class='fa fa-star-o'></span>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-title'>\
-    //                                         Title:<a href=''>${this.title}</a>\
-    //                                     </span>\
-    //                                     <span class='proj-page-no'>\
-    //                                         Page:<a href=''>4</a>\
-    //                                     </span>\
-    //                                     <span class='proj-public'>\
-    //                                         <a href=''>Public</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Creator:<a href=''>${this.creator}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Format:<a href=''>${this.format}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Team:<a href=''>Actor,Director +</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Cast:<a href=''>Female(27),Female(35)</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                                 <div class='project-line mt-1 ml-1 mb-1'>\
-    //                                     <span class='proj-format'>\
-    //                                         Location:<a href=''>${this.location}</a>\
-    //                                     </span>\
-    //                                 </div>\
-    //                             </div>\
-    //                         </div></div>`
-    //                     $(`#${parent}`).children().append(div);
-
-    //                     // If there is more than 3 projects next button will appear
-    //                     if(count >= 3){
-    //                         let btn = "<button type='button' role='presentation' class='jquery-btn'><i class='fa fa-caret-right' aria-hidden='true'></i></button>"
-    //                         $(`#${parent}`).children().append(btn);
-    //                     }
-    //                 });
-    //             });
-    //         })
-    //     }, (error) => {
-    //         console.log(error);
-    //     });
-    // }
-
     // OwlCarousel Script
-    $('#project-owl').owlCarousel({
+    $('#project-owl1').owlCarousel({
         loop:true,
         margin:10,
         responsiveClass:true,
@@ -1371,5 +698,515 @@
             },
         }
     })
+
+
+    const origin_url = window.location.origin
+
+    const owlSettings = (owl)=>{
+        return owl.owlCarousel({
+                    loop:true,
+                    margin:10,
+                    responsiveClass:true,
+                    nav: true,
+                    navText: [
+                    "<i class='fa fa-caret-left'></i>",
+                    "<i class='fa fa-caret-right'></i>"
+                    ],
+                    responsive:{
+                        0:{
+                            items:1,
+                            nav:true
+                        },
+                        641:{
+                            items:2,
+                            nav:true
+                        },
+                        885:{
+                            items:3,
+                            nav:true
+                        },
+                        992:{
+                            items:2,
+                            nav:true
+                        },
+                        1200:{
+                            items:3,
+                            nav:true,
+                            loop:false
+                        },
+                    }
+                });
+    }
+
+    const dataInsertion = (data, id=5)=>{
+        if (id!=5){
+            console.log(`#demo${id}`)
+            let rows = {'1':data.scene,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
+            $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
+
+            jQuery.each(rows[id], function() {
+                let div = `<div class='item'>\
+                        <div class='card proj-card' >\
+                            <div class='project-line'>\
+                                <span class='proj-no'>\
+                                    Project<a href=''>#${this.id}</a>\
+                                </span>\
+                                <span class='proj-pay'>\
+                                    $<a href=''>0</a>\
+                                </span>\
+                                <span class='proj-gener-align'>\
+                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                </span>\
+                                <span  class='proj-symb'>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line2'>\
+                                <span class='proj-title'>\
+                                    Title:<a href=''>${this.title}</a>\
+                                </span>\
+                                <span class='proj-page-no'>\
+                                    Page:<a href=''>4</a>\
+                                </span>\
+                                <span class='proj-public'>\
+                                    <span><a href=''>Public</a></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Creator:<a href=''>${this.creator}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Format:<a href=''>${format[this.format]}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Team:<a href=''>Actor,Director +</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Cast:<a href=''>Female(27),Female(35)</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Location:<a href=''>${this.location}</a>\
+                                </span>\
+                            </div>\
+                        </div>\
+                    </div></div>`
+                // appending div to results
+                $(`#project-owl${id}`).append(div);
+            })
+            var owl = $(`#project-owl${id}`);
+            owlSettings(owl);
+        }
+        else{
+            $('#demo1').html("<div class='owl-carousel owl-theme ' id='project-owl1'>");
+            $('#demo2').html("<div class='owl-carousel owl-theme ' id='project-owl2'>");
+            $('#demo3').html("<div class='owl-carousel owl-theme ' id='project-owl3'>");
+            $('#demo4').html("<div class='owl-carousel owl-theme ' id='project-owl4'>");
+            // Scenes
+            jQuery.each(data.scenes, function() {
+                let div = `<div class='item'>\
+                        <div class='card proj-card' >\
+                            <div class='project-line'>\
+                                <span class='proj-no'>\
+                                    Project<a href=''>#${this.id}</a>\
+                                </span>\
+                                <span class='proj-pay'>\
+                                    $<a href=''>0</a>\
+                                </span>\
+                                <span class='proj-gener-align'>\
+                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                </span>\
+                                <span  class='proj-symb'>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line2'>\
+                                <span class='proj-title'>\
+                                    Title:<a href=''>${this.title}</a>\
+                                </span>\
+                                <span class='proj-page-no'>\
+                                    Page:<a href=''>4</a>\
+                                </span>\
+                                <span class='proj-public'>\
+                                    <span><a href=''>Public</a></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Creator:<a href=''>${this.creator}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Format:<a href=''>${format[this.format]}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Team:<a href=''>Actor,Director +</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Cast:<a href=''>Female(27),Female(35)</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Location:<a href=''>${this.location}</a>\
+                                </span>\
+                            </div>\
+                        </div>\
+                    </div></div>`
+                // appending div to results
+                $('#project-owl1').append(div);
+            })
+            var owl = $("#project-owl1");
+            owlSettings(owl);
+            // Top scenes
+            jQuery.each(data.top_scenes, function() {
+                let div = `<div class='item'>\
+                        <div class='card proj-card' >\
+                            <div class='project-line'>\
+                                <span class='proj-no'>\
+                                    Project<a href=''>#${this.id}</a>\
+                                </span>\
+                                <span class='proj-pay'>\
+                                    $<a href=''>0</a>\
+                                </span>\
+                                <span class='proj-gener-align'>\
+                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                </span>\
+                                <span  class='proj-symb'>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line2'>\
+                                <span class='proj-title'>\
+                                    Title:<a href=''>${this.title}</a>\
+                                </span>\
+                                <span class='proj-page-no'>\
+                                    Page:<a href=''>4</a>\
+                                </span>\
+                                <span class='proj-public'>\
+                                    <span><a href=''>Public</a></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Creator:<a href=''>${this.creator}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Format:<a href=''>${format[this.format]}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Team:<a href=''>Actor,Director +</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Cast:<a href=''>Female(27),Female(35)</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Location:<a href=''>${this.location}</a>\
+                                </span>\
+                            </div>\
+                        </div>\
+                    </div></div>`
+                // appending div to results
+                $('#project-owl2').append(div);
+            })
+            var owl = $("#project-owl2");
+            owlSettings(owl);
+            // Filims
+            jQuery.each(data.filims, function() {
+                let div = `<div class='item'>\
+                        <div class='card proj-card' >\
+                            <div class='project-line'>\
+                                <span class='proj-no'>\
+                                    Project<a href=''>#${this.id}</a>\
+                                </span>\
+                                <span class='proj-pay'>\
+                                    $<a href=''>0</a>\
+                                </span>\
+                                <span class='proj-gener-align'>\
+                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                </span>\
+                                <span  class='proj-symb'>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line2'>\
+                                <span class='proj-title'>\
+                                    Title:<a href=''>${this.title}</a>\
+                                </span>\
+                                <span class='proj-page-no'>\
+                                    Page:<a href=''>4</a>\
+                                </span>\
+                                <span class='proj-public'>\
+                                    <span><a href=''>Public</a></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Creator:<a href=''>${this.creator}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Format:<a href=''>${format[this.format]}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Team:<a href=''>Actor,Director +</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Cast:<a href=''>Female(27),Female(35)</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Location:<a href=''>${this.location}</a>\
+                                </span>\
+                            </div>\
+                        </div>\
+                    </div></div>`
+                // appending div to results
+                $('#project-owl3').append(div);
+            })
+            var owl = $("#project-owl3");
+            owlSettings(owl);
+            // Top filims
+            jQuery.each(data.top_filims, function() {
+                let div = `<div class='item'>\
+                        <div class='card proj-card' >\
+                            <div class='project-line'>\
+                                <span class='proj-no'>\
+                                    Project<a href=''>#${this.id}</a>\
+                                </span>\
+                                <span class='proj-pay'>\
+                                    $<a href=''>0</a>\
+                                </span>\
+                                <span class='proj-gener-align'>\
+                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                </span>\
+                                <span  class='proj-symb'>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star checked'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                    <span class='fa fa-star-o'></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line2'>\
+                                <span class='proj-title'>\
+                                    Title:<a href=''>${this.title}</a>\
+                                </span>\
+                                <span class='proj-page-no'>\
+                                    Page:<a href=''>4</a>\
+                                </span>\
+                                <span class='proj-public'>\
+                                    <span><a href=''>Public</a></span>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Creator:<a href=''>${this.creator}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Format:<a href=''>${format[this.format]}</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line-single-span'>\
+                                <span class='proj-format'>\
+                                    Team:<a href=''>Actor,Director +</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Cast:<a href=''>Female(27),Female(35)</a>\
+                                </span>\
+                            </div>\
+                            <div class='project-line'>\
+                                <span class='proj-format'>\
+                                    Location:<a href=''>${this.location}</a>\
+                                </span>\
+                            </div>\
+                        </div>\
+                    </div></div>`
+                // appending div to results
+                $('#project-owl4').append(div);
+            })
+            var owl = $("#project-owl4");
+            owlSettings(owl);
+            }
+    }
+
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
+    }
+
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
+    }
+
+    // Script for search functionality
+    $('#search').on('change',()=>{
+        post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
+        axios.get(post_url)
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Decreases (Date Filter)
+    $('#decreseyear').on('click',()=>{
+        document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)-1
+
+        post_url = origin_url + `/hobo_user/projects/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {},
+            data: {
+                year : document.getElementById('year').innerHTML
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Increases (Date Filter)
+    $('#increseyear').on('click',()=>{
+        document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)+1
+        post_url = origin_url + `/hobo_user/projects/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {},
+            data: {
+                year : document.getElementById('year').innerHTML
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    let date = ''
+
+    let months = {'January':'01','February':'02','March':'03','April':'04','May':'05','June':'06',
+                  'July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'}
+
+    let genre = { 'ACTION':'ACT', 'ADVENTURE':'ADV', 'ANIMATION':'ANI', 'BIOGRAPHY':'BIO', 'COMEDY':'COM',
+                 'CRIME':'CRI', 'DOCUMENTARY':'DOC', 'DRAMA':'DRA', 'FAMILY':'FAM', 'FANTASY':'FAN', 'FILM_NOIR':'FIL',
+                 'GAME_SHOW':'GAM', 'HISTORY':'HIS', 'HORROR':'HOR', 'LGBTQ':'LGB', 'MILITARY':'MIL', 'MUSICAL':'MUS','MYSTERY':'MYS',
+                 'REALITY_TV':'REA','ROMANCE':'ROM', 'SCIENCE_FICTION':'SCI', 'SPORT':'SPO', 'TALK_SHOW':'TAL','THRILLER':'THR',
+                 'WESTERN':'WES'}
+
+    let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
+
+    // Month and Year filter (Date Filter)
+    function monthFilter(data){
+        $('.list-group a li').removeClass('text-primary selected');
+        $('.list-group a li').removeAttr('id');
+        data.setAttribute("class", "text-primary");
+        data.setAttribute("id", "selected");
+
+        post_url = origin_url + `/hobo_user/projects/date/`
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {},
+            data: {
+                year : document.getElementById('year').innerHTML,
+                month : months[document.getElementById('selected').innerHTML]
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+    // Filter Projects according to full date (Date Filter)
+    function date_filter(data){
+        $('table a').addClass('text-dark');
+        $('table a').removeClass('font-weight-bold');
+        data.setAttribute("class", "text-primary font-weight-bold");
+
+        date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
+        console.log(date)
+        post_url = origin_url + `/hobo_user/projects/?timestamp=${date}`
+        axios.get(post_url)
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+    // Filter Projects based on genere selected (Category Filter)
+    function genereFilter(data){
+        console.log(data)
+        $('.proj-cnt-menu-li a').removeClass('clicked')
+        let keyword = data.innerHTML.toUpperCase()
+        data.setAttribute("class", "clicked");
+        parent = data.parentNode.parentNode.getAttribute("id");
+        console.log("PARENT", parent)
+
+        post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
+        axios.get(post_url)
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data, parent)
+        }, (error) => {console.log(error);})
+    }
+
 </script>
 {% endblock %}

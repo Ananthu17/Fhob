@@ -100,7 +100,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
 from payment.views import IsSuperUser
 
-from .utils import notify
+from .mixins import SegregatorMixin
+from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
@@ -4768,7 +4769,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 3
 
 # Project CRUD
-class ProjectAPIView(ListAPIView):
+class ProjectAPIView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     # permission_classes = (IsAuthenticated,)
@@ -4780,8 +4781,13 @@ class ProjectAPIView(ListAPIView):
                         'visibility_password', 'cast_attachment',
                         'cast_pay_rate', 'cast_samr', 'timestamp']
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.project_segregator(queryset)
+        return Response(context)
 
-class ProjectDateFilterAPI(APIView):
+
+class ProjectDateFilterAPI(APIView, SegregatorMixin):
 
     def post(self, request):
         received_data = json.loads(request.body)
@@ -4791,19 +4797,15 @@ class ProjectDateFilterAPI(APIView):
             year = received_data['year']
             project = Project.objects.filter(timestamp__range=[year+"-"+month+"-01",
                                                                year+"-"+month+"-30"])
-            project_dict = {}
-            for item in project:
-                project_dict[item.id] = ProjectSerializer(item).data
-            return Response(project_dict)
+            context = self.project_segregator(project)
+            return Response(context)
 
         elif 'year' in received_data:
             year = received_data['year']
             project = Project.objects.filter(timestamp__range=[year+"-01-01",
                                                                year+"-12-30"])
-            project_dict = {}
-            for item in project:
-                project_dict[item.id] = ProjectSerializer(item).data
-            return Response(project_dict)
+            context = self.project_segregator(project)
+            return Response(context)
 
 
 class ProjectCreateAPIView(CreateAPIView):
@@ -4850,28 +4852,18 @@ class TeamDeleteAPIView(DestroyAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-# class ProjectSearchView(TemplateView, ListAPIView):
+
+# class ProjectSearchView(ListAPIView, SegregatorMixin):
 #     queryset = Project.objects.all()
 #     serializer_class = ProjectSerializer
 #     filter_backends = [filters.SearchFilter]
 #     search_fields = ["title", "format", "genre",
 #                      "rating", "timestamp"]
-#     template_name = 'user_pages/projects-page.html'
-#     login_url = '/hobo_user/user_login/'
-#     redirect_field_name = 'login_url'
 
 #     def list(self, request, *args, **kwargs):
 #         queryset = self.filter_queryset(self.get_queryset())
-#         return queryset
-
-#     def get_context_data(self, **kwargs):
-#         query = self.list(request)
-#         context = super().get_context_data(**kwargs)
-#         context["scenes"] = query.filter(format="SCH").order_by('-id')
-#         context["toprated_scenes"] = query.filter(format="SCH").order_by('-rating')
-#         context["filims"] = query.filter(format="SHO").order_by('-id')
-#         context["toprated_filims"] = query.filter(format="SHO").order_by('-rating')
-#         return context
+#         context = self.project_segregator(queryset)
+#         return Response(context)
 
 
 # Api to add rating to project video
