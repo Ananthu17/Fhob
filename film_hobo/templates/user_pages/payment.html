@@ -28,7 +28,7 @@
                 <div class="col-4 d-flex justify-content-center">
                     <a href="" class="btn btn-account">Indie</a>
                 </div>
-                <div class="col-4 d-flex justify-content-center">
+                <div id="center_btn" class="col-4 d-flex justify-content-center">
                     <a href="" class="btn btn-account">Pro</a>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
@@ -50,7 +50,7 @@
                             {% endif %}
                             <div class="mt-2">Estimated Tax Percentage: <span id="tax_percentage">{{ payment_details.estimated_tax }}</span> %</div>
                             <div class="mt-2">Your credit card will be charged on
-                                {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, <span id="days_free">{{ payment_details.free_days }}</span> days from today</div>
+                                <span id="bill_start_date">{{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}</span>, <span id="days_free">{{ payment_details.free_days }}</span> days from today</div>
                             <div class="row mt-2">
                                 <div class="col-3">
                                     <label class="form-title">Promo Code</label>

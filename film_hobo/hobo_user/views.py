@@ -14,6 +14,7 @@ from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
@@ -22,6 +23,7 @@ from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
 
 from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.pagination import PageNumberPagination

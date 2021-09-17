@@ -96,6 +96,16 @@ class UpdateMembershipFeeDetailsAPI(APIView):
         #     return HttpResponse('Could not save data')
 
 
+class BetaUserPlanDetails(APIView):
+    """
+    API to get beta user plan details
+    """
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        
+
+
 class GetMembershipFeeDetailsAPI(APIView):
     """
     API for superuser to get the membership fee details
