@@ -212,7 +212,7 @@
                         {% if form.phone_number.value != None %}value="{{ form.phone_number.value|stringformat:'s' }}"{% endif %}
                         maxlength="{{ form.phone_number.field.max_length }}"
                         {% if form.phone_number.field.required %}required{% endif %}
-                        placeholder="Phone" autocomplete="off">
+                        placeholder="Phone" autocomplete="off" >
                         {% if form.errors.phone_number %}
                           <p style="color: red">{{form.errors.phone_number}}</p>
                         {% endif %}
@@ -256,7 +256,7 @@
                   </div>
                   <div class="row mt-3">
                       <div class="col-2">
-                          <label class="form-title">Country</label>
+                          <label class="form-title">Country :</label>
                       </div>
                       <div class="col-4 form-group">
                         <select class="form-control form-control-input" name="{{ form.country.name }}"
@@ -274,14 +274,15 @@
                   </div>
                   <div class="row mt-2">
                       <div class="col-2">
-                          <label class="form-title">Company Type</label>
+                          <label class="form-title">Company Type :</label>
                       </div>
                       <div class="col-4 form-group">
                         <select class="form-control form-control-input" name="{{ form.company_type.name }}"
                         id="company_type"
                         placeholder="Company Type"
                         required data-toggle="modal" data-target="#warning">
-                        <option value="production">Production</option>
+                        <option >Choose Type</option>
+                        <option value="production">Production </option>
                         <option value="agency_management">Agency/Management</option>
                         </select>
                         {% if form.errors.company_type %}
@@ -291,7 +292,7 @@
                   </div>
                   <div class="row mt-2">
                       <div class="col-2">
-                          <label class="form-title" >Password</label>
+                          <label class="form-title" >Password:</label>
                       </div>
                       <div class="col-4 form-group">
                         <input type="password"
@@ -309,7 +310,7 @@
                   </div>
                   <div class="row mt-2">
                       <div class="col-2">
-                          <label class="form-title" >Repeat Password</label>
+                          <label class="form-title" >Repeat Password:</label>
                       </div>
                       <div class="col-4 form-group">
                         <input type="password"
@@ -327,7 +328,7 @@
                   </div>
                   <div id="beta-user-div" class="row mt-2">
                     <div class="col-2">
-                        <label class="form-title">Beta User</label>
+                        <label class="form-title">Beta User:</label>
                     </div>
                     <div class="col-4 form-group">
                       <input type="text"
@@ -339,7 +340,7 @@
                 </div>
                   <div id="beta-user-code-div" class="row mt-2">
                     <div class="col-2">
-                        <label class="form-title">Beta User Code</label>
+                        <label class="form-title">Beta User Code:</label>
                     </div>
                     <div class="col-4 form-group">
                       <input type="text"
@@ -351,7 +352,7 @@
                 </div>
                 <div id="beta-user-code-lastdate-div" class="row mt-2">
                   <div class="col-2">
-                      <label class="form-title">Beta User Final Day</label>
+                      <label class="form-title">Beta User Final Day:</label>
                   </div>
                   <div class="col-4 form-group">
                     <input type="text"

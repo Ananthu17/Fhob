@@ -39,7 +39,8 @@ PROJECT_ENVIRONMENT = "LOCAL"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     # ORIGIN_URL = "http://202.88.246.92:8041"
-    ORIGIN_URL = "http://172.22.0.1:8041"
+    ORIGIN_URL = "http://172.19.0.3:8041"
+    
 elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
     ORIGIN_URL = "http://www.filmhobo.com"
 else:
