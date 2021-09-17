@@ -14,6 +14,18 @@ $( document ).ready(function() {
     else{
         $("#remove_promocode").hide();
     }
+
+    if(window.location.href.indexOf("indie") != -1){
+        $("#indie_btn").hide();
+        $("#company_btn").hide();
+    }
+
+    // check if the user is beta user and
+    var betacode = localStorage.getItem("beta-code");
+    if (betacode){
+        
+    }
+
 });
 
 $("#apply_promocode").click(function(){
