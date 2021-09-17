@@ -1,6 +1,7 @@
 import braintree
 import json
 import requests
+from datetime import date
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
@@ -19,7 +20,7 @@ from datetimerange import DateTimeRange
 from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
-    BraintreePromoCode
+    BraintreePromoCode, BetaTesterCodes
 from .models import PaymentOptions, Transaction
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
@@ -55,7 +56,6 @@ class UpdateMembershipFeeDetailsAPI(APIView):
                      'Accept-Language': 'en_US'},
             params={'grant_type': 'client_credentials'},
             auth=(token_generation_url_username, token_generation_url_password))
-        import pdb;pdb.set_trace()
         if indie_monthly_user_response.status_code == 200:
             passindie_monthly_user_response
         else:
@@ -102,8 +102,18 @@ class BetaUserPlanDetails(APIView):
     """
 
     def post(self, request, *args, **kwargs):
-        data = request.data
-        
+        pass
+        # import pdb;pdb.set_trace()
+        # data = request.data
+        # code = data['code']
+        # membership_plan = data['membership']
+
+        # bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
+
+        # today = date.today()
+        # final_date = today.strftime("%d/%m/%Y")
+        # days_remaining = data
+        # return Response(data, status=status.HTTP_200_OK)
 
 
 class GetMembershipFeeDetailsAPI(APIView):

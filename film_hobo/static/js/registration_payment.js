@@ -22,8 +22,9 @@ $( document ).ready(function() {
 
     // check if the user is beta user and
     var betacode = localStorage.getItem("beta-code");
-    // if (betacode){
-    // }
+    if (betacode){
+        
+    }
 
 });
 
