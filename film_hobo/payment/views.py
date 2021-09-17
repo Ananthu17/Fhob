@@ -1,7 +1,8 @@
 import braintree
 import json
 import requests
-from datetime import date
+import datetime
+from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
@@ -103,17 +104,21 @@ class BetaUserPlanDetails(APIView):
 
     def post(self, request, *args, **kwargs):
         pass
-        # import pdb;pdb.set_trace()
-        # data = request.data
-        # code = data['code']
-        # membership_plan = data['membership']
+        import pdb;pdb.set_trace()
+        data = request.data
+        code = data['code']
+        membership_plan = data['membership']
 
-        # bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
+        bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
+        free_evaluation_time = bet_user_code_obj.days
+        date_today = datetime.date.today()
+        date_interval = datetime.timedelta(days=int(free_evaluation_time))
+        bill_date = date_today + date_interval
+        context['bill_date'] = bill_date
 
-        # today = date.today()
-        # final_date = today.strftime("%d/%m/%Y")
-        # days_remaining = data
-        # return Response(data, status=status.HTTP_200_OK)
+        final_date = today.strftime("%d/%m/%Y")
+        days_remaining = data
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class GetMembershipFeeDetailsAPI(APIView):

@@ -16,8 +16,15 @@ $( document ).ready(function() {
     }
 
     if(window.location.href.indexOf("indie") != -1){
-        $("#indie_btn").hide();
-        $("#company_btn").hide();
+        $('#center_btn_text').text("Indie");
+    }
+
+    if(window.location.href.indexOf("pro") != -1){
+        $('#center_btn_text').text("Pro");
+    }
+
+    if(window.location.href.indexOf("company") != -1){
+        $('#center_btn_text').text("Company");
     }
 
     // check if the user is beta user and

@@ -1,9 +1,9 @@
 
 import datetime
 
-from django.db.models import Q
-from autoslug import AutoSlugField
-from django.contrib.auth.hashers import make_password
+# from django.db.models import Q
+# from autoslug import AutoSlugField
+# from django.contrib.auth.hashers import make_password
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -15,7 +15,6 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 

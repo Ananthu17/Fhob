@@ -174,14 +174,14 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 {% if user.is_superuser %}
-                                    Admin 
+                                    Admin
                                 {% else %}
                                     {{ user.get_full_name }}
                                 {% endif %}
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
                                 {% if user.is_superuser %}
-                                
+
                                     <a class="dropdown-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
                                     <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
                                     <a class="dropdown-item" href="#">Settings & Privacy</a>
@@ -196,9 +196,9 @@
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% else %}
-                                 
+
                                     <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
-                                    {% if user.membership == "HOB" or user.membership == "IND" or user.membership == "PRO"   %}
+                                    {% if user.membership == "HOB" or user.membership == "IND" or user.membership == "PRO" %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     {% elif user.membership == "COM" and user.company_type == "production" %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-production-company-profile' %}">Edit Profile</a>
