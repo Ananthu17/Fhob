@@ -26,7 +26,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-# from django_filters import rest_framework as filters
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -48,7 +47,6 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 from datetime import date
 
 from authemail.views import SignupVerify
@@ -101,7 +99,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     TeamSerializer, VideoRatingSerializer, VideoSerializer, \
     EditUserInterestSerializer
 
-from .mixins import SegregatorMixin
+from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify, get_notifications_time
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -4365,7 +4363,7 @@ class TeamDeleteAPIView(DestroyAPIView):
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [SearchFilter]
     search_fields = ["title", "format", "genre",
                      "rating", "timestamp"]
 

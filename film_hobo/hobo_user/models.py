@@ -611,7 +611,7 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.FloatField(_("Rating"), validators=[MinValueValidator(0),
-                               MaxValueValidator(5)], null=True, blank=True)
+                               MaxValueValidator(5)], null=True, blank=True, default=1)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
