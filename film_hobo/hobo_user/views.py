@@ -21,6 +21,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
+from django.http import FileResponse
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse

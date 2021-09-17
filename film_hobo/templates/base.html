@@ -48,7 +48,7 @@
                             {% if request.user.is_anonymous %}
                                 <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
                             {% else %}
-                            <form action="{% url 'hobo_user:page_search_results' %}" method="get">
+                            <form action="" method="get">
                                 <input type="text" name="q" placeholder="Search" class="search-placeholder" id="search">
                             </form>
                             {% endif %}
