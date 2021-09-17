@@ -4575,6 +4575,34 @@ class TeamDeleteAPIView(DestroyAPIView):
 #                      "rating", "timestamp"]
 
 
+#Search API for Pages 
+
+#API for Searching things in a page 
+
+class PageSearchView(ListAPIView):
+    template_name = 'search_results.html'
+    serializer_class = ProjectSerializer
+    def get_queryset(self): 
+       
+        query = self.request.GET.get('q')
+        format_map = {v: k for k, v  in enumerate(Project.FORMAT_CHOICES)}
+        genre_map = {i: j for j, i  in enumerate(Project.GENRE_CHOICES)}
+        # get the corresponding key,value  from choice filed of model
+
+        for val in format_map.keys():
+            if(query==val[1]):
+                query=val[0]
+        
+        for val in genre_map.keys():
+            if(query==val[1]):
+                query=val[0]
+        object_list = Project.objects.filter(
+            Q(title__icontains=query) | Q(format__icontains=query) | Q(genre__icontains=query) 
+            | Q(rating__icontains=query) | Q(location__country__icontains=query)
+        )
+        return object_list
+
+
 # Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer

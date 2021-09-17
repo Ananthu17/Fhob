@@ -14,7 +14,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, CustomUserLogout, \
-                   ExtendedRegisterCompanyView, \
+                   ExtendedRegisterCompanyView,PageSearchView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
@@ -333,6 +333,8 @@ urlpatterns = [
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),
     #      name="project-search"),
+    path('page/search/',  PageSearchView.as_view(),
+          name="page_search_results"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
