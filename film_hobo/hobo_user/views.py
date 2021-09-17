@@ -4810,6 +4810,18 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+class ProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.project_segregator(queryset)
+        return Response(context)
+
 
 class ProjectCreateAPIView(CreateAPIView):
   permission_classes = (IsAuthenticated,)
@@ -4854,19 +4866,6 @@ class TeamDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
-
-
-class ProjectSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         context = self.project_segregator(queryset)
-#         return Response(context)
 
 
 # Api to add rating to project video
