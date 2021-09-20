@@ -58,9 +58,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, \
+                    GuildMembership, GroupUsers, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
-                    UserProject, Video, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
@@ -1209,7 +1208,7 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        message =""
+        message = ""
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         origin_url = settings.ORIGIN_URL
@@ -1244,7 +1243,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id]= obj.first_name + " "+ obj.last_name
+                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1765,7 +1764,7 @@ class PersonalDetailsAPI(APIView):
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
         personal_settings['athletic_skills'] = athletic_skill_list
-        response = {"personal_settings" : personal_settings}
+        response = {"personal_settings": personal_settings}
         return Response(response)
 
     def post(self, request):
@@ -2720,7 +2719,7 @@ class GetAgentManagerAPI(APIView):
         agent_dict = {}
         agents = UserAgentManager.objects.filter(user=self.request.user)
         for agent in agents:
-            agent_dict[agent.id ]= self.serializer_class(agent).data
+            agent_dict[agent.id] = self.serializer_class(agent).data
         response = {'Agents and managers': agent_dict}
         return Response(response)
 
@@ -2789,7 +2788,7 @@ class RemoveClientAPI(APIView):
                     obj.delete()
                 except CompanyClient.DoesNotExist:
                     response = {'message': "Invalid Id",
-                            'status': status.HTTP_400_BAD_REQUEST}
+                                'status': status.HTTP_400_BAD_REQUEST}
                     return Response(response)
                 response = {'message': "Client Removed",
                             'id': id,
@@ -2909,11 +2908,11 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                                 Q(user=user) &
                                 Q(job_type=job))
                     rating = rating_obj.rating * 20
-                    job_dict[job.id]=job.title
-                    rating_dict[job.id]=rating
+                    job_dict[job.id] = job.title
+                    rating_dict[job.id] = rating
                 except UserRatingCombined.DoesNotExist:
-                    rating_dict[job.id]=0
-                    job_dict[job.id]=job.title
+                    rating_dict[job.id] = 0
+                    job_dict[job.id] = job.title
             context['job_dict'] = job_dict
             context['rating_dict'] = rating_dict
         except UserProfile.DoesNotExist:
@@ -5069,33 +5068,6 @@ class ScreeningProjectDeatilInviteView(APIView):
                 return Response({"status": "invite success"}, status=status.HTTP_200_OK)
         except:
             return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
-
-class TermsOfService(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'terms_of_service.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class PrivacyPolicy(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'privacy_policy.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class RefundPolicy(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'refund_policy.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class IntellectualPropertyRights(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'intellectual_property_rights.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
 
 
 class GetBetaTesterCodeId(APIView):

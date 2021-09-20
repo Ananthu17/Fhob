@@ -1,11 +1,6 @@
 
 import datetime
 
-# from django.db.models import Q
-# from autoslug import AutoSlugField
-# from django.contrib.auth.hashers import make_password
-from phonenumber_field.modelfields import PhoneNumberField
-
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -15,6 +10,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
@@ -282,7 +278,7 @@ class CustomUser(AbstractUser):
     #                                                         )
     #                                          )
     ethnic_appearance = models.ForeignKey('hobo_user.EthnicAppearance',
-                                          on_delete=models.SET_NULL,
+                                        on_delete=models.SET_NULL,
                                           related_name='user_ethnic_appearance',
                                           verbose_name=_("Ethnic Appearance"),
                                           null=True)
@@ -829,7 +825,7 @@ class Team(models.Model):
                                  on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.project.title +" - "+ self.job_type.title
+        return self.project.title + " - " + self.job_type.title
 
     def save(self, *args, **kwargs):
         try:

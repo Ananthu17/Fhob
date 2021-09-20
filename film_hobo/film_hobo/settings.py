@@ -40,7 +40,7 @@ PROJECT_ENVIRONMENT = "LOCAL"
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     # ORIGIN_URL = "http://202.88.246.92:8041"
     ORIGIN_URL = "http://172.19.0.3:8041"
-    
+
 elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
     ORIGIN_URL = "http://www.filmhobo.com"
 else:
@@ -374,7 +374,8 @@ CKEDITOR_CONFIGS = {
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
-            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
+             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
+             'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
             ['Undo', 'Redo'],
             ['Format', 'Styles', 'Font'],
         ],

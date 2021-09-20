@@ -1,3 +1,6 @@
+origin_url = window.location.origin
+get_beta_tester_code_id_url = origin_url + "/hobo_user/get-beta-tester-code-id/"
+
 $( document ).ready(function() {
     $("#remove_promocode").hide();
     // $("#paypal-div").hide();
@@ -17,20 +20,36 @@ $( document ).ready(function() {
 
     if(window.location.href.indexOf("indie") != -1){
         $('#center_btn_text').text("Indie");
+        var membership = 'indie'
     }
 
     if(window.location.href.indexOf("pro") != -1){
         $('#center_btn_text').text("Pro");
+        var membership = 'pro'
     }
 
     if(window.location.href.indexOf("company") != -1){
         $('#center_btn_text').text("Company");
+        var membership = 'company'
     }
 
     // check if the user is beta user and
     var betacode = localStorage.getItem("beta-code");
     if (betacode){
-        
+        get_beta_user_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
+
+        time_period = $("#payment_plan").text();
+        extra_args = {"code": betacode,
+                      "membership": membership,
+                      "period": time_period}
+        axios.post(get_beta_user_plan_details_api, extra_args)
+        .then((response) => {
+            debugger
+            console.log(response);
+        }, (error) => {
+            debugger
+            console.log(error);
+        });
     }
 
 });
