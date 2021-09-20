@@ -412,3 +412,31 @@ class AttachCrewSerializer(serializers.Serializer):
                 max_length=150,
                 required=False,
             )
+
+
+class ReplaceCrewSerializer(serializers.Serializer):
+    attached_crew_member_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    user = serializers.CharField(
+                max_length=150,
+                required=False,
+            )
+    name = serializers.CharField(
+                max_length=150,
+                required=False,
+            )
+
+
+class CrewQualificationSerializer(serializers.Serializer):
+    crew_id = serializers.CharField(
+                max_length=150,
+                required=True,
+            )
+    qualification = serializers.CharField(
+                max_length=150,
+                required=False,
+            )
+
+

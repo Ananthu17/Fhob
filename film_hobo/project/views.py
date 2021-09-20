@@ -62,7 +62,8 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
       SidesPDFSerializer, CrewApplicationSerializer, JobTypeSerializer, \
       AttachProjectCrewSerializer, ProjectCrewSerializer, \
-      CharacterPasswordSerializer, AttachCrewSerializer
+      CharacterPasswordSerializer, AttachCrewSerializer, \
+      CrewQualificationSerializer, ReplaceCrewSerializer
 
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify
@@ -2999,6 +3000,22 @@ class GetCastAtachResponseNotificationAjaxView(View, JSONResponseMixin):
         context['notification_html'] = notification_html
         return self.render_json_response(context)
 
+class GetCrewAtachResponseNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_response_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.CREW_ATTACH_RESPONSE)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_response_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
 
 class AddToFavoritesAPI(APIView):
     serializer_class = UserProjectSerializer
@@ -3530,9 +3547,10 @@ class AttachCrewAPI(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         response = {}
+        user_id = ""
+        name = ""
         if serializer.is_valid():
             data_dict = serializer.data
-            print(data_dict)
             crew_id = data_dict['crew_id']
             if 'user' in data_dict:
                 user_id = data_dict['user']
@@ -3546,11 +3564,21 @@ class AttachCrewAPI(APIView):
                         user_audition = CrewApplication.objects.filter(
                                             Q(user=user) &
                                             Q(project=crew_obj.project) &
-                                            Q(crew=crew_obj)
+                                            Q(crew=crew_obj) &
+                                            Q(application_status=CrewApplication.APPLIED)
                                             ).first()
-                        if user_audition:
-                            print("user_audition---------", user_audition)
-                            if user_audition.application_status == CrewApplication.APPLIED:
+                        attached_obj = AttachedCrewMember.objects.filter(
+                                    Q(user=user) &
+                                    Q(crew=crew_obj)
+                                ).first()
+                        if attached_obj:
+                            response = {'errors': 'This user is already attached/requested to the same post.', 'status':
+                                        status.HTTP_400_BAD_REQUEST}
+                            messages.warning(self.request, "This user is already attached/requested to the same post.")
+                        else:
+                            if user_audition:
+                                user_audition.application_status = CrewApplication.ATTACHED
+                                user_audition.save()
                                 # update AttachedCrewMember table
                                 attached_crew_member_obj = AttachedCrewMember()
                                 attached_crew_member_obj.user = user
@@ -3598,49 +3626,57 @@ class AttachCrewAPI(APIView):
                                     }
                                 notify(room_name, notification_msg)
                                 # end notification section
-                            if user_audition.application_status == CrewApplication.ATTACHED:
-                                response = {'errors': 'This user is already attached to same post.', 'status':
-                                            status.HTTP_400_BAD_REQUEST}
-                                messages.warning(self.request, "This user is already attached to same post.")
-                        else:
-                            # send attach request
-                            # update AttachedCrewMember table
-                            attached_crew_member_obj = AttachedCrewMember()
-                            attached_crew_member_obj.user = user
-                            attached_crew_member_obj.crew = crew_obj
-                            attached_crew_member_obj.crew_status = AttachedCrewMember.REQUESTED
-                            attached_crew_member_obj.save()
 
-                            #update notification table
-                            notification = UserNotification()
-                            notification.user = user
-                            notification.project = crew_obj.project
-                            notification.crew = crew_obj
-                            notification.notification_type = UserNotification.CREW_ATTACH_REQUEST
-                            notification.message = str(crew_obj.project.creator)+" wants to attach you as <b>"+str(crew_obj.job_type)+"</b> to his project <b>"+str(crew_obj.project.title)+"</b>"
-                            notification.save()
-                            # send attach request notification
-                            room_name = "user_"+str(user.id)
-                            notification_msg = {
-                                    'type': 'send_crew_attach_request_notification',
-                                    'message': str(notification.message),
-                                    'from': crew_obj.project.creator,
-                                    "event": "CREW_ATTACH_REQUEST"
-                                }
-                            notify(room_name, notification_msg)
-                            # end notification section
 
-                            response = {'message': "Request Sent",
-                                        'status': status.HTTP_200_OK}
-                            msg = "Request sent to "+user.get_full_name()
-                            messages.success(self.request, msg)
+                            else:
+                                # send attach request
+                                # update AttachedCrewMember table
+                                attached_crew_member_obj = AttachedCrewMember()
+                                attached_crew_member_obj.user = user
+                                attached_crew_member_obj.crew = crew_obj
+                                attached_crew_member_obj.crew_status = AttachedCrewMember.REQUESTED
+                                attached_crew_member_obj.save()
+
+                                #update notification table
+                                notification = UserNotification()
+                                notification.user = user
+                                notification.project = crew_obj.project
+                                notification.crew = crew_obj
+                                notification.notification_type = UserNotification.CREW_ATTACH_REQUEST
+                                notification.message = str(crew_obj.project.creator)+" wants to attach you as <b>"+str(crew_obj.job_type)+"</b> to his project <b>"+str(crew_obj.project.title)+"</b>"
+                                notification.save()
+                                # send attach request notification
+                                room_name = "user_"+str(user.id)
+                                notification_msg = {
+                                        'type': 'send_crew_attach_request_notification',
+                                        'message': str(notification.message),
+                                        'from': crew_obj.project.creator,
+                                        "event": "CREW_ATTACH_REQUEST"
+                                    }
+                                notify(room_name, notification_msg)
+                                # end notification section
+
+                                response = {'message': "Request Sent",
+                                            'status': status.HTTP_200_OK}
+                                msg = "Request sent to "+user.get_full_name()
+                                messages.success(self.request, msg)
 
                     except CustomUser.DoesNotExist:
                         response = {'errors': 'Invalid user ID', 'status':
                                     status.HTTP_400_BAD_REQUEST}
-                else:
-                    # add non filmhobo user
-                    pass
+
+                # add non filmhobo user
+                if name:
+                    # update AttachedCrewMember table
+                    attached_crew_member_obj = AttachedCrewMember()
+                    attached_crew_member_obj.name = name
+                    attached_crew_member_obj.crew = crew_obj
+                    attached_crew_member_obj.crew_status = AttachedCrewMember.ATTACHED
+                    attached_crew_member_obj.save()
+                    msg = "Attached "+name+" as "+str(crew_obj.job_type)
+                    messages.success(self.request, msg)
+                    response = {'message': msg, 'status':
+                                status.HTTP_200_OK}
             except ProjectCrew.DoesNotExist:
                 response = {'errors': 'Invalid crew ID', 'status':
                             status.HTTP_400_BAD_REQUEST}
@@ -3988,10 +4024,16 @@ class CrewAttachReplaceView(LoginRequiredMixin, TemplateView):
         project = get_object_or_404(Project, pk=project_id)
         crew = ProjectCrew.objects.filter(project=project).order_by('created_time')
         attached_members_dict = {}
+        available_dict = {}
         for obj in crew:
             attached_crew_members = AttachedCrewMember.objects.filter(crew=obj)
             attached_crew_members_list = list(attached_crew_members)
             list_size = attached_crew_members.count()
+
+            diff = obj.count-list_size
+            if diff != 0:
+                available_dict[obj.id] = "Available ("+str(diff)+"/"+str(obj.count)+")"
+
             if list_size<obj.count:
                 diff = obj.count-list_size
                 for i in range(diff):
@@ -3999,6 +4041,7 @@ class CrewAttachReplaceView(LoginRequiredMixin, TemplateView):
             attached_members_dict[obj.id] = attached_crew_members_list
 
         context['project'] = project
+        context['available_dict'] = available_dict
         context['crew_objs'] = crew
         context['attached_members_dict'] = attached_members_dict
         users = CustomUser.objects.all()
@@ -4119,6 +4162,206 @@ class RemoveAttachedCrewAPI(APIView):
             except AttachedCrewMember.DoesNotExist:
                 response = {'errors': 'Invalid ID', 'status':
                                 status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AddCrewQualificationAPI(APIView):
+    serializer_class = CrewQualificationSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            crew_id = data_dict['crew_id']
+            try:
+                crew_obj = ProjectCrew.objects.get(pk=crew_id)
+                crew_obj.qualification = data_dict['qualification']
+                crew_obj.save()
+                qualification = data_dict['qualification']
+                response = {'message': str(crew_obj.job_type)+" qualification added",
+                            'status': status.HTTP_200_OK}
+            except ProjectCrew.DoesNotExist:
+                response = {'errors': "Invalid ID", 'status':
+                            status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CancelCrewAttachRequestAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            attach_crew_member_id = data_dict['id']
+
+            try:
+                attached_crew_member = AttachedCrewMember.objects.get(pk=attach_crew_member_id)
+                notification_obj =UserNotification.objects.filter(
+                                    Q(user = attached_crew_member.user) &
+                                    Q(crew = attached_crew_member.crew) &
+                                    Q(project = attached_crew_member.crew.project) &
+                                    Q(notification_type = UserNotification.CREW_ATTACH_REQUEST)
+                                )
+                notification_obj.delete()
+                attached_crew_member.delete()
+                messages.success(self.request, "Request removed.")
+                response = {'message': "Crew Attach Request Removed",
+                            'status': status.HTTP_200_OK}
+            except AttachedCrewMember.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DeclineCrewAttachRequestAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            crew_id = data_dict['id']
+            try:
+                crew_obj = ProjectCrew.objects.get(pk=crew_id)
+                notification_obj =UserNotification.objects.filter(
+                                    Q(user = self.request.user) &
+                                    Q(crew = crew_obj) &
+                                    Q(project = crew_obj.project) &
+                                    Q(notification_type = UserNotification.CREW_ATTACH_REQUEST)
+                                )
+                notification_obj.delete()
+                attached_crew_member = AttachedCrewMember.objects.filter(
+                    Q(crew=crew_obj) &
+                    Q(crew_status=AttachedCrewMember.REQUESTED) &
+                    Q(user=self.request.user)
+                )
+                attached_crew_member.delete()
+                # update notification table
+                notification = UserNotification()
+                notification.user = crew_obj.project.creator
+                notification.from_user = self.request.user
+                notification.project = crew_obj.project
+                notification.notification_type = UserNotification.CREW_ATTACH_RESPONSE
+                notification.message = self.request.user.get_full_name()+" declined your attach request for  <b>"+str(crew_obj.job_type)+"</b> post for the project <b>"+str(crew_obj.project.title)+"</b>"
+                notification.crew = crew_obj
+                notification.save()
+                # send notification to project creator
+                room_name = "user_"+str(crew_obj.project.creator.id)
+                notification_msg = {
+                        'type': 'send_crew_attach_response_notification',
+                        'message': str(notification.message),
+                        'from': notification.from_user.get_full_name(),
+                        "event": "CREW_ATTACH_RESPONSE"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+                response = {'message': "Crew Attach Request Declined",
+                            'project': crew_obj.project.title,
+                            'status': status.HTTP_200_OK}
+            except AttachedCrewMember.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class AcceptCrewAttachRequestAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            crew_id = data_dict['id']
+            try:
+                crew = ProjectCrew.objects.get(pk=crew_id)
+                attached_member_obj = AttachedCrewMember.objects.filter(
+                                            Q(crew=crew) &
+                                            Q(user=self.request.user) &
+                                            Q(crew_status=AttachedCrewMember.REQUESTED)
+                                        ).first()
+                if  attached_member_obj:
+                    attached_member_obj.crew_status = AttachedCrewMember.ATTACHED
+                    attached_member_obj.save()
+
+                    # update user project table
+                    user_project_obj = UserProject()
+                    user_project_obj.user = self.request.user
+                    user_project_obj.project = crew.project
+                    user_project_obj.crew = crew
+                    user_project_obj.relation_type = UserProject.ATTACHED
+                    user_project_obj.save()
+                    # end
+
+                    # add to team
+                    team_obj = Team()
+                    team_obj.user = self.request.user
+                    team_obj.project = crew.project
+                    team_obj.job_type = crew.job_type
+                    team_obj.save()
+                    # end
+
+                    notification_obj = UserNotification.objects.filter(
+                                        Q(user=self.request.user) &
+                                        Q(notification_type=UserNotification.CREW_ATTACH_REQUEST) &
+                                        Q(crew=crew)
+                                       ).first()
+                    notification_obj.delete()
+
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = crew.project.creator
+                    notification.from_user = self.request.user
+                    notification.project = crew.project
+                    notification.notification_type = UserNotification.CREW_ATTACH_RESPONSE
+                    notification.message = self.request.user.get_full_name()+" accepted your attach request as "+str(crew.job_type)+"</b> for the project <b>"+str(crew.project.title)+"</b>"
+                    notification.crew = crew
+                    notification.save()
+                    # send notification to project creator
+                    room_name = "user_"+str(crew.project.creator.id)
+                    notification_msg = {
+                            'type': 'send_crew_attach_response_notification',
+                            'message': str(notification.message),
+                            'from': notification.from_user.get_full_name(),
+                            "event": "CREW_ATTACH_RESPONSE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+
+                    response = {'message': "Crew Attach Request Accepted",
+                                'crew': crew.job_type.title,
+                                'project': crew.project.title,
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': 'Invalid user', 'status':
+                                 status.HTTP_400_BAD_REQUEST}
+            except Character.DoesNotExist:
+                response = {'errors': 'Invalid ID', 'status':
+                             status.HTTP_400_BAD_REQUEST}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':

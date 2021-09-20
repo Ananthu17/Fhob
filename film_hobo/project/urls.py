@@ -24,7 +24,9 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      AttachCrewMemberAPI, RemoveCrewMemberAPI, AddJobTypeView, SaveJobTypeAPI, \
      AddProjectCrewAPI, CastPasswordCheckView, CastApplyPasswordCheckAPI, \
      CrewAttachReplaceView, RemoveAttachedCrewAPI, AttachCrewAPI, \
-     GetCrewAtachRequestNotificationAjaxView
+     GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
+     AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
+     GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI
 
 
 urlpatterns = [
@@ -143,6 +145,9 @@ urlpatterns = [
      path('get-cast-attach-response-notification-html/',
           GetCastAtachResponseNotificationAjaxView.as_view(),
           name='get-cast-attach-response-notification-html'),
+     path('get-crew-attach-response-notification-html/',
+          GetCrewAtachResponseNotificationAjaxView.as_view(),
+          name='get-crew-attach-response-notification-html'),
      path('cancel-cast-attach-request-api/',
           CancelCastAttachRequestAPI.as_view(),
           name='cancel-cast-attach-request-api'),
@@ -181,6 +186,14 @@ urlpatterns = [
           name='cast-apply-password-check-api'),
      path('crew-attach-replace/<int:id>/', CrewAttachReplaceView.as_view(),
           name='crew-attach-replace'),
-     path('remove-attached-crew-api/',RemoveAttachedCrewAPI.as_view(),
+     path('remove-attached-crew-api/', RemoveAttachedCrewAPI.as_view(),
           name='remove-attached-crew-api'),
+     path('cancel-crew-attach-request-api/', CancelCrewAttachRequestAPI.as_view(),
+          name='cancel-crew-attach-request-api'),
+     path('add-crew-qualification-api/', AddCrewQualificationAPI.as_view(),
+          name='add-crew-qualification-api'),
+     path('decline-crew-attach-request-api/', DeclineCrewAttachRequestAPI.as_view(),
+          name='decline-crew-attach-request-api'),
+     path('accept-crew-attach-request-api/', AcceptCrewAttachRequestAPI.as_view(),
+          name='accept-crew-attach-request-api'),
     ]

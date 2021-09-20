@@ -20,7 +20,7 @@
         <b><a href="{% url 'project:single-film-project' notification.project.id %}" >{{notification.project.title}}</a></b><br>
         <b>{{ notification.project.creator.get_membership_display }}</b><br>
         <span class="btn-blue cursor-pointer accept_cast_attach_request" id="{{notification.character.id}}">Accept</span>
-        <span class="btn-grey  cursor-pointer decline_cast_request" id="{{notification.character.id}}">Delete</span>
+        <span class="btn-grey  cursor-pointer decline_cast_request" id="{{notification.character.id}}">Decline</span>
     </div>
     {% elif notification.notification_type == 'crew_attach_request' %}
     <div class="col-10 " id="crew-attach-req-btns-{{notification.crew.id}}">
@@ -29,7 +29,7 @@
         <b><a href="{% url 'project:single-film-project' notification.project.id %}" >{{notification.project.title}}</a></b><br>
         <b>{{ notification.project.creator.get_membership_display }}</b><br>
         <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{notification.crew.id}}">Accept</span>
-        <span class="btn-grey  cursor-pointer decline_crew_request" id="{{notification.crew.id}}">Delete</span>
+        <span class="btn-grey  cursor-pointer decline_crew_request" id="{{notification.crew.id}}">Decline</span>
     </div>
     {% endif %}
 </div>

@@ -241,6 +241,19 @@ notificationSocket.onmessage = function (e) {
                      }
              });
             break;
+        case "CREW_ATTACH_RESPONSE":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-crew-attach-response-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
         default:
             console.log("No event")
     }
