@@ -64,8 +64,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddBetaTesterCode, \
                    ListBetaTesterCode, DeleteBetaTesterCode, \
                    EditBetaTesterCode, CheckBetaTesterCode, \
-                   RateCompanyAPI, ProjectDateFilterAPI, \
-                   GetBetaTesterCodeId
+                   ProjectDateFilterAPI, GetBetaTesterCodeId
 
 
 app_name = "hobo_user"

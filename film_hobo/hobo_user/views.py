@@ -698,11 +698,11 @@ class SelectPaymentPlanIndieView(TemplateView):
         response = ast.literal_eval(dict_str)
         email = response['email']
         if user.beta_user_code is not None:
-            return_url = "/hobo_user/payment_pro?email=" + email + \
+            return_url = "/hobo_user/payment_indie?email=" + email + \
                         "&user_token=" + key + \
                         "&beta_code=" + user.beta_user_code.code
         else:
-            return_url = "/hobo_user/payment_pro?email=" + email + \
+            return_url = "/hobo_user/payment_indie?email=" + email + \
                         "&user_token=" + key
         return HttpResponseRedirect(return_url)
 
@@ -795,11 +795,11 @@ class SelectPaymentPlanCompanyView(TemplateView):
         response = ast.literal_eval(dict_str)
         email = response['email']
         if user.beta_user_code is not None:
-            return_url = "/hobo_user/payment_pro?email=" + email + \
+            return_url = "/hobo_user/payment_company?email=" + email + \
                         "&user_token=" + key + \
                         "&beta_code=" + user.beta_user_code.code
         else:
-            return_url = "/hobo_user/payment_pro?email=" + email + \
+            return_url = "/hobo_user/payment_company?email=" + email + \
                         "&user_token=" + key
         return HttpResponseRedirect(return_url)
 
@@ -810,7 +810,6 @@ class PaymentIndieView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         user_email = request.GET.get('email')
-        # user_token = request.GET.get('user_token')
         self.user = CustomUser.objects.get(email=user_email)
 
         # if settings.BRAINTREE_PRODUCTION:
@@ -863,10 +862,10 @@ class PaymentIndieView(FormView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
-        context['braintree_client_token'] = ''
-        context.update({
-            'braintree_client_token': self.braintree_client_token,
-        })
+        # context['braintree_client_token'] = ''
+        # context.update({
+        #     'braintree_client_token': self.braintree_client_token,
+        # })
         return context
 
     # def form_valid(self, form):
