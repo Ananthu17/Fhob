@@ -1,6 +1,8 @@
+import os
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic.base import View
@@ -33,7 +35,7 @@ class HelpAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
-            screenshot =  request.data['screenshot']
+            screenshot = request.data['screenshot']
             help_obj = Help()
             help_obj.user = self.request.user
             help_obj.subject = data_dict['subject']
@@ -74,7 +76,8 @@ class HelpView(LoginRequiredMixin, TemplateView):
         help_obj.description = description
         help_obj.screenshot = screenshot
         help_obj.save()
-        messages.success(self.request, "Message received. Will get back to you soon.")
+        messages.success(self.request,
+                         "Message received. Will get back to you soon.")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
@@ -114,3 +117,43 @@ class HelpRating(View):
     """
     def get(self, request, *args, **kwargs):
         return render(request, 'help/help_rating.html')
+
+
+class TermsOfService(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'terms_of_service.pdf')
+        return FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf')
+
+
+class PrivacyPolicy(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'privacy_policy.pdf')
+        return FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf')
+
+
+class RefundPolicy(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'refund_policy.pdf')
+        return FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf')
+
+
+class IntellectualPropertyRights(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'intellectual_property_rights.pdf')
+        return FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf')
+
+
+class Membership(View):
+
+    def get(self, request, *args, **kwargs):
+        filepath = os.path.join('media', 'membership.pdf')
+        return FileResponse(open(filepath, 'rb'),
+                            content_type='application/pdf')

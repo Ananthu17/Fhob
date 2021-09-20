@@ -2,7 +2,6 @@ import ast
 import braintree
 import datetime
 import json
-import os
 import requests
 from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
@@ -14,7 +13,7 @@ from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
@@ -59,9 +58,8 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, \
+                    GuildMembership, GroupUsers, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
-                    UserProject, Video, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
@@ -699,7 +697,14 @@ class SelectPaymentPlanIndieView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_indie?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_indie?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_indie?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanProView(TemplateView):
@@ -740,7 +745,14 @@ class SelectPaymentPlanProView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_pro?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanCompanyView(TemplateView):
@@ -782,7 +794,14 @@ class SelectPaymentPlanCompanyView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_company?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_company?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_company?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class PaymentIndieView(FormView):
@@ -806,16 +825,16 @@ class PaymentIndieView(FormView):
         # )
         # self.braintree_client_token = braintree.ClientToken.generate({})
 
-        gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                braintree.Environment.Sandbox,
-                merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                public_key=settings.BRAINTREE_PUBLIC_KEY,
-                private_key=settings.BRAINTREE_PRIVATE_KEY
-            )
-        )
-        self.braintree_client_token = \
-            gateway.client_token.generate()
+        # gateway = braintree.BraintreeGateway(
+        #     braintree.Configuration(
+        #         braintree.Environment.Sandbox,
+        #         merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #         public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #         private_key=settings.BRAINTREE_PRIVATE_KEY
+        #     )
+        # )
+        # self.braintree_client_token = \
+        #     gateway.client_token.generate()
 
         return super(PaymentIndieView, self).dispatch(request, *args, **kwargs)
 
@@ -843,10 +862,10 @@ class PaymentIndieView(FormView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
-        context['braintree_client_token'] = ''
-        context.update({
-            'braintree_client_token': self.braintree_client_token,
-        })
+        # context['braintree_client_token'] = ''
+        # context.update({
+        #     'braintree_client_token': self.braintree_client_token,
+        # })
         return context
 
     # def form_valid(self, form):
@@ -1210,7 +1229,7 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        message =""
+        message = ""
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         origin_url = settings.ORIGIN_URL
@@ -1245,7 +1264,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id]= obj.first_name + " "+ obj.last_name
+                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1766,7 +1785,7 @@ class PersonalDetailsAPI(APIView):
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
         personal_settings['athletic_skills'] = athletic_skill_list
-        response = {"personal_settings" : personal_settings}
+        response = {"personal_settings": personal_settings}
         return Response(response)
 
     def post(self, request):
@@ -2089,7 +2108,6 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
         profile = UserProfile.objects.get(user=user)
         all_agents = UserAgentManager.objects.filter(user=self.request.user)
         context['all_agents'] = all_agents
@@ -2722,7 +2740,7 @@ class GetAgentManagerAPI(APIView):
         agent_dict = {}
         agents = UserAgentManager.objects.filter(user=self.request.user)
         for agent in agents:
-            agent_dict[agent.id ]= self.serializer_class(agent).data
+            agent_dict[agent.id] = self.serializer_class(agent).data
         response = {'Agents and managers': agent_dict}
         return Response(response)
 
@@ -2791,7 +2809,7 @@ class RemoveClientAPI(APIView):
                     obj.delete()
                 except CompanyClient.DoesNotExist:
                     response = {'message': "Invalid Id",
-                            'status': status.HTTP_400_BAD_REQUEST}
+                                'status': status.HTTP_400_BAD_REQUEST}
                     return Response(response)
                 response = {'message': "Client Removed",
                             'id': id,
@@ -2911,11 +2929,11 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                                 Q(user=user) &
                                 Q(job_type=job))
                     rating = rating_obj.rating * 20
-                    job_dict[job.id]=job.title
-                    rating_dict[job.id]=rating
+                    job_dict[job.id] = job.title
+                    rating_dict[job.id] = rating
                 except UserRatingCombined.DoesNotExist:
-                    rating_dict[job.id]=0
-                    job_dict[job.id]=job.title
+                    rating_dict[job.id] = 0
+                    job_dict[job.id] = job.title
             context['job_dict'] = job_dict
             context['rating_dict'] = rating_dict
         except UserProfile.DoesNotExist:
@@ -4812,6 +4830,18 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+class ProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.project_segregator(queryset)
+        return Response(context)
+
 
 class ProjectCreateAPIView(CreateAPIView):
   permission_classes = (IsAuthenticated,)
@@ -4871,15 +4901,15 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 #         return Response(context)
 
 
-#Search API for Pages 
+#Search API for Pages
 
-#API for Searching things in a page 
+#API for Searching things in a page
 
 class PageSearchView(ListAPIView):
     template_name = 'search_results.html'
     serializer_class = ProjectSerializer
-    def get_queryset(self): 
-       
+    def get_queryset(self):
+
         query = self.request.GET.get('q')
         format_map = {v: k for k, v  in enumerate(Project.FORMAT_CHOICES)}
         genre_map = {i: j for j, i  in enumerate(Project.GENRE_CHOICES)}
@@ -4888,7 +4918,7 @@ class PageSearchView(ListAPIView):
         for val in format_map.keys():
             if(query==val[1]):
                 query=val[0]
-        
+
         for val in genre_map.keys():
             if(query==val[1]):
                 query=val[0]
@@ -5104,33 +5134,6 @@ class ScreeningProjectDeatilInviteView(APIView):
                 return Response({"status": "invite success"}, status=status.HTTP_200_OK)
         except:
             return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
-
-class TermsOfService(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'terms_of_service.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class PrivacyPolicy(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'privacy_policy.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class RefundPolicy(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'refund_policy.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
-
-
-class IntellectualPropertyRights(View):
-
-    def get(self, request, *args, **kwargs):
-        filepath = os.path.join('media', 'intellectual_property_rights.pdf')
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
 
 
 class GetBetaTesterCodeId(APIView):

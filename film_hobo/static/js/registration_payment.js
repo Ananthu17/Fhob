@@ -1,6 +1,24 @@
+origin_url = window.location.origin
+get_beta_tester_code_id_url = origin_url + "/hobo_user/get-beta-tester-code-id/"
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+
 $( document ).ready(function() {
     $("#remove_promocode").hide();
-    // $("#paypal-div").hide();
     localStorage.setItem('promocode', '');
     localStorage.setItem('promotion_amount', '');
     localStorage.setItem('final_amount', '');
@@ -16,27 +34,52 @@ $( document ).ready(function() {
     }
 
     if(window.location.href.indexOf("indie") != -1){
-        $("#indie_btn").hide();
-        $("#company_btn").hide();
+        $('#center_btn_text').text("Indie");
+        var membership = 'indie'
+    }
+
+    if(window.location.href.indexOf("pro") != -1){
+        $('#center_btn_text').text("Pro");
+        var membership = 'pro'
+    }
+
+    if(window.location.href.indexOf("company") != -1){
+        $('#center_btn_text').text("Company");
+        var membership = 'company'
     }
 
     // check if the user is beta user and
-    var betacode = localStorage.getItem("beta-code");
+    var betacode = getUrlParameter('beta_code');
     if (betacode){
-        
+        // check if beta-user code is valid
+        check_beta_tester_code_args = {"code": betacode}
+        check_beta_tester_code_api = origin_url + '/hobo_user/check-beta-tester-code/'
+        axios.post(check_beta_tester_code_api, check_beta_tester_code_args)
+        .then((response) => {
+            if (response.status == 200){
+                // get the beta user plan details
+                get_beta_user_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
+                time_period = $("#payment_plan").text();
+                extra_args = {"code": betacode,
+                              "membership": membership,
+                              "period": time_period}
+                axios.post(get_beta_user_plan_details_api, extra_args)
+                .then((response) => {
+                    var bill_date = response.data.bill_date
+                    var days = response.data.days
+                    $("#bill_start_date").text(bill_date);
+                    $("#days_free").text(days);
+                }, (error) => {
+                    console.log(error);
+                });
+            }
+        }, (error) => {
+            console.log(error);
+        });
     }
-
 });
 
 $("#apply_promocode").click(function(){
-    // var title = "Promotion"
-    // var modal = $("#promocode_modal")
-    // var modal_success_text = "Promocode Applied Successfully"
-    // var modal_failure_text = "Invalid Promocode"
-    // modal.find('.modal-title').text(title)
-    // modal.find('.modal-body').text(modal_success_text)
-    // $("#promocode_modal").modal('show');
-
     origin_url = window.location.origin
     get_url = origin_url + '/payment/get_membership_fee_detail/'
     var token = localStorage.getItem("token");

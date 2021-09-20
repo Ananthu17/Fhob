@@ -14,7 +14,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, CustomUserLogout, \
-                   ExtendedRegisterCompanyView,PageSearchView, \
+                   ExtendedRegisterCompanyView, PageSearchView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
@@ -61,14 +61,10 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CreateProjectView, ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
-                   TermsOfService, PrivacyPolicy, AddBetaTesterCode, \
+                   AddBetaTesterCode, \
                    ListBetaTesterCode, DeleteBetaTesterCode, \
                    EditBetaTesterCode, CheckBetaTesterCode, \
-                   TeamDeleteAPIView, VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI, ProjectView, \
-                   CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
-                   ProjectDateFilterAPI, RefundPolicy, \
-                   IntellectualPropertyRights, GetBetaTesterCodeId
+                   ProjectDateFilterAPI, GetBetaTesterCodeId
 
 
 app_name = "hobo_user"
@@ -187,9 +183,8 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
-
-    path('get-all-users-api/', GetAllUsersAPI.as_view(), name='get-all-users-api'),
-
+    path('get-all-users-api/', GetAllUsersAPI.as_view(),
+         name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
          name='add-beta-tester-code'),
     path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
@@ -205,11 +200,6 @@ urlpatterns = [
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
-    path('terms_of_service/', TermsOfService.as_view(), name='terms_of_service'),
-    path('privacy_policy/', PrivacyPolicy.as_view(), name='privacy_policy'),
-    path('refund_policy/', RefundPolicy.as_view(), name='refund_policy'),
-    path('intellectual_property_rights/', IntellectualPropertyRights.as_view(),
-         name='intellectual_property_rights'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),

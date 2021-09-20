@@ -1,11 +1,6 @@
 
 import datetime
 
-from django.db.models import Q
-from autoslug import AutoSlugField
-from django.contrib.auth.hashers import make_password
-from phonenumber_field.modelfields import PhoneNumberField
-
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -283,7 +278,7 @@ class CustomUser(AbstractUser):
     #                                                         )
     #                                          )
     ethnic_appearance = models.ForeignKey('hobo_user.EthnicAppearance',
-                                          on_delete=models.SET_NULL,
+                                        on_delete=models.SET_NULL,
                                           related_name='user_ethnic_appearance',
                                           verbose_name=_("Ethnic Appearance"),
                                           null=True)
@@ -628,9 +623,9 @@ class Project(models.Model):
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
-    rating = models.FloatField(_("Rating"), validators=[MinValueValidator(0),
-                               MaxValueValidator(5)], null=True, blank=True,
-                               default=1)
+    rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True, blank=True,
+                                 default=1)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
@@ -830,7 +825,7 @@ class Team(models.Model):
                                  on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.project.title +" - "+ self.job_type.title
+        return self.project.title + " - " + self.job_type.title
 
     def save(self, *args, **kwargs):
         try:

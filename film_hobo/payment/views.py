@@ -1,7 +1,8 @@
 import braintree
 import json
 import requests
-from datetime import date
+import datetime
+from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
@@ -102,18 +103,49 @@ class BetaUserPlanDetails(APIView):
     """
 
     def post(self, request, *args, **kwargs):
-        pass
-        # import pdb;pdb.set_trace()
-        # data = request.data
-        # code = data['code']
-        # membership_plan = data['membership']
-
-        # bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
-
-        # today = date.today()
-        # final_date = today.strftime("%d/%m/%Y")
-        # days_remaining = data
-        # return Response(data, status=status.HTTP_200_OK)
+        data = request.data
+        code = data['code']
+        membership_plan = data['membership']
+        period = data['period']
+        if not code or not membership_plan or not period:
+            return Response(
+                {"status": "failure",
+                 "message": "please enter a valid code/memebrship/period"
+                 }, status=status.HTTP_204_NO_CONTENT)
+        else:
+            extra_data = {'code': '', 'days': '',
+                          'bill_date': '',
+                          'selected_plan_id': ''}
+            bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
+            free_evaluation_time = bet_user_code_obj.days
+            date_today = datetime.date.today()
+            date_interval = datetime.timedelta(days=int(free_evaluation_time))
+            bill_date = date_today + date_interval
+            extra_data['code'] = code
+            extra_data['days'] = bet_user_code_obj.days
+            extra_data['bill_date'] = bill_date.strftime("%d/%m/%Y")
+            if membership_plan == 'indie':
+                if period == 'monthly':
+                    selected_plan_id = bet_user_code_obj.indie_monthly_plan_id
+                else:
+                    selected_plan_id = bet_user_code_obj.indie_yearly_plan_id
+            elif membership_plan == 'pro':
+                if period == 'monthly':
+                    selected_plan_id = bet_user_code_obj.pro_monthly_plan_id
+                else:
+                    selected_plan_id = bet_user_code_obj.pro_yearly_plan_id
+            elif membership_plan == 'company':
+                if period == 'monthly':
+                    selected_plan_id = \
+                        bet_user_code_obj.company_monthly_plan_id
+                else:
+                    selected_plan_id = \
+                        bet_user_code_obj.company_yearly_plan_id
+            else:
+                pass
+            extra_data['selected_plan_id'] = selected_plan_id
+            data.update(extra_data)
+            return Response(extra_data, status=status.HTTP_200_OK)
 
 
 class GetMembershipFeeDetailsAPI(APIView):
