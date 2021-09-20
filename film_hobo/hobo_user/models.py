@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -1849,3 +1850,16 @@ class BetaTesterCodes(models.Model):
     class Meta:
         verbose_name = 'Beta Tester Code'
         verbose_name_plural = 'Beta Tester Codes'
+
+
+def create_profile_for_admin_user(sender, instance, **kwargs):
+    if instance.membership == 'ADMIN':
+        UserProfile.objects.create(user=instance)
+        CustomUserSettings.objects.create(
+            user=instance, profile_visibility=CustomUserSettings.NO_ONE,
+            who_can_contact_me=CustomUserSettings.NO_ONE,
+            who_can_track_me=CustomUserSettings.NO_ONE,
+            account_status=CustomUserSettings.ENABLED)
+
+
+post_save.connect(create_profile_for_admin_user, sender=CustomUser)

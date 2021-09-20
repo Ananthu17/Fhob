@@ -5,11 +5,11 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, GetProductID, \
-     SubscriptionDetails, PaypalToken, PaypalPlanID, InitialRequest, \
-     BraintreeSubscriptionDetails, UpdateSubscription, \
-     GetBraintreeDiscountDetailListAPI, BraintreeCalculateDiscountAPI, \
-     GetNewPlanDetailsJSON, UpdateMembershipFeeDetailsAPI, \
-     BetaUserPlanDetails
+     SubscriptionDetails, PaypalToken, PaypalPlanID, \
+     BraintreeSubscriptionDetails, GetNewPlanDetailsJSON, \
+     UpdateMembershipFeeDetailsAPI, BetaUserPlanDetails
+# from .views import InitialRequest, UpdateSubscription, \
+#      GetBraintreeDiscountDetailListAPI, BraintreeCalculateDiscountAPI
 # from .paypal import CreateOrder, CaptureOrder
 
 app_name = "payment"
