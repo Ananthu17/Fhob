@@ -4974,13 +4974,17 @@ class ProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/projects-page.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        context['user'] = user
         context["scenes"] = Project.objects.filter(format="SCH").order_by('-id')
         context["toprated_scenes"] = Project.objects.filter(format="SCH").order_by('-rating')
         context["filims"] = Project.objects.filter(format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
+       
         return context
 
 

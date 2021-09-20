@@ -150,6 +150,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
+                            {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
                             <div class="item">
@@ -165,12 +166,14 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% if project.rating != None %}
                                             {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
                                             {% endfor %}
                                             {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
                                             {% endfor %}
+                                            {% endif %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -212,6 +215,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                         </div>
                         <!-- owl-carousel End -->
@@ -245,6 +249,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo2">
                         <div class="owl-carousel owl-theme " id="project-owl2">
+                            {% if toprated_scenes != None  %}
                             {% for project in toprated_scenes %}
                             <!-- item 1  -->
                             <div class="item">
@@ -260,12 +265,14 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
+                                            {% if project.rating != None %}
                                             {% for item in project.rating|times %}
                                             <span class="fa fa-star checked "></span>
                                             {% endfor %}
                                             {% for item in project.rating|blank %}
                                             <span class="fa fa-star-o"></span>
                                             {% endfor %}
+                                            {% endif %}
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -307,6 +314,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                         </div>
                         <!-- owl-carousel End -->
@@ -340,6 +348,7 @@
                         <!-- owl-carousel  -->
                         <div id="demo3">
                         <div class="owl-carousel owl-theme " id="project-owl3">
+                            {% if filims != None  %}
                             {% for project in filims %}
                             <!-- item 1  -->
                             <div class="item">
@@ -402,6 +411,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                         </div>
                         <!-- owl-carousel End -->
@@ -435,6 +445,7 @@
                         <!-- owl-carousel  -->
                         <div id="demo4">
                         <div class="owl-carousel owl-theme " id="project-owl4">
+                            {% if toprated_filims != None  %}
                             {% for project in toprated_filims %}
                             <!-- item 1  -->
                             <div class="item">
@@ -497,6 +508,7 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                         </div>
                         <!-- owl-carousel End -->

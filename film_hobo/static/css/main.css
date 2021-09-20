@@ -73,6 +73,11 @@
   text-align: center; 
 }
 
+a:hover.link-color{
+  color:#0105f8 !important;
+}
+
+
 .search-placeholder{
   width: 75%;
   height: 18px;
