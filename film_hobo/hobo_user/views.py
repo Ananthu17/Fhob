@@ -2,7 +2,6 @@ import ast
 import braintree
 import datetime
 import json
-import os
 import requests
 from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
@@ -14,13 +13,14 @@ from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
+from django.http import FileResponse
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -697,7 +697,14 @@ class SelectPaymentPlanIndieView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_indie?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanProView(TemplateView):
@@ -738,7 +745,14 @@ class SelectPaymentPlanProView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_pro?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanCompanyView(TemplateView):
@@ -780,7 +794,14 @@ class SelectPaymentPlanCompanyView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_company?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class PaymentIndieView(FormView):
@@ -789,6 +810,7 @@ class PaymentIndieView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         user_email = request.GET.get('email')
+        # user_token = request.GET.get('user_token')
         self.user = CustomUser.objects.get(email=user_email)
 
         # if settings.BRAINTREE_PRODUCTION:
@@ -804,16 +826,16 @@ class PaymentIndieView(FormView):
         # )
         # self.braintree_client_token = braintree.ClientToken.generate({})
 
-        gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                braintree.Environment.Sandbox,
-                merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                public_key=settings.BRAINTREE_PUBLIC_KEY,
-                private_key=settings.BRAINTREE_PRIVATE_KEY
-            )
-        )
-        self.braintree_client_token = \
-            gateway.client_token.generate()
+        # gateway = braintree.BraintreeGateway(
+        #     braintree.Configuration(
+        #         braintree.Environment.Sandbox,
+        #         merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #         public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #         private_key=settings.BRAINTREE_PRIVATE_KEY
+        #     )
+        # )
+        # self.braintree_client_token = \
+        #     gateway.client_token.generate()
 
         return super(PaymentIndieView, self).dispatch(request, *args, **kwargs)
 
@@ -4865,6 +4887,47 @@ class TeamDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = TeamSerializer
+
+
+class ProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.filter_queryset(self.get_queryset())
+#         context = self.project_segregator(queryset)
+#         return Response(context)
+
+
+#Search API for Pages
+
+#API for Searching things in a page
+
+class PageSearchView(ListAPIView):
+    template_name = 'search_results.html'
+    serializer_class = ProjectSerializer
+    def get_queryset(self):
+
+        query = self.request.GET.get('q')
+        format_map = {v: k for k, v  in enumerate(Project.FORMAT_CHOICES)}
+        genre_map = {i: j for j, i  in enumerate(Project.GENRE_CHOICES)}
+        # get the corresponding key,value  from choice filed of model
+
+        for val in format_map.keys():
+            if(query==val[1]):
+                query=val[0]
+
+        for val in genre_map.keys():
+            if(query==val[1]):
+                query=val[0]
+        object_list = Project.objects.filter(
+            Q(title__icontains=query) | Q(format__icontains=query) | Q(genre__icontains=query) 
+            | Q(rating__icontains=query) | Q(location__country__icontains=query)
+        )
+        return object_list
 
 
 # Api to add rating to project video

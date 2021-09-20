@@ -14,7 +14,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, CustomUserLogout, \
-                   ExtendedRegisterCompanyView, \
+                   ExtendedRegisterCompanyView, PageSearchView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
@@ -64,10 +64,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddBetaTesterCode, \
                    ListBetaTesterCode, DeleteBetaTesterCode, \
                    EditBetaTesterCode, CheckBetaTesterCode, \
-                   TeamDeleteAPIView, VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI, ProjectView, \
-                   CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
-                   ProjectDateFilterAPI, GetBetaTesterCodeId
+                   RateCompanyAPI, ProjectDateFilterAPI, \
+                   GetBetaTesterCodeId
 
 
 app_name = "hobo_user"
@@ -186,9 +184,8 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
-
-    path('get-all-users-api/', GetAllUsersAPI.as_view(), name='get-all-users-api'),
-
+    path('get-all-users-api/', GetAllUsersAPI.as_view(),
+         name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
          name='add-beta-tester-code'),
     path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
@@ -327,6 +324,8 @@ urlpatterns = [
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),
     #      name="project-search"),
+    path('page/search/',  PageSearchView.as_view(),
+         name="page_search_results"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),

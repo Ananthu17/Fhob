@@ -48,7 +48,9 @@
                             {% if request.user.is_anonymous %}
                                 <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
                             {% else %}
-                                <input type="text" placeholder="Search" class="search-placeholder" id="search">
+                            <form action="" method="get">
+                                <input type="text" name="q" placeholder="Search" class="search-placeholder" id="search">
+                            </form>
                             {% endif %}
                         </div>
                     </div>
@@ -147,7 +149,8 @@
                         </li>
                     {% endif %}
 
-                    {% if request.user.is_anonymous %}
+                    {% if not user.is_authenticated %}
+
                         <li class="nav-item">
                             <a id="showcase_non_clickable" class="nav-link-non-clickable" href="">SHOWCASE</a>
                         </li>
