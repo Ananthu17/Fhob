@@ -75,9 +75,9 @@
                             <div class="col-6">
                                 {{writerform.name}}
                             </div>
-                            <div class="col-4 mt-2">
+                            <!-- <div class="col-4 mt-2">
                                 <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER WRITER</a>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="row">
@@ -118,7 +118,7 @@
                                 <label class="form-title mem-setup-blu-f">NUMBER OF PAGES:</label>
                             </div>
                             <div class="col-6">
-                                <input class="inp-line" placeholder="" required />
+                                <input class="inp-line" placeholder="" type="number" required />
                             </div>
                         </div>
 
@@ -147,19 +147,19 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">ROMANCE
+                                    <label class="containerradio bold">ROMANCE&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="20">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">SCI-FI
+                                    <label class="containerradio bold">SCI-FI&nbsp; 
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="21">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">HORROR
+                                    <label class="containerradio bold">HORROR&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="14">
                                         <span class="checkmarkagree"></span>
                                     </label>
@@ -171,38 +171,20 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">MYSTERY / THRILLER
+                                    <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="18">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">MUSICAL
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="17">
+                                    <label class="containerradio bold" >LGBTQ 
+                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="15">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">WAR / MILITARY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="16">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">FANTASY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="10">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">LGBTQ
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="15">
+                                <div class="form-check form-check-inline"> 
+                                    <label class="containerradio bold " style="margin:left 7px;">MUSICAL &nbsp;&nbsp;
+                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="17">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
@@ -212,6 +194,28 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">FANTASY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="10">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                               
+                               
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">WAR / MILITARY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="16">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold"  >FAMILY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                
+                                
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="3">
@@ -343,7 +347,8 @@
                                 <form class="form-inline">
                                     <div class="form-group d-none" id="visibility_password">
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
-                                        {{form.visibility_password}}
+                                        {{form.visibility_password }}
+                                        <input type="radio" onclick="myFunction_visibility()">Show Password
                                     </div>
                                 </form>
                             </div>
@@ -355,7 +360,7 @@
 
                         <div class="row">
                             <div class="col-2 ">
-                                <label class="form-title mem-setup-blu-f">LOCATION(S):</label>
+                                <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
                             <div class="col-6">
                                 <!-- <input class="inp-line" placeholder="Separate by Commas" /> -->
@@ -525,6 +530,9 @@
                                     <div class="form-group d-none" id="script_password">
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.script_password}}
+                                       
+                                        <br>&nbsp;<input type="radio" onclick="myFunction_script()"  >&nbsp;Show Password
+                                        
                                     </div>
                                 </form>
                             </div>
@@ -547,7 +555,9 @@
                                     <div class="form-group">
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.cast_audition_password}}
+                                        &nbsp;<input type="radio" onclick="myFunction_audition()" >&nbsp;Show Password
                                     </div>
+                                    
                                 </form>
                             </div>
                         </div>
@@ -561,6 +571,7 @@
                                     <div class="form-group">
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.team_select_password}}
+                                        &nbsp;<input type="radio" onclick="myFunction_team()" >&nbsp;Show Password
                                     </div>
                                 </form>
                             </div>
@@ -712,5 +723,42 @@
     }
     });
 
+
+    function myFunction_visibility() {
+    var x = document.getElementById("id_visibility_password");
+        if (x.type === "password") {
+            x.type = "text";
+            } 
+        else {
+            x.type = "password";
+        }
+    }
+    function myFunction_script() {
+    var x = document.getElementById("id_script_password");
+        if (x.type === "password") {
+            x.type = "text";
+            } 
+        else {
+            x.type = "password";
+        }
+    }
+    function myFunction_audition() {
+    var x = document.getElementById("id_cast_audition_password");
+        if (x.type === "password") {
+            x.type = "text";
+            } 
+        else {
+            x.type = "password";
+        }
+    }
+    function myFunction_team() {
+    var x = document.getElementById("id_team_select_password");
+        if (x.type === "password") {
+            x.type = "text";
+            } 
+        else {
+            x.type = "password";
+        }
+    }
 </script>
 {% endblock %}

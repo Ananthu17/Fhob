@@ -435,7 +435,7 @@ class ProjectCreationForm(forms.ModelForm):
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
-                'script': forms.FileInput(),
+                'script': forms.FileInput(attrs={'accept':'application/pdf'}),
                 'script_password': forms.PasswordInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
                                                             'placeholder': 'password'
