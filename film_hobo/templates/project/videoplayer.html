@@ -82,7 +82,7 @@
                 <div class="vdo-menu-bg">
                     <div>
                         <ul class="log-menu">
-                            <li><span class="video-menu-head">PROJECT </span><a href="" >#{{project.id}}</a></li>
+                            <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}" >#{{project.id}}</a></li>
                             <li><span >Title: </span><span class="vdo-details-blue txt-capitalize">{{project.title}}</span></li>
                             <li><span>Format: </span><span class="vdo-details-blue">{{project.get_format_display}}</span></li>
                             <li><span>Genre: </span><span class="vdo-details-blue">{{project.get_genre_display}}</span></li>

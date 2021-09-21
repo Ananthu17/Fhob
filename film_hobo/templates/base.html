@@ -66,21 +66,24 @@
                                     {% endif %}
                                 </i>
                             </li>
-                            <li class="list-inline-item m-0"><img src="{% static 'images/man-user.png' %}"
+                            <li class="list-inline-item m-0">
+                                <a href="{{ request.user.get_profile_url }}">
+                                <img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img">
-                                    {% if user.membership == 'HOB' %}
-                                        <span class="header-icon-pos pro-font">Hobo</span>
-                                    {% elif user.membership == 'IND' %}
-                                        <span class="header-icon-pos pro-font">Indie</span>
-                                    {% elif user.membership == 'PRO' %}
-                                        <span class="header-icon-pos pro-font">Pro</span>
-                                    {% elif user.membership == 'COM' %}
-                                        <span class="header-icon-pos pro-font">Company</span>
-                                    {% elif user.membership == 'ADMIN' %}
-                                        <span class="header-icon-pos pro-font">Admin</span>
-                                    {% else %}
-                                        <span class="header-icon-pos pro-font"></span>
-                                    {% endif %}
+                                </a>
+                                {% if user.membership == 'HOB' %}
+                                    <span class="header-icon-pos pro-font">Hobo</span>
+                                {% elif user.membership == 'IND' %}
+                                    <span class="header-icon-pos pro-font">Indie</span>
+                                {% elif user.membership == 'PRO' %}
+                                    <span class="header-icon-pos pro-font">Pro</span>
+                                {% elif user.membership == 'COM' %}
+                                    <span class="header-icon-pos pro-font">Company</span>
+                                {% elif user.membership == 'ADMIN' %}
+                                    <span class="header-icon-pos pro-font">Admin</span>
+                                {% else %}
+                                    <span class="header-icon-pos pro-font"></span>
+                                {% endif %}
                             </li>
                         </ul>
                     </div>
@@ -322,6 +325,7 @@
 <script src="{% static 'js/friend_request.js' %}"></script>
 <script src="{% static 'js/top_rated_list.js' %}"></script>
 <script src="{% static 'js/cast-attach-request.js' %}"></script>
+<script src="{% static 'js/crew-attach-request.js' %}"></script>
 <!-- <script src="{% static 'js/a076d05399.js' %}"></script> -->
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->

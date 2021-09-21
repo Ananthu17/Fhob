@@ -19,7 +19,14 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
      GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
      GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI, \
-     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView
+     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView, \
+     CrewApplyAuditionView, CrewApplyAPI, CrewApplicationListingView, \
+     AttachCrewMemberAPI, RemoveCrewMemberAPI, AddJobTypeView, SaveJobTypeAPI, \
+     AddProjectCrewAPI, CastPasswordCheckView, CastApplyPasswordCheckAPI, \
+     CrewAttachReplaceView, RemoveAttachedCrewAPI, AttachCrewAPI, \
+     GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
+     AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
+     GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI
 
 
 urlpatterns = [
@@ -132,9 +139,15 @@ urlpatterns = [
      path('get-cast-attach-request-notification-html/',
           GetCastAtachRequestNotificationAjaxView.as_view(),
           name='get-cast-attach-request-notification-html'),
+     path('get-crew-attach-request-notification-html/',
+          GetCrewAtachRequestNotificationAjaxView.as_view(),
+          name='get-crew-attach-request-notification-html'),
      path('get-cast-attach-response-notification-html/',
           GetCastAtachResponseNotificationAjaxView.as_view(),
           name='get-cast-attach-response-notification-html'),
+     path('get-crew-attach-response-notification-html/',
+          GetCrewAtachResponseNotificationAjaxView.as_view(),
+          name='get-crew-attach-response-notification-html'),
      path('cancel-cast-attach-request-api/',
           CancelCastAttachRequestAPI.as_view(),
           name='cancel-cast-attach-request-api'),
@@ -149,4 +162,38 @@ urlpatterns = [
           name='remove-character-scenes-api'),
      path('all-members/<int:id>/', AllMembersView.as_view(),
           name='all-members'),
+     path('crew-apply-audition/<int:id>/', CrewApplyAuditionView.as_view(),
+          name='crew-apply-audition'),
+     path('crew-apply-api/', CrewApplyAPI.as_view(),
+          name='crew-apply-api'),
+     path('crew-application-listing/<int:id>/', CrewApplicationListingView.as_view(),
+          name='crew-application-listing'),
+     path('attach-crew-member-api/', AttachCrewMemberAPI.as_view(),
+          name='attach-crew-member-api'),
+     path('attach-crew-api/', AttachCrewAPI.as_view(),
+          name='attach-crew-api'),
+     path('remove-crew-member-api/', RemoveCrewMemberAPI.as_view(),
+          name='remove-crew-member-api'),
+     path('add-project-crew/<int:id>/', AddJobTypeView.as_view(),
+          name='add-project-crew'),
+     path('add-project-crew-api/', AddProjectCrewAPI.as_view(),
+          name='add-project-crew-api'),
+     path('save-job-type-api/', SaveJobTypeAPI.as_view(),
+          name='save-job-type-api'),
+     path('cast-password-check/<int:id>/', CastPasswordCheckView.as_view(),
+          name='cast-password-check'),
+     path('cast-apply-password-check-api/', CastApplyPasswordCheckAPI.as_view(),
+          name='cast-apply-password-check-api'),
+     path('crew-attach-replace/<int:id>/', CrewAttachReplaceView.as_view(),
+          name='crew-attach-replace'),
+     path('remove-attached-crew-api/', RemoveAttachedCrewAPI.as_view(),
+          name='remove-attached-crew-api'),
+     path('cancel-crew-attach-request-api/', CancelCrewAttachRequestAPI.as_view(),
+          name='cancel-crew-attach-request-api'),
+     path('add-crew-qualification-api/', AddCrewQualificationAPI.as_view(),
+          name='add-crew-qualification-api'),
+     path('decline-crew-attach-request-api/', DeclineCrewAttachRequestAPI.as_view(),
+          name='decline-crew-attach-request-api'),
+     path('accept-crew-attach-request-api/', AcceptCrewAttachRequestAPI.as_view(),
+          name='accept-crew-attach-request-api'),
     ]
