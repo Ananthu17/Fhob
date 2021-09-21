@@ -1876,13 +1876,14 @@ class BetaTesterCodes(models.Model):
 
 
 def create_profile_for_admin_user(sender, instance, **kwargs):
-    if instance.membership == 'ADMIN':
-        UserProfile.objects.create(user=instance)
-        CustomUserSettings.objects.create(
-            user=instance, profile_visibility=CustomUserSettings.NO_ONE,
-            who_can_contact_me=CustomUserSettings.NO_ONE,
-            who_can_track_me=CustomUserSettings.NO_ONE,
-            account_status=CustomUserSettings.ENABLED)
+    if kwargs['created']:
+        if instance.membership == 'ADMIN':
+            UserProfile.objects.create(user=instance)
+            CustomUserSettings.objects.create(
+                user=instance, profile_visibility=CustomUserSettings.NO_ONE,
+                who_can_contact_me=CustomUserSettings.NO_ONE,
+                who_can_track_me=CustomUserSettings.NO_ONE,
+                account_status=CustomUserSettings.ENABLED)
 
 
 post_save.connect(create_profile_for_admin_user, sender=CustomUser)
