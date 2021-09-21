@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="row">
+<div class="col-4">
+<h3>Message</h3>
+
+    To<select class="car-input-field to_user" id="to_user" name="to_user" class="form-control" id="">
+        <option value="" selected disabled hidden >Type here</option>
+        {% for user in users %}
+        <option value="{{user.id}}">{{user.get_full_name}}</option>
+        {% endfor %}
+    </select>
+    <p class="reason-error to-user-err"></p>
+    Subject<input name="subject" class="form-control" id="subject"/>
+    Message<textarea name="mesage" class="form-control" id="user_message"></textarea>
+    <p class="reason-error msg-err"></p>
+    <button class="btn btn-outline-danger btn-sm send_message ">Send</button>
+    <p></p>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+        $(document).ready(function() {
+        $('.to_user').select2();
+    });
+
+    // send message
+    $('body').on('click' , '.send_message', function(){
+       var token = $("#token").val();
+       data_dict = {};
+       var to_user =  $("#to_user").find("option:selected").val();
+       var subject = $("#subject").val();
+       var user_message = $("#user_message").val();
+       if(subject!=""){
+            data_dict['subject']=subject;
+       }
+       if((to_user!="") & (user_message!="")){
+            data_dict['to_user']=to_user;
+            data_dict['message']= user_message;
+            console.log(data_dict)
+            $.ajax
+            ({
+                type: "POST",
+                url: "/message/compose-message-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    window.location.reload();
+                }
+            });
+       }else{
+            if(to_user==""){
+                $(".to-user-err").html("This field is required.")
+            }
+            if(user_message==""){
+                $(".msg-err").html("This field is required.")
+            }
+       }
+
+
+     });
+</script>
+{% endblock %}

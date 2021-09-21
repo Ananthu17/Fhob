@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="row">
+<div class="col-4">
+<h3>All Messages</h3>
+{% for msg in user_messages %}
+<p>{{msg.from_user}}: {{msg.subject}}</p>
+{% endfor %}
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}

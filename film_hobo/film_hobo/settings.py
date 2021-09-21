@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'payment',
     'general',
     'project',
+    'messaging',
 
     'bootstrap_datepicker_plus',
     'django_select2',

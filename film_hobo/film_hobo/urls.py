@@ -36,6 +36,7 @@ urlpatterns = [
     path('hobo_user/', include('hobo_user.urls')),
     path('general/', include(('general.urls', 'general'), namespace='general')),
     path('project/', include(('project.urls', 'project'), namespace='project')),
+    path('message/', include(('messaging.urls', 'message'), namespace='message')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(),
          name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(),
