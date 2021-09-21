@@ -279,7 +279,7 @@ class CustomUser(AbstractUser):
     #                                                         )
     #                                          )
     ethnic_appearance = models.ForeignKey('hobo_user.EthnicAppearance',
-                                        on_delete=models.SET_NULL,
+                                          on_delete=models.SET_NULL,
                                           related_name='user_ethnic_appearance',
                                           verbose_name=_("Ethnic Appearance"),
                                           null=True)
