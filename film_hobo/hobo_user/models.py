@@ -685,6 +685,7 @@ class Project(models.Model):
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
     timestamp = models.DateField(auto_now_add=True)
+    test = models.CharField(max_length=1000,  null=True, blank=True)
 
     def __str__(self):
         return self.title
