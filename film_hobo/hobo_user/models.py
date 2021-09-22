@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -278,7 +279,7 @@ class CustomUser(AbstractUser):
     #                                                         )
     #                                          )
     ethnic_appearance = models.ForeignKey('hobo_user.EthnicAppearance',
-                                        on_delete=models.SET_NULL,
+                                          on_delete=models.SET_NULL,
                                           related_name='user_ethnic_appearance',
                                           verbose_name=_("Ethnic Appearance"),
                                           null=True)
@@ -639,9 +640,9 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
-                                  related_name='project_team',
-                                  blank=True)
+    # team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
+    #                               related_name='project_team',
+    #                               blank=True)
     script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
@@ -657,6 +658,10 @@ class Project(models.Model):
                                  choices=CAST_PAY_RATE_CHOICES,
                                  max_length=150, default=NEGOTIABLE)
     cast_samr = models.CharField(_("Cast SAMR"),
+                                 choices=CAST_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    crew_samr = models.CharField(_("Crew SAMR"),
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
@@ -680,6 +685,7 @@ class Project(models.Model):
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
     timestamp = models.DateField(auto_now_add=True)
+    # test = models.CharField(max_length=1000,  null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -1091,6 +1097,7 @@ class CustomUserSettings(models.Model):
 
 class JobType(models.Model):
     title = models.CharField(max_length=1000)
+    label = models.CharField(max_length=1000, null=True, blank=True)
     slug = models.SlugField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -1662,6 +1669,8 @@ class UserNotification(models.Model):
     COMMENTS_MENTION = 'comments_mention'
     CAST_ATTACH_REQUEST = 'cast_attach_request'
     CAST_ATTACH_RESPONSE = 'cast_attach_response'
+    CREW_ATTACH_REQUEST = 'crew_attach_request'
+    CREW_ATTACH_RESPONSE = 'crew_attach_response'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1683,6 +1692,8 @@ class UserNotification(models.Model):
                                 (COMMENTS_MENTION, 'Comments Mention'),
                                 (CAST_ATTACH_REQUEST, 'Cast Attach Request'),
                                 (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
+                                (CREW_ATTACH_REQUEST, 'Crew Attach Request'),
+                                (CREW_ATTACH_RESPONSE, 'Crew Attach Response'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1718,6 +1729,10 @@ class UserNotification(models.Model):
                                   verbose_name=_("Character"),
                                   on_delete=models.CASCADE,
                                   null=True, blank=True)
+    crew = models.ForeignKey('project.ProjectCrew',
+                             verbose_name=_("Crew"),
+                             on_delete=models.CASCADE,
+                             null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1815,8 +1830,17 @@ class UserProject(models.Model):
                                   related_name='user_project_character',
                                   verbose_name=_("Character"),
                                   null=True, blank=True)
-    created_time = models.DateTimeField(_('Created Time'),
-                                        auto_now_add=True,
+    crew_application = models.ForeignKey("project.CrewApplication",
+                                         on_delete=models.CASCADE,
+                                         related_name='user_crew_application',
+                                         verbose_name=_("Cast Application"),
+                                         null=True, blank=True)
+    crew = models.ForeignKey("project.ProjectCrew",
+                             on_delete=models.CASCADE,
+                             related_name='project_crew',
+                             verbose_name=_("Project Crew"),
+                             null=True, blank=True)
+    created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=True)
 
     def __str__(self):
@@ -1849,3 +1873,17 @@ class BetaTesterCodes(models.Model):
     class Meta:
         verbose_name = 'Beta Tester Code'
         verbose_name_plural = 'Beta Tester Codes'
+
+
+def create_profile_for_admin_user(sender, instance, **kwargs):
+    if kwargs['created']:
+        if instance.membership == 'ADMIN':
+            UserProfile.objects.create(user=instance)
+            CustomUserSettings.objects.create(
+                user=instance, profile_visibility=CustomUserSettings.NO_ONE,
+                who_can_contact_me=CustomUserSettings.NO_ONE,
+                who_can_track_me=CustomUserSettings.NO_ONE,
+                account_status=CustomUserSettings.ENABLED)
+
+
+post_save.connect(create_profile_for_admin_user, sender=CustomUser)

@@ -26,6 +26,17 @@
                 <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
                 {% endif %}
             </a>
+            {% elif obj.notification_type == 'crew_attach_request' %}
+            <a href="{% url 'project:single-film-project' obj.project.id %}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.project.video_cover_image %}
+                <img src="{{ obj.project.video_cover_image.url }}" class="notification_img"/>
+                {% elif obj.project.creator.get_profile_photo %}
+                <img src="{{ obj.project.creator.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
             {% elif obj.notification_type == 'video_rating' %}
             <a href="{% url 'project:video' obj.project.id %}"
             target="_blank" id ="{{obj.id}}" class="notification_link">
@@ -93,7 +104,20 @@
                     {{time}} ago.
                 </div>
             </div>
-            {% elif obj.notification_type == 'cast_attach_response' %}
+            {% elif obj.notification_type == 'crew_attach_request' %}
+            <div class="row">
+                <div class="col-10 " id="crew-attach-req-btns-{{obj.crew.id}}">
+                    {{ obj.project.creator.get_full_name}} wants to attach you as
+                    <b>{{obj.crew.job_type}}</b> to his project
+                    <b><a href="{% url 'project:single-film-project' obj.project.id %}" >{{obj.project.title}}</a></b><br>
+                    <b>{{ obj.project.creator.get_membership_display  }}</b><br>
+                    <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{obj.crew.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer decline_crew_request" id="{{obj.crew.id}}">Decline</span>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response' %}
             <div class="row">
                 <div class="col-10">
                     {{obj.message|safe}}<br>
@@ -151,7 +175,7 @@
             {% elif obj.notification_type == 'audition_status' %}
             <div class="row">
                 <div class="col-10 ">
-                    {{obj.message}}<br>
+                    {{obj.message|safe}}<br>
                     {% get_notifications_time obj.created_time as time %}
                     {{time}} ago.
                 </div>

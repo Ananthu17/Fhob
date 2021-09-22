@@ -1,9 +1,10 @@
 from django.db import models
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext_lazy as _
 
 from solo.models import SingletonModel
 
-from hobo_user.models import PromoCode
+from hobo_user.models import CustomUser
 
 # Create your models here.
 
@@ -84,3 +85,12 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "{}:{}".format(self.id, self.user.email)
+
+
+def change_registration_complete_to_true(sender, instance, **kwargs):
+    paid_user_obj = CustomUser.objects.get(email=instance.user.email)
+    paid_user_obj.registration_complete = True
+    paid_user_obj.save()
+
+
+post_save.connect(change_registration_complete_to_true, sender=Transaction)

@@ -34,21 +34,75 @@ const csrftoken = getCookie('csrftoken');
 
 let orderId;
 
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
 
-subscription_details_url = origin_url + '/payment/subscription_details'
-subscription_details_args = {
-    "token": token,
-    "payment_plan": $("#payment_plan").text(),
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+
+if(window.location.href.indexOf("indie") != -1){
+    $('#center_btn_text').text("Indie");
+    var membership = 'indie'
 }
 
-var plan_id = ""
+if(window.location.href.indexOf("pro") != -1){
+    $('#center_btn_text').text("Pro");
+    var membership = 'pro'
+}
 
-axios.post(subscription_details_url, subscription_details_args)
-.then((response) => {
-    plan_id = response.data.plan_id
-}, (error) => {
-    console.log(error);
-});
+if(window.location.href.indexOf("company") != -1){
+    $('#center_btn_text').text("Company");
+    var membership = 'company'
+}
+
+var betacode = getUrlParameter('beta_code');
+if(betacode){
+    beta_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
+    time_period = $("#payment_plan").text();
+    extra_args = {"code": betacode,
+                  "membership": membership,
+                  "period": time_period}
+    axios.post(beta_plan_details_api, extra_args)
+    .then((response) => {
+        var bill_date = response.data.bill_date
+        var days = response.data.days
+        var selected_plan_id = response.data.selected_plan_id
+        $("#bill_start_date").text(bill_date);
+        $("#days_free").text(days);
+        var plan_id = selected_plan_id
+        localStorage.setItem('plan_id', plan_id);
+    }, (error) => {
+        console.log(error);
+    })
+}
+else{
+    subscription_details_url = origin_url + '/payment/subscription_details'
+    subscription_details_args = {
+        "token": token,
+        "payment_plan": $("#payment_plan").text(),
+    }
+
+    var plan_id = ""
+
+    axios.post(subscription_details_url, subscription_details_args)
+    .then((response) => {
+        plan_id = response.data.plan_id
+        localStorage.setItem('plan_id', plan_id);
+    }, (error) => {
+        console.log(error);
+    });
+}
+var plan_id_final = localStorage.getItem("plan_id");
 
 const headers = {
     'Accept': 'application/json',
@@ -63,7 +117,7 @@ createSubscription: function(data, actions) {
 
     return actions.subscription.create({
 
-        'plan_id': plan_id
+        'plan_id': plan_id_final
 
     });
 },

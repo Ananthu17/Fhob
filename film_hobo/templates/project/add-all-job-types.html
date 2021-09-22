@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load samr_display_tag %}
+{% load project_rating_tag %}
+{% block extracss %}
+<style>
+    .cancel_btn, .save_btn, .attach_btn, .remove_btn, .plus_minus_btn
+        {
+        visibility:hidden;
+        }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg craa-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-center-section-align">
+                    <!-- project menu  -->
+                    <div class="sds-menu-bg">
+                        <div class="cta-menu-align">
+                            <ul class="cva-menu ">
+                                <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}"
+                                        class="video-menu-head-tag">#{{project.id}}</a></li>
+                                <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
+                                <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
+                                <li><span>Genre: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_genre_display}}</span></li>
+                                <li><span>Location(s): </span><span class="sgl-menu-blue txt-uppercase">{{project.location}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- project menu  End-->
+                    <!-- Attach section  -->
+{% if request.user == project.creator or request.user.is_superuser %}
+                    <div class="craa-menu-bg">
+                        <div class="craa-attach-sec">
+                            <div class="craa-input-cast-sec">
+                                <div>
+                                    <div class="crr-input-head">
+                                        <span>
+                                            FILMMAKERS / CREW POSITIONS
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span>Team SAMR: </span>
+                                        {% get_samr_display_value project.id as samr_data %}
+                                        <span class="car-pro-txt">{{ samr_data.0 }}</span>
+                                        <span class="car-input-rate-star">
+                                            <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="craa-btn-flex-1">
+                                    <button class="craa-add-more-btn attach_all attach_btn">ATTACH ALL</button>
+                                </div>
+                                <div class="craa-btn-flex-2 plus_minus_btn">
+                                    <div>
+                                        <button class="craa-plus-minus-btn">
+                                            <i class="fa fa-plus craa-plus"></i>
+                                        </button>
+                                        <span class="craa-plus-txt">
+                                            To Add
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <button class="craa-plus-minus-btn">
+                                            <i class="fa fa-minus craa-minus"></i>
+                                        </button>
+                                        <span class="craa-plus-txt">
+                                            To Remove
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="craa-btn-flex-1">
+                                    <button class="craa-remove-btn remove_all remove_btn">REMOVE ALL</button>
+                                </div>
+                                <form method="post" action="{% url 'project:add-project-crew' project.id %}">
+                                    {% csrf_token %}
+                                <div class="craa-save-edit-sec">
+                                    <span>
+                                        <input type="submit" value="Save" class="crr-save-btn save_btn ">
+                                    </span>
+                                    <span>
+                                        <a class="crr-save-btn cursor-pointer edit_btn">Edit</a>
+                                    </span>
+                                    <span>
+                                        <a class="crr-save-btn cursor-pointer cancel_btn ">Cancel</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="craa-list-sec-bg">
+                        <!-- Grid Section  -->
+                        <div class="craa-list-sec">
+                            <!-- List section  col-->
+                            {% for label,job_types in job_dict.items %}
+                            <div class="">
+                                <!-- col 1  -->
+                                <div>
+                                    <!-- box Section 1 -->
+                                    <div class="craa-bg-color-sec">
+                                        <div class="craa-list-sec-head">
+                                            <div class="craa-list-head-style">
+                                                <span class="txt-uppercase">{{label}}</span>
+                                                <span>
+                                                    <hr class="craa-sce-hr">
+                                                </span>
+                                            </div>
+                                            {% for job in job_types %}
+                                            <!-- plus-minus sec  -->
+                                            <div class="craa-card-sec-align">
+                                                <div class="card craa-card-sec">
+                                                    <div class="craa-card-inner-align">
+                                                        <div class="craa-card-name craa-card-name-green">
+                                                            {{job.title}}
+                                                        </div>
+                                                        <div>
+                                                            <a class="craa-plus-list-btn add pt-1 pb-1" id="{{job.id}}" >
+                                                                <i class="fa fa-plus craa-plus"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div>
+                                                    <div class="craa-count-sec-display">
+                                                        {% get_dict_value_if_exists project_crew_dict job.id as crew_count %}
+                                                        {% get_dict_value_if_exists attached_crew_dict job.id as attached_crew_count %}
+                                                        <input type="hidden" name="attached_crew_count" id="attached_crew_count_{{job.id}}" value="{{attached_crew_count}}"/>
+                                                        <span class="craa-count-sec">(<span
+                                                                class="craa-card-num-black job_count_label" id="job_count_label_{{job.id}}">{{crew_count}}</span>)</span>
+                                                                <input type="hidden" class="job_count" name="{{job.slug}}" id="job_count_{{job.id}}"
+                                                                value="{{crew_count}}" />
+                                                        <span class="craa-btn-top">
+                                                            <a class="craa-plus-minus-list-btn minus" id="{{job.id}}">
+                                                                <i class="fa fa-minus craa-minus"></i>
+                                                            </a>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- plus-minus sec End -->
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <!-- box Section 1 End  -->
+                                </div>
+                                <!-- col 1 End   -->
+                            </div>
+                            {% endfor %}
+                            <!-- List section col End -->
+
+                        </div>
+                    </form>
+                        <!-- Grid Section End  -->
+                        <div>
+                            {% if request.user.is_superuser %}
+                            <button class="craa-btm-add-more-btn" data-toggle="modal"
+                            data-target="#add_more_jobs">ADD MORE</button>
+                            {% endif %}
+                        </div>
+                    </div>
+<!-- The Modal -->
+<div class="modal fade" id="add_more_jobs">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Add Project Crew</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row mt-1">
+                <div class="offset-1 col-3">
+                    <span class="all-p"> Heading Label</span>
+                </div>
+                <div class="col-7">
+                    <input class="form-control" name="label" id="label" autocomplete="off"/>
+                    <span class="help_text">Eg:- Production, Visual Effects, Post Production etc</span>
+                    <div class="all-error-msg" id="label_error"></div>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3 ">
+                    <span class="all-p"> Crew Title</span>
+                </div>
+                <div class="col-7">
+                    <input class="form-control" name="title" id="title" autocomplete="off"/>
+                    <div class="all-error-msg" id="title_error"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button class="btn btn-outline-danger btn-sm save_job_type">Save</button>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                    <!-- Attach section End  -->
+
+{% else %}
+<p class="all-p-light">Invalid Page</p>
+{% endif %}
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('body').on('click' , '.save_job_type', function(){
+        $("#title_error").html("");
+        $("#label_error").html("");
+       var token = $("#token").val();
+       data_dict = {};
+       title = $("#title").val();
+       label = $("#label").val();
+       if((title!="")&(label!="")){
+           data_dict['title'] = title;
+           data_dict['label'] = label;
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/save-job-type-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    window.location.reload()
+                }
+            });
+        }else {
+            if(title=="")
+                {
+                    $("#title_error").html("This field is required");
+                }
+            if(label=="")
+                {
+                    $("#label_error").html("This field is required");
+                }
+        }
+
+     });
+
+
+    $('body').on('click' , '.add_count', function(){
+        var id = $(this).attr('id');
+        var input_field_id = "#job_count_"+id;
+        var label_id = "#job_count_label_"+id;
+        var count = parseInt($(input_field_id).val());
+        count+=1;
+        $(label_id).html("");
+        $(label_id).html(count);
+        $(input_field_id).val(count);
+
+     });
+    $('body').on('click' , '.minus_count', function(){
+        var id = $(this).attr('id');
+        var input_field_id = "#job_count_"+id;
+        var label_id = "#job_count_label_"+id;
+        var attached_crew_count_id = "#attached_crew_count_"+id;
+        var attached_crew_count = parseInt($(attached_crew_count_id).val());
+        var count = parseInt($(input_field_id).val());
+        if(count>1){
+            count-=1;
+        }else{
+            count=0
+        }
+        if(attached_crew_count>count){
+            $('#warning_message').fadeIn().html("Cannot reduce count!! Please remove attached members.");
+            setTimeout(function() {$('#warning_message').fadeOut("slow");}, 2000 );
+        }else{
+            $(label_id).html("");
+            $(label_id).html(count);
+            $(input_field_id).val(count);
+        }
+
+
+     });
+    $('body').on('click' , '.attach_all', function(){
+        $(".job_count_label").html("");
+        $(".job_count_label").html(1);
+        $(".job_count").val(1);
+     });
+    $('body').on('click' , '.remove_all', function(){
+        $(".job_count_label").html("");
+        $(".job_count_label").html(0);
+        $(".job_count").val(0);
+     });
+    $('body').on('click' , '.edit_btn', function(){
+        $(".edit_btn").css('display', 'none');
+        $(".cancel_btn").css('visibility', 'visible');
+        $(".save_btn").css('visibility', 'visible');
+        $(".attach_btn").css('visibility', 'visible');
+        $(".plus_minus_btn").css('visibility', 'visible');
+        $(".remove_btn").css('visibility', 'visible');
+        $(".add").addClass('add_count cursor-pointer');
+        $(".minus").addClass('minus_count cursor-pointer');
+     });
+    $('body').on('click' , '.cancel_btn', function(){
+        window.location.reload();
+     });
+</script>
+{% endblock %}

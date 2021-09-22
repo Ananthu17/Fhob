@@ -395,7 +395,7 @@ class CustomUserSignupIndieView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                new_user.registration_complete = True
+                # new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -453,7 +453,7 @@ class CustomUserSignupProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                new_user.registration_complete = True
+                # new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -502,7 +502,7 @@ class CustomUserSignupCompany(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                new_user.registration_complete = True
+                # new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')

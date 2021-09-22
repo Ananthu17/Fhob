@@ -55,7 +55,8 @@
                     <div class="sds-menu-bg">
                         <div class="cta-menu-align">
                             <ul class="sds-menu sds-menu-padding">
-                                <li><span class="video-menu-head">PROJECT </span><a href="" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                                <li><span class="video-menu-head">PROJECT </span>
+                                    <a href="{% url 'project:single-film-project' project.id %}" class="video-menu-head-tag" >#{{project.id}}</a></li>
                                 <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
                                 <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
                                 <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
@@ -143,7 +144,7 @@
                         <!-- col-3  -->
                         <div class="caa-sec-bg">
                             <div class="caa-audition-info-align"
-                            {% if samr_data.1 >= logged_user_rating or request.user.membership not in samr_data.2 %}
+                            {% if samr_data.1 > logged_user_rating or request.user.membership not in samr_data.2 %}
                             data-toggle="modal" data-target="#cannotapply"
                             {% endif %}>
                                 <form  method="post"
@@ -156,7 +157,7 @@
                                     </div>
                                     <div class="cas-input-display-align">
                                         <div class="caa-input-display mt-2">
-                                            <span class="caa-input-name">Name:</span>
+                                            <span class="caa-input-name">Name</span>
                                             <span class="caa-input-align">
                                                 <input name="name" class="caa-input-field" autocomplete='off'
                                                 required></span>
@@ -218,7 +219,10 @@
                                     <div class="caa-submit-sec">
                                         <span class="caa-submit-txt">Submit Video by: <span class="caa-date-span">{{project.last_date}}</span></span>
                                         <span class="caa-upload-tag">
-                                            <a data-toggle="modal" data-target="#form_submission_modal"
+                                            <a
+                                            {% if samr_data.1 <= logged_user_rating and request.user.membership in samr_data.2 %}
+                                            data-toggle="modal" data-target="#form_submission_modal"
+                                            {% endif %}
                                             class="caa-upload-save-btn cursor-pointer">Submit</a>
 
                                         </span>

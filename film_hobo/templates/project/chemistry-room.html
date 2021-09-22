@@ -17,7 +17,8 @@
                         <div class="chm-menu-align">
                             <ul class="chm-menu sds-menu-padding">
                                 <li><span class="video-menu-head">CHEMISTRY ROOM</span></li>
-                                <li><span>Project: </span><span class="chm-menu-blue"><a href="">#{{project.id}}</a></span></li>
+                                <li><span>Project: </span><span class="chm-menu-blue">
+                                    <a href="{% url 'project:single-film-project' project.id %}">#{{project.id}}</a></span></li>
                                 <li><span>Title: </span><span class="chm-menu-blue txt-uppercase">{{project.title}}</span></li>
                                 <li><span>Format: </span><span class="chm-menu-blue">{{project.get_format_display}}</span></li>
                             </ul>
