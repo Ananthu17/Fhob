@@ -5077,7 +5077,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request):
         try:
-            projectform = ProjectCreationForm(request.POST or None)
+            projectform = ProjectCreationForm(request.POST or None, request.FILES)
+            
             writerform = WriterForm(request.POST or None)
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
