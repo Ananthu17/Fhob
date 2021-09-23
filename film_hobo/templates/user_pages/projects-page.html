@@ -746,7 +746,7 @@
     const dataInsertion = (data, id=5)=>{
         if (id!=5){
             console.log(`#demo${id}`)
-            let rows = {'1':data.scene,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
+            let rows = {'1':data.scenes,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
             $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
             jQuery.each(rows[id], function() {
                 let div1 = `<div class='item'>\
@@ -1112,7 +1112,11 @@
     // Script for search functionality
     $('#search').on('change',()=>{
         post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
-        axios.get(post_url)
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
         .then((response) => {
                 console.log("Response",response.data)
                 dataInsertion(response.data)
@@ -1128,7 +1132,7 @@
         axios({
             method: 'post',
             url: post_url,
-            headers: {},
+            headers: {"Authorization":$("#token").val()},
             data: {
                 year : document.getElementById('year').innerHTML
             }
@@ -1147,7 +1151,7 @@
         axios({
             method: 'post',
             url: post_url,
-            headers: {},
+            headers: {"Authorization":$("#token").val()},
             data: {
                 year : document.getElementById('year').innerHTML
             }
@@ -1182,7 +1186,7 @@
         axios({
             method: 'post',
             url: post_url,
-            headers: {},
+            headers: {"Authorization":$("#token").val()},
             data: {
                 year : document.getElementById('year').innerHTML,
                 month : months[document.getElementById('selected').innerHTML]
@@ -1203,7 +1207,11 @@
         date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
         console.log(date)
         post_url = origin_url + `/hobo_user/projects/?timestamp=${date}`
-        axios.get(post_url)
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
         .then((response) => {
                 console.log("Response",response.data)
                 dataInsertion(response.data)
@@ -1220,9 +1228,13 @@
         console.log("PARENT", parent)
 
         post_url = origin_url + `/hobo_user/projects/?genre=${genre[keyword]}`
-        axios.get(post_url)
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
         .then((response) => {
-                console.log("Response",response.data)
+                console.log("Response",response)
                 dataInsertion(response.data, parent)
         }, (error) => {console.log(error);})
     }
