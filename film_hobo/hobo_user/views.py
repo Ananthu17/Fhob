@@ -308,10 +308,22 @@ class HowTo(View):
         return render(request, 'user_pages/how_to.html')
 
 
-class HomePage(View):
+class HomePage(TemplateView):
+    template_name = 'user_pages/user_home.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
 
-    def get(self, request, *args, **kwargs):
-        return render(request, 'user_pages/user_home.html')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(
+                            format="SCH").order_by('-id')
+        context["toprated_scenes"] = Project.objects.filter(
+                                     format="SCH").order_by('-rating')
+        context["filims"] = Project.objects.filter(
+                            format="SHO").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="SHO").order_by('-rating')
+        return context
 
 
 class CustomUserList(APIView):
