@@ -1,3 +1,3 @@
 $( document ).ready(function() {
-    $("#showcase").addClass('active');
+    $("#screeing_room").addClass('active');
 });

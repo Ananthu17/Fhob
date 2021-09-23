@@ -7,7 +7,6 @@ from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
 
-from django.core.files import File
 from django.db.models import Sum, Q, query
 from django.template import loader
 from django.core.mail import send_mail
@@ -20,7 +19,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-from django.http import FileResponse
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -94,7 +92,8 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer, \
+    EditBetaTesterCodeSerializer
 from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
@@ -4727,17 +4726,47 @@ class EditBetaTesterCode(APIView):
 
     def put(self, request, *args, **kwargs):
         try:
+            import pdb;pdb.set_trace()
             data = request.data
-            unique_id = request.data['id']
-            testercode_instance = BetaTesterCodes.objects.get(id=unique_id)
-            serializer = AddBetaTesterCodeSerializer(testercode_instance,
+            beta_tester_code = request.data['code']
+            testercode_instance = BetaTesterCodes.objects.get(code=beta_tester_code)
+            serializer = EditBetaTesterCodeSerializer(testercode_instance,
                                              data=request.data, partial=True)
             if serializer.is_valid():
-                serializer.update(BetaTesterCodes.objects.get(id=unique_id),
+                # get paypal access_token
+                paypal_client_id = settings.PAYPAL_CLIENT_ID
+                paypal_secret = settings.PAYPAL_SECRET_ID
+                data = {'grant_type': 'client_credentials'}
+                token_user_response = requests.post(
+                                    'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                    data=data,
+                                    auth=(paypal_client_id, paypal_secret),
+                                    headers={'Accept': 'application/json',
+                                            'Accept-Language': 'en_US'})
+                if token_user_response.status_code == 200:
+                    access_token = json.loads(token_user_response.content)['access_token']
+                else:
+                    return Response(
+                        {"status": "error in fetching paypal access token"},
+                        status=status.HTTP_404_NOT_FOUND)
+
+                access_token_strting = 'Bearer ' + access_token
+
+                # update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/' + plan_id
+
+                edit_json = [
+                    {
+                        "op": "replace",
+                        "path": "/billing_cycles/pricing_scheme/fixed_price/value",
+                        "value": 11
+                    }
+                ]
+
+                # update the local db
+
+                serializer.update(BetaTesterCodes.objects.get(code=beta_tester_code),
                                   request.data)
-                return Response(
-                    {"status": "success",
-                     "message": "beta tester code updated successfully"})
+                return Response(serializer.data)
             else:
                 return Response(serializer.errors)
         except ObjectDoesNotExist:

@@ -5,8 +5,10 @@ import datetime
 from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -22,7 +24,7 @@ from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
     BraintreePromoCode, BetaTesterCodes
-from .models import PaymentOptions, Transaction
+from .models import PaymentOptions, Transaction, EmailRecord
 from .serializers import DiscountsSerializer, TransactionSerializer
 # Create your views here.
 
@@ -1266,41 +1268,41 @@ class InitialRequest(APIView):
             status=status.HTTP_200_OK)
 
 
-class UpdateSubscription(APIView):
-    """
-    API to update the braintree subscription
-    """
-    permission_classes = (IsAdminUser,)
+# class UpdateSubscription(APIView):
+#     """
+#     API to update the braintree subscription
+#     """
+#     permission_classes = (IsAdminUser,)
 
-    def post(self, request, *args, **kwargs):
-        new_indie_monthly = request.data['indie_monthly']
-        new_indie_yearly = request.data['indie_yearly']
-        new_pro_monthly = request.data['pro_monthly']
-        new_pro_yearly = request.data['pro_yearly']
-        new_company_monthly = request.data['company_monthly']
-        new_company_yearly = request.data['company_yearly']
+#     def post(self, request, *args, **kwargs):
+#         new_indie_monthly = request.data['indie_monthly']
+#         new_indie_yearly = request.data['indie_yearly']
+#         new_pro_monthly = request.data['pro_monthly']
+#         new_pro_yearly = request.data['pro_yearly']
+#         new_company_monthly = request.data['company_monthly']
+#         new_company_yearly = request.data['company_yearly']
 
-        gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                braintree.Environment.Sandbox,
-                merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                public_key=settings.BRAINTREE_PUBLIC_KEY,
-                private_key=settings.BRAINTREE_PRIVATE_KEY
-            )
-        )
-        result = gateway.subscription.update("a_subscription_id", {
-            "id": "new_id",
-            "payment_method_token": "new_payment_method_token",
-            "price": "new_price",
-            "plan_id": "new_plan",
-        })
-        if not result.is_success:
-            return Response(
-                {"status": "braintree subscription updation unsuccsessful "},
-                status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            {"status": "braintree subscription updation succsessful "},
-            status=status.HTTP_200_OK)
+#         gateway = braintree.BraintreeGateway(
+#             braintree.Configuration(
+#                 braintree.Environment.Sandbox,
+#                 merchant_id=settings.BRAINTREE_MERCHANT_ID,
+#                 public_key=settings.BRAINTREE_PUBLIC_KEY,
+#                 private_key=settings.BRAINTREE_PRIVATE_KEY
+#             )
+#         )
+#         result = gateway.subscription.update("a_subscription_id", {
+#             "id": "new_id",
+#             "payment_method_token": "new_payment_method_token",
+#             "price": "new_price",
+#             "plan_id": "new_plan",
+#         })
+#         if not result.is_success:
+#             return Response(
+#                 {"status": "braintree subscription updation unsuccsessful "},
+#                 status=status.HTTP_400_BAD_REQUEST)
+#         return Response(
+#             {"status": "braintree subscription updation succsessful "},
+#             status=status.HTTP_200_OK)
 
 
 class GetBraintreeDiscountDetailListAPI(APIView):
@@ -1466,3 +1468,60 @@ class GetNewPlanDetailsJSON(APIView):
                              }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse(data_dict, safe=False)
+
+
+class PayPalSendEmail(View):
+
+    def post(self, request, *args, **kwargs):
+        context = {
+            'user_name': '',
+            'user_membership': '',
+            'order_id': '',
+            'start_date': '',
+            'start_date_after_trial': '',
+
+            'payment_method': '',
+            'plan': '',
+            'price': '',
+            'free_trial_days': '',
+
+            'start_date_total_purchase_value': '',
+            'start_date_sales_tax_percentage': '',
+            'start_date_sales_tax_value': '',
+            'start_date_order_total_value': '',
+
+            'paid_start_date_total_purchase_value': '',
+            'paid_start_date_sales_tax_percentage': '',
+            'paid_start_date_sales_tax_value': '',
+            'paid_start_date_order_total_value': '',
+        }
+        email_subject = "Welcome to FilmHobo. " \
+            "Here are your subscription details."
+        email_body_text = render_to_string(
+            "payment_receipts/email_receipt.txt", context, request
+        )
+        email_body_html = render_to_string(
+            "payment_receipts/email_receipt.html", context, request
+        )
+        email_recipients = [request.user.email]
+        email_from = getattr(
+            settings, "DEFAULT_FROM_EMAIL", "support@filmhobo.com"
+        )
+        success = send_mail(
+            subject=email_subject,
+            message=email_body_text,
+            from_email=email_from,
+            recipient_list=email_recipients,
+            html_message=email_body_html,
+        )
+        EmailRecord.objects.create(
+            sender=request.user,
+            recipient=request.user,
+            email=request.user.email,
+            subject=email_subject,
+            body=email_body_text,
+            ok=success,
+        )
+        return render(
+            request, "payment_receipts/email_receipt.html", context
+        )

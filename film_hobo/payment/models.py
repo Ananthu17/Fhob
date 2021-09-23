@@ -87,6 +87,39 @@ class Transaction(models.Model):
         return "{}:{}".format(self.id, self.user.email)
 
 
+class FilmHoboSenderEmail(models.Model):
+    """
+    Model to store all the sender emails.
+    """
+    email = models.EmailField(_('Email'))
+
+
+class EmailRecord(models.Model):
+    """
+    Model to store all the outgoing emails.
+    """
+
+    when = models.DateTimeField(null=False, auto_now_add=True)
+    sender = models.ForeignKey(
+        FilmHoboSenderEmail,
+        related_name="sent_messages",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    recipient = models.ForeignKey(
+        CustomUser,
+        related_name="recv_messages",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    email = models.EmailField(null=False, blank=False)
+    subject = models.CharField(null=False, max_length=128)
+    body = models.TextField(null=False, max_length=1024)
+    ok = models.BooleanField(null=False, default=True)
+
+
 def change_registration_complete_to_true(sender, instance, **kwargs):
     paid_user_obj = CustomUser.objects.get(email=instance.user.email)
     paid_user_obj.registration_complete = True
