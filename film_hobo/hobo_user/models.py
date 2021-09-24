@@ -289,7 +289,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.get_full_name()
 
     def get_full_name(self):
         if self.is_superuser:

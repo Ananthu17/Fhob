@@ -69,7 +69,8 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserRating, Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
                     Feedback, CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined, BetaTesterCodes
+                    VideoRatingCombined, BetaTesterCodes,Writer
+
 from payment.models import Transaction
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
@@ -5068,9 +5069,11 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/new-project.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        mode_operation="create"
+        context['mode_operation']=mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
         return context
@@ -5078,7 +5081,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         try:
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
-            
             writerform = WriterForm(request.POST or None)
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
@@ -5100,6 +5102,47 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))
 
+class EditProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project=get_object_or_404(Project, id=self.kwargs.get('id'))
+        mode_operation="update"
+        writer=Writer.objects.get(project=project.id)
+        context['mode_operation']=mode_operation
+        context['project_obj']=project
+        context['form'] = ProjectCreationForm(instance=project)
+        context['writerform'] = WriterForm(instance=writer)
+        return context
+
+    def post(self, request,**kwargs):
+        try:
+            project=get_object_or_404(Project, id=self.kwargs.get('id'))
+            writer=Writer.objects.get(project=project.id)
+            projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
+            writerform = WriterForm(request.POST or None,instance=writer)
+            print("valid ahno project:", projectform.is_valid())
+            print('form error project', projectform.errors)
+            print("valid ahno writer:", writerform.is_valid())
+            print('form error writer', writerform.errors)
+            if projectform.is_valid() and writerform.is_valid():
+                writer = writerform.save()
+                project = projectform.save()
+                writer.project = project
+                writer.save()
+                messages.success(request, "Project Updated Successfully.")
+                return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+            messages.error(request, "Form not valid")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+        except:
+            messages.error(request, "Can't read data")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
 
 class ScreeningProjectDeatilInviteView(APIView):
     permission_classes = (IsAuthenticated,)
