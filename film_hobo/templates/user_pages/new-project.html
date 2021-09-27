@@ -28,7 +28,27 @@
             border: none;
             cursor: pointer;
         }
+        .select2-container--default .select2-selection--single
+        {
+            border-radius: 0!important;
+            border:none!important;
+            border-bottom:1px solid#9c9c9c!important;
+        }
+        .select2-container .select2-selection--single {
+            height:19px!important; 
+            
+            }
+        .select2-container--default .select2-selection--single .select2-selection__rendered
+            {
+                line-height:19px;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__arrow
+            {
+            height:15px;
+          
+        }
 
+     
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
@@ -373,14 +393,18 @@
                                 the Project Page.
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
                             <div class="col-6">
-                                <!-- <input class="inp-line" placeholder="Separate by Commas" /> -->
-                                {{form.location}}
+                                <br><select class=" inp-line  modal-location" id ="location_1"
+                                name="location" required >
+                               
+                                {% for item in form.location %}
+                                {{item}}
+                                {% endfor %}
+                                </select>
                             </div>
                         </div>
                         {% if mode_operation != 'create' %}
@@ -495,23 +519,32 @@
                             <div class="col-3">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
-                            <div class="col-md-2 mt-3">
-                                <div class="form-check-inline">
+                            <div class="col-md-6 mt-3">
+                                <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
-                                        <span>
+                                        <!-- <span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o "></span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o"></span>
-                                        </span>
+                                        </span> -->
                                         <input type="radio" name="radiorow9" id="public_script" onclick="selectscript(this)" value="0">
                                         <span class="checkmarkagree"></span>
                                     </label>
+                              
+                                    <label class="snf-file-upload d-flex flex-row align-items-left" style="margin-right: 2em; margin-left: 1em;">
+                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload">Upload</span>
+                                        (PDF)
+                                    </label>
+                                    <div class="fileuploaddiv d-none" id="filenameblock">
+                                        <span id="filename" class="mr-1"></span>
+                                        <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-2 mt-3 cus-file-upload">
+                            <!-- <div class="col-2 mt-3 cus-file-upload">
                                 <label class="snf-file-upload d-flex flex-row align-items-center">
                                     {{form.script}}<span class="mem-setup-blu-f underline ml-1">Upload</span>
                                     (PDF)
@@ -520,36 +553,36 @@
                                     <span id="filename" class="mr-1"></span>
                                     <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="row">
                             <div class="col-3">
                             </div>
-                            <div class="col-md-2 mt-3">
+                            <div class="col-md-6 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold" style="font: size em;">Privte
-                                        <span>
+                                    <label class="containerradio bold" style="margin-right: 2em;">Private
+                                        <!-- <span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o "></span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o"></span>
-                                        </span>
+                                        </span> -->
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" required>
                                         <span class="checkmarkagree"></span>
                                     </label>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-sm-3 mt-2">
-                                <form class="form-inline">
-                                    <div class="form-group d-none" id="script_password">
-                                        <label for="inputPassword3" style="margin-right:3em" class="bold mr-1">(Create a Password) </label>
-                                        {{form.script_password}}
-                                        <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right:2em;"></i>
+                                
+                               
+                                    <form class="form-inline">
+                                        <div class="form-group d-none" id="script_password">
+                                            <label for="inputPassword3" class="bold mr-1" >(Create a Password) </label>
+                                            {{form.script_password}}
+                                            <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right: 13em; margin-bottom: 1em;" ></i>
 
-                                    </div>
-                                </form>
+                                        </div>
+                                    </form>
+                              </div>  
                             </div>
                            
                         </div>
@@ -801,7 +834,35 @@ jQuery($ => {
   });
 });
 
+$(document).ready(function() {
+        $('#location_1').select2();
+        $('.modal-location').select2();
 
+
+        var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+            return false;
+        };
+        var trackers = getUrlParameter('trackers');
+        var tracking = getUrlParameter('tracking');
+        if(tracking == 'true'){
+            toggleVisibility("Menu1");
+        }
+        if(trackers == 'true'){
+            toggleVisibility("Menu2");
+        }
+    });
 
 </script>
 {% endblock %}

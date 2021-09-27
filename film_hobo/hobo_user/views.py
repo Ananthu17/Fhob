@@ -5122,8 +5122,12 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
         try:
             project=get_object_or_404(Project, id=self.kwargs.get('id'))
             writer=Writer.objects.get(project=project.id)
+            print(request.POST)
+            
             projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
             writerform = WriterForm(request.POST or None,instance=writer)
+            new_writer=request.POST.get('new_writer')
+            
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
             print("valid ahno writer:", writerform.is_valid())
@@ -5132,6 +5136,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 writer = writerform.save()
                 project = projectform.save()
                 writer.project = project
+                writer.name=new_writer
                 writer.save()
                 messages.success(request, "Project Updated Successfully.")
                 return HttpResponseRedirect(
