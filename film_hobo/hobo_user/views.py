@@ -67,7 +67,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserRating, Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
                     Feedback, CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined, BetaTesterCodes,Writer
+                    VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
 
