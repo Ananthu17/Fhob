@@ -5071,7 +5071,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 class ProjectAPIView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['creator', 'title', 'format', 'genre',
@@ -5081,12 +5081,14 @@ class ProjectAPIView(ListAPIView, SegregatorMixin):
                         'cast_pay_rate', 'cast_samr', 'timestamp']
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+                   creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
 
 class ProjectDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         received_data = json.loads(request.body)
@@ -5094,21 +5096,26 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
         if 'year' in received_data and 'month' in received_data:
             month = received_data['month']
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[year+"-"+month+"-01",
-                                                               year+"-"+month+"-30"])
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ]).filter(
+                   creator=request.user)
             context = self.project_segregator(project)
             return Response(context)
 
         elif 'year' in received_data:
             year = received_data['year']
             project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"])
+                                                               year+"-12-30"]).filter(
+                                                               creator=request.user)
             context = self.project_segregator(project)
             return Response(context)
 
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
     search_fields = ["title", "format", "genre",
                      "rating", "timestamp"]
@@ -5280,19 +5287,18 @@ class ProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/projects-page.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-    
-    def get_context_data(self, **kwargs):
+
+    def get_context_data(self, user, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        
-        context['user'] = user
-        context["scenes"] = Project.objects.filter(format="SCH").order_by('-id')
-        context["toprated_scenes"] = Project.objects.filter(format="SCH").order_by('-rating')
-        context["filims"] = Project.objects.filter(format="SHO").order_by('-id')
-        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-rating')
-       
+        context["scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-id')
+        context["toprated_scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-rating')
+        context["filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-rating')
         return context
 
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(request.user, **kwargs)
+        return self.render_to_response(context)
 
 
 class GetAllUsersAPI(APIView):
@@ -5310,6 +5316,7 @@ class GetAllUsersAPI(APIView):
             name_list.append(user.get_full_name())
             name_dict[user.get_full_name()]="<a href='"+user.get_profile_url()+"' id='"+str(user.id)+"' class='mention_user'>"+user.get_full_name()+"</a> "
         return Response({"serializer_list": serializer_list, "name_dict": name_dict, "name_list": name_list})
+
 
 class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/screening_video_page.html'
@@ -5344,7 +5351,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/new-project.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         mode_operation="create"

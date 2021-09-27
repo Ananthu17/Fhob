@@ -58,7 +58,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetAllUsersAPI, \
                    EditUserInterestAPI, VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
-                   CreateProjectView,EditProjectView, ScreeningProjectDeatilView, \
+                   CreateProjectView, EditProjectView, ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
                    AddBetaTesterCode, \
