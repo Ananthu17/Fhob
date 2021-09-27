@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% load samr_display_tag %}
+{% load static %}
+{% block extracss %}
+<style>
+.select2-container--default .select2-selection--single
+    {
+        border-radius: 0!important;
+        border:none!important;
+        border-bottom:1px solid #000!important;
+    }
+.select2-container .select2-selection--single {
+    height:19px!important;
+    }
+.select2-container--default .select2-selection--single .select2-selection__rendered
+    {
+        line-height:19px;
+        background-color:#f3f3f3;
+        border-bottom:1px solid #000!important;
+        font-size:13px;
+        color:#000;
+    }
+.select2-container--default .select2-selection--single .select2-selection__arrow
+    {
+        height:15px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                <div class="crw-sec-bg ">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="crw-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                <!-- project menu  -->
+                <div class="sds-menu-bg">
+                    <div class="cta-menu-align">
+                        <ul class="cva-menu ">
+                            <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}"
+                                    class="video-menu-head-tag">#{{project.id}}</a></li>
+                            <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_format_display}}</span></li>
+                            <li><span>Genre: </span><span class="sgl-menu-blue txt-uppercase">{{project.get_genre_display}}</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue txt-uppercase">{{project.location}}</span></li>
+                        </ul>
+                    </div>
+                </div>
+                {% if crew %}
+                <!-- project menu  End-->
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <div class="crw-div1-background">
+                            <div class="crw-creator-sec-padding">
+                                <div>
+                                    <span class="sgl-black-txt">Creator:</span>
+                                    <span class="crw-blue-txt txt-capitalize" title="{{project.creator.get_full_name}}">
+                                        <a href="">{{project.creator.get_full_name}}</a>
+                                    </span>
+                                    <span class="crw-log-star">
+                                        <div class="">
+                                            <div class="cta-stars-outer">
+                                                <div class="cta-stars-inner" style="width:{{project_creator_rating}}%;"></div>
+                                              </div>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="sgl-black-txt">Producers:</span>
+                                    {% for producer, rating in producer_dict.items %}
+                                    <br>
+                                    <span class="crw-blue-txt" title="{{producer.get_full_name}}">
+                                        <a href="">{{producer}}</a></span>
+                                    <span class="crw-log-star">
+                                        <div class="">
+                                            <div class="cta-stars-outer">
+                                                <div class="cta-stars-inner" style="width:{{rating}}%;"></div>
+                                              </div>
+                                        </div>
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                                <div class="mt-2">
+                                    <span class="sgl-black-txt">Crew SAMR:</span>
+                                    {% get_crew_samr_display_value project.id as samr_data %}
+                                    <span class="crw-pro-txt">{{ samr_data.0 }}</span>
+                                    <span class="crw-log-star">
+                                        <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        <span class="fa {% if samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="">
+                                        <a class="video-menu-head cursor-pointer add_to_favorites favorites-btn remove-decoration"
+                                        id="{{project.id}}">Add to Favorites</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 crw-margin-top">
+                        <div class="crw-div2-background">
+                            <div class="crw-creator-sec-padding">
+                                <div class="crw-crew-sec">
+                                    <span class="sgl-black-txt">CREW:</span>
+                                    <span class="sgl-orange-txt txt-uppercase">{{crew.job_type.title}}</span>
+                                </div>
+                                <div class="crw-card-sec">
+                                    <div class="card crw-card-border">
+                                        {{crew.qualification}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12 crw-margin-top">
+                        <div class="crw-div3-background"
+                            {% if samr_data.1 > logged_user_rating or request.user.membership not in samr_data.2 %}
+                            data-toggle="modal" data-target="#cannotapply"
+                            {% endif %}>
+                            <form  method="post"
+                            action="{% url 'project:crew-apply-audition' project.id %}"
+                            id="crew_apply_form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="crew_id" value="{{crew.id}}" />
+                            <div class="crw-creator-sec-padding">
+                                <div class="crw-crew-sec">
+                                    <span class="sgl-black-txt">YOUR INFO</span>
+                                </div>
+                                <div class="crw-input-sec">
+                                    <span class="crw-name-txt">Name<i class="required-star">*</i></span>
+                                    <span><input class="caa-input-field" name="name" autocomplete='off'
+                                        required></span>
+                                </div>
+                                <div class="crw-input-sec mt-1">
+                                    <span class="crw-name-txt">Agent Name</span>
+                                    <span><input class="caa-input-field" name="agent_name" autocomplete='off'></span>
+                                </div>
+                                <div class="crw-input-sec mt-1">
+                                    <span class="crw-name-txt">Agent Email</span>
+                                    <span><input type="email" class="caa-input-email-field" name="agent_email" autocomplete='off'></span>
+                                </div>
+                                <div class="crw-input-sec mt-1">
+                                    <span class="crw-name-txt">Location<i class="required-star">*</i></span>
+                                    <span>
+                                        <!-- <input class="caa-input-field" name="location" id="location"> -->
+                                        <select class="caa-drop-down " name="location" id="location" required>
+                                            <option value="" disabled selected hidden>Choose location</option>
+                                            {% for item in locations %}
+                                                <option value="{{item.id}}">{{item}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </span>
+                                </div>
+                                <div class="crw-input-sec mt-1">
+                                    <span class="crw-name-txt">Phone<i class="required-star">*</i></span>
+                                    <span><input class="caa-input-field" name="phone_number"  autocomplete='off'
+                                        required></span>
+                                </div>
+                                <div class="crw-display-grid">
+                                    <span class="crw-upload-sec">
+                                        <span class="crw-upload-tag">
+                                            <input type="file" class="crw-input-upload" name="cover_letter" autocomplete='off'
+                                            required accept="application/pdf" id="file">
+                                            <span>Cover Letter<i class="required-star">*</i></span>
+                                        </span>
+                                        <span class="crw-pdf-txt pdf-filename">(PDF)</span>
+                                    </span>
+                                    <span class="crw-cover-tag crw-tag-flex">
+                                        <a class="cursor-pointer"
+                                        {% if samr_data.1 <= logged_user_rating and request.user.membership in samr_data.2 %}
+                                        data-toggle="modal" data-target="#form_submission_modal"
+                                        {% endif %}>Apply</a></span>
+                                </div>
+                            </div>
+<!-- The Modal -->
+<div class="modal fade" id="form_submission_modal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Submit Audition</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <p>
+                        <span class="all-p-light">By FilmHobo Terms of Service you have agreed to, you acknowledge here that by applying to
+                        any Project on the website as a Cast, Filmmaker or Crew, you agree and irrevocably give
+                        permission to FilmHobo to use and display Your name, voice, performance, and likeness in
+                        such Project and/or Content created and being posted on the FilmHobo website, as well as the
+                        right to use Your Name, voice, performance, and likeness in FilmHobo marketing campaigns.
+                        (Terms of Service, Paragraph 6</span> <span class="all-p">“Representations and Warranties”</span>,
+                        <span class="all-p-light">Item (d)</span>
+                        <span class="all-p">“Your release for participation in Projects and Content created on the website”</span>
+                        <span class="all-p-light">).</span>
+                        <p class="alert-style">If you disagree with the statement above, please do not apply for any roles
+                        or positions on the FilmHobo website!</p>
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3 ">
+                    <span class="">
+                        <input type="checkbox" name="i_agree" required/> 
+                        <span class="all-p">I Agree</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <input type="submit" class='btn btn-outline-danger btn-sm cursor-pointer submit_crew_application'
+        value="Submit" />
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                            </form>
+<!-- The Modal -->
+<div class="modal fade" id="cannotapply">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Sorry, You cannot apply for this Project!!</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">Your {{crew.job_type.title}} rating does not satisfy the cast SAMR. </p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="all-p">Invalid Page</div>
+                {% endif %}
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                <div class="crw-sec-bg ">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="crw-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+    $(document).ready(function() {
+        $('#location').select2();
+    });
+</script>
+<script>
+    $('body').on('click' , '.add_to_favorites', function(){
+       var project_id = $(this).attr("id");
+       var token = $("#token").val();
+       data_dict = {};
+       data_dict['project']=project_id;
+       data_dict['crew']= '{{ crew.id }}';
+
+       $.ajax
+       ({
+           type: "POST",
+           url: "/project/add-to-favorites-api/",
+           dataType: 'json',
+           async: false,
+           data: data_dict,
+           beforeSend: function (xhr) {
+               xhr.setRequestHeader ("Authorization", token);
+           },
+           success: function(response){
+               console.log(response)
+               $('#success_message').fadeIn().html(response['message']);
+               setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+           }
+       });
+
+     });
+
+</script>
+<script>
+    $("input[id='file']").change(function (e) {
+        var $this = $(this);
+        console.log($this.val().split('\\').pop())
+        $(".pdf-filename").html($this.val().split('\\').pop());
+    });
+</script>
+{% endblock %}

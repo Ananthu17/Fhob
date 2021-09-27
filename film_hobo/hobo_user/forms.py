@@ -61,7 +61,8 @@ class SignUpIndieForm(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'i_agree', 'date_of_birth', 'country')
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country')
         widgets = {
             'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
         }
@@ -69,6 +70,9 @@ class SignUpIndieForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpIndieForm, self).__init__(*args, **kwargs)
         self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+        self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['i_agree'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -91,6 +95,12 @@ class SignUpIndieForm(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
@@ -157,7 +167,8 @@ class SignUpFormCompany(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'i_agree', 'date_of_birth', 'country',
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country',
                   'title', 'company_name', 'company_address',
                   'company_phone', 'company_website', 'company_type')
 
@@ -177,6 +188,9 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
+        self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True
@@ -197,6 +211,12 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['address'].widget.attrs['class'] = 'inp-line'
         self.fields['address'].widget.attrs['placeholder'] = 'Address'
         self.fields['title'].widget.attrs['class'] = 'inp-line'
@@ -214,7 +234,6 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
-
 
 
 # class SignUpFormCompany(forms.Form):
@@ -259,7 +278,6 @@ class SignUpFormCompany(UserCreationForm):
 #         self.fields['company_address'].widget.attrs['placeholder'] = 'Address'
 #         self.fields['user_address'].widget.attrs['class'] = 'inp-line'
 #         self.fields['user_address'].widget.attrs['placeholder'] = 'Address'
-
 
 
 class ChangePasswordForm(forms.Form):
@@ -390,13 +408,13 @@ class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ('creator', 'title', 'format', 'genre', 'script', 'video_url',
-                  'video_type', 'location', 'visibility', 'script',
-                  'cast_attachment', 'cast_pay_rate', 'cast_samr',
-                  'visibility_password', 'video_status', 'video_cover_image',
-                  'script_password', 'team_select_password', 'logline',
-                  'cast_audition_password', 'project_info', 'sag_aftra',
-                  'script_visibility'
+        fields = ( 'title','creator', 'format', 'genre','cast_pay_rate', 'sag_aftra',
+                   'cast_attachment','visibility','script_visibility','visibility_password',
+                    'location','cast_samr', 'script','script_password','cast_audition_password',
+                    'team_select_password',
+                    'video_url','video_type','video_status', 'video_cover_image', 
+                    'logline','project_info', 
+                   
                   )
         widgets = {
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
@@ -413,11 +431,11 @@ class ProjectCreationForm(forms.ModelForm):
                 'visibility_password': forms.PasswordInput(attrs={
                                                            "class": "form-control\
                                                            form-control-input mem-b-placeholder",
-                                                           'placeholder': 'password'
+                                                           'placeholder': 'password' ,'data-toggle': 'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
-                'script': forms.FileInput(),
+                'script': forms.FileInput(attrs={'accept':'application/pdf'}),
                 'script_password': forms.PasswordInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
                                                             'placeholder': 'password'

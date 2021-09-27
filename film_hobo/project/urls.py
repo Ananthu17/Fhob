@@ -5,10 +5,29 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      CharacterCreateAPIView, CharacterUpdateAPIView, AddCharactersView, \
      AddSidesAjaxView, EditCharactersView, AddProjectSidesLastDateAPIView, \
      AddSidesView, SidesCreateAPIView, CastApplyAuditionView, getpdf, \
-     SubmitAuditionAPI, AuditionListView, EditSidesView, AddProjectVideoView, \
+     SubmitAuditionAPI, AuditionListView, AddProjectVideoView, \
      PostProjectVideoAPI, ScriptPasswordCheckAPI, CastAuditionPasswordCheckAPI, \
      TeamSelectPasswordCheckAPI, SaveProjectLoglineAPI, ListProjectTrackersAPI, \
-     TrackProjectAPI, UnTrackProjectAPI
+     TrackProjectAPI, UnTrackProjectAPI, CastVideoAuditionView, RateAuditionAPI, \
+     UpdateAuditionStatusAPI, ChemistryRoomView, ProjectRatingAPI, \
+     GetAuditionStatusNotificationAjaxView, GetVideoRatingNotificationAjaxView, \
+     GetProjectRatingNotificationAjaxView, CastAttachRemoveView, \
+     RemoveAttachedCastAPI, ReplaceAttachedCastAPI, CommentAPI, \
+     DeleteCommentAPI, GetCommentsMentionNotificationAjaxView, \
+     GetCommentsNotificationAjaxView, GetCommentsReplyNotificationAjaxView, \
+     PdfToImageAPI, AddSceneImagesView, GenerateSceneImagePDFAPI, \
+     DeleteSceneImageAPI, TopRatedMembersAjaxView, AcceptCastAttachRequestAPI,\
+     GetCastAtachRequestNotificationAjaxView, CancelCastAttachRequestAPI, \
+     GetCastAtachResponseNotificationAjaxView, AddToFavoritesAPI, \
+     RemoveFromFavoritesAPI, RemoveCharacterScenesAPI, AllMembersView, \
+     CrewApplyAuditionView, CrewApplyAPI, CrewApplicationListingView, \
+     AttachCrewMemberAPI, RemoveCrewMemberAPI, AddJobTypeView, SaveJobTypeAPI, \
+     AddProjectCrewAPI, CastPasswordCheckView, CastApplyPasswordCheckAPI, \
+     CrewAttachReplaceView, RemoveAttachedCrewAPI, AttachCrewAPI, \
+     GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
+     AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
+     GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI
+
 
 urlpatterns = [
      path('video/<int:id>/', ProjectVideoPlayerView.as_view(), name='video'),
@@ -38,8 +57,6 @@ urlpatterns = [
           name='add-video-submit-last-date'),
      path('add-sides/<int:id>/', AddSidesView.as_view(),
           name='add-sides'),
-     path('edit-sides/<int:id>/', EditSidesView.as_view(),
-          name='edit-sides'),
      path('add-sides-api/', SidesCreateAPIView.as_view(),
           name='add-sides-api'),
      path('cast-apply-audition/<int:id>/', CastApplyAuditionView.as_view(),
@@ -55,7 +72,8 @@ urlpatterns = [
           name='post-project-video'),
      path('script-password-check/', ScriptPasswordCheckAPI.as_view(),
           name='script-password-check'),
-     path('cast-audition-password-check/', CastAuditionPasswordCheckAPI.as_view(),
+     path('cast-audition-password-check/',
+          CastAuditionPasswordCheckAPI.as_view(),
           name='cast-audition-password-check'),
      path('team-select-password-check/', TeamSelectPasswordCheckAPI.as_view(),
           name='team-select-password-check'),
@@ -67,4 +85,115 @@ urlpatterns = [
           name='track-project-api'),
      path('untrack-project-api/', UnTrackProjectAPI.as_view(),
           name='untrack-project-api'),
+     path('cast-video-audition/<int:id>/', CastVideoAuditionView.as_view(),
+          name='cast-video-audition'),
+     path('rate-audition-api/', RateAuditionAPI.as_view(),
+          name='rate-audition-api'),
+     path('update-audition-status-api/', UpdateAuditionStatusAPI.as_view(),
+          name='update-audition-status-api'),
+     path('chemistry-room/<int:id>/', ChemistryRoomView.as_view(),
+          name='chemistry-room'),
+     path('project-rating-api/', ProjectRatingAPI.as_view(),
+          name='project-rating-api'),
+     path('get-audition-status-notification/',
+          GetAuditionStatusNotificationAjaxView.as_view(),
+          name='get-audition-status-notification'),
+     path('get-video-rating-notification-html/',
+          GetVideoRatingNotificationAjaxView.as_view(),
+          name='get-video-rating-notification-html'),
+     path('get-project-rating-notification-html/',
+          GetProjectRatingNotificationAjaxView.as_view(),
+          name='get-project-rating-notification-html'),
+     path('cast-attach-remove/<int:id>/',
+          CastAttachRemoveView.as_view(),
+          name='cast-attach-remove'),
+     path('remove-attached-cast-api/',
+          RemoveAttachedCastAPI.as_view(),
+          name='remove-attached-cast-api'),
+     path('replace-attached-cast-api/',
+          ReplaceAttachedCastAPI.as_view(),
+          name='replace-attached-cast-api'),
+     path('post-comment-api/', CommentAPI.as_view(),
+          name='post-comment-api'),
+     path('delete-comment-api/', DeleteCommentAPI.as_view(),
+          name='delete-comment-api'),
+     path('get-comments-mention-notification-html/',
+          GetCommentsMentionNotificationAjaxView.as_view(),
+          name='get-comments-mention-notification-html'),
+     path('get-comments-notification-html/',
+          GetCommentsNotificationAjaxView.as_view(),
+          name='get-comments-notification-html'),
+     path('get-comments-reply-notification-html/',
+          GetCommentsReplyNotificationAjaxView.as_view(),
+          name='get-comments-reply-notification-html'),
+     path('pdf-to-image-api/', PdfToImageAPI.as_view(),
+          name='pdf-to-image-api'),
+     path('add-scene-images/<int:id>/', AddSceneImagesView.as_view(),
+          name='add-scene-images'),
+     path('generate-scene-image-pdf-api/', GenerateSceneImagePDFAPI.as_view(),
+          name='generate-scene-image-pdf-api'),
+     path('delete-scene-image-api/', DeleteSceneImageAPI.as_view(),
+          name='delete-scene-image-api'),
+     path('show-top-rated-member/', TopRatedMembersAjaxView.as_view(),
+          name='show-top-rated-member'),
+     path('get-cast-attach-request-notification-html/',
+          GetCastAtachRequestNotificationAjaxView.as_view(),
+          name='get-cast-attach-request-notification-html'),
+     path('get-crew-attach-request-notification-html/',
+          GetCrewAtachRequestNotificationAjaxView.as_view(),
+          name='get-crew-attach-request-notification-html'),
+     path('get-cast-attach-response-notification-html/',
+          GetCastAtachResponseNotificationAjaxView.as_view(),
+          name='get-cast-attach-response-notification-html'),
+     path('get-crew-attach-response-notification-html/',
+          GetCrewAtachResponseNotificationAjaxView.as_view(),
+          name='get-crew-attach-response-notification-html'),
+     path('cancel-cast-attach-request-api/',
+          CancelCastAttachRequestAPI.as_view(),
+          name='cancel-cast-attach-request-api'),
+     path('accept-cast-attach-request-api/',
+          AcceptCastAttachRequestAPI.as_view(),
+          name='accept-cast-attach-request-api'),
+     path('add-to-favorites-api/', AddToFavoritesAPI.as_view(),
+          name='add-to-favorites-api'),
+     path('remove-from-favorites-api/', RemoveFromFavoritesAPI.as_view(),
+          name='remove-from-favorites-api'),
+     path('remove-character-scenes-api/', RemoveCharacterScenesAPI.as_view(),
+          name='remove-character-scenes-api'),
+     path('all-members/<int:id>/', AllMembersView.as_view(),
+          name='all-members'),
+     path('crew-apply-audition/<int:id>/', CrewApplyAuditionView.as_view(),
+          name='crew-apply-audition'),
+     path('crew-apply-api/', CrewApplyAPI.as_view(),
+          name='crew-apply-api'),
+     path('crew-application-listing/<int:id>/', CrewApplicationListingView.as_view(),
+          name='crew-application-listing'),
+     path('attach-crew-member-api/', AttachCrewMemberAPI.as_view(),
+          name='attach-crew-member-api'),
+     path('attach-crew-api/', AttachCrewAPI.as_view(),
+          name='attach-crew-api'),
+     path('remove-crew-member-api/', RemoveCrewMemberAPI.as_view(),
+          name='remove-crew-member-api'),
+     path('add-project-crew/<int:id>/', AddJobTypeView.as_view(),
+          name='add-project-crew'),
+     path('add-project-crew-api/', AddProjectCrewAPI.as_view(),
+          name='add-project-crew-api'),
+     path('save-job-type-api/', SaveJobTypeAPI.as_view(),
+          name='save-job-type-api'),
+     path('cast-password-check/<int:id>/', CastPasswordCheckView.as_view(),
+          name='cast-password-check'),
+     path('cast-apply-password-check-api/', CastApplyPasswordCheckAPI.as_view(),
+          name='cast-apply-password-check-api'),
+     path('crew-attach-replace/<int:id>/', CrewAttachReplaceView.as_view(),
+          name='crew-attach-replace'),
+     path('remove-attached-crew-api/', RemoveAttachedCrewAPI.as_view(),
+          name='remove-attached-crew-api'),
+     path('cancel-crew-attach-request-api/', CancelCrewAttachRequestAPI.as_view(),
+          name='cancel-crew-attach-request-api'),
+     path('add-crew-qualification-api/', AddCrewQualificationAPI.as_view(),
+          name='add-crew-qualification-api'),
+     path('decline-crew-attach-request-api/', DeclineCrewAttachRequestAPI.as_view(),
+          name='decline-crew-attach-request-api'),
+     path('accept-crew-attach-request-api/', AcceptCrewAttachRequestAPI.as_view(),
+          name='accept-crew-attach-request-api'),
     ]

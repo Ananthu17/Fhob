@@ -1,42 +1,41 @@
 import ast
 import braintree
-import json
-from os import remove
-from django.contrib.auth.models import User
-import requests
 import datetime
-from braces.views import JSONResponseMixin
+import json
+import requests
 from authemail.models import SignupCode
+from braces.views import JSONResponseMixin
+from datetime import timedelta, date
 
-from django.core.files import File
-from django.db.models import Sum, Q, query
+from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-from django.http import HttpResponseRedirect, request
-from django.http.response import HttpResponse
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import messages
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework import serializers
+# from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from rest_framework import authentication
 from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework import permissions
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
-from rest_auth.registration.views import RegisterView
 from rest_framework.authtoken.models import Token
+from rest_auth.registration.views import RegisterView
 from rest_auth.views import LoginView as AuthLoginView
 from rest_auth.views import LogoutView as AuthLogoutView
 from rest_auth.views import PasswordChangeView as AuthPasswordChangeView
@@ -47,20 +46,18 @@ from rest_framework.generics import (ListAPIView,
                                      CreateAPIView, DestroyAPIView,
                                      UpdateAPIView, RetrieveAPIView)
 from django_filters.rest_framework import DjangoFilterBackend
-from datetime import date
-
 from authemail.views import SignupVerify
 
 from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     SignUpFormCompany, SignUpProForm, ChangePasswordForm, \
     ForgotPasswordEmailForm, ResetPasswordForm, PersonalDetailsForm, \
     EditProfileForm, EditProductionCompanyProfileForm, UserInterestForm, \
-    EditAgencyManagementCompanyProfileForm, CheckoutForm, ProjectCreationForm, \
-    WriterForm
+    EditAgencyManagementCompanyProfileForm, CheckoutForm, \
+    ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, \
-                    IndiePaymentDetails, Photo, ProPaymentDetails, Video, \
+                    GuildMembership, GroupUsers, Video, \
+                    IndiePaymentDetails, Photo, ProPaymentDetails, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
                     AthleticSkill, AthleticSkillInline, \
@@ -68,8 +65,11 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
                     UserRating, Location, UserRatingCombined, \
-                    UserTracking, CompanyProfile, \
-                    Feedback, CompanyRating, CompanyRatingCombined, VideoRatingCombined
+                    UserTracking, CompanyProfile, UserProject, \
+                    Feedback, CompanyRating, CompanyRatingCombined, \
+                    VideoRatingCombined, BetaTesterCodes, Writer
+
+from payment.models import Transaction
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -93,18 +93,30 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     FeedbackSerializer, RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    RemoveCoWorkerSerializer, AgentManagerSerializer, \
-    RemoveAgentManagerSerializer, TrackUserSerializer, UserSerializer, \
-    GetSettingsSerializer, PhotoSerializer, UploadPhotoSerializer, \
-    TeamSerializer, VideoRatingSerializer, VideoSerializer, \
-    EditUserInterestSerializer
+    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer, \
+    EditBetaTesterCodeSerializer
+from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
-from .utils import notify, get_notifications_time
+from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
+
+
+class AdminAuthenticationPermission(permissions.BasePermission):
+    ADMIN_ONLY_AUTH_CLASSES = [authentication.BasicAuthentication,
+                               authentication.SessionAuthentication]
+
+    def has_permission(self, request, view):
+        user = request.user
+        if user and user.is_authenticated():
+            return user.is_superuser or \
+                not any(isinstance(
+                    request._authenticator, x)
+                    for x in self.ADMIN_ONLY_AUTH_CLASSES)
+        return False
 
 
 class ExtendedLoginView(AuthLoginView):
@@ -202,6 +214,12 @@ class ExtendedRegisterCompanyView(RegisterView):
     def create(self, request, *args, **kwargs):
         user_input_data = request.data
         user_input_data['membership'] = CustomUser.PRODUCTION_COMPANY
+        if user_input_data['beta_user'] == '':
+            user_input_data['beta_user'] = False
+        if user_input_data['beta_user_code'] == '':
+            user_input_data['beta_user_code'] = None
+        if user_input_data['beta_user_end'] == '':
+            user_input_data['beta_user_end'] = None
         serializer = RegisterCompanySerializer(data=user_input_data)
         serializer.is_valid()
         serializer.is_valid(raise_exception=True)
@@ -277,14 +295,17 @@ class CustomUserSignupHobo(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration/'
             user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/registration/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-
+                new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -358,7 +379,7 @@ class ChooseMembershipPage(APIView):
     template_name = 'user_pages/choose_your_membership.html'
 
     def get(self, request):
-        return Response({})
+        return Response()
 
 
 class CustomUserSignupIndieView(APIView):
@@ -379,13 +400,17 @@ class CustomUserSignupIndieView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_indie/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_indie/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                # new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -396,7 +421,8 @@ class CustomUserSignupIndieView(APIView):
                               'user_pages/user_email_verification.html',
                               {'user': new_user})
             else:
-                return HttpResponse('Could not save data')
+                return render(request, 'user_pages/signup_indie.html',
+                              {'form': form})
         return render(request, 'user_pages/signup_indie.html',
                       {'form': form})
 
@@ -432,13 +458,17 @@ class CustomUserSignupProView(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_pro/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_pro/',
+                complete_url,
                 data=json.dumps(json_dict),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                # new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -477,13 +507,17 @@ class CustomUserSignupCompany(APIView):
             if not request.POST._mutable:
                 request.POST._mutable = True
             request.POST['username'] = customuser_username
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/registration_company/'
             user_response = requests.post(
-                'http://127.0.0.1:8000/hobo_user/registration_company/',
+                complete_url,
                 data=json.dumps(request.POST),
                 headers={'Content-type': 'application/json'})
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
+                # new_user.registration_complete = True
+                new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
                     signup_code = SignupCode.objects.create_signup_code(
@@ -648,8 +682,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -664,8 +700,10 @@ class SelectPaymentPlanIndieView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                    complete_url,
                     data=json.dumps(request.POST),
                     headers={'Content-type': 'application/json',
                              'Authorization': token})
@@ -673,7 +711,14 @@ class SelectPaymentPlanIndieView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_indie?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_indie?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_indie?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanProView(TemplateView):
@@ -685,8 +730,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -701,8 +748,10 @@ class SelectPaymentPlanProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -710,7 +759,14 @@ class SelectPaymentPlanProView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_pro?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_pro?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class SelectPaymentPlanCompanyView(TemplateView):
@@ -722,8 +778,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         print(user_response)
@@ -739,8 +797,10 @@ class SelectPaymentPlanCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/select-payment-plan-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/select-payment-plan-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -748,7 +808,14 @@ class SelectPaymentPlanCompanyView(TemplateView):
         dict_str = byte_str.decode("UTF-8")
         response = ast.literal_eval(dict_str)
         email = response['email']
-        return HttpResponseRedirect("/hobo_user/payment_company?email="+email)
+        if user.beta_user_code is not None:
+            return_url = "/hobo_user/payment_company?email=" + email + \
+                        "&user_token=" + key + \
+                        "&beta_code=" + user.beta_user_code.code
+        else:
+            return_url = "/hobo_user/payment_company?email=" + email + \
+                        "&user_token=" + key
+        return HttpResponseRedirect(return_url)
 
 
 class PaymentIndieView(FormView):
@@ -772,16 +839,16 @@ class PaymentIndieView(FormView):
         # )
         # self.braintree_client_token = braintree.ClientToken.generate({})
 
-        gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                braintree.Environment.Sandbox,
-                merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                public_key=settings.BRAINTREE_PUBLIC_KEY,
-                private_key=settings.BRAINTREE_PRIVATE_KEY
-            )
-        )
-        self.braintree_client_token = \
-            gateway.client_token.generate()
+        # gateway = braintree.BraintreeGateway(
+        #     braintree.Configuration(
+        #         braintree.Environment.Sandbox,
+        #         merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        #         public_key=settings.BRAINTREE_PUBLIC_KEY,
+        #         private_key=settings.BRAINTREE_PRIVATE_KEY
+        #     )
+        # )
+        # self.braintree_client_token = \
+        #     gateway.client_token.generate()
 
         return super(PaymentIndieView, self).dispatch(request, *args, **kwargs)
 
@@ -791,8 +858,10 @@ class PaymentIndieView(FormView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/indie_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/indie_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -807,10 +876,10 @@ class PaymentIndieView(FormView):
         date_interval = datetime.timedelta(days=int(free_evaluation_time))
         bill_date = date_today + date_interval
         context['bill_date'] = bill_date
-        context['braintree_client_token'] = ''
-        context.update({
-            'braintree_client_token': self.braintree_client_token,
-        })
+        # context['braintree_client_token'] = ''
+        # context.update({
+        #     'braintree_client_token': self.braintree_client_token,
+        # })
         return context
 
     # def form_valid(self, form):
@@ -931,8 +1000,10 @@ class PaymentProView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/pro_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/pro_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -993,8 +1064,10 @@ class PaymentCompanyView(TemplateView):
         user = CustomUser.objects.get(email=email)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/company_payment_details_api/'
         user_response = requests.get(
-                'http://127.0.0.1:8000/hobo_user/company_payment_details_api/',
+                complete_url,
                 headers={'Content-type': 'application/json',
                          'Authorization': token})
         byte_str = user_response.content
@@ -1170,11 +1243,13 @@ class EnableAccountView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
-        message =""
+        message = ""
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/enable-account-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/enable-account-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1203,7 +1278,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id]= obj.first_name + " "+ obj.last_name
+                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1318,8 +1393,10 @@ class ForgotPasswordView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/forgot-password-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/forgot-password-api/',
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         # print(user_response)
@@ -1353,9 +1430,10 @@ class PasswordResetTemplateView(TemplateView):
         uid = request.POST.get('uid')
         token = request.POST.get('token')
         email = request.POST.get('email')
-        url = 'http://127.0.0.1:8000/password-reset-confirm/'+uid+"/"+token
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/password-reset-confirm/'+uid+"/"+token
         user_response = requests.post(
-                            url,
+                            complete_url,
                             data=json.dumps(request.POST),
                             headers={'Content-type': 'application/json'})
         byte_str = user_response.content
@@ -1387,8 +1465,7 @@ class PasswordResetTemplateView(TemplateView):
         return render(request, 'registration/password_reset_from_key.html',
                       {'response': response,
                        'form': form,
-                      }
-                     )
+                      })
 
 
 class SettingsAPI(APIView):
@@ -1493,6 +1570,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
+        context['transaction'] = \
+            Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1613,8 +1692,10 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         json_dict['hide_ratings'] = hide_ratings
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/update-settings-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/update-settings-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -1718,7 +1799,7 @@ class PersonalDetailsAPI(APIView):
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
         personal_settings['athletic_skills'] = athletic_skill_list
-        response = {"personal_settings" : personal_settings}
+        response = {"personal_settings": personal_settings}
         return Response(response)
 
     def post(self, request):
@@ -1812,8 +1893,10 @@ class PersonalDetailsView(LoginRequiredMixin, TemplateView):
             json_dict['stop_age'] = None
         key = Token.objects.get(user=user).key
         token = 'Token '+key
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/personal-details-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/personal-details-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2081,7 +2164,7 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
         return context
 
@@ -2128,8 +2211,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             else:
                 edit_agent_dict['agent_email'] = ""
             # call edit-agent api
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/edit-agent-manager-api/'
             user_response = requests.post(
-                    'http://127.0.0.1:8000/hobo_user/edit-agent-manager-api/',
+                    complete_url,
                     data=json.dumps(edit_agent_dict),
                     headers={'Content-type': 'application/json',
                             'Authorization': token})
@@ -2204,8 +2289,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                         agent_dict['agent_email'] = ""
 
                 # save agents/manager
+                origin_url = settings.ORIGIN_URL
+                complete_url = origin_url + '/hobo_user/add-agent-manager-api/'
                 user_response = requests.post(
-                                    'http://127.0.0.1:8000/hobo_user/add-agent-manager-api/',
+                                    complete_url,
                                     data=json.dumps(agent_dict),
                                     headers={'Content-type': 'application/json',
                                             'Authorization': token})
@@ -2230,8 +2317,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                                     reverse('hobo_user:edit-profile'))
         if remove_agents:
             remove_dict['id'] = remove_agents
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/remove-agent-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/remove-agent-api/',
+                                complete_url,
                                 data=json.dumps(remove_dict),
                                 headers={
                                     'Content-type': 'application/json',
@@ -2250,8 +2339,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
                             reverse('hobo_user:edit-profile'))
 
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2288,6 +2379,8 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         profile = get_object_or_404(CompanyProfile, user=user)
+        print(profile)
+        print(user)
         context['user'] = user
         context['profile'] = profile
         pos_list = [2, 3, 4]
@@ -2313,11 +2406,14 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['tracking_list'] = tracking_list[:6]
 
         try:
-            friend_obj = Friend.objects.get(user=user)
-            friends = friend_obj.friends.all()
-            context['friends'] = friends[:8]
+            friend=Friend.objects.all()
+            if(friend):
+                friend_obj = Friend.objects.get(user=user)
+                friends = friend_obj.friends.all()
+                context['friends'] = friends[:8]
+                context['friends_list_count']=friends.count()
         except FriendRequest.DoesNotExist:
-            pass
+            context['friends'] = 0
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2354,8 +2450,10 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/production-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/production-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2472,8 +2570,10 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             submission_policy = ""
         json_dict['submission_policy_SAMR'] = submission_policy
         # Update Profile
+        origin_url = settings.ORIGIN_URL
+        complete_url = origin_url + '/hobo_user/agency-management-company-profile-api/'
         user_response = requests.post(
-                            'http://127.0.0.1:8000/hobo_user/agency-management-company-profile-api/',
+                            complete_url,
                             data=json.dumps(json_dict),
                             headers={'Content-type': 'application/json',
                                      'Authorization': token})
@@ -2551,7 +2651,7 @@ class EditCoworkerAPI(APIView):
                     if 'position' in data_dict:
                         position = JobType.objects.get(id=data_dict['position'])
                         coworker.position = position
-                    if 'user' in data_dict and data_dict['user']!="":
+                    if 'user' in data_dict and data_dict['user'] != "":
                         user_id = data_dict['user']
                         user = CustomUser.objects.get(id=user_id)
                         coworker.user = user
@@ -2654,7 +2754,7 @@ class GetAgentManagerAPI(APIView):
         agent_dict = {}
         agents = UserAgentManager.objects.filter(user=self.request.user)
         for agent in agents:
-            agent_dict[agent.id ]= self.serializer_class(agent).data
+            agent_dict[agent.id] = self.serializer_class(agent).data
         response = {'Agents and managers': agent_dict}
         return Response(response)
 
@@ -2723,7 +2823,7 @@ class RemoveClientAPI(APIView):
                     obj.delete()
                 except CompanyClient.DoesNotExist:
                     response = {'message': "Invalid Id",
-                            'status': status.HTTP_400_BAD_REQUEST}
+                                'status': status.HTTP_400_BAD_REQUEST}
                     return Response(response)
                 response = {'message': "Client Removed",
                             'id': id,
@@ -2843,11 +2943,11 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
                                 Q(user=user) &
                                 Q(job_type=job))
                     rating = rating_obj.rating * 20
-                    job_dict[job.id]=job.title
-                    rating_dict[job.id]=rating
+                    job_dict[job.id] = job.title
+                    rating_dict[job.id] = rating
                 except UserRatingCombined.DoesNotExist:
-                    rating_dict[job.id]=0
-                    job_dict[job.id]=job.title
+                    rating_dict[job.id] = 0
+                    job_dict[job.id] = job.title
             context['job_dict'] = job_dict
             context['rating_dict'] = rating_dict
         except UserProfile.DoesNotExist:
@@ -2859,6 +2959,14 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        user_projects = UserProject.objects.filter(user=user)
+        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
+        favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
+        applied = user_projects.filter(relation_type = UserProject.APPLIED).order_by('-created_time')
+        context['my_projects'] = my_projects
+        context['favorites'] = favorites
+        context['applied'] = applied
         return context
 
 
@@ -3524,8 +3632,10 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
             json_dict['budget'] = budget[i]
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + '/hobo_user/add-user-interest-api/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/hobo_user/add-user-interest-api/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                         'Authorization': token})
@@ -3669,6 +3779,29 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
                             Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
         notification_html = render_to_string(
                                 'user_pages/get-profile-rating-notification.html',
+                                {'from_user': from_user,
+                                'message':message,
+                                'notification_id':notification_id,
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
+class GetScreeningProjectInviteNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'user_pages/get-screening-project-invite.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        user = self.request.user
+        id = self.request.GET.get('from_user')
+        message = self.request.GET.get('message')
+        from_user = CustomUser.objects.get(id=id)
+        notification_id = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(from_user=from_user) &
+                            Q(notification_type=UserNotification.INVITE)).order_by('-created_time').first().id
+        notification_html = render_to_string(
+                                'user_pages/get-screening-project-invite.html',
                                 {'from_user': from_user,
                                 'message':message,
                                 'notification_id':notification_id,
@@ -4043,10 +4176,12 @@ class ListAllFriendsAPI(APIView):
         user = request.user
         try:
             friend_obj = Friend.objects.get(user=user)
+            for ind, obj in enumerate(friend_obj.friends.all()):
+                        individual_friend_data = {'email': obj.email, 'user': obj.first_name +' '+ obj.last_name}
+                        # individual_friend_data = {obj.email, obj.first_name +' '+ obj.last_name}
+                        friends_dict[ind] = individual_friend_data
         except Friend.DoesNotExist:
-            pass
-        for obj in friend_obj.friends.all():
-            friends_dict[obj.id] = obj.email
+            response['friends'] = {}
         response['friends'] = friends_dict
         return Response(response)
 
@@ -4257,6 +4392,669 @@ class FeedbackAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AddBetaTesterCode(APIView):
+    """
+    API endpoint to add a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def post(self, request, *args, **kwargs):
+        initial_data = request.data
+        # function to get value of a key in json
+        def find_values(id, json_repr):
+            results = []
+
+            def _decode_dict(a_dict):
+                try:
+                    results.append(a_dict[id])
+                except KeyError:
+                    pass
+                return a_dict
+
+            json.loads(json_repr, object_hook=_decode_dict)
+            return results
+
+        # get paypal access_token
+        paypal_client_id = settings.PAYPAL_CLIENT_ID
+        paypal_secret = settings.PAYPAL_SECRET_ID
+        data = {'grant_type': 'client_credentials'}
+        token_user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                            data=data,
+                            auth=(paypal_client_id, paypal_secret),
+                            headers={'Accept': 'application/json',
+                                        'Accept-Language': 'en_US'})
+        if token_user_response.status_code == 200:
+            access_token = json.loads(token_user_response.content)['access_token']
+        else:
+            return Response(
+                {"status": "error in fetching paypal access token"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        access_token_strting = 'Bearer ' + access_token
+
+        #get the current plan details
+        paypal_get_plan_details_api = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
+
+        #1
+        indie_monthly_plan_details_api = paypal_get_plan_details_api + settings.INDIE_PAYMENT_MONTHLY
+        indie_monthly_plan_details_api_response = requests.get(
+                            indie_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_monthly_plan_details_api_response.status_code == 200:
+            indie_monthly_plan_value = find_values('value', indie_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #2
+        indie_yearly_plan_details_api = paypal_get_plan_details_api + settings.INDIE_PAYMENT_YEARLY
+        indie_yearly_plan_details_api_response = requests.get(
+                            indie_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_yearly_plan_details_api_response.status_code == 200:
+            indie_yearly_plan_value = find_values('value', indie_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #3
+        pro_monthly_plan_details_api = paypal_get_plan_details_api + settings.PRO_PAYMENT_MONTHLY
+        pro_monthly_plan_details_api_response = requests.get(
+                            pro_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_monthly_plan_details_api_response.status_code == 200:
+            pro_monthly_plan_value = find_values('value', pro_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #4
+        pro_yearly_plan_details_api = paypal_get_plan_details_api + settings.PRO_PAYMENT_YEARLY
+        pro_yearly_plan_details_api_response = requests.get(
+                            pro_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_yearly_plan_details_api_response.status_code == 200:
+            pro_yearly_plan_value = find_values('value', pro_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #5
+        company_monthly_plan_details_api = paypal_get_plan_details_api + settings.COMPANY_PAYMENT_MONTHLY
+        company_monthly_plan_details_api_response = requests.get(
+                            company_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_monthly_plan_details_api_response.status_code == 200:
+            company_monthly_plan_value = find_values('value', company_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        #6
+        company_yearly_plan_details_api = paypal_get_plan_details_api + settings.COMPANY_PAYMENT_YEARLY
+        company_yearly_plan_details_api_response = requests.get(
+                            company_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_yearly_plan_details_api_response.status_code == 200:
+            company_yearly_plan_value = find_values('value', company_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        # create plans based on the input
+        paypal_create_plan_api = "https://api-m.sandbox.paypal.com/v1/billing/plans"
+
+        plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+        plan_ids = {'indie_monthly_plan_id': '',
+                    'indie_yearly_plan_id': '',
+                    'pro_monthly_plan_id': '',
+                    'pro_yearly_plan_id': '',
+                    'company_monthly_plan_id': '',
+                    'company_yearly_plan_id': ''}
+        for plan_type in plan_types:
+            plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + request.data['code']
+            if plan_type.find('Monthly'):
+                plan_interval_unit = 'MONTH'
+            else:
+                plan_interval_unit = 'YEAR'
+
+            if plan_type == 'Indie Payment Monthly':
+                plan_interval_count = indie_monthly_plan_value
+            elif plan_type == 'Indie Payment Yearly':
+                plan_interval_count = indie_yearly_plan_value
+            elif plan_type == 'Pro Payment Monthly':
+                plan_interval_count = pro_monthly_plan_value
+            elif plan_type == 'Pro Payment Yearly':
+                plan_interval_count = pro_yearly_plan_value
+            elif plan_type == 'Company Payment Monthly':
+                plan_interval_count = company_monthly_plan_value
+            elif plan_type == 'Company Payment Yearly':
+                plan_interval_count = company_yearly_plan_value
+            else:
+                pass
+
+            create_plan_json ={
+                "name": plan_name,
+                "description": plan_name,
+                "product_id": settings.PRODUCT_ID,
+                "billing_cycles": [
+                    {
+                        "frequency": {
+                            "interval_unit": "DAY",
+                            "interval_count": request.data['days']
+                        },
+                        "tenure_type": "TRIAL",
+                        "sequence": 1,
+                        "total_cycles": 1,
+                        "pricing_scheme": {
+                            "fixed_price": {
+                                "value": "0",
+                                "currency_code": "USD"
+                            }
+                        }
+                    },
+                    {
+                        "frequency": {
+                            "interval_unit": plan_interval_unit,
+                            "interval_count": 1
+                        },
+                        "tenure_type": "REGULAR",
+                        "sequence": 2,
+                        "total_cycles": 0,
+                        "pricing_scheme": {
+                            "fixed_price": {
+                                "value": plan_interval_count,
+                                "currency_code": "USD"
+                            }
+                        }
+                    }
+                ],
+                "payment_preferences": {
+                    "auto_bill_outstanding": True,
+                    "payment_failure_threshold": 1
+                }
+            }
+            create_plan_user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                            data=json.dumps(create_plan_json),
+                            headers={'Accept': 'application/json',
+                                        'Authorization': access_token_strting,
+                                        'Content-type': 'application/json'
+                                        })
+            if create_plan_user_response.status_code == 201:
+                plan_id = json.loads(create_plan_user_response.content)['id']
+                if plan_type == 'Indie Payment Monthly':
+                    plan_ids['indie_monthly_plan_id'] = plan_id
+                elif plan_type == 'Indie Payment Yearly':
+                    plan_ids['indie_yearly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Monthly':
+                    plan_ids['pro_monthly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Yearly':
+                    plan_ids['pro_yearly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Monthly':
+                    plan_ids['company_monthly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Yearly':
+                    plan_ids['company_yearly_plan_id'] = plan_id
+                else:
+                    pass
+            else:
+                return HttpResponse('Could not save data')
+        initial_data.update(plan_ids)
+        serializer = AddBetaTesterCodeSerializer(data=initial_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListBetaTesterCode(APIView):
+    """
+    API endpoint to list beta tester codes
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        filter_objs = BetaTesterCodes.objects.all()
+        serialized_results = AddBetaTesterCodeSerializer(filter_objs, many=True)
+        if serialized_results.is_valid:
+            return Response(serialized_results.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serialized_results.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteBetaTesterCode(APIView):
+    """
+    API endpoint to delete a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            delete_obj_id = kwargs['id']
+            delete_obj = BetaTesterCodes.objects.get(id=delete_obj_id)
+
+            # get paypal access_token
+            paypal_client_id = settings.PAYPAL_CLIENT_ID
+            paypal_secret = settings.PAYPAL_SECRET_ID
+            data = {'grant_type': 'client_credentials'}
+            token_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                data=data,
+                                auth=(paypal_client_id, paypal_secret),
+                                headers={'Accept': 'application/json',
+                                            'Accept-Language': 'en_US'})
+            if token_user_response.status_code == 200:
+                access_token = json.loads(token_user_response.content)['access_token']
+            else:
+                return Response(
+                    {"status": "error in fetching paypal access token"},
+                    status=status.HTTP_404_NOT_FOUND)
+
+            access_token_strting = 'Bearer ' + access_token
+
+            plan_ids = []
+            deactivate_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+            deactivate_indie_monthly_plan_url = deactivate_plan_base_url + delete_obj.indie_monthly_plan_id + '/deactivate'
+            deactivate_indie_monthly_plan_url_response = requests.post(
+                    deactivate_indie_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_indie_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.indie_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_indie_yearly_plan_url = deactivate_plan_base_url + delete_obj.indie_yearly_plan_id + '/deactivate'
+            deactivate_indie_yearly_plan_url_response = requests.post(
+                    deactivate_indie_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_indie_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.indie_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_pro_monthly_plan_url = deactivate_plan_base_url + delete_obj.pro_monthly_plan_id + '/deactivate'
+            deactivate_pro_monthly_plan_url_response = requests.post(
+                    deactivate_pro_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_pro_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.pro_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_pro_yearly_plan_url = deactivate_plan_base_url + delete_obj.pro_yearly_plan_id + '/deactivate'
+            deactivate_pro_yearly_plan_url_response = requests.post(
+                    deactivate_pro_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_pro_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.pro_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_company_monthly_plan_url = deactivate_plan_base_url + delete_obj.company_monthly_plan_id + '/deactivate'
+            deactivate_company_monthly_plan_url_response = requests.post(
+                    deactivate_company_monthly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_company_monthly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.company_monthly_plan_id
+                plan_ids.append(plan_id)
+
+            deactivate_company_yearly_plan_url = deactivate_plan_base_url + delete_obj.company_yearly_plan_id + '/deactivate'
+            deactivate_company_yearly_plan_url_response = requests.post(
+                    deactivate_company_yearly_plan_url,
+                    headers={'Content-Type': 'application/json',
+                             'Authorization': access_token_strting})
+            if deactivate_company_yearly_plan_url_response.status_code == 204:
+                plan_id = delete_obj.company_yearly_plan_id
+                plan_ids.append(plan_id)
+
+            if len(plan_ids) >= 1:
+                delete_obj.delete()
+                final_response = 'successfully deleted the plans associated with the beta_user_code' + delete_obj.code
+                return Response(
+                    {'status': final_response}, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {'status': 'error in deleteing the beta-user-plan'}, status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            return Response(
+                {'status': 'code with this id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditBetaTesterCode(APIView):
+    """
+    API endpoint to edit a beta tester code
+    """
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+
+        def get_paypal_access_token():
+            # get paypal access_token
+            paypal_client_id = settings.PAYPAL_CLIENT_ID
+            paypal_secret = settings.PAYPAL_SECRET_ID
+            data = {'grant_type': 'client_credentials'}
+            token_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                data=data,
+                                auth=(paypal_client_id, paypal_secret),
+                                headers={'Accept': 'application/json',
+                                         'Accept-Language': 'en_US'})
+            if token_user_response.status_code == 200:
+                access_token = json.loads(token_user_response.content)['access_token']
+            else:
+                return Response(
+                    {"status": "error in fetching paypal access token"},
+                    status=status.HTTP_404_NOT_FOUND)
+
+            access_token_string = 'Bearer ' + access_token
+            return access_token_string
+
+        try:
+            data = request.data
+            beta_tester_code_id = request.data['id']
+            beta_tester_code = request.data['code']
+            beta_tester_code_days = request.data['days']
+            testercode_instance = BetaTesterCodes.objects.get(id=beta_tester_code_id)
+            serializer = EditBetaTesterCodeSerializer(testercode_instance,
+                                             data=request.data, partial=True)
+            if serializer.is_valid():
+                plans_updated = ""
+                plans_failed = ""
+                plans_updated_list = ""
+                if ((testercode_instance.code == beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
+                    serializer.update(BetaTesterCodes.objects.get(code=beta_tester_code),
+                                    request.data)
+                    return Response(serializer.data)
+                elif ((testercode_instance.code != beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
+                    access_token_string = get_paypal_access_token()
+                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+
+                    for plan_type in plan_types:
+                        plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + beta_tester_code
+                        edit_json_1 = [
+                            {
+                                "op": "replace",
+                                "path": "/name",
+                                "value": plan_name
+                            }
+                        ]
+                        edit_json_2 = [
+                            {
+                                "op": "replace",
+                                "path": "/description",
+                                "value": plan_name
+                            }
+                        ]
+                        if plan_type == 'Indie Payment Monthly':
+                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
+                            indie_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+
+                            if indie_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += testercode_instance.indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' name,'
+                            indie_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if indie_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' description,'
+
+                        elif plan_type == 'Indie Payment Yearly':
+                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
+                            indie_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += indie_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_yearly_plan_id + ' name,'
+                            indie_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if indie_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += indie_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_yearly_plan_id + ' description,'
+
+                        elif plan_type == 'Pro Payment Monthly':
+                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
+                            pro_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += pro_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_monthly_plan_id + ' name,'
+                            pro_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if pro_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += pro_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_monthly_plan_id + ' description,'
+
+                        elif plan_type == 'Pro Payment Yearly':
+                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
+                            pro_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += pro_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_yearly_plan_id + ' name,'
+
+                            pro_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if pro_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += pro_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_yearly_plan_id + ' description,'
+                        elif plan_type == 'Company Payment Monthly':
+                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
+                            company_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += company_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_monthly_plan_id + ' name,'
+                            company_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if company_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += company_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_monthly_plan_id + ' description,'
+                        elif plan_type == 'Company Payment Yearly':
+                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
+                            company_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += company_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_yearly_plan_id + ' name,'
+                            company_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if company_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += company_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_yearly_plan_id + ' description,'
+                        else:
+                            pass
+                        if len(plans_updated_list) == 12:
+                            serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
+                                    request.data)
+                            return Response(serializer.data)
+                        else:
+                            return Response({"status": plans_failed},
+                                            status=status.HTTP_404_NOT_FOUND)
+                elif ((testercode_instance.code == beta_tester_code) and (testercode_instance.days != beta_tester_code_days)):
+                    access_token_string = get_paypal_access_token()
+                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+                    for plan_type in plan_types:
+                        edit_json = [
+                            {
+                                "op": "replace",
+                                "path": "/billing_cycles/frequency/interval_count",
+                                "value": int(beta_tester_code_days)
+                            }
+                        ]
+                        if plan_type == 'Indie Payment Monthly':
+                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
+                            indie_monthly_update_plan_full_url_response = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_monthly_update_plan_full_url_response.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
+                        elif plan_type == 'Indie Payment Yearly':
+                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
+                            indie_yearly_update_plan_full_url_response = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_yearly_update_plan_full_url_response.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
+                        elif plan_type == 'Pro Payment Monthly':
+                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
+                            pro_monthly_update_plan_full_url_response = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_monthly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_3")
+                        elif plan_type == 'Pro Payment Yearly':
+                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
+                            pro_yearly_update_plan_full_url_response = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_yearly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_4")
+                        elif plan_type == 'Company Payment Monthly':
+                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
+                            company_monthly_update_plan_full_url_response = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_monthly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_5")
+                        elif plan_type == 'Company Payment Yearly':
+                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
+                            company_yearly_update_plan_full_url_response = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_yearly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_6")
+                else:
+                    # update the local db
+                    serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
+                                    request.data)
+                    return Response(serializer.data)
+            else:
+                return Response(serializer.errors)
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code record not found"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class CheckBetaTesterCode(APIView):
+    """
+    API endpoint to check a beta tester code
+    """
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            unique_id = request.data['code']
+            testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
+            if testercode_instance:
+                return Response(
+                    {"status": "success",
+                     "message": "beta tester code exists",
+                     "code": unique_id})
+        except ObjectDoesNotExist:
+            return Response(
+                {"status": "beta tester code does not exist"},
+                status=status.HTTP_404_NOT_FOUND)
+
+
 class FeedbackWebView(View):
     # renderer_classes = [TemplateHTMLRenderer]
     # template_name = 'user_pages/feedback.html'
@@ -4276,12 +5074,10 @@ class FeedbackWebView(View):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 3
     page_size_query_param = 'page_size'
     max_page_size = 3
-
 
 # Project CRUD
 class ProjectAPIView(ListAPIView, SegregatorMixin):
@@ -4343,9 +5139,9 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 
 
 class ProjectCreateAPIView(CreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+  permission_classes = (IsAuthenticated,)
+  queryset = Project.objects.all()
+  serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -4354,13 +5150,11 @@ class ProjectUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = ProjectSerializer
 
-
 class ProjectDeleteAPIView(DestroyAPIView):
     queryset = Project.objects.all()
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = ProjectSerializer
-
 
 # Team CRUD
 class TeamAPIView(ListAPIView):
@@ -4371,10 +5165,9 @@ class TeamAPIView(ListAPIView):
     filterset_fields = ["title", "format", "genre",
                         "rating", "timestamp"]
 
-
 class TeamCreateAPIView(CreateAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+  queryset = Team.objects.all()
+  serializer_class = TeamSerializer
 
 
 class TeamUpdateAPIView(UpdateAPIView):
@@ -4383,7 +5176,6 @@ class TeamUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = TeamSerializer
 
-
 class TeamDeleteAPIView(DestroyAPIView):
     queryset = Team.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -4391,14 +5183,55 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
+class ProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.filter_queryset(self.get_queryset())
+#         context = self.project_segregator(queryset)
+#         return Response(context)
+
+
+#Search API for Pages
+
+#API for Searching things in a page
+
+class PageSearchView(ListAPIView):
+    template_name = 'search_results.html'
+    serializer_class = ProjectSerializer
+    def get_queryset(self):
+
+        query = self.request.GET.get('q')
+        format_map = {v: k for k, v  in enumerate(Project.FORMAT_CHOICES)}
+        genre_map = {i: j for j, i  in enumerate(Project.GENRE_CHOICES)}
+        # get the corresponding key,value  from choice filed of model
+
+        for val in format_map.keys():
+            if(query==val[1]):
+                query=val[0]
+
+        for val in genre_map.keys():
+            if(query==val[1]):
+                query=val[0]
+        object_list = Project.objects.filter(
+            Q(title__icontains=query) | Q(format__icontains=query) | Q(genre__icontains=query) 
+            | Q(rating__icontains=query) | Q(location__country__icontains=query)
+        )
+        return object_list
+
+
 # Api to add rating to project video
 class VideoRatingView(APIView):
     serializer_class = VideoRatingSerializer
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def post(self,request):
         serializer = self.serializer_class(data=request.data)
-        allowed_members = ['IND', 'PRO', 'COM']
+        allowed_members = ['IND','PRO','COM']
         if serializer.is_valid():
             user = self.request.user
             project = serializer.validated_data.get('project')
@@ -4448,7 +5281,6 @@ class VideoRatingView(APIView):
             video_rating_combined.rating = combined_rating
             video_rating_combined.save()
 
-
 # API to find rating of a video
 class FindVideoRatingAPI(RetrieveAPIView):
     serializer_class = VideoSerializer
@@ -4456,12 +5288,11 @@ class FindVideoRatingAPI(RetrieveAPIView):
     queryset = Video.objects.all()
     lookup_field = 'id'
 
-
 # Api to list Video based on rating
 class VideoListAPI(ListAPIView):
     serializer_class = VideoSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = Video.objects.all().order_by('-rating', '-created')
+    queryset = Video.objects.all().order_by('-rating','-created')
 
 
 class ProjectView(LoginRequiredMixin, TemplateView):
@@ -4481,6 +5312,53 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(request.user, **kwargs)
         return self.render_to_response(context)
 
+
+class GetAllUsersAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        super_users = CustomUser.objects.filter(is_superuser=True).values_list('id')
+        all_users = CustomUser.objects.exclude(id__in=super_users)
+        all_users = all_users.exclude(id=self.request.user.id)
+        serializer_list = []
+        name_list = []
+        name_dict = {}
+        for user in all_users:
+            serializer_list.append(user.get_full_name())
+            name_list.append(user.get_full_name())
+            name_dict[user.get_full_name()]="<a href='"+user.get_profile_url()+"' id='"+str(user.id)+"' class='mention_user'>"+user.get_full_name()+"</a> "
+        return Response({"serializer_list": serializer_list, "name_dict": name_dict, "name_list": name_list})
+
+
+class ScreeningProjectDeatilView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/screening_video_page.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project_obj = Project.objects.get(id=project_id)
+        context["project"] = project_obj
+        return context
+
+
+class UserHomeProjectInvite(APIView):
+
+    def post(self, request, *args, **kwargs):
+        emails = request.data['emails']
+        content = request.data['project_url']
+
+        subject, from_email, to = 'Subject', 'from@xxx.com', 'to@xxx.com'
+
+        html_content = render_to_string('mail_template.html', {'varname':'value'})
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+
 class CreateProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'user_pages/new-project.html'
     login_url = '/hobo_user/user_login/'
@@ -4488,13 +5366,15 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        mode_operation="create"
+        context['mode_operation']=mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
         return context
 
     def post(self, request):
         try:
-            projectform = ProjectCreationForm(request.POST or None)
+            projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
@@ -4515,3 +5395,130 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             messages.error(request, "Can't read data")
             return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))
+
+class EditProjectView(LoginRequiredMixin, TemplateView):
+    template_name = 'user_pages/edit-project.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project=get_object_or_404(Project, id=self.kwargs.get('id'))
+        mode_operation="update"
+        writer=Writer.objects.get(project=project.id)
+        context['mode_operation']=mode_operation
+        context['project_obj']=project
+        context['form'] = ProjectCreationForm(instance=project)
+        context['writerform'] = WriterForm(instance=writer)
+        return context
+
+    def post(self, request,**kwargs):
+        try:
+            project=get_object_or_404(Project, id=self.kwargs.get('id'))
+            writer=Writer.objects.get(project=project.id)
+            projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
+            writerform = WriterForm(request.POST or None,instance=writer)
+            print("valid ahno project:", projectform.is_valid())
+            print('form error project', projectform.errors)
+            print("valid ahno writer:", writerform.is_valid())
+            print('form error writer', writerform.errors)
+            if projectform.is_valid() and writerform.is_valid():
+                writer = writerform.save()
+                project = projectform.save()
+                writer.project = project
+                writer.save()
+                messages.success(request, "Project Updated Successfully.")
+                return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+            messages.error(request, "Form not valid")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+        except:
+            messages.error(request, "Can't read data")
+            return HttpResponseRedirect(
+                                    reverse('hobo_user:projects'))
+
+class ScreeningProjectDeatilInviteView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # send notification
+            logged_in_user = request.user
+            to_user = CustomUser.objects.get(email=request.data['to_user_email'])
+            project_url = request.data['project_url']
+            project_id = project_url.rsplit('/', 2)[1]
+            project_obj = Project.objects.get(id=project_id)
+
+            #update notification table
+            notification = UserNotification()
+            notification.user = to_user
+            notification.notification_type = UserNotification.INVITE
+            notification.from_user = self.request.user
+            notification.message = self.request.user.get_full_name()+" invited you to check his project titled "+str(project_obj.title)+""
+            notification.invite_url = project_url
+            notification.save()
+            # send notification
+            room_name = "user_"+str(logged_in_user.id)
+            notification_msg = {
+                    'type': 'send_profile_rating_notification',
+                    'message': str(notification.message),
+                    'from': str(request.user.id),
+                    "event": "INVITE"
+                }
+            notify(room_name, notification_msg)
+            # end notification section
+            if notification_msg:
+                return Response({"status": "invite success"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetBetaTesterCodeId(APIView):
+    """
+    API endpoint to get a beta tester code id
+    """
+
+    def post(self, request, *args, **kwargs):
+        if request.data['code'] != None:
+            try:
+                data = request.data
+                unique_id = request.data['code']
+                testercode_instance = BetaTesterCodes.objects.get(code=unique_id)
+                final_date = date.today() + timedelta(days=testercode_instance.days)
+                if testercode_instance:
+                    return Response(
+                        {"status": "success",
+                        "code_id": testercode_instance.id,
+                        "code": testercode_instance.code,
+                        "days": testercode_instance.days,
+                        "final_day": final_date})
+            except ObjectDoesNotExist:
+                return Response(
+                    {"status": "beta tester code does not exist"},
+                    status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(
+            {"status": "no content"},
+            status=status.HTTP_204_NO_CONTENT)
+
+
+class SentPaymentMail(APIView):
+
+    def post(self, request):
+        must_validate_email = getattr(settings,
+                                        'AUTH_EMAIL_VERIFICATION', True)
+        # key = request.POST['key']
+        if must_validate_email:
+            user_token = Token.objects.get(key=key)
+            user = user_token.user
+            ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+            signup_code = SignupCode.objects.create_signup_code(
+                        user, ipaddr)
+            signup_code.send_signup_email()
+            response = {'message': 'Email send', 'signup_code':
+                        signup_code.code}
+
+        else:
+            response = {'message': 'Invalid data'}
+        return Response(response)

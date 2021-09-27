@@ -5,14 +5,20 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      EditDiscountDetailAPI, DeleteDiscountDetailAPI, CalculateDiscountAPI, \
      GetMembershipFeeDetailsPublicAPI, TransactionSave, GetToken, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, GetProductID, \
-     SubscriptionDetails, PaypalToken, PaypalPlanID, InitialRequest, \
-     BraintreeSubscriptionDetails, ManageSubscription
+     SubscriptionDetails, PaypalToken, PaypalPlanID, \
+     BraintreeSubscriptionDetails, GetNewPlanDetailsJSON, \
+     UpdateMembershipFeeDetailsAPI, BetaUserPlanDetails, PayPalSendEmail
+# from .views import InitialRequest, UpdateSubscription, \
+#      GetBraintreeDiscountDetailListAPI, BraintreeCalculateDiscountAPI
 # from .paypal import CreateOrder, CaptureOrder
 
 app_name = "payment"
 
 urlpatterns = [
     # api-view endpoints
+    path('get_membership_fee_detail_from_paypal/',
+         UpdateMembershipFeeDetailsAPI.as_view(),
+         name='get_membership_fee_detail_from_paypal'),
     path('get_membership_fee_detail/', GetMembershipFeeDetailsAPI.as_view(),
          name='get_membership_fee_detail'),
     path('get_membership_fee_detail_public/',
@@ -43,6 +49,8 @@ urlpatterns = [
          name='get_paypal_token'),
     path('get_paypal_plan_id', PaypalPlanID.as_view(),
          name='get_paypal_plan_id'),
+    path('get_beta_user_plan_details', BetaUserPlanDetails.as_view(),
+         name='get_beta_user_plan_details'),
     # web-view endpoints
     path('payment_admin', PaymentAdmin.as_view(),
          name='payment_admin'),
@@ -55,9 +63,21 @@ urlpatterns = [
          GetOrderDetails.as_view(), name="paypal-get-details"),
     path('paypal/get_product_id/',
          GetProductID.as_view(), name="paypal-get-product-id"),
+    path('paypal/get_new_plan_details/',
+         GetNewPlanDetailsJSON.as_view(),
+         name='paypal-get-new-plan-details'),
+    path('paypal/send_email_recepit/',
+         PayPalSendEmail.as_view(),
+         name='paypal_send_email_recepit'),
     # braintree endpoints
-    path('braintree/initial_request/',
-         InitialRequest.as_view(), name="braintree-initial-request"),
-    path('braintree/manage_subscription/',
-         ManageSubscription.as_view(), name="braintree-manage-subscription")
+    # path('braintree/initial_request/',
+    #      InitialRequest.as_view(), name="braintree-initial-request"),
+    # path('braintree/update_subscription/',
+    #      UpdateSubscription.as_view(), name="braintree-update-subscription"),
+    # path('braintree/get_discount_details/',
+    #      GetBraintreeDiscountDetailListAPI.as_view(),
+    #      name="braintree-discount-details"),
+    # path('braintree/calculate_discount/',
+    #      BraintreeCalculateDiscountAPI.as_view(),
+    #      name='braintree-calculate-discount'),
 ]

@@ -68,7 +68,7 @@ braintree.dropin.create({
       axios.post(post_url, JSON.stringify(result), {headers: { 'Content-Type': 'application/json' }})
       .then((response) => {
         $('#payment-success-div').show();
-        var delay = 1000;
+        var delay = 5000;
         setTimeout(function(){ window.location = success_redirect; }, delay);
       }, (error) => {
         $('#payment-success-div').replaceWith(

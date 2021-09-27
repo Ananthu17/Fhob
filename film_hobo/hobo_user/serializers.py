@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+# from urllib.parse import urlparse
 
 from rest_framework import serializers
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -22,11 +22,9 @@ from .adapters import CustomUserAccountAdapter, CustomIndieProUserAdapter, \
 from .models import CustomUser, Country, GuildMembership, \
     IndiePaymentDetails, Photo, ProPaymentDetails, PromoCode, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
-    EthnicAppearance, AthleticSkill, UserAgentManager, UserNotification, \
-    UserProfile, CoWorker, UserInterest, \
-    UserRating, Photo, CompanyProfile, \
-    CompanyClient, FriendRequest, FriendGroup, Feedback, \
-    Photo, Project, Team, Video, VideoRating
+    UserAgentManager, UserNotification, UserProfile, CoWorker, UserInterest, \
+    UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
+    Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -180,7 +178,7 @@ class RegisterIndieSerializer(serializers.Serializer):
         fields = ['email', 'username', 'first_name', 'middle_name',
                   'last_name', 'password1', 'password2', 'phone_number',
                   'address', 'date_of_birth', 'membership', 'i_agree',
-                  'country']
+                  'country', 'beta_user', 'beta_user_code', 'beta_user_end']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -198,10 +196,19 @@ class RegisterIndieSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate_i_agree(self, i_agree):
-        if i_agree != True:
+        if not i_agree:
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
+
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterIndieSerializer, self).to_internal_value(data)
 
     def validate(self, data):
         if data['password1'] != data['password2']:
@@ -226,6 +233,9 @@ class RegisterIndieSerializer(serializers.Serializer):
             'country': self.validated_data.get('country', ''),
             'membership': self.validated_data.get('membership', ''),
             'i_agree': self.validated_data.get('i_agree', ''),
+            'beta_user': self.validated_data.get('beta_user', ''),
+            'beta_user_code': self.validated_data.get('beta_user_code', ''),
+            'beta_user_end': self.validated_data.get('beta_user_end', ''),
         }
 
     def save(self, request):
@@ -293,11 +303,13 @@ class LoginSerializer(serializers.Serializer):
             from allauth.account import app_settings
 
             # Authentication through email
-            if app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.EMAIL:
+            if app_settings.AUTHENTICATION_METHOD == \
+                    app_settings.AuthenticationMethod.EMAIL:
                 user = self._validate_email(email, password)
 
             # Authentication through username
-            elif app_settings.AUTHENTICATION_METHOD == app_settings.AuthenticationMethod.USERNAME:
+            elif app_settings.AUTHENTICATION_METHOD == \
+                    app_settings.AuthenticationMethod.USERNAME:
                 user = self._validate_username(username, password)
 
             # Authentication through either username or email
@@ -316,7 +328,6 @@ class LoginSerializer(serializers.Serializer):
             if username:
                 user = self._validate_username_email(username, '', password)
 
-
         # Did we get back an active user?
         if user:
             if not user.is_active:
@@ -328,7 +339,8 @@ class LoginSerializer(serializers.Serializer):
 
         if 'rest_auth.registration' in settings.INSTALLED_APPS:
             from allauth.account import app_settings
-            if app_settings.EMAIL_VERIFICATION == app_settings.EmailVerificationMethod.MANDATORY:
+            if app_settings.EMAIL_VERIFICATION == \
+                    app_settings.EmailVerificationMethod.MANDATORY:
                 email_address = user.emailaddress_set.get(email=user.email)
                 if not email_address.verified:
                     raise serializers.ValidationError(
@@ -380,6 +392,15 @@ class RegisterProSerializer(serializers.Serializer):
                   'address', 'date_of_birth', 'membership', 'i_agree',
                   'country', 'guild_membership_id']
 
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterProSerializer, self).to_internal_value(data)
+
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
         return username
@@ -396,7 +417,7 @@ class RegisterProSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate_i_agree(self, i_agree):
-        if i_agree != True:
+        if not i_agree:
             raise serializers.ValidationError(
                 _("You must accept our terms and conditions!!"))
         return i_agree
@@ -491,14 +512,17 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     company_phone = PhoneNumberField()
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
+    beta_user_end = serializers.DateField(allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
                   'last_name', 'password1', 'password2', 'phone_number',
                   'date_of_birth', 'address', 'country',
+                  'beta_user', 'beta_user_code', 'beta_user_end',
                   'company_name', 'company_address', 'company_website',
-                  'company_phone', 'title', 'membership', 'company_type']
+                  'company_phone', 'title', 'membership', 'company_type',
+                  ]
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -830,6 +854,7 @@ class TrackUserSerializer(serializers.Serializer):
         required=True,
     )
 
+
 class RateCompanySerializer(serializers.ModelSerializer):
     company = serializers.CharField(
         max_length=150,
@@ -1064,6 +1089,8 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = ['email', 'name', 'user_rating', 'user_feedback',
                   'timestamp']
+        extra_kwargs = {"user_rating": {
+            "error_messages": {"required": "Please select the rating"}}}
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -1094,3 +1121,20 @@ class VideoRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoRating
         fields = ['project', 'rating', 'reason']
+
+
+class AddBetaTesterCodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BetaTesterCodes
+        fields = ['id', 'code', 'days',
+                  'indie_monthly_plan_id', 'indie_yearly_plan_id',
+                  'pro_monthly_plan_id', 'pro_yearly_plan_id',
+                  'company_monthly_plan_id', 'company_yearly_plan_id']
+
+
+class EditBetaTesterCodeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BetaTesterCodes
+        fields = ['code', 'days']

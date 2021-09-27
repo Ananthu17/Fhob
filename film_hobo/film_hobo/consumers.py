@@ -69,6 +69,15 @@ class NotificationConsumer(WebsocketConsumer):
                             'message': message,
                             "event": "USER_RATING"
                           })
+        if event == 'INVITE':
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                          self.room_group_name,
+                          {
+                            'type': 'send_project_invite_notification',
+                            'message': message,
+                            "event": "INVITE"
+                          })
 
     def receive_json(self, content, **kwargs):
         print("Received event: {}".format(content))
@@ -120,9 +129,90 @@ class NotificationConsumer(WebsocketConsumer):
             'event': "MEMBERSHIP_CHANGE"
         }))
 
+    def send_project_invite_notification(self, event):
+        message = event['message']
+        id = event['from']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'user_id': id,
+            'event': "INVITE"
+        }))
+
     def send_project_tracking_notification(self, event):
         message = event['message']
         self.send(text_data=json.dumps({
             'message': message,
             'event': "PROJECT_TRACKING"
         }))
+
+    def send_audition_status_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "AUDITION_STATUS"
+        }))
+
+    def send_video_rating_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "VIDEO_RATING"
+        }))
+
+    def send_project_rating_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "PROJECT_RATING"
+        }))
+
+    def send_comments_mention_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS_MENTION"
+        }))
+
+    def send_comments_reply_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS_REPLY"
+        }))
+
+    def send_comments_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "COMMENTS"
+        }))
+
+    def send_cast_attach_request_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CAST_ATTACH_REQUEST",
+        }))
+
+    def send_cast_attach_response_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CAST_ATTACH_RESPONSE",
+        }))
+
+    def send_crew_attach_request_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CREW_ATTACH_REQUEST",
+        }))
+
+    def send_crew_attach_response_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "CREW_ATTACH_RESPONSE",
+        }))
+
+

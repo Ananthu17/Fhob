@@ -23,11 +23,14 @@ from hobo_user.views import ExtendedSignupVerify, \
 
 from rest_framework_simplejwt import views as jwt_views
 from initial_user import views as initial_user_views
-from initial_user.views import InitialUserDetailSavePage
+# from initial_user.views import InitialUserDetailSavePage
+from hobo_user.views import HowTo
+
 
 urlpatterns = [
-    path('', InitialUserDetailSavePage.as_view(),
-         name='landing_home'),
+    # path('', InitialUserDetailSavePage.as_view(),
+    #      name='landing_home'),
+    path('', HowTo.as_view(), name='how_to'),
     path('admin/', admin.site.urls),
     path('initial_user/', include('initial_user.urls')),
     path('payment/', include('payment.urls')),

@@ -1,8 +1,88 @@
-id,title
-1,Director
-2,Actor
-3,Actress
-4,Writer
-5,Producer
-6,Cinematographer
-7,Editor
+id,title,label
+1,Producer,PRODUCTION
+2,Executive Producer ,PRODUCTION
+3,Co -Producer ,PRODUCTION
+4,Line Producer,PRODUCTION
+5,UPM,PRODUCTION
+6,Production Coordinator,PRODUCTION
+7,Production Secretary,PRODUCTION
+8,Office PA,PRODUCTION
+9,Assistant Producer,PRODUCTION
+10,Property Master,PROPS
+11,Assistant Prop Master,PROPS
+12,Prop Maker,PROPS
+13,Prop Assistant,PROPS
+14,Food Stylist,PROPS
+15,Animal Wrangler,PROPS
+16,Director,DIRECTION
+17,1st AD,DIRECTION
+18,2nd AD,DIRECTION
+19,2nd 2nd AD,DIRECTION
+20,Key PA,DIRECTION
+21,Set PA,DIRECTION
+22,Casting Director,DIRECTION
+23,Costume Designer,WARDROBE
+24,Assistant C. Designer,WARDROBE
+25,Shopper,WARDROBE
+26,Wardrobe Superviser,WARDROBE
+27,Set Costumer,WARDROBE
+28,Seamstress,WARDROBE
+29,Writer,SCRIPT
+30,Script Superviser,SCRIPT
+31,Script Editor,SCRIPT
+32,Production Designer,ART
+33,Art Director,ART
+34,Art Dept. Coordinator,ART
+35,Construction Coordinator,ART
+36,Key Scenic,ART
+37,Set Decorator,ART
+38,Buyer,ART
+39,Leadman,ART
+40,Set Dresser,ART
+41,Greensman,ART
+42,Storyboard Artist,ART
+43,Art PA,ART
+44,Director of Photography,CAMERA
+45,1st Camera Assistant,CAMERA
+46,2nd Camera Assistant,CAMERA
+47,Stedicam Operator,CAMERA
+48,Loader,CAMERA
+49,DIT/Media Manager,CAMERA
+50,Stills Photographer,CAMERA
+51,Camera PA,CAMERA
+52,Hair Dep. Head,HAIR & MAKEUP
+53,Key Hair Department,HAIR & MAKEUP
+54,Makeup Dep. Head,HAIR & MAKEUP
+55,Key Makeup Department,HAIR & MAKEUP
+56,SFX Makeup,HAIR & MAKEUP
+57,Stunt Coordinator,STUNTS
+58,Stunt Performer,STUNTS
+59,Sound Mixer,SOUND
+60,Boom Operator,SOUND
+61,Sound Utility,SOUND
+62,Gaffer,ELECTRIC
+63,Best Boy Electric,ELECTRIC
+64,Electrician,ELECTRIC
+65,Generator Operator,ELECTRIC
+66,SFX Superviser,SPECIAL EFFECTS
+67,SFX Foreman,SPECIAL EFFECTS
+68,SFX Technician,SPECIAL EFFECTS
+69,Armorer Pyrotechnic,SPECIAL EFFECTS
+70,VFX Superviser,VISUAL EFFECTS
+71,Location Manager,LOCATION
+72,Location Assistant,LOCATION
+73,Location Scout,LOCATION
+74,Unit PA,LOCATION
+75,Key Grip,GRIP
+76,Best Boy Grip,GRIP
+77,Dolly Grip,GRIP
+78,Rigging Grips,GRIP
+79,Editor,POST PRODUCTION
+80,Composer,POST PRODUCTION
+81,Colorist,POST PRODUCTION
+82,Sound Designer,POST PRODUCTION
+83,Foley Artist,POST PRODUCTION
+84,Dialogue Editor,POST PRODUCTION
+85,Project Creator,GENERAL
+86,Actor/Actress,GENERAL
+87,Make-Up/Hair Artist,HAIR & MAKEUP

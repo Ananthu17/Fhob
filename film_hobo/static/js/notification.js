@@ -60,6 +60,30 @@ notificationSocket.onmessage = function (e) {
                      }
              });
              break;
+        case "CAST_ATTACH_REQUEST":
+            // get friend request notification html
+            data_dict = {}
+            data_dict['from_user'] = user_id
+            $.get('/project/get-cast-attach-request-notification-html/', data_dict)
+            .done(function(data) {
+                if(data.results!='')
+                    {
+                        $('.notification-modal-content').prepend(data['notification_html'])
+                    }
+            });
+            break;
+        case "CREW_ATTACH_REQUEST":
+            // get friend request notification html
+            data_dict = {}
+            data_dict['from_user'] = user_id
+            $.get('/project/get-crew-attach-request-notification-html/', data_dict)
+            .done(function(data) {
+                if(data.results!='')
+                    {
+                        $('.notification-modal-content').prepend(data['notification_html'])
+                    }
+            });
+            break;
         case "FRIEND_REQUEST_ACCEPT":
              // get friend request accept notification html
              data_dict = {}
@@ -99,12 +123,130 @@ notificationSocket.onmessage = function (e) {
                      }
              });
             break;
+        case "INVITE":
+            // get invite to see a project notification html
+            data_dict = {}
+            data_dict['from_user'] = user_id
+            data_dict['message'] = message
+            console.log(data_dict)
+            $.get('/hobo_user/get-profile-rating-notification-html/', data_dict)
+            .done(function(data) {
+                if(data.results!='')
+                    {
+                        $('.notification-modal-content').prepend(data['notification_html'])
+                    }
+            });
+            break;
         case "PROJECT_TRACKING":
              // get membership change notification html
              data_dict = {}
              data_dict['message'] = message
              console.log(data_dict)
-             $.get('/project/get-notification-html/', data_dict)
+             $.get('/project/get-project-tracking-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "AUDITION_STATUS":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-audition-status-notification/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "VIDEO_RATING":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-video-rating-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "PROJECT_RATING":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-project-rating-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "COMMENTS_MENTION":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-comments-mention-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "COMMENTS":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-comments-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "COMMENTS_REPLY":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-comments-reply-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "CAST_ATTACH_RESPONSE":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-cast-attach-response-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "CREW_ATTACH_RESPONSE":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-crew-attach-response-notification-html/', data_dict)
              .done(function(data) {
                  if(data.results!='')
                      {

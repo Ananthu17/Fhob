@@ -19,8 +19,6 @@
                 <div class="left-mode-sec p-2 text-center ">
                     <div class="log-left-sec">
                         <ul class="list-unstyled">
-                            <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
-                                        class="mem-small-f">NVITE</span></a></li>
                             <li class="mt-1">
 
 
@@ -46,7 +44,7 @@
                                 class="mem-small-f">ROJECT</span></a>
                                 <div class="sgl-rate-star" data-toggle="modal" data-target="#rating_modal">
                                     <div class="cta-stars-outer">
-                                        <div class="cta-stars-inner" style="width:{{project_rating}}%;"></div>
+                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
                                     </div>
                                 </div>
 <!-- The Modal -->
@@ -124,7 +122,7 @@
                         <div class="card sgl-left-box-lg">
                             <div class="sgl-left-box-sm-align">
                                 <div class="sgl-left-box-lg-align">
-                                    <span class="sgl-left-box-lg-txt"><a href="">{{project.title}}</a> Written by Tom Smith</span>
+                                    <span class="sgl-left-box-lg-txt"><a href="">{{project.title}}</a> Written by </span>
                                 </div>
                             </div>
                             <div class="sgl-info-open-txt-align">
@@ -163,12 +161,12 @@
                 <!-- Top menu  -->
                 <div class="sgl-menu-bg">
                     <ul class="sgl-menu">
-                        <li><span class="video-menu-head">PROJECT </span><a href="" >#{{project.id}}</a></li>
+                        <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}" >#{{project.id}}</a></li>
                         <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
                         <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
                         <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
                         <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
-                    </ul>    
+                    </ul>
                 </div>
                 <!-- Top menu  End-->
                 <!-- Three column  -->
@@ -207,71 +205,53 @@
                     <div class="col-lg-4 col-sm-12 mb-2">
                         <div class="left-mode-sec sgl-topcol-align1">
                             <div class="sgl-col-cnt2">
+                                <div id="style-crew" class="show-more-div">
                                 <div>
                                     <span class="sgl-black-txt">FILMMAKERS / CREW  (TEAM)</span>
                                 </div>
                                 <div>
                                     <span class="sgl-team-fnt">Team SAMR: </span>
-                                    <span class="sgl-pro-fnt">Pro</span>
+                                    {% get_crew_samr_display_value project.id as crew_samr_data %}
+                                    <span class="sgl-pro-fnt">{{ crew_samr_data.0 }}</span>
                                     <span>
                                         <span class="log-star">
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            <span class="fa {% if crew_samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                            <span class="fa {% if crew_samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if crew_samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if crew_samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if crew_samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
                                         </span>
                                     </span>
                                 </div>
+                                {% for  crew in project_crew %}
                                 <div>
-                                    <span class="sgl-black-txt">PRODUCER: </span>
-                                    <span class="sgl-blue-txt"><a href="">Konstantin Selivan</a></span>
+                                    <span class="sgl-black-txt txt-uppercase">{{crew.job_type.title}}: </span>
+                                    {% get_dict_value crew_dict crew.id as attached_members %}
+                                    {% if attached_members %}
+                                    {% for member in attached_members %}
+                                    <br>
+                                    <span class="sgl-blue-txt"><a href="{{member.user.get_profile_url}}">{{member.user.get_full_name}}</a></span>
                                     <span>
+                                        {% get_dict_value crew_rating_dict member.user.id as rating%}
                                         <span class="log-star">
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star-o"></span>
+                                            <span class="cta-stars-outer">
+                                                <span class="cta-stars-inner" style="width:{{rating}}%;"></span>
+                                            </span>
                                         </span>
                                     </span>
+                                    {% endfor %}
+                                    {% else %}
+                                    <span class="sgl-green-txt">
+                                        <a href="{% url 'project:crew-apply-audition' project.id %}?crew_id={{crew.id}}">Available</a></span>
+                                    {% endif %}
                                 </div>
-                                <div>
-                                    <span class="sgl-black-txt">WRITER: </span>
-                                    <span class="sgl-blue-txt"><a href="">Tom Smith</a></span>
-                                    <span>
-                                        <span class="log-star">
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star checked"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="sgl-black-txt">DIRECTOR: </span>
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
-                                </div>
-                                <div>
-                                    <span class="sgl-black-txt">DP: </span>
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
-                                </div>
-                                <div>
-                                    <span class="sgl-black-txt">EDITOR: </span>
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
-                                </div>
-                                <div>
-                                    <span class="sgl-black-txt">SOUND DESIGNER: </span>
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
-                                </div>
-                                <div>
-                                    <span class="sgl-black-txt">CASTING DIRECTOR: </span>
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
-                                </div>
-                                <div class="">
-                                    <span class="sgl-blue-txt sgl-full-lst-align"><a href="">Full List</a></span>
-                                </div>
+                                {% endfor %}
+                                
+                            </div>
+                            <div class="">
+                                <span class="sgl-blue-txt sgl-full-lst-align">
+                                    <a class="enable-scroll-crew cursor-pointer">Full List</a></span>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -299,20 +279,27 @@
                                 {% for character in characters %}
                                 <div class>
                                     <span class="sgl-orange-txt">{{character.name}}:</span>
-                                    {% if character.attached_user %}
+                                    {% if character.attached_user or character.attached_user_name %}
                                     <span class="sgl-blue-txt">
-                                        <a href="">{{character.attached_user.get_full_name|truncatechars:"10"}}</a>
+                                        {% if character.attached_user %}
+                                        <a href="{{character.attached_user.get_profile_url}}">{{character.attached_user.get_full_name|truncatechars:"10"}}</a>
+                                        {% elif character.attached_user_name %}
+                                        <a>{{character.attached_user_name|truncatechars:"10"}}</a>
+                                        {% endif %}
                                     </span>
                                     <span class="log-star">
+                                        {% if character.attached_user %}
                                         {% get_dict_value rating_dict character.attached_user.id as rating%}
                                         <span class="">
                                             <span class="cta-stars-outer">
                                                 <span class="cta-stars-inner" style="width:{{rating}}%;"></span>
                                             </span>
                                         </span>
+                                        {% endif %}
                                     </span>
                                     {% else %}
-                                    <span class="sgl-green-txt"><a href="">Available</a></span>
+                                    <span class="sgl-green-txt">
+                                        <a href="{% url 'project:cast-password-check' project.id %}">Available</a></span>
                                     {% endif %}
                                 </div>
                                 {% endfor %}
@@ -369,7 +356,10 @@
                             <div class="sgl-up-video-align">
                                 <div>
                                     <span class="sgl-upload-blue-tag">
-                                        {% if project.creator == request.user %}
+                                        {% if project.creator == request.user and project.video_url is not none %}
+                                        <a data-toggle="modal" data-target="#upload_video"
+                                        class="cursor-pointer">CHANGE VIDEO</a>
+                                        {% elif project.creator == request.user and project.video_url is none %}
                                         <a data-toggle="modal" data-target="#upload_video"
                                         class="cursor-pointer">UPLOAD VIDEO</a>
                                         {% else %}
@@ -379,18 +369,26 @@
                                 </div>
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-upload-vdo-frame">
+                                    <a
+                                    {% if project.video_status == 'uploaded'%}
+                                    data-toggle="modal" data-target="#video_player_modal"
+                                    {% elif project.video_status == 'posted' %}
+                                    href="{% url 'project:video' project.id %}"
+                                    {% endif %}
+                                     class="cursor-pointer">
                                     {% if project.video_cover_image %}
                                     <img src="{{ project.video_cover_image.url }}" class="sgl-upload-img" >
                                     {% else %}
                                     <img src="{% static 'images/video.png' %}" class="sgl-upload-img" >
                                     {% endif %}
+                                    </a>
                                 </div>
                                 <div class="sgl-upvideo-txt-align">
                                     <span class="sgl-sm-name-txt">Project</span><span class="sgl-blue-txt"><a > #{{project.id}}</a></span>
                                     <span class="sgl-blue-txt sgl-upload-blue-txt-align"><a>{{project.get_format_display}}</a></span>
                                     <span class="sgl-upload-star">
                                         <div class="cta-stars-outer">
-                                            <div class="cta-stars-inner" style="width:{{project_rating}}%;"></div>
+                                            <div class="cta-stars-inner" style="width:{{project.video_rating}}%;"></div>
                                         </div>
                                     </span>
                                 </div>
@@ -400,7 +398,83 @@
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-red-post-align">
                                     <span class="sgl-post-red-tag">
-                                        <a class="publish_video cursor-pointer" title="Publish Video" id="{{project.id}}">POST VIDEO</a>
+                                        <a class=" cursor-pointer" title="Publish Video" data-toggle="modal" data-target="#post_video">POST VIDEO</a>
+
+<!-- The Modal -->
+<div class="modal fade" id="video_player_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Watch {{project.title}}</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                            <div class="row" >
+                                <div class="col-12" >
+                                {% if project.video_type == 'vimeo' %}
+                                    <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="250"
+                                    data-show-text="false" frameborder="0" allowfullscreen></iframe>
+                                    <img src=""/>
+                                {% elif project.video_type == 'youtube' %}
+                                    <iframe
+                                    src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ project.video_url }}&color=white" width="100%" height="250"
+                                    data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0"></iframe>
+                                {% endif %}
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+<!-- The Modal -->
+<div class="modal fade" id="post_video">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">POST VIDEO</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                            <div class="row" >
+                                <div class="col-12" >
+                                    <p class="all-p-light">Video posted to screening room cannot be deleted. But in future you can replace your video
+                                        with another video.
+                                    </p>
+                                    <p class="all-p">Do you want to post the video to screening room ?</p>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm publish_video"
+                id="{{project.id}}" title="Publish Video">Yes</button>
+                <button type="button" class="btn btn-outline-danger btn-sm "
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
                                     </span>
                                 </div>
                             </div>
@@ -544,13 +618,7 @@
                     <span class=""> Logline</span>
                 </div>
                 <div class="col-7">
-                    <input class="form-control" name="logline" id="logline"
-                    value="
-                    {% if project.logline %}
-                        {{project.logline}}
-                    {% else %}
-                    {% endif %}
-                    " />
+                    <input class="form-control" name="logline" id="logline" value="{% if project.logline %}{{project.logline}}{% else %}{% endif %}" />
                 </div>
             </div>
             <div class="row mt-1">
@@ -558,13 +626,7 @@
                     <span class=""> Project Info </span>
                 </div>
                 <div class="col-7">
-                    <textarea class="form-control" name="project_info" rows=8
-                    id="project_info" >
-                    {% if project.project_info %}
-                        {{project.project_info}}
-                    {% else %}
-                    {% endif %}
-                    </textarea>
+                    <textarea class="form-control" name="project_info" rows=8 id="project_info" >{% if project.project_info %}{{project.project_info}}{% else %}{% endif %}</textarea>
                 </div>
             </div>
         </div>
@@ -602,7 +664,7 @@
                                             <span class="sgl-post-cont-fnt"><span class="sgl-post-cont-fnt-lg">W</span>HEN SOMEONE POSTS A MESSAGE EVERYONE (FROM THAT GROUP) GETS NOTIFICATION.  </span>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -614,58 +676,7 @@
             <!-- Center section End -->
             <!-- Right section -->
 
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3">
-                <div class="left-mode-sec right-sec-height">
-                    <div class="mem-list-head">Top Actors</div>
-                    <ol class="mem-list-cont mb-0 ">
-                        <li class="mt-1">John Smith</li>
-                        <li class="mt-1">John Dow</li>
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Aaron McCarty</li>
-                        <li class="mt-1">Toli Chew</li>
-                    </ol>
-                    <div class="mem-list-head">Top Writers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Tom Saint</li>
-                        <li class="mt-1">Lola Carola</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Jamal Smith</li>
-                        <li class="mt-1">Nikita Selivan</li>
-                    </ol>
-                    <div class="mem-list-head">Top Directors</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Karen Do</li>
-                        <li class="mt-1">Ivan Drago</li>
-                        <li class="mt-1">Ken Track</li>
-                        <li class="mt-1">Kendra Shulman</li>
-                        <li class="mt-1">Sandra O’brian</li>
-                    </ol>
-                    <div class="mem-list-head">Top Producers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top DPs</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head">Top Sound Designers</div>
-                    <ol class="mem-list-cont mb-0">
-                        <li class="mt-1">Sarah Lee</li>
-                        <li class="mt-1">Colle Ace</li>
-                        <li class="mt-1">Duran Duran</li>
-                        <li class="mt-1">Char Hendrix</li>
-                        <li class="mt-1">Oleg Smirnov</li>
-                    </ol>
-                    <div class="mem-list-head underline">TopTalent/Crew</div>
-                </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
             </div>
 
             <!-- Right section  End-->
@@ -714,6 +725,9 @@ $('body').on('click' , '.publish_video', function(){
 <script>
     $('body').on('click' , '.enable-scroll', function(){
         $("#style-2").css({ 'overflow-y': 'scroll'});
+    });
+    $('body').on('click' , '.enable-scroll-crew', function(){
+        $("#style-crew").css({ 'overflow-y': 'scroll'});
     });
 </script>
 <script type="text/javascript">
@@ -874,19 +888,7 @@ $('body').on('click' , '.publish_video', function(){
     });
 </script>
 <script>
-    // $('body').on('click' , '.edit_logline', function(){
-    //     var project_id = $(this).attr('id');
-    //      $('#logline').removeAttr("disabled");
-    //      $('#logline').css({
-    //         'border': '1px solid #c7c7c7'
-    //         });
-    //      $('#project_info').removeAttr("disabled");
-    //      $('#project_info').css({
-    //         'border': '1px solid #c7c7c7'
-    //         });
-    //     var submit_btn = "<a class='custom-save-btn btn mem-setup-blu-f save_logline' id='"+project_id+"'/>Save</a>"
-    //     $("#logline-sbmit-div").html(submit_btn)
-    // });
+
     $('body').on('click' , '.save_logline', function(){
         var project_id = $(this).attr('id')
         var logline = $("#logline").val();
@@ -913,6 +915,7 @@ $('body').on('click' , '.publish_video', function(){
             });
     });
 </script>
+
 <script src="{% static 'js/project_tracking.js' %}"></script>
 {% endblock %}
 

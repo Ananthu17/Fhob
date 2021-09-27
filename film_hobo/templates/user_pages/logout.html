@@ -1,18 +1,21 @@
 {% extends 'base.html' %}
-{% load rest_framework %}
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-    <h1>Logged out</h1>
-    <form method="post" action="{% url 'hobo_user:user_login' %}">
-        {% csrf_token %}
-        <p> {{ form.non_field_errors }}</p>
-        <p>Thanks for spending some quality time with the Web site today.</p>
-        <p><a href="{% url 'hobo_user:user_login' %}">Log in again</a></p>
-    </form>
+    <div class="container">
+        <div class="row align-items-center pt-4 pb-4">
+            <img class="content-page-logo" src="{% static 'images/FH_Logo.png' %}">
+        </div>
+        <div class="row m-2 d-flex justify-content-center">
+            <h4 style="text-align:center">Logged Out Successfully.<br/>
+                Thank you for spending quality time with FilmHobo.
+            </h4>
+        </div>
+    </div>
 </div>
 {% endblock %}
 

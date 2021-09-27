@@ -37,9 +37,11 @@ class SubmitAuditionForm(forms.ModelForm):
         self.fields['video_url'].required = True
 
 
-class AddSidesForm(forms.ModelForm):
-    description = forms.CharField(widget=CKEditorUploadingWidget())
+# class AddSidesForm(forms.ModelForm):
+#     # scene_1 = forms.CharField(widget=CKEditorUploadingWidget())
+#     # scene_2 = forms.CharField(widget=CKEditorUploadingWidget())
+#     # scene_3 = forms.CharField(widget=CKEditorUploadingWidget())
 
-    class Meta:
-        model = Sides
-        fields = ('scene_1', 'scene_2', 'scene_3')
+#     class Meta:
+#         model = Sides
+#         fields = ('scene_1', 'scene_2', 'scene_3')

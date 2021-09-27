@@ -26,13 +26,13 @@
             <hr class="m-0 signup-border-hr">
             <div class="row mt-2">
                 <div class="col-4 d-flex justify-content-center">
-                    <a href="" class="btn btn-account">Indie</a>
+                    <!-- <a href="" class="btn btn-account">Indie</a> -->
+                </div>
+                <div id="center_btn" class="col-4 d-flex justify-content-center">
+                    <a id="center_btn_text" href="" class="btn btn-account"></a>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
-                    <a href="" class="btn btn-account">Pro</a>
-                </div>
-                <div class="col-4 d-flex justify-content-center">
-                    <a href="" class="btn btn-account">Company</a>
+                    <!-- <a href="" class="btn btn-account">Company</a> -->
                 </div>
             </div>
             <!-- Tab panes -->
@@ -50,7 +50,7 @@
                             {% endif %}
                             <div class="mt-2">Estimated Tax Percentage: <span id="tax_percentage">{{ payment_details.estimated_tax }}</span> %</div>
                             <div class="mt-2">Your credit card will be charged on
-                                {{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}, <span id="days_free">{{ payment_details.free_days }}</span> days from today</div>
+                                <span id="bill_start_date">{{ bill_date.day }}/{{ bill_date.month }}/{{ bill_date.year }}</span>, <span id="days_free">{{ payment_details.free_days }}</span> days from today</div>
                             <div class="row mt-2">
                                 <div class="col-3">
                                     <label class="form-title">Promo Code</label>
@@ -92,21 +92,21 @@
                                 <p>Pay via</p>
                                     <div id="paypal-div" class="mt-4"></div>
                                     <script src="https://js.braintreegateway.com/web/dropin/1.30.1/js/dropin.js"></script>
-                                    <div align="center">or</div>
+                                    <!-- <div align="center">or</div>
                                     <input type="hidden" id="braintreeVar" name="variable" value="{{ braintree_client_token }}">
                                     <button type="button" class="btn btn-secondary btn-lg btn-block btn-dark" data-toggle="collapse" data-target="#main-dropin-container">Debit or Credit Card</button>
-                                    <div id="main-dropin-container" class="collapse">
+                                    <div id="main-dropin-container" class="collapse"> -->
                                         <!-- <div class="braintree-notifications"></div>
                                         <div id="braintree-dropin"></div>
                                         <input class="btn btn-success btn-lg btn-block" type="submit" value="Pay now!" /> -->
 
-                                        <div id="dropin-container"></div>
+                                        <!-- <div id="dropin-container"></div>
                                         <button id="submit-button" class="button button--small button--green" onclick="function defaultprev(event){event.preventDefault();}">Purchase</button>
                                     </div>
                                     <h1></h1>
                                     <div id="payment-success-div" class="alert alert-success">
                                         <strong></strong>Thank you! The payment was accepted
-                                    </div>
+                                    </div> -->
                             <!-- </form> -->
                         </div>
                     </div>
@@ -115,7 +115,7 @@
             <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
                 <ul class="list-inline m-0">
                     <li class="list-inline-item fb">
-                        <a class="list-inline-item fb" >Back</a>
+                        <!-- <a class="list-inline-item fb" >Back</a> -->
                     </li>
                     <li class="list-inline-item">
                         <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
@@ -133,7 +133,7 @@
         <!-- Modal Header -->
         <div class="modal-header">
         <h5 class="modal-title">Modal Heading</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <button id="modal_cancel_cross" type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Modal body -->
         <div class="modal-body">
@@ -150,11 +150,11 @@
 {% endblock %}
 
 {% block extrajs %}
-<script src="https://js.braintreegateway.com/web/dropin/1.30.1/js/dropin.min.js"></script>
+<!-- <script src="https://js.braintreegateway.com/web/dropin/1.30.1/js/dropin.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.min.js"></script>
 <script src="{% static 'js/registration_payment.js' %}"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=ATjE-6pV7YtjfJhvu9FxaBAeXUiu5fuIN_Uu3LvAayqaZ8UxRXIrLuWvTub0AQn1JB6Re03p4ypG6IM2&vault=true&intent=subscription"></script>
 <script src="{% static 'js/paypal_payment.js' %}"></script>
-<script src="{% static 'js/braintree.js' %}"></script>
+<!-- <script src="{% static 'js/braintree.js' %}"></script> -->
 {% endblock %}

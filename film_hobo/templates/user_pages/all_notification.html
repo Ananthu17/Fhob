@@ -4,18 +4,71 @@
 
     <div class="row unread_notification">
         <div  class="col-2">
-            <a href="{{ obj.from_user.get_profile_url }}"
+            {% if obj.notification_type == 'audition_status' %}
+            <a href="{% url 'project:single-film-project' obj.project.id %}"
             target="_blank" id ="{{obj.id}}" class="notification_link">
-            {% if obj.from_user %}
+                {% if obj.project.video_cover_image %}
+                <img src="{{ obj.project.video_cover_image.url }}" class="notification_img"/>
+                {% elif obj.project.creator.get_profile_photo %}
+                <img src="{{ obj.project.creator.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
+            {% elif obj.notification_type == 'cast_attach_request' %}
+            <a href="{% url 'project:single-film-project' obj.project.id %}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.project.video_cover_image %}
+                <img src="{{ obj.project.video_cover_image.url }}" class="notification_img"/>
+                {% elif obj.project.creator.get_profile_photo %}
+                <img src="{{ obj.project.creator.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
+            {% elif obj.notification_type == 'crew_attach_request' %}
+            <a href="{% url 'project:single-film-project' obj.project.id %}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.project.video_cover_image %}
+                <img src="{{ obj.project.video_cover_image.url }}" class="notification_img"/>
+                {% elif obj.project.creator.get_profile_photo %}
+                <img src="{{ obj.project.creator.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
+            {% elif obj.notification_type == 'video_rating' %}
+            <a href="{% url 'project:video' obj.project.id %}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.project.video_cover_image %}
+                <img src="{{ obj.project.video_cover_image.url }}" class="notification_img"/>
+                {% elif obj.project.creator.get_profile_photo %}
+                <img src="{{ obj.project.creator.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/FH_Logo.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
+            {% elif obj.notification_type == 'comments_mention' %}
+            <a href="{{ notification.from_user.get_profile_url }}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
                 {% if obj.from_user.get_profile_photo %}
                 <img src="{{ obj.from_user.get_profile_photo }}" class="notification_img"/>
                 {% else %}
                 <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
                 {% endif %}
+            </a>
+            {% elif obj.from_user %}
+            <a href="{{ obj.from_user.get_profile_url }}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.from_user.get_profile_photo %}
+                <img src="{{ obj.from_user.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
             {% else %}
              <img src="{% static 'images/FH_Logo.png' %}" class="notification_img"/>
             {% endif %}
-            </a>
         </div>
         <div class="col-10">
             {% if obj.notification_type == 'tracking' %}
@@ -38,6 +91,41 @@
                     {{time}} ago.
                 </div>
             </div>
+            {% elif obj.notification_type == 'cast_attach_request' %}
+            <div class="row">
+                <div class="col-10 " id="cast-attach-req-btns-{{obj.character.id}}">
+                    {{ obj.project.creator.get_full_name}} wants to attach you to character
+                    <b>{{obj.character.name}}</b> of his project
+                    <b><a href="{% url 'project:single-film-project' obj.project.id %}" >{{obj.project.title}}</a></b><br>
+                    <b>{{ obj.project.creator.get_membership_display  }}</b><br>
+                    <span class="btn-blue cursor-pointer accept_cast_attach_request" id="{{obj.character.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer decline_cast_request" id="{{obj.character.id}}">Decline</span>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'crew_attach_request' %}
+            <div class="row">
+                <div class="col-10 " id="crew-attach-req-btns-{{obj.crew.id}}">
+                    {{ obj.project.creator.get_full_name}} wants to attach you as
+                    <b>{{obj.crew.job_type}}</b> to his project
+                    <b><a href="{% url 'project:single-film-project' obj.project.id %}" >{{obj.project.title}}</a></b><br>
+                    <b>{{ obj.project.creator.get_membership_display  }}</b><br>
+                    <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{obj.crew.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer decline_crew_request" id="{{obj.crew.id}}">Decline</span>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response' %}
+            <div class="row">
+                <div class="col-10">
+                    {{obj.message|safe}}<br>
+                    <b>{{ obj.project.creator.get_membership_display  }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
             {% elif obj.notification_type == 'accepted_friend_request' %}
             <div class="row">
                 <div class="col-10 ">
@@ -51,6 +139,16 @@
             <div class="row">
                 <div class="col-10 ">
                     {{obj.message}}<br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'invite' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message}}<br><a href={{obj.invite_url}}>Click here to view</a>
+                    {{obj.inviteurl}}<br>
                     <b>{{ obj.from_user.get_membership_display }}</b><br>
                     {% get_notifications_time obj.created_time as time %}
                     {{time}} ago.
@@ -74,6 +172,73 @@
                     {{time}} ago.
                 </div>
             </div>
+            {% elif obj.notification_type == 'audition_status' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message|safe}}<br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'video_rating' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.message}}<br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'project_rating' %}
+            <div class="row">
+                <div class="col-10 ">
+                    {{obj.from_user.get_full_name}} rated your project <a href="{% url 'project:single-film-project' obj.project.id %}">{{obj.project.title}}</a> as {{obj.rating|floatformat:0}} stars<br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'comments_mention' %}
+            <div class="row">
+                <div class="col-10 ">
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    target="_blank" id ="{{obj.id}}" class="notification_link blue_color_link">
+                    {{obj.from_user.get_full_name}}
+                    </a> mentioned you in <a href="{% url 'project:video' obj.project.id %}"
+                    class="notification_link blue_color_link">{{obj.project.title}}</a>'s post.
+                    <br>
+                    <b>{{ obj.from_user.get_membership_display }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'comments' %}
+                <div class="row">
+                    <div class="col-10 ">
+                        <a href="{{ obj.from_user.get_profile_url }}"
+                        target="_blank" id ="{{obj.id}}" class="blue_color_link notification_link">
+                        {{obj.from_user.get_full_name}}
+                        </a> commented on your project <a href="{% url 'project:video' obj.project.id %}"
+                        class="notification_link blue_color_link">{{obj.project.title}}</a>'s video.
+                        <br>
+                        <b>{{ obj.from_user.get_membership_display }}</b><br>
+                        {% get_notifications_time obj.created_time as time %}
+                        {{time}} ago.
+                    </div>
+                </div>
+            {% elif obj.notification_type == 'comments_reply' %}
+                <div class="row">
+                    <div class="col-10 ">
+                        <a href="{{ obj.from_user.get_profile_url }}"
+                        target="_blank" id ="{{obj.id}}" class="blue_color_link notification_link">
+                        {{obj.from_user.get_full_name}}
+                        </a> replied to your comment on project <a href="{% url 'project:video' obj.project.id %}"
+                        class="notification_link blue_color_link">{{obj.project.title}}</a>'s video.
+                        <br>
+                        <b>{{ obj.from_user.get_membership_display }}</b><br>
+                        {% get_notifications_time obj.created_time as time %}
+                        {{time}} ago.
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>
