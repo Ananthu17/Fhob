@@ -583,13 +583,13 @@ class ExtendedSignupVerify(SignupVerify):
                 signup_code = SignupCode.objects.get(code=code)
                 email = signup_code.user
                 user_membership = CustomUser.objects.get(
-                                  email=email).membership
+                                  email=email.email).membership
                 signup_code.delete()
             except SignupCode.DoesNotExist:
                 pass
             content = {'message': 'Email address verified.', 'status':
-                       status.HTTP_200_OK, 'email': email, 'user_membership':
-                       user_membership}
+                       status.HTTP_200_OK, 'email': email.email,
+                       'user_membership': user_membership}
             return render(request,
                           'user_pages/email_verification_success.html',
                           {'content': content})

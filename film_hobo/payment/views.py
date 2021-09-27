@@ -2,7 +2,7 @@ import braintree
 import datetime
 import json
 import requests
-from datetime import timedelta, date
+# from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
@@ -24,8 +24,10 @@ from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
     BraintreePromoCode, BetaTesterCodes
-from .models import PaymentOptions, Transaction, EmailRecord
-from .serializers import DiscountsSerializer, TransactionSerializer
+from .models import PaymentOptions, Transaction, EmailRecord, \
+    FilmHoboSenderEmail
+from .serializers import DiscountsSerializer, TransactionSerializer, \
+    EmailRecordSerializer
 # Create your views here.
 
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
@@ -1470,14 +1472,18 @@ class GetNewPlanDetailsJSON(APIView):
             return JsonResponse(data_dict, safe=False)
 
 
-class PayPalSendEmail(View):
-
+class PayPalSendEmail(APIView):
+    """
+    API to send receipt for paypal transaction
+    """
     def post(self, request, *args, **kwargs):
-        context = {
-            'user_name': '',
+        order_id = request.data['order_id']
+        transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
+        html_context = {
+            'user_name': transaction_obj.user.get_full_name,
             'user_membership': '',
-            'order_id': '',
-            'start_date': '',
+            'order_id': transaction_obj.id,
+            'start_date': transaction_obj.days_free,
             'start_date_after_trial': '',
 
             'payment_method': '',
@@ -1495,18 +1501,23 @@ class PayPalSendEmail(View):
             'paid_start_date_sales_tax_value': '',
             'paid_start_date_order_total_value': '',
         }
+        text_context = {
+            'user_name': transaction_obj.user.get_full_name,
+        }
         email_subject = "Welcome to FilmHobo. " \
             "Here are your subscription details."
         email_body_text = render_to_string(
-            "payment_receipts/email_receipt.txt", context, request
+            "payment_receipts/email_receipt.txt", text_context, request
         )
         email_body_html = render_to_string(
-            "payment_receipts/email_receipt.html", context, request
+            "payment_receipts/email_receipt.html", html_context, request
         )
-        email_recipients = [request.user.email]
+        recipient_email = transaction_obj.user.email
+        email_recipients = [recipient_email]
         email_from = getattr(
-            settings, "DEFAULT_FROM_EMAIL", "support@filmhobo.com"
+            settings, "PAYPAL_SENDER_EMAIL",
         )
+        email_from_obj = FilmHoboSenderEmail.objects.get(email=email_from)
         success = send_mail(
             subject=email_subject,
             message=email_body_text,
@@ -1514,14 +1525,23 @@ class PayPalSendEmail(View):
             recipient_list=email_recipients,
             html_message=email_body_html,
         )
-        EmailRecord.objects.create(
-            sender=request.user,
-            recipient=request.user,
-            email=request.user.email,
+        email_record_obj = EmailRecord.objects.create(
+            sender=email_from_obj,
+            recipient=transaction_obj.user,
+            email=transaction_obj.user.email,
             subject=email_subject,
-            body=email_body_text,
-            ok=success,
+            sent=success,
         )
-        return render(
-            request, "payment_receipts/email_receipt.html", context
-        )
+        serialized_obj_dict = {
+            "when": email_record_obj.when,
+            "sender": email_record_obj.sender.id,
+            "recipient": email_record_obj.recipient.id,
+            "email": email_record_obj.email,
+            "subject": email_record_obj.subject,
+            "sent": email_record_obj.sent
+        }
+        serializer = EmailRecordSerializer(data=serialized_obj_dict)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)

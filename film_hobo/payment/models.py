@@ -123,7 +123,6 @@ class EmailRecord(models.Model):
     )
     email = models.EmailField(null=False, blank=False)
     subject = models.CharField(null=False, max_length=128)
-    body = models.TextField(null=False, max_length=1024)
     sent = models.BooleanField(null=False, default=False)
 
 
