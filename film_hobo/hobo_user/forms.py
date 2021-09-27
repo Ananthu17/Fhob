@@ -408,13 +408,13 @@ class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ('creator', 'title', 'format', 'genre', 'script', 'video_url',
-                  'video_type', 'location', 'visibility', 'script',
-                  'cast_attachment', 'cast_pay_rate', 'cast_samr',
-                  'visibility_password', 'video_status', 'video_cover_image',
-                  'script_password', 'team_select_password', 'logline',
-                  'cast_audition_password', 'project_info', 'sag_aftra',
-                  'script_visibility'
+        fields = ( 'title','creator', 'format', 'genre','cast_pay_rate', 'sag_aftra',
+                   'cast_attachment','visibility','script_visibility','visibility_password',
+                    'location','cast_samr', 'script','script_password','cast_audition_password',
+                    'team_select_password',
+                    'video_url','video_type','video_status', 'video_cover_image', 
+                    'logline','project_info', 
+                   
                   )
         widgets = {
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
@@ -431,11 +431,11 @@ class ProjectCreationForm(forms.ModelForm):
                 'visibility_password': forms.PasswordInput(attrs={
                                                            "class": "form-control\
                                                            form-control-input mem-b-placeholder",
-                                                           'placeholder': 'password'
+                                                           'placeholder': 'password' ,'data-toggle': 'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
-                'script': forms.FileInput(),
+                'script': forms.FileInput(attrs={'accept':'application/pdf'}),
                 'script_password': forms.PasswordInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
                                                             'placeholder': 'password'

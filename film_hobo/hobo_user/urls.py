@@ -58,7 +58,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetAllUsersAPI, \
                    EditUserInterestAPI, VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
-                   CreateProjectView, ScreeningProjectDeatilView, \
+                   CreateProjectView,EditProjectView, ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
                    AddBetaTesterCode, \
@@ -304,7 +304,7 @@ urlpatterns = [
     path('projects/delete/<id>', ProjectDeleteAPIView.as_view(),
          name='delete-project'),
     path('projects/update/<id>', ProjectUpdateAPIView.as_view(),
-         name='delete-project'),
+         name='update-project'),
     path('teams/', TeamAPIView.as_view(),
          name='team-list'),
     path('teams/create/', TeamCreateAPIView.as_view(),
@@ -323,8 +323,8 @@ urlpatterns = [
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),
     #      name="project-search"),
-    path('page/search/',  PageSearchView.as_view(),
-         name="page_search_results"),
+#     path('page/search/',  PageSearchView.as_view(),
+#           name="page_search_results"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
@@ -335,6 +335,8 @@ urlpatterns = [
          name='projects'),
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
+    path('projectview/update/<int:id>',EditProjectView.as_view(),
+         name='update-project'),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
          name="date_filter"),
 ]
