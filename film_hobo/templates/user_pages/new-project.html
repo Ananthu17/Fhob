@@ -528,7 +528,7 @@
                             </div>
                             <div class="col-md-2 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Privte
+                                    <label class="containerradio bold" style="font: size em;">Privte
                                         <span>
                                             <span class="fa fa-star-o"></span>
                                             <span class="fa fa-star-o "></span>
@@ -740,6 +740,9 @@
     }
     });
 
+
+
+// Visibility Password hide and show eye
     const togglePassword1 = document.querySelector('#togglePassword1');
     const password1 = document.querySelector('#id_visibility_password');
     togglePassword1.addEventListener('click', function (e) {
@@ -749,6 +752,9 @@
     // toggle the eye / eye slash icon
     this.classList.toggle('bi-eye');
 });
+
+
+//Script Password hide and show eye
 const togglePassword2 = document.querySelector('#togglePassword2');
     const password2 = document.querySelector('#id_script_password');
     togglePassword2.addEventListener('click', function (e) {
@@ -758,6 +764,8 @@ const togglePassword2 = document.querySelector('#togglePassword2');
     // toggle the eye / eye slash icon
     this.classList.toggle('bi-eye');
 });
+
+//Cast Audition Password hide and show eye
 const togglePassword3 = document.querySelector('#togglePassword3');
     const password3 = document.querySelector('#id_cast_audition_password');
     togglePassword3.addEventListener('click', function (e) {
@@ -767,6 +775,9 @@ const togglePassword3 = document.querySelector('#togglePassword3');
     // toggle the eye / eye slash icon
     this.classList.toggle('bi-eye');
 });
+
+
+//Team Select Password hide and show eye
 const togglePassword4 = document.querySelector('#togglePassword4');
     const password4 = document.querySelector('#id_team_select_password');
     togglePassword4.addEventListener('click', function (e) {
@@ -776,6 +787,10 @@ const togglePassword4 = document.querySelector('#togglePassword4');
     // toggle the eye / eye slash icon
     this.classList.toggle('bi-eye');
 });
+
+
+// Acknowledge radio button monioter 
+
 
 jQuery($ => {
   $('#id_creator').prop('disabled', true);
