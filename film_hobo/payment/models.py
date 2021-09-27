@@ -93,6 +93,13 @@ class FilmHoboSenderEmail(models.Model):
     """
     email = models.EmailField(_('Email'))
 
+    class Meta:
+        verbose_name = 'Sender Email'
+        verbose_name_plural = 'Sender Emails'
+
+    def __str__(self):
+        return "{}:{}".format(self.id, self.email)
+
 
 class EmailRecord(models.Model):
     """
@@ -117,7 +124,7 @@ class EmailRecord(models.Model):
     email = models.EmailField(null=False, blank=False)
     subject = models.CharField(null=False, max_length=128)
     body = models.TextField(null=False, max_length=1024)
-    ok = models.BooleanField(null=False, default=True)
+    sent = models.BooleanField(null=False, default=False)
 
 
 def change_registration_complete_to_true(sender, instance, **kwargs):

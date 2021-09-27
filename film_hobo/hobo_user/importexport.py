@@ -3,6 +3,7 @@ from import_export.resources import ModelResource
 
 from .models import EthnicAppearance, AthleticSkill, Country, \
     GuildMembership, JobType, Location
+from payment.models import FilmHoboSenderEmail
 
 
 class EthnicAppearanceResource(ModelResource):
@@ -42,3 +43,9 @@ class LocationResource(ModelResource):
 
     class Meta:
         model = Location
+
+
+class FilmHoboSenderEmailResource(ModelResource):
+
+    class Meta:
+        model = FilmHoboSenderEmail

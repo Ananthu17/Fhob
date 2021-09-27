@@ -1,7 +1,7 @@
 import braintree
+import datetime
 import json
 import requests
-import datetime
 from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist

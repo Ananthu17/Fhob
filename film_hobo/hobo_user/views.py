@@ -7,7 +7,7 @@ from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
 
-from django.db.models import Sum, Q, query
+from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -24,7 +24,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from rest_framework import serializers
+# from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -97,7 +97,7 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
 from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
-from .utils import notify, get_notifications_time
+from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 CHECKBOX_MAPPING = {'on': True,
@@ -105,14 +105,16 @@ CHECKBOX_MAPPING = {'on': True,
 
 
 class AdminAuthenticationPermission(permissions.BasePermission):
-    ADMIN_ONLY_AUTH_CLASSES = [authentication.BasicAuthentication, authentication.SessionAuthentication]
+    ADMIN_ONLY_AUTH_CLASSES = [authentication.BasicAuthentication,
+                               authentication.SessionAuthentication]
 
     def has_permission(self, request, view):
         user = request.user
         if user and user.is_authenticated():
             return user.is_superuser or \
                 not any(isinstance(
-                    request._authenticator, x) for x in self.ADMIN_ONLY_AUTH_CLASSES)
+                    request._authenticator, x)
+                    for x in self.ADMIN_ONLY_AUTH_CLASSES)
         return False
 
 
@@ -4725,48 +4727,292 @@ class EditBetaTesterCode(APIView):
     permission_classes = (IsSuperUser,)
 
     def put(self, request, *args, **kwargs):
+
+        def get_paypal_access_token():
+            # get paypal access_token
+            paypal_client_id = settings.PAYPAL_CLIENT_ID
+            paypal_secret = settings.PAYPAL_SECRET_ID
+            data = {'grant_type': 'client_credentials'}
+            token_user_response = requests.post(
+                                'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                                data=data,
+                                auth=(paypal_client_id, paypal_secret),
+                                headers={'Accept': 'application/json',
+                                         'Accept-Language': 'en_US'})
+            if token_user_response.status_code == 200:
+                access_token = json.loads(token_user_response.content)['access_token']
+            else:
+                return Response(
+                    {"status": "error in fetching paypal access token"},
+                    status=status.HTTP_404_NOT_FOUND)
+
+            access_token_string = 'Bearer ' + access_token
+            return access_token_string
+
         try:
-            import pdb;pdb.set_trace()
             data = request.data
+            beta_tester_code_id = request.data['id']
             beta_tester_code = request.data['code']
-            testercode_instance = BetaTesterCodes.objects.get(code=beta_tester_code)
+            beta_tester_code_days = request.data['days']
+            testercode_instance = BetaTesterCodes.objects.get(id=beta_tester_code_id)
             serializer = EditBetaTesterCodeSerializer(testercode_instance,
                                              data=request.data, partial=True)
             if serializer.is_valid():
-                # get paypal access_token
-                paypal_client_id = settings.PAYPAL_CLIENT_ID
-                paypal_secret = settings.PAYPAL_SECRET_ID
-                data = {'grant_type': 'client_credentials'}
-                token_user_response = requests.post(
-                                    'https://api-m.sandbox.paypal.com/v1/oauth2/token',
-                                    data=data,
-                                    auth=(paypal_client_id, paypal_secret),
-                                    headers={'Accept': 'application/json',
-                                            'Accept-Language': 'en_US'})
-                if token_user_response.status_code == 200:
-                    access_token = json.loads(token_user_response.content)['access_token']
+                plans_updated = ""
+                plans_failed = ""
+                plans_updated_list = ""
+                if ((testercode_instance.code == beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
+                    serializer.update(BetaTesterCodes.objects.get(code=beta_tester_code),
+                                    request.data)
+                    return Response(serializer.data)
+                elif ((testercode_instance.code != beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
+                    access_token_string = get_paypal_access_token()
+                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+
+                    for plan_type in plan_types:
+                        plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + beta_tester_code
+                        edit_json_1 = [
+                            {
+                                "op": "replace",
+                                "path": "/name",
+                                "value": plan_name
+                            }
+                        ]
+                        edit_json_2 = [
+                            {
+                                "op": "replace",
+                                "path": "/description",
+                                "value": plan_name
+                            }
+                        ]
+                        if plan_type == 'Indie Payment Monthly':
+                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
+                            indie_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+
+                            if indie_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += testercode_instance.indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' name,'
+                            indie_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if indie_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' description,'
+
+                        elif plan_type == 'Indie Payment Yearly':
+                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
+                            indie_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += indie_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_yearly_plan_id + ' name,'
+                            indie_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if indie_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += indie_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_yearly_plan_id + ' description,'
+
+                        elif plan_type == 'Pro Payment Monthly':
+                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
+                            pro_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += pro_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_monthly_plan_id + ' name,'
+                            pro_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if pro_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += pro_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_monthly_plan_id + ' description,'
+
+                        elif plan_type == 'Pro Payment Yearly':
+                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
+                            pro_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += pro_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_yearly_plan_id + ' name,'
+
+                            pro_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if pro_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += pro_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.pro_yearly_plan_id + ' description,'
+                        elif plan_type == 'Company Payment Monthly':
+                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
+                            company_monthly_update_plan_full_url_response_1 = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_monthly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += company_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_monthly_plan_id + ' name,'
+                            company_monthly_update_plan_full_url_response_2 = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if company_monthly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += company_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_monthly_plan_id + ' description,'
+                        elif plan_type == 'Company Payment Yearly':
+                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
+                            company_yearly_update_plan_full_url_response_1 = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_1),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_yearly_update_plan_full_url_response_1.status_code == 204:
+                                plans_updated_list += company_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_yearly_plan_id + ' name,'
+                            company_yearly_update_plan_full_url_response_2 = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json_2),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string})
+                            if company_yearly_update_plan_full_url_response_2.status_code == 204:
+                                plans_updated_list += company_yearly_plan_id
+                            else:
+                                plans_failed += testercode_instance.company_yearly_plan_id + ' description,'
+                        else:
+                            pass
+                        if len(plans_updated_list) == 12:
+                            serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
+                                    request.data)
+                            return Response(serializer.data)
+                        else:
+                            return Response({"status": plans_failed},
+                                            status=status.HTTP_404_NOT_FOUND)
+                elif ((testercode_instance.code == beta_tester_code) and (testercode_instance.days != beta_tester_code_days)):
+                    access_token_string = get_paypal_access_token()
+                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+
+                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
+                      'Pro Payment Monthly','Pro Payment Yearly',
+                      'Company Payment Monthly','Company Payment Yearly']
+                    for plan_type in plan_types:
+                        edit_json = [
+                            {
+                                "op": "replace",
+                                "path": "/billing_cycles/frequency/interval_count",
+                                "value": int(beta_tester_code_days)
+                            }
+                        ]
+                        if plan_type == 'Indie Payment Monthly':
+                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
+                            indie_monthly_update_plan_full_url_response = requests.patch(
+                                                indie_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_monthly_update_plan_full_url_response.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
+                        elif plan_type == 'Indie Payment Yearly':
+                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
+                            indie_yearly_update_plan_full_url_response = requests.patch(
+                                                indie_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if indie_yearly_update_plan_full_url_response.status_code == 204:
+                                plans_updated_list += indie_monthly_plan_id
+                            else:
+                                plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
+                        elif plan_type == 'Pro Payment Monthly':
+                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
+                            pro_monthly_update_plan_full_url_response = requests.patch(
+                                                pro_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_monthly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_3")
+                        elif plan_type == 'Pro Payment Yearly':
+                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
+                            pro_yearly_update_plan_full_url_response = requests.patch(
+                                                pro_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if pro_yearly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_4")
+                        elif plan_type == 'Company Payment Monthly':
+                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
+                            company_monthly_update_plan_full_url_response = requests.patch(
+                                                company_monthly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_monthly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_5")
+                        elif plan_type == 'Company Payment Yearly':
+                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
+                            company_yearly_update_plan_full_url_response = requests.patch(
+                                                company_yearly_update_plan_full_url,
+                                                data=json.dumps(edit_json),
+                                                headers={'Content-Type': 'application/json',
+                                                        'Authorization': access_token_string},
+                                                )
+                            if company_yearly_update_plan_full_url_response.status_code == 204:
+                                print("part_2_success_6")
                 else:
-                    return Response(
-                        {"status": "error in fetching paypal access token"},
-                        status=status.HTTP_404_NOT_FOUND)
-
-                access_token_strting = 'Bearer ' + access_token
-
-                # update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/' + plan_id
-
-                edit_json = [
-                    {
-                        "op": "replace",
-                        "path": "/billing_cycles/pricing_scheme/fixed_price/value",
-                        "value": 11
-                    }
-                ]
-
-                # update the local db
-
-                serializer.update(BetaTesterCodes.objects.get(code=beta_tester_code),
-                                  request.data)
-                return Response(serializer.data)
+                    # update the local db
+                    serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
+                                    request.data)
+                    return Response(serializer.data)
             else:
                 return Response(serializer.errors)
         except ObjectDoesNotExist:

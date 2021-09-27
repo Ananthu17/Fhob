@@ -37,7 +37,7 @@
             <header class="fh-header">
                 <div class="row no-wrap justify-content-between align-items-center">
                     <div class="col-md-3 col-xs-6">
-                        <a href="#home">
+                        <a href="{% url 'hobo_user:user_home' %}">
                             <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
                         </a>
                     </div>
@@ -149,6 +149,9 @@
                                 <a class="dropdown-item" href="#">Projects</a>
                                 <a class="dropdown-item" href="#">Films</a>
                             </div>
+                        </li>
+                        <li class="nav-item">
+                            <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                         </li>
                     {% endif %}
 
