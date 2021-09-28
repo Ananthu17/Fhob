@@ -13,9 +13,14 @@
                     <a class="help-blu-link ">Showcase</a>
                 </div>
                 <div>
-                    <button class="btn help-top-btn ">Report a Problem</button>
+                    <button class="btn help-top-btn mb-2">Report a Problem</button>
                 </div>
             </div>
+            <span>
+                <a href="{% url 'general:help' %}">
+                    <img src="{% static 'images/right-arrow.png' %}" class="img-fluid help-arrow m-0">
+                </a>
+            </span>
         </div>
         <div class="bg-light-help">
             <div class="col-12 mt-3 mb-3">

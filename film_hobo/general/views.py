@@ -127,6 +127,38 @@ class HelpShowcase(View):
         return render(request, 'help/help_showcase.html')
 
 
+class HelpSAMR(View):
+    """
+    Web URL View to load the samr help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_samr.html')
+
+
+class HelpNetworking(View):
+    """
+    Web URL View to load the networking help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_networking.html')
+
+
+class HelpCommunityRules(View):
+    """
+    Web URL View to load the community rules help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_community_rules.html')
+
+
+class HelpMembership(View):
+    """
+    Web URL View to load the membership rules help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_membership.html')
+
+
 class TermsOfService(View):
 
     def get(self, request, *args, **kwargs):

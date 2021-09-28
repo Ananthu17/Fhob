@@ -104,7 +104,7 @@ $( document ).ready(function() {
       obj_id = d.id
       delete_url = origin_url + '/hobo_user/delete-beta-tester-code/' + d.id
       table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.code+'</td><td contenteditable="false" class="edit'+d.id+'">'+d.days+'</td>';
-      table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteCodeFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editCodeFunction('+obj_id+')">Edit</a></td></tr>';
+      table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteCodeFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td></tr>';
     })
     table += '</tbody>';
     $('#beta_user_code_table').empty().html(table);
