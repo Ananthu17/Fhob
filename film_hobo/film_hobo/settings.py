@@ -177,12 +177,12 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 # demo server database credentials
 DATABASES = {
     'default': {
-        'ENGINE': env("DATABASE_ENGINE"),
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT"),
+        'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+        'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+        'USER': env("DEMO_SERVER_DATABASE_USER"),
+        'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+        'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+        'PORT': env("DEMO_SERVER_DATABASE_PORT"),
     }
 }
 
