@@ -1479,17 +1479,23 @@ class PayPalSendEmail(APIView):
     def post(self, request, *args, **kwargs):
         order_id = request.data['order_id']
         transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
+        start_date = transaction_obj.date
+        free_days = datetime.timedelta(days=int(transaction_obj.days_free))
+        start_date_after_trial = start_date + free_days
+        start_date_after_trial_formated = start_date_after_trial.strftime(
+            "%d/%m/%Y")
+
         html_context = {
-            'user_name': transaction_obj.user.get_full_name,
-            'user_membership': '',
+            'user_name': transaction_obj.user.get_full_name(),
+            'user_membership': transaction_obj.user.membership,
             'order_id': transaction_obj.id,
-            'start_date': transaction_obj.days_free,
-            'start_date_after_trial': '',
+            'start_date': start_date,
+            'start_date_after_trial': start_date_after_trial_formated,
 
             'payment_method': '',
             'plan': '',
             'price': '',
-            'free_trial_days': '',
+            'free_trial_days': transaction_obj.days_free,
 
             'start_date_total_purchase_value': '',
             'start_date_sales_tax_percentage': '',
