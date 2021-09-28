@@ -407,8 +407,10 @@ class CheckoutForm(forms.Form):
 class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
-        model = Project
-        fields = ( 'title','creator', 'format', 'genre','cast_pay_rate', 'sag_aftra',
+        model = Project       
+    
+        
+        fields = ( 'title','creator','format','genre','cast_pay_rate', 'sag_aftra',
                    'cast_attachment','visibility','script_visibility','visibility_password',
                     'location','cast_samr', 'script','script_password','cast_audition_password',
                     'team_select_password',
@@ -417,6 +419,7 @@ class ProjectCreationForm(forms.ModelForm):
                    
                   )
         widgets = {
+               
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
                 'creator': forms.Select(attrs={'class': 'inp-line'}),
                 'format': forms.Select(attrs={'class': 'd-none'}),

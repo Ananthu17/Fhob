@@ -299,6 +299,9 @@ class CustomUser(AbstractUser):
         else:
             name = self.first_name+" "+self.last_name
         return name
+    
+    
+
 
     def get_height_in_meters(self):
         if self.feet:

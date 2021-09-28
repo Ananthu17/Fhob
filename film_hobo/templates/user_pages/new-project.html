@@ -90,12 +90,13 @@
                                 </div>
                             </div>
                         </div>
-
+                       
                         <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
                             </div>
                             <div class="col-6">
+                                
                                 {{form.creator}}
                             </div>
                         </div>
@@ -105,6 +106,7 @@
                                 <label class="form-title mem-setup-blu-f">WRITER:</label>
                             </div>
                             <div class="col-6">
+                               
                                 {{writerform.name}}
                             </div>
 
@@ -206,6 +208,13 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
+                                    <label class="containerradio bold"  >FAMILY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="18">
                                         <span class="checkmarkagree"></span>
@@ -243,13 +252,7 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold"  >FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                
+                              
                                 
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION

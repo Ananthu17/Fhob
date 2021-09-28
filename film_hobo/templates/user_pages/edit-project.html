@@ -193,6 +193,12 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
+                                    <label class="containerradio bold"  >FAMILY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}     value="9">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.MYSTERY  %}checked{% endif%}     value="18">
                                         <span class="checkmarkagree"></span>
@@ -230,14 +236,7 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold"  >FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}     value="9">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                
-                                
+                               
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.ANIMATION %}checked{% endif%}     value="3">
