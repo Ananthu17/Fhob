@@ -65,7 +65,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    AddBetaTesterCode, ListBetaTesterCode, \
                    DeleteBetaTesterCode, EditBetaTesterCode, \
                    CheckBetaTesterCode, ProjectDateFilterAPI, \
-                   GetBetaTesterCodeId
+                   GetBetaTesterCodeId, HomeProjectAPIView, \
+                   HomeProjectDateFilterAPI, HomeProjectSearchView, \
+                   ProjectSearchView
 
 
 app_name = "hobo_user"
@@ -320,12 +322,6 @@ urlpatterns = [
     path('get-screeing-project-notification-html/',
          GetScreeningProjectInviteNotificationAjaxView.as_view(),
          name='get-screeing-project-notification-html'),
-    # path('projects/rating', UserRatingAPI.as_view(),
-    #      name="rate-api"),
-    # path('projects/search/',  ProjectSearchView.as_view(),
-    #      name="project-search"),
-    # path('page/search/',  PageSearchView.as_view(),
-    #      name="page_search_results"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
@@ -338,6 +334,14 @@ urlpatterns = [
          name='new-project'),
     path('projectview/update/<int:id>', EditProjectView.as_view(),
          name='update-project'),
+    path('projects/search/',  ProjectSearchView.as_view(),
+         name="project-search"),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
          name="date_filter"),
+    path('user_home-projects/date/', HomeProjectDateFilterAPI.as_view(),
+         name="user-date_filter"),
+    path('user_home-projects/search/',  HomeProjectSearchView.as_view(),
+         name="user-project-search"),
+    path('user_home-projects/', HomeProjectAPIView.as_view(),
+         name='user-project-list'),
 ]
