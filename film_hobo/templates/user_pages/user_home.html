@@ -10,6 +10,12 @@
     .clicked{
         color: orange !important;
     }
+    .proj-card:hover{
+        background-color: rgb(201, 201, 201);
+    }
+    div.pointer {
+        cursor: pointer;
+    }
 </style>
 <div class="wrapper flex-grow-1">
     <div class="container-fluid">
@@ -154,7 +160,7 @@
                             {% for project in scenes %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card" >
+                                <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
                                             Project<a href="">#{{project.id}}</a>
@@ -253,7 +259,7 @@
                             {% for project in toprated_scenes %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card" >
+                                <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
                                             Project<a href="">#{{project.id}}</a>
@@ -352,7 +358,7 @@
                             {% for project in filims %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card" >
+                                <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
                                             Project<a href="">#{{project.id}}</a>
@@ -449,7 +455,7 @@
                             {% for project in toprated_filims %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card" >
+                                <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
                                             Project<a href="">#{{project.id}}</a>
@@ -762,7 +768,7 @@
             $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
             jQuery.each(rows[id], function() {
                 let div1 = `<div class='item'>\
-                        <div class='card proj-card' >\
+                        <div class='card proj-card pointer' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
                                     Project<a href=''>#${this.id}</a>\
@@ -836,7 +842,7 @@
             // Scenes
             jQuery.each(data.scenes, function() {
                 let div1 = `<div class='item'>\
-                        <div class='card proj-card' >\
+                        <div class='card proj-card pointer' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
                                     Project<a href=''>#${this.id}</a>\
@@ -904,7 +910,7 @@
             // Top scenes
             jQuery.each(data.top_scenes, function() {
                 let div1 = `<div class='item'>\
-                        <div class='card proj-card' >\
+                        <div class='card proj-card pointer' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
                                     Project<a href=''>#${this.id}</a>\
@@ -972,7 +978,7 @@
             // Filims
             jQuery.each(data.filims, function() {
                 let div1 = `<div class='item'>\
-                        <div class='card proj-card' >\
+                        <div class='card proj-card pointer' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
                                     Project<a href=''>#${this.id}</a>\
@@ -1040,7 +1046,7 @@
             // Top filims
             jQuery.each(data.top_filims, function() {
                 let div1 = `<div class='item'>\
-                        <div class='card proj-card' >\
+                        <div class='card proj-card pointer' >\
                             <div class='project-line'>\
                                 <span class='proj-no'>\
                                     Project<a href=''>#${this.id}</a>\
@@ -1255,5 +1261,15 @@
         $("#screeing_room").addClass('active');
     });
 
+</script>
+<script>
+    $(".proj-card").click(function(){
+        var proj_card_ele = $(this)
+        var project_obj = proj_card_ele[0].children[0].children[0].innerText
+        var project_id = project_obj.split("#").pop();
+        var origin_url = window.location.origin
+        var redirect_url = origin_url + '/project/video/' + project_id + '/'
+        window.location.replace(redirect_url);
+    });
 </script>
 {% endblock %}
