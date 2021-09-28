@@ -5,7 +5,6 @@ $(document).ready(function() {
 origin_url = window.location.origin
 create_url = origin_url + '/payment/paypal/create/'
 send_email_url = origin_url + '/payment/paypal/send_email_recepit/'
-sendSuccessEmail()
 var token = localStorage.getItem("token");
 token_str = "Token "
 token_val = String(token)
@@ -163,12 +162,9 @@ onApprove: function(data, actions) {
 
 }).render('#paypal-div'); // Display payment options on your web page
 
-// function sendSuccessEmail(data)
-function sendSuccessEmail()
+function sendSuccessEmail(data)
 {
-    debugger
-    // var order_id = data.orderID
-    var order_id = "0HD29369C3915992L"
+    var order_id = data.orderID
     send_email_url_args = {
         "order_id": order_id
     }
