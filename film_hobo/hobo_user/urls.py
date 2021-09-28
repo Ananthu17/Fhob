@@ -55,16 +55,17 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, \
                    GetProfileRatingNotificationAjaxView, \
-                   GetAllUsersAPI, \
-                   EditUserInterestAPI, VideoRatingView, ProjectView, \
+                   GetAllUsersAPI, EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
-                   CreateProjectView,EditProjectView, ScreeningProjectDeatilView, \
+                   CreateProjectView, EditProjectView, \
+                   ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
-                   AddBetaTesterCode, \
-                   ListBetaTesterCode, DeleteBetaTesterCode, \
-                   EditBetaTesterCode, CheckBetaTesterCode, \
-                   ProjectDateFilterAPI, GetBetaTesterCodeId
+                   AddBetaTesterCode, ListBetaTesterCode, \
+                   DeleteBetaTesterCode, EditBetaTesterCode, \
+                   CheckBetaTesterCode, ProjectDateFilterAPI, \
+                   GetBetaTesterCodeId
 
 
 app_name = "hobo_user"
@@ -323,8 +324,8 @@ urlpatterns = [
     #      name="rate-api"),
     # path('projects/search/',  ProjectSearchView.as_view(),
     #      name="project-search"),
-#     path('page/search/',  PageSearchView.as_view(),
-#           name="page_search_results"),
+    # path('page/search/',  PageSearchView.as_view(),
+    #      name="page_search_results"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
@@ -335,7 +336,7 @@ urlpatterns = [
          name='projects'),
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
-    path('projectview/update/<int:id>',EditProjectView.as_view(),
+    path('projectview/update/<int:id>', EditProjectView.as_view(),
          name='update-project'),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
          name="date_filter"),

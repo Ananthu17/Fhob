@@ -7,7 +7,7 @@ from .views import GetMembershipFeeDetailsAPI, UpdateMembershipFeeAPI, \
      CreateUserOrder, CaptureUserOrder, GetOrderDetails, GetProductID, \
      SubscriptionDetails, PaypalToken, PaypalPlanID, \
      BraintreeSubscriptionDetails, GetNewPlanDetailsJSON, \
-     UpdateMembershipFeeDetailsAPI, BetaUserPlanDetails
+     UpdateMembershipFeeDetailsAPI, BetaUserPlanDetails, PayPalSendEmail
 # from .views import InitialRequest, UpdateSubscription, \
 #      GetBraintreeDiscountDetailListAPI, BraintreeCalculateDiscountAPI
 # from .paypal import CreateOrder, CaptureOrder
@@ -66,6 +66,9 @@ urlpatterns = [
     path('paypal/get_new_plan_details/',
          GetNewPlanDetailsJSON.as_view(),
          name='paypal-get-new-plan-details'),
+    path('paypal/send_email_recepit/',
+         PayPalSendEmail.as_view(),
+         name='paypal_send_email_recepit'),
     # braintree endpoints
     # path('braintree/initial_request/',
     #      InitialRequest.as_view(), name="braintree-initial-request"),

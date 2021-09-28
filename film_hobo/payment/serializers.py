@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from hobo_user.models import PromoCode
-from .models import Transaction
+from .models import Transaction, EmailRecord
 
 
 class DiscountsSerializer(serializers.ModelSerializer):
@@ -44,3 +44,10 @@ class TransactionSerializer(serializers.ModelSerializer):
                   'payment_plan', 'initial_amount', 'tax_applied',
                   'promocodes_applied', 'promotion_amount',
                   'final_amount', 'paid']
+
+
+class EmailRecordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EmailRecord
+        fields = '__all__'

@@ -119,6 +119,14 @@ class HelpRating(View):
         return render(request, 'help/help_rating.html')
 
 
+class HelpShowcase(View):
+    """
+    Web URL View to load the showcase help page
+    """
+    def get(self, request, *args, **kwargs):
+        return render(request, 'help/help_showcase.html')
+
+
 class TermsOfService(View):
 
     def get(self, request, *args, **kwargs):

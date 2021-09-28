@@ -64,10 +64,33 @@ function editCodeFunction(obj_id) {
               editable_elements.item(i).contentEditable = true;
           }
       }
-      editable_elements.item(2).children[0].readOnly = false
-      editable_elements.item(2).children[1].readOnly = false
   }
   else{
+    editable_fields = 'edit' + obj_id
+    var editable_elements = document.getElementsByClassName(editable_fields);
+    edit_beta_tester_code_url = origin_url + '/hobo_user/edit-beta-tester-code/'
+
+    for (var i = 0; i < editable_elements.length; i++) {
+      beta_tester_code_val = editable_elements.item(0).textContent
+      amount_val = editable_elements.item(1).textContent
+    }
+    editable_fields = '.edit' + obj_id
+    var edit_class = $(editable_fields);
+
+    beta_tester_code_args = {
+      "code": editable_elements[0].innerText,
+      "days": editable_elements[1].innerText,
+    }
+
+    axios.put(edit_beta_tester_code_url, beta_tester_code_args, {headers: {'Authorization': authorization_str}})
+    .then((response) => {
+      if (response.status == 200){
+
+      }
+    }, (error) => {
+      console.log(error);
+    });
+
   }
 }
 
