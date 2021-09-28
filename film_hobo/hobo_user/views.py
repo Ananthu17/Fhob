@@ -347,6 +347,68 @@ class HomePage(TemplateView):
         return context
 
 
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 3
+
+
+class HomeProjectAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    pagination_class = StandardResultsSetPagination
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.project_segregator(queryset)
+        return Response(context)
+
+
+class HomeProjectDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.project_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.project_segregator(project)
+            return Response(context)
+
+
+class HomeProjectSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.project_segregator(queryset)
+        return Response(context)
+
+
 class CustomUserList(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'user_pages/custom_user_list.html'
@@ -5074,10 +5136,6 @@ class FeedbackWebView(View):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 3
-    page_size_query_param = 'page_size'
-    max_page_size = 3
 
 # Project CRUD
 class ProjectAPIView(ListAPIView, SegregatorMixin):
@@ -5133,7 +5191,8 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
                      "rating", "timestamp"]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+                                        creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
