@@ -2,7 +2,6 @@ import braintree
 import datetime
 import json
 import requests
-# from datetime import timedelta, date
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
@@ -1480,21 +1479,24 @@ class PayPalSendEmail(APIView):
         order_id = request.data['order_id']
         transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
         start_date = transaction_obj.date
+        start_date_formated = start_date.strftime("%d/%m/%Y")
         free_days = datetime.timedelta(days=int(transaction_obj.days_free))
         start_date_after_trial = start_date + free_days
-        start_date_after_trial_formated = start_date_after_trial.strftime(
-            "%d/%m/%Y")
-
+        start_date_after_trial_formated = \
+            start_date_after_trial.strftime("%d/%m/%Y")
+        payment_method = transaction_obj.payment_method
+        payment_plan = transaction_obj.payment_plan
+        price = float(transaction_obj.final_amount)
         html_context = {
             'user_name': transaction_obj.user.get_full_name(),
             'user_membership': transaction_obj.user.membership,
             'order_id': transaction_obj.id,
-            'start_date': start_date,
+            'start_date': start_date_formated,
             'start_date_after_trial': start_date_after_trial_formated,
 
-            'payment_method': '',
-            'plan': '',
-            'price': '',
+            'payment_method': payment_method,
+            'plan': payment_plan,
+            'price': price,
             'free_trial_days': transaction_obj.days_free,
 
             'start_date_total_purchase_value': '',
@@ -1506,6 +1508,9 @@ class PayPalSendEmail(APIView):
             'paid_start_date_sales_tax_percentage': '',
             'paid_start_date_sales_tax_value': '',
             'paid_start_date_order_total_value': '',
+
+            'privacy_policy_url': 'http://127.0.0.1:8000/general/privacy_policy/',
+            'terms_of_service_url': 'http://127.0.0.1:8000/general/terms_of_service/',
         }
         text_context = {
             'user_name': transaction_obj.user.get_full_name,

@@ -4943,7 +4943,7 @@ class EditBetaTesterCode(APIView):
                             {
                                 "op": "replace",
                                 "path": "/billing_cycles/frequency/interval_count",
-                                "value": int(beta_tester_code_days)
+                                "value": int(request.data['days'])
                             }
                         ]
                         if plan_type == 'Indie Payment Monthly':
@@ -4955,7 +4955,7 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if indie_monthly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_monthly_plan_id
+                                plans_updated_list += testercode_instance.indie_monthly_plan_id + " "
                             else:
                                 plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
                         elif plan_type == 'Indie Payment Yearly':
@@ -4967,7 +4967,7 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if indie_yearly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_yearly_plan_id
+                                plans_updated_list += testercode_instance.indie_yearly_plan_id + " "
                             else:
                                 plans_failed += testercode_instance.indie_yearly_plan_id + ' days,'
                         elif plan_type == 'Pro Payment Monthly':
@@ -4979,7 +4979,9 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if pro_monthly_update_plan_full_url_response.status_code == 204:
-                                print("part_2_success_3")
+                                plans_updated_list += testercode_instance.pro_monthly_plan_id + " "
+                            else:
+                                plans_failed += testercode_instance.pro_monthly_plan_id + ' days,'
                         elif plan_type == 'Pro Payment Yearly':
                             pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
                             pro_yearly_update_plan_full_url_response = requests.patch(
@@ -4989,7 +4991,9 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if pro_yearly_update_plan_full_url_response.status_code == 204:
-                                print("part_2_success_4")
+                                plans_updated_list += testercode_instance.pro_yearly_plan_id + " "
+                            else:
+                                plans_failed += testercode_instance.pro_yearly_plan_id + ' days,'
                         elif plan_type == 'Company Payment Monthly':
                             company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
                             company_monthly_update_plan_full_url_response = requests.patch(
@@ -4999,7 +5003,9 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if company_monthly_update_plan_full_url_response.status_code == 204:
-                                print("part_2_success_5")
+                                plans_updated_list += testercode_instance.company_monthly_plan_id + " "
+                            else:
+                                plans_failed += testercode_instance.company_monthly_plan_id + ' days,'
                         elif plan_type == 'Company Payment Yearly':
                             company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
                             company_yearly_update_plan_full_url_response = requests.patch(
@@ -5009,7 +5015,15 @@ class EditBetaTesterCode(APIView):
                                                         'Authorization': access_token_string},
                                                 )
                             if company_yearly_update_plan_full_url_response.status_code == 204:
-                                print("part_2_success_6")
+                                plans_updated_list += testercode_instance.company_yearly_plan_id + " "
+                            else:
+                                plans_failed += testercode_instance.company_yearly_plan_id + ' days,'
+                    word_list = plans_updated_list.split()
+                    number_of_words = len(word_list)
+                    if number_of_words == 12:
+                        serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
+                                request.data)
+                        return Response(serializer.data)
                 else:
                     # update the local db
                     serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
