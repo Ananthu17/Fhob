@@ -289,19 +289,27 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.get_full_name()
 
+    # def get_full_name(self):
+    #     if self.is_superuser:
+    #         name = "Admin"
+    #     elif self.middle_name:
+    #         name = self.first_name+" "+self.middle_name+" "+self.last_name
+    #     else:
+    #         name = self.first_name+" "+self.last_name
+    #     return name
+    
     def get_full_name(self):
         if self.is_superuser:
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
-        else:
+        elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
+        else:
+            name = self.email
         return name
-    
-    
-
 
     def get_height_in_meters(self):
         if self.feet:
