@@ -11,15 +11,14 @@
     <div style="max-width: 1080px; width: 100%; margin-left: auto; margin-right: auto;">
         <div style="margin: 10px;">
             <div style="margin-left:18px">
-                <div style="display: flex; justify-content: center; align-items: center;">
+                <div style="width: 343px; height: 243px; margin:0 auto">
                     <div style="width: 343px; height: 266px;">
                         <img src="https://film-hobo-static.s3.amazonaws.com/initial_user/img/landing_logo_n.png" style="width: 100%; height: 100%;" alt="">
                     </div>
                 </div>
                 <div style="font-size: 16px; font-family: sans-serif;">
                     <p>
-                        Dear {{ user_name }} thank you for joining FilmHobo tribe! We are supper excited to see your
-                        work!
+                        Dear {{ user_name }} thank you for joining FilmHobo tribe! We are supper excited to see your work!
                     </p>
                     <p>
                         Here are the details of your membership.
@@ -29,23 +28,17 @@
                     <table style="border-collapse: collapse; width: 100%;">
                         <tbody>
                             <tr>
-                                <th
-                                    style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-left: none; width: 25%;">
-                                    Name</th>
-                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">
-                                    Membership Type</th>
-                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">
-                                    Order #</th>
-                                <th
-                                    style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-right: none; width: 25%;">
-                                    Date</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-left: none; width: 25%;">Name</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">Membership Type</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">Order #</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-right: none; width: 25%;">Date</th>
                             </tr>
                             <tr>
                                 <td style="font-weight: 500;  padding: 10px; color: #ada9a9;">{{ user_name }}</td>
                                 {% if user_membership == 'IND' %}
                                     <td style="font-weight: 500;  padding: 10px; text-align: center;">Indie</td>
                                 {% elif user_membership == 'PRO' %}
-                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Pro</td>
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Indie</td>
                                 {% elif user_membership == 'COM' %}
                                     <td style="font-weight: 500;  padding: 10px; text-align: center;">Company</td>
                                 {% endif %}
@@ -59,16 +52,10 @@
                     <table style="border-collapse: collapse; width: 100%;">
                         <tbody>
                             <tr>
-                                <th
-                                    style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-left: none; width: 25%;">
-                                    Payment Method</th>
-                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">Plan
-                                </th>
-                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">
-                                    Price</th>
-                                <th
-                                    style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-right: none; width: 25%;">
-                                    Free Trial</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-left: none; width: 25%;">Payment Method</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">Plan</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; width: 25%;">Price</th>
+                                <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-right: none; width: 25%;">Free Trial</th>
                             </tr>
                             <tr>
                                 {% if payment_method == 'paypal_account' %}
@@ -81,85 +68,74 @@
                                 {% else %}
                                     <td style="font-weight: 500;  padding: 10px; text-align: center;">Yearly</td>
                                 {% endif %}
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">${{ price }}</td>
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">{{ free_trial_days }} days</td>
+                                <td style="font-weight: 500;  padding: 10px; text-align: center;">${{price}}</td>
+                                <td style="font-weight: 500;  padding: 10px; text-align: center;">{{free_trial_days}} days</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div
-                    style="margin-top: 42px; display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%, 350px),1fr)); grid-row-gap: 40px; font-size: 16px; font-family: sans-serif;">
-                    <div>
-                        <div>
-                            As of {{ start_date }}:
-                        </div>
-                        <hr
-                            style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
-                            <div>${{ start_date_total_purchase_value }}</div>
-                        </div>
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{ start_date_sales_tax_percentage }}%):</div>
-                            <div>${{ start_date_sales_tax_value }}</div>
-                        </div>
-                        <hr
-                            style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
-                            <div>${{ start_date_order_total_value }}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <div>
-                            As of {{ start_date_after_trial }}:
-                        </div>
-                        <hr
-                            style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
-                            <div>${{ paid_start_date_total_purchase_value }}</div>
-                        </div>
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{ paid_start_date_sales_tax_percentage }}%):</div>
-                            <div>${{ paid_start_date_sales_tax_value }}</div>
-                        </div>
-                        <hr
-                            style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
-                            <div>${{ paid_start_date_order_total_value }}</div>
-                        </div>
-                    </div>
-                    <div>
-
-                    </div>
+                <div style="margin-top: 42px; overflow-x:auto;">
+                    <table style="font-size: 16px; font-family: sans-serif;">
+                        <tr>
+                            <td style="padding-right: 55px;">
+                                <div>
+                                    As of {{ start_date }}:
+                                </div>
+                                <hr style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
+                                    <div>${{ start_date_total_purchase_value }}</div>
+                                </div>
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div  style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{start_date_sales_tax_percentage}}%):</div>
+                                    <div>${{ start_date_sales_tax_value }}</div>
+                                </div>
+                                <hr style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div  style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
+                                    <div>${{ start_date_order_total_value }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    As of {{ start_date_after_trial }}:
+                                </div>
+                                <hr style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
+                                    <div>${{ paid_start_date_total_purchase_value }}</div>
+                                </div>
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div  style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{ paid_start_date_sales_tax_percentage }}%):</div>
+                                    <div>${{ paid_start_date_sales_tax_value }}</div>
+                                </div>
+                                <hr style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                                <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
+                                    <div  style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
+                                    <div>${{ paid_start_date_order_total_value }}</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
                 <div style="margin-top: 40px; font-size: 17px; font-family: sans-serif; font-weight: 500;">
                     <p style="margin-bottom: 2px; margin-top: 2px;">
-                        You'll pay ${{paid_start_date_order_total_value}} each month (plus tax if any) once your free trial ends on {{ start_date_after_trial }}. You can
-                        cancel your membership any time before the free trial ends to avoid charges.
+                        You'll pay ${{paid_start_date_order_total_value}} each month (plus tax if any) once your free trial ends on {{start_date_after_trial}}. You can cancel your membership any time before the free trial ends to avoid charges.
                     </p>
                 </div>
             </div>
             <footer style="margin-top: 35px; margin-bottom: 45px;">
-                <hr
-                    style="margin-left:0; margin-right:0; margin-top: 4px;  width:100%; color:#0071bc; border:none; border-bottom:1px solid; margin-bottom: 20px;">
-                <div
-                    style="margin-top: 35px; display: flex; flex-direction: column; justify-content: center;align-items: center; row-gap: 15px; font-size: 13px; font-family: sans-serif;">
-                    <div>
-                        <a href="{{privacy_policy_url}}" style="color: #2c43ff;">Privacy Policy</a> | <a href="{{terms_of_service_url}}" style="color:#2c43ff">Terms
-                            of Service</a>
+                <hr style="margin-left:0; margin-right:0; margin-top: 4px;  width:100%; color:#0071bc; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                <div style="margin-top: 35px;font-size: 13px; font-family: sans-serif;">
+                    <div style="margin: 0 auto;text-align: center;">
+                       <a href="{{privacy_policy_url}}" style="color: #2c43ff;">Privacy Policy</a> | <a href="{{terms_of_service_url}}" style="color:#2c43ff">Terms of Service</a>
                     </div>
-                    <div>
+                    <div style="margin: 0 auto;text-align: center;">
                         © 2021 All rights reserved - FilmHobo®
                     </div>
                 </div>
             </footer>
         </div>
     </div>
-
 </body>
-
 </html>
-</body>
