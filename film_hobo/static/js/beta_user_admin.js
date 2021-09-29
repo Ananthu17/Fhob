@@ -48,52 +48,6 @@ function deleteCodeFunction(obj_id) {
   $("#payment_admin_modal").modal('show');
 }
 
-function editCodeFunction(obj_id) {
-  edit_field_element = '#modify_edit_' + obj_id
-  edit_state = $(edit_field_element).text()
-  if (edit_state === 'Edit'){
-      $(edit_field_element).html("Save");
-
-      editable_fields = 'edit' + obj_id
-      var editable_elements = document.getElementsByClassName(editable_fields);
-      for (var i = 0; i < editable_elements.length; i++) {
-          element_to_change = editable_elements
-          if (editable_elements.item(i).contentEditable == true) {
-              editable_elements.item(i).contentEditable = false;
-          } else {
-              editable_elements.item(i).contentEditable = true;
-          }
-      }
-  }
-  else{
-    editable_fields = 'edit' + obj_id
-    var editable_elements = document.getElementsByClassName(editable_fields);
-    edit_beta_tester_code_url = origin_url + '/hobo_user/edit-beta-tester-code/'
-
-    for (var i = 0; i < editable_elements.length; i++) {
-      beta_tester_code_val = editable_elements.item(0).textContent
-      amount_val = editable_elements.item(1).textContent
-    }
-    editable_fields = '.edit' + obj_id
-    var edit_class = $(editable_fields);
-
-    beta_tester_code_args = {
-      "code": editable_elements[0].innerText,
-      "days": editable_elements[1].innerText,
-    }
-
-    axios.put(edit_beta_tester_code_url, beta_tester_code_args, {headers: {'Authorization': authorization_str}})
-    .then((response) => {
-      if (response.status == 200){
-
-      }
-    }, (error) => {
-      console.log(error);
-    });
-
-  }
-}
-
 $( document ).ready(function() {
   axios.get(get_list_url, {headers: {'Authorization': authorization_str}})
   .then((response) => {

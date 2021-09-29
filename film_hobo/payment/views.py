@@ -1487,6 +1487,21 @@ class PayPalSendEmail(APIView):
         payment_method = transaction_obj.payment_method
         payment_plan = transaction_obj.payment_plan
         price = float(transaction_obj.final_amount)
+
+        start_date_total_purchase_value = "00.00"
+        start_date_sales_tax_percentage = 0.0
+        start_date_sales_tax_value = "00.00"
+        start_date_order_total_value = "00.00"
+
+        paid_start_date_total_purchase_value = '{:.2f}'.format(round(price, 2))
+        paid_start_date_sales_tax_percentage = 0.0
+        paid_start_date_sales_tax_value = "00.00"
+        paid_start_date_order_total_value = '{:.2f}'.format(round(price, 2))
+
+        base_url = settings.ORIGIN_URL
+        privacy_policy_url = base_url + '/general/privacy_policy/'
+        terms_of_service_url = base_url + '/general/terms_of_service/'
+
         html_context = {
             'user_name': transaction_obj.user.get_full_name(),
             'user_membership': transaction_obj.user.membership,
@@ -1499,18 +1514,22 @@ class PayPalSendEmail(APIView):
             'price': price,
             'free_trial_days': transaction_obj.days_free,
 
-            'start_date_total_purchase_value': '',
-            'start_date_sales_tax_percentage': '',
-            'start_date_sales_tax_value': '',
-            'start_date_order_total_value': '',
+            'start_date_total_purchase_value': start_date_total_purchase_value,
+            'start_date_sales_tax_percentage': start_date_sales_tax_percentage,
+            'start_date_sales_tax_value': start_date_sales_tax_value,
+            'start_date_order_total_value': start_date_order_total_value,
 
-            'paid_start_date_total_purchase_value': '',
-            'paid_start_date_sales_tax_percentage': '',
-            'paid_start_date_sales_tax_value': '',
-            'paid_start_date_order_total_value': '',
+            'paid_start_date_total_purchase_value':
+            paid_start_date_total_purchase_value,
+            'paid_start_date_sales_tax_percentage':
+            paid_start_date_sales_tax_percentage,
+            'paid_start_date_sales_tax_value':
+            paid_start_date_sales_tax_value,
+            'paid_start_date_order_total_value':
+            paid_start_date_order_total_value,
 
-            'privacy_policy_url': 'http://127.0.0.1:8000/general/privacy_policy/',
-            'terms_of_service_url': 'http://127.0.0.1:8000/general/terms_of_service/',
+            'privacy_policy_url': privacy_policy_url,
+            'terms_of_service_url': terms_of_service_url,
         }
         text_context = {
             'user_name': transaction_obj.user.get_full_name,

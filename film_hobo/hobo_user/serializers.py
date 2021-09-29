@@ -1132,9 +1132,3 @@ class AddBetaTesterCodeSerializer(serializers.ModelSerializer):
                   'pro_monthly_plan_id', 'pro_yearly_plan_id',
                   'company_monthly_plan_id', 'company_yearly_plan_id']
 
-
-class EditBetaTesterCodeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = BetaTesterCodes
-        fields = ['code', 'days']

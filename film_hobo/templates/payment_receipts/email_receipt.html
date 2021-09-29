@@ -42,7 +42,13 @@
                             </tr>
                             <tr>
                                 <td style="font-weight: 500;  padding: 10px; color: #ada9a9;">{{ user_name }}</td>
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">Pro</td>
+                                {% if user_membership == 'IND' %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Indie</td>
+                                {% elif user_membership == 'PRO' %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Pro</td>
+                                {% elif user_membership == 'COM' %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Company</td>
+                                {% endif %}
                                 <td style="font-weight: 500;  padding: 10px; text-align: center;">{{ order_id }}</td>
                                 <td style="font-weight: 500;  padding: 10px; text-align: center;">{{ start_date }}</td>
                             </tr>
@@ -70,10 +76,10 @@
                                 {% else %}
                                     <td style="font-weight: 500;  padding: 10px;">Card Payment</td>
                                 {% endif %}
-                                {% if payment_plan == 'monthly' %}
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">Monthly</td>
+                                {% if plan == 'monthly' %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Monthly</td>
                                 {% else %}
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">Yearly</td>
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Yearly</td>
                                 {% endif %}
                                 <td style="font-weight: 500;  padding: 10px; text-align: center;">${{ price }}</td>
                                 <td style="font-weight: 500;  padding: 10px; text-align: center;">{{ free_trial_days }} days</td>
@@ -91,17 +97,17 @@
                             style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                             <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
-                            <div>$0.00</div>
+                            <div>${{ start_date_total_purchase_value }}</div>
                         </div>
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax (0%):</div>
-                            <div>$0.00</div>
+                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{ start_date_sales_tax_percentage }}%):</div>
+                            <div>${{ start_date_sales_tax_value }}</div>
                         </div>
                         <hr
                             style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                             <div style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
-                            <div>$0.00</div>
+                            <div>${{ start_date_order_total_value }}</div>
                         </div>
                     </div>
                     <div>
@@ -112,17 +118,17 @@
                             style="margin-left:0; margin-right:0; margin-top: 2px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                             <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:</div>
-                            <div>${{price}}</div>
+                            <div>${{ paid_start_date_total_purchase_value }}</div>
                         </div>
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax (0%):</div>
-                            <div>$0.00</div>
+                            <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{ paid_start_date_sales_tax_percentage }}%):</div>
+                            <div>${{ paid_start_date_sales_tax_value }}</div>
                         </div>
                         <hr
                             style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
                         <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                             <div style="max-width:130px; width: 100%; word-break: break-word;">Order Total:</div>
-                            <div>${{price}}</div>
+                            <div>${{ paid_start_date_order_total_value }}</div>
                         </div>
                     </div>
                     <div>
@@ -131,7 +137,7 @@
                 </div>
                 <div style="margin-top: 40px; font-size: 17px; font-family: sans-serif; font-weight: 500;">
                     <p style="margin-bottom: 2px; margin-top: 2px;">
-                        You'll pay $15 each month (plus tax if any) once your free trial ends on {{ start_date_after_trial }}. You can
+                        You'll pay ${{paid_start_date_order_total_value}} each month (plus tax if any) once your free trial ends on {{ start_date_after_trial }}. You can
                         cancel your membership any time before the free trial ends to avoid charges.
                     </p>
                 </div>

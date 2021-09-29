@@ -63,7 +63,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
                    AddBetaTesterCode, ListBetaTesterCode, \
-                   DeleteBetaTesterCode, EditBetaTesterCode, \
+                   DeleteBetaTesterCode, \
                    CheckBetaTesterCode, ProjectDateFilterAPI, \
                    GetBetaTesterCodeId, HomeProjectAPIView, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
@@ -194,8 +194,6 @@ urlpatterns = [
          name='list-beta-tester-code'),
     path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
          name='delete-beta-tester-code'),
-    path('edit-beta-tester-code/', EditBetaTesterCode.as_view(),
-         name='edit-beta-tester-code'),
     path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
          name='check-beta-tester-code'),
     path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
