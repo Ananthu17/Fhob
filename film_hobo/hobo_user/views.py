@@ -5369,7 +5369,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        mode_operation="create"
+        mode_operation="create" 
         context['mode_operation']=mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
@@ -5377,8 +5377,102 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request):
         try:
+            print(request.POST)
+            # import pdb
+            # pdb.set_trace()
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
+            project=Project()
+
+            #Passing cast_star rating
+            cast_star1=request.POST.get('cast-star1')
+            cast_star2=request.POST.get('cast-star2')
+            cast_star3=request.POST.get('cast-star3')
+            
+            cast_star_smar=0
+           
+            
+            if (cast_star1!=''):
+                if (cast_star1=='1'):
+                    cast_star1=project.INDIE_WITH_RATING_1_STAR
+                elif(cast_star1=='2'):
+                    cast_star1=project.INDIE_WITH_RATING_2_STAR
+                elif(cast_star1=='3'):
+                    cast_star1=project.INDIE_WITH_RATING_3_STAR
+                elif(cast_star1=='4'):
+                    cast_star1=project.INDIE_WITH_RATING_4_STAR
+                elif(cast_star1=='5'):
+                    cast_star1=project.INDIE_WITH_RATING_5_STAR
+                cast_star_smar=cast_star1
+            elif(cast_star2!=''):
+                if (cast_star2=='1'):
+                    cast_star2=project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2=='2'):
+                    cast_star2=project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2=='3'):
+                    cast_star2=project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2=='4'):
+                    cast_star2=project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2=='5'):
+                    cast_star2=project.PRO_WITH_RATING_5_STAR
+                cast_star_smar=cast_star2
+            elif(cast_star3!=''):
+                if (cast_star3=='1'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3=='2'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3=='3'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3=='4'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3=='5'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar=cast_star3
+
+            #Passing crew_star rating
+            crew_star1=request.POST.get('crew-star1')
+            crew_star2=request.POST.get('crew-star2')
+            crew_star3=request.POST.get('crew-star3')
+            
+            crew_star_smar=0
+            
+            if (crew_star1!=''):
+                if (crew_star1=='1'):
+                    crew_star1=project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1=='2'):
+                    crew_star1=project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1=='3'):
+                    crew_star1=project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1=='4'):
+                    crew_star1=project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1=='5'):
+                    crew_star1=project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar=crew_star1
+            if (crew_star2!=''):
+                if (crew_star2=='1'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_1_STAR
+                elif (crew_star2=='2'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_2_STAR
+                elif (crew_star2=='3'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_3_STAR
+                elif (crew_star2=='4'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_4_STAR
+                elif (crew_star2=='5'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_5_STAR
+                crew_star_smar=crew_star2
+            if (crew_star3!=''):
+                if (crew_star3=='1'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
+                if (crew_star3=='2'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
+                if (crew_star3=='3'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
+                if (crew_star3=='4'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
+                if (crew_star3=='5'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
+                crew_star_smar=crew_star3
+
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
             print("valid ahno writer:", writerform.is_valid())
@@ -5386,7 +5480,10 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             if projectform.is_valid() and writerform.is_valid():
                 writer = writerform.save()
                 project = projectform.save()
+                project.cast_samr=cast_star_smar
+                project.crew_samr=crew_star_smar
                 writer.project = project
+                project.save()
                 writer.save()
                 messages.success(request, "New project added.")
                 return HttpResponseRedirect(
@@ -5420,7 +5517,95 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project=get_object_or_404(Project, id=self.kwargs.get('id'))
             writer=Writer.objects.get(project=project.id)
             print(request.POST)
+
+            #Updating  cast_star rating
+            cast_star1=request.POST.get('cast-star1')
+            cast_star2=request.POST.get('cast-star2')
+            cast_star3=request.POST.get('cast-star3')
             
+            cast_star_smar=0
+            
+            if (cast_star1!=''):
+                if (cast_star1=='1'):
+                    cast_star1=project.INDIE_WITH_RATING_1_STAR
+                elif(cast_star1=='2'):
+                    cast_star1=project.INDIE_WITH_RATING_2_STAR
+                elif(cast_star1=='3'):
+                    cast_star1=project.INDIE_WITH_RATING_3_STAR
+                elif(cast_star1=='4'):
+                    cast_star1=project.INDIE_WITH_RATING_4_STAR
+                elif(cast_star1=='5'):
+                    cast_star1=project.INDIE_WITH_RATING_5_STAR
+                cast_star_smar=cast_star1
+            elif(cast_star2!=''):
+                if (cast_star2=='1'):
+                    cast_star2=project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2=='2'):
+                    cast_star2=project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2=='3'):
+                    cast_star2=project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2=='4'):
+                    cast_star2=project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2=='5'):
+                    cast_star2=project.PRO_WITH_RATING_5_STAR
+                cast_star_smar=cast_star2
+            elif(cast_star3!=''):
+                if (cast_star3=='1'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3=='2'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3=='3'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3=='4'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3=='5'):
+                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar=cast_star3
+
+            #Updating crew_star rating
+            crew_star1=request.POST.get('crew-star1')
+            crew_star2=request.POST.get('crew-star2')
+            crew_star3=request.POST.get('crew-star3')
+            
+            crew_star_smar=0
+            
+            if (crew_star1!=''):
+                if (crew_star1=='1'):
+                    crew_star1=project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1=='2'):
+                    crew_star1=project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1=='3'):
+                    crew_star1=project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1=='4'):
+                    crew_star1=project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1=='5'):
+                    crew_star1=project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar=crew_star1
+            if (crew_star2!=''):
+                if (crew_star2=='1'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_1_STAR
+                elif (crew_star2=='2'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_2_STAR
+                elif (crew_star2=='3'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_3_STAR
+                elif (crew_star2=='4'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_4_STAR
+                elif (crew_star2=='5'):
+                    crew_star2=project.PRO_AND_COMP_WITH_RATING_5_STAR
+                crew_star_smar=crew_star2
+            if (crew_star3!=''):
+                if (crew_star3=='1'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
+                if (crew_star3=='2'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
+                if (crew_star3=='3'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
+                if (crew_star3=='4'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
+                if (crew_star3=='5'):
+                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
+                crew_star_smar=crew_star3
+
             projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
             writerform = WriterForm(request.POST or None,instance=writer)
             new_writer=request.POST.get('new_writer')
@@ -5430,10 +5615,14 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             print("valid ahno writer:", writerform.is_valid())
             print('form error writer', writerform.errors)
             if projectform.is_valid() and writerform.is_valid():
+                
                 writer = writerform.save()
                 project = projectform.save()
+                project.cast_samr=cast_star_smar
+                project.crew_samr=crew_star_smar
                 writer.project = project
                 writer.name=new_writer
+                project.save()
                 writer.save()
                 messages.success(request, "Project Updated Successfully.")
                 return HttpResponseRedirect(

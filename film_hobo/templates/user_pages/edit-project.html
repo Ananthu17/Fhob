@@ -32,6 +32,39 @@
 
         }
        
+        .star-rating__ico{
+           
+           padding-left: 2px;
+           cursor: pointer;
+           color: #FFB300;
+        }
+        .cast-star-rating1 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .cast-star-rating2 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .cast-star-rating3 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .crew-star-rating1{
+
+            font-size:1em;
+            cursor: pointer;
+        }
+        .crew-star-rating2{
+
+        font-size:1em;
+        cursor: pointer;
+        }
+        .crew-star-rating3{
+
+        font-size:1em;
+        cursor: pointer;
+        }
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
@@ -89,6 +122,7 @@
                             </div>
                             <div class="col-6">
                                 {{writerform.name}}
+                                
                             </div>
 
                             {% if mode_operation == 'update' %}
@@ -140,7 +174,7 @@
                                 <label class="form-title mem-setup-blu-f">NUMBER OF PAGES:</label>
                             </div>
                             <div class="col-6">
-                                <input class="inp-line" placeholder="" type="number" required />
+                                {{form.number_of_pages}}
                             </div>
                         </div>
 
@@ -414,43 +448,83 @@
                             <div class="col-md-9 mt-3">
                                 {{form.cast_samr}}
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="0" {% if project_obj.cast_samr == project_obj.INDIE_WITH_RATING_1_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_2_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_3_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_4_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_5_STAR %} checked{% endif %}    required>
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="cast-star-rating1"> 
+                                        <label class="containerradio bold">Indie
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            {% if project_obj.cast_samr == project_obj.INDIE_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" value="1" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" value="2" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" value="3" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" value="4" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" value="5" >
+                                            {% else %}
+                                            <input type="hidden" name="cast-star1" class="rating-value1" >
+                                            {% endif %}
+                                            <input type="radio" name="radiorow7" id="star1" onclick="selectsamr(this)" value="0" {% if project_obj.cast_samr == project_obj.INDIE_WITH_RATING_1_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_2_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_3_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_4_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_5_STAR %} checked{% endif %}    required>
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Pro
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="5"  {% if project_obj.cast_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_5_STAR  %} checked{% endif %} >
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="cast-star-rating2"> 
+                                        <label class="containerradio bold">Pro
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+
+                                            {% if project_obj.cast_samr == project_obj.PRO_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2" value="1" >
+                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2" value="2" >
+                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2" value="3" >
+                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2" value="4" >
+                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2" value="5" >
+                                            {% else %}
+                                            <input type="hidden" name="cast-star2" class="rating-value2">
+                                            {% endif %}
+                                            <input type="radio" name="radiorow7" id="star2" onclick="selectsamr(this)" value="5"  {% if project_obj.cast_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_5_STAR  %} checked{% endif %} >
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie & Pro
-                                        <span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)"   value="10"   {% if project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="cast-star-rating3"> 
+                                        <label class="containerradio bold">Indie & Pro
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            {% if project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" value="1" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" value="2" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" value="3" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" value="4" >
+                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" value="5" >
+                                            {% else %}
+                                            <input type="hidden" name="cast-star3" class="rating-value3" >
+                                            {% endif %}
+                                            <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)"   value="10"   {% if project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -463,43 +537,82 @@
                             <div class="col-md-9 mt-3">
                                 {{form.crew_samr}}
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)"  value="1"  {% if project_obj.crew_samr == project_obj.INDIE_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_5_STAR  %} checked{% endif %}  required >
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating1"> 
+                                        <label class="containerradio bold">Indie
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            {% if project_obj.crew_samr == project_obj.INDIE_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="1" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="2" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="3" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="4" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="5" >
+                                            {% else %}
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" >
+                                            {% endif %}
+                                            <input type="radio" name="radiorow8" id="crew1" onclick="selectsamr(this)"  value="1"  {% if project_obj.crew_samr == project_obj.INDIE_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_5_STAR  %} checked{% endif %}  required >
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Pro & Comp
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)" value="6" {% if project_obj.crew_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_5_STAR %} checked{% endif %} >
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating2"> 
+                                        <label class="containerradio bold">Pro & Comp
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            {% if project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="1">
+                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="2">
+                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="3">
+                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="4">
+                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="5">
+                                            {% else %}
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" >
+                                            {% endif %}
+                                            <input type="radio" name="radiorow8"  id="crew2" onclick="selectsamr(this)" value="6" {% if project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_5_STAR %} checked{% endif %} >
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie, Pro & Comp
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)" value="11"  {% if project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating3"> 
+                                        <label class="containerradio bold">Indie, Pro & Comp
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            {% if project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="1" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="2" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="3" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="4" >
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="5" >
+                                            {% else %}
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" >
+                                            {% endif %}
+                                            <input type="radio" name="radiorow8" id="crew3" onclick="selectsamr(this)" value="11"  {% if project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR  %} checked{% endif %}>
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>   
                                 </div>
                             </div>
                         </div>
@@ -512,13 +625,7 @@
                                 <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
-                                        <!-- <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span> -->
+                                        
                                         <input type="radio" name="radiorow9" id="public_script" onclick="selectscript(this)" value="0" {% if project_obj.script_visibility == project_obj.PUBLIC %}checked{% endif%}>
                                         <span class="checkmarkagree"></span>
                                     </label>
@@ -543,13 +650,7 @@
                             <div class="col-md-6 mt-3">
                                 <div class="form-check-inline">
                                     <label class="containerradio bold" style="margin-right: 1em;">Private
-                                        <!-- <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span> -->
+                                       
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" {% if project_obj.script_visibility == project_obj.PRIVATE %}checked{% endif%} required>
                                         <span class="checkmarkagree"></span>
                                     </label>
@@ -835,6 +936,249 @@ $(document).ready(function() {
             toggleVisibility("Menu2");
         }
     });
+
+
+
+// Star rating for Indi  Cast Smar
+var $radio_star1=$('#star1')
+var $star_rating1 = $('.cast-star-rating1 .fa');
+
+var SetRatingStar1 = function() {
+  return $star_rating1.each(function() {
+    if (parseInt($star_rating1.siblings('input.rating-value1').val()) >= parseInt($(this).data('rating'))) {
+        console.log(parseInt($star_rating1.siblings('input.rating-value1').val()));
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star1.on('click', function(){
+    if($radio_star1.prop('checked')){
+        $star_rating1.on('click', function() {
+        console.log($radio_star1)
+        $star_rating1.siblings('input.rating-value1').val($(this).data('rating'));
+    return SetRatingStar1();
+});
+}
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    console.log($radio_star1.prop('checked'))
+    $star_rating1.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar1();
+
+
+
+// Star rating for Pro Cast Smar
+
+var $radio_star2=$('#star2')
+var $star_rating2 = $('.cast-star-rating2 .fa');
+
+var SetRatingStar2 = function() {
+  return $star_rating2.each(function() {
+    if (parseInt($star_rating2.siblings('input.rating-value2').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star2.on('click', function(){
+if($radio_star2.prop('checked')){
+$star_rating2.on('click', function() {
+
+  $star_rating2.siblings('input.rating-value2').val($(this).data('rating'));
+  return SetRatingStar2();
+});
+}
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    
+    $star_rating2.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar2();
+
+
+// Star rating for Indi & Pro Cast Smar
+
+var $radio_star3=$('#star3')
+var $star_rating3 = $('.cast-star-rating3 .fa');
+
+var SetRatingStar3 = function() {
+  return $star_rating3.each(function() {
+    if (parseInt($star_rating3.siblings('input.rating-value3').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star3.on('click', function(){
+if($radio_star3.prop('checked')){
+$star_rating3.on('click', function() {
+
+  $star_rating3.siblings('input.rating-value3').val($(this).data('rating'));
+  return SetRatingStar3();
+});
+}
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    
+    $star_rating3.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar3();
+
+
+// Star rating for Indi  Crew Smar
+
+var $cw_radio_star1=$('#crew1')
+var $cw_star_rating1 = $('.crew-star-rating1 .fa');
+
+var Cw_SetRatingStar1 = function() {
+  return $cw_star_rating1.each(function() {
+    if (parseInt($cw_star_rating1.siblings('input.cw-rating-value1').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star1.on('click', function(){
+    if($cw_radio_star1.prop('checked')){
+        $cw_star_rating1.on('click', function() {
+        $cw_star_rating1.siblings('input.cw-rating-value1').val($(this).data('rating'));
+  return Cw_SetRatingStar1();
+        });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating1.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar1();
+
+
+// Star rating for Pro & Comp Crew Smar
+
+var $cw_radio_star2=$('#crew2')
+var $cw_star_rating2 = $('.crew-star-rating2 .fa');
+
+var Cw_SetRatingStar2 = function() {
+  return $cw_star_rating2.each(function() {
+    if (parseInt($cw_star_rating2.siblings('input.cw-rating-value2').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star2.on('click', function(){
+    if($cw_radio_star2.prop('checked')){
+        $cw_star_rating2.on('click', function() {
+
+        $cw_star_rating2.siblings('input.cw-rating-value2').val($(this).data('rating'));
+    return Cw_SetRatingStar2();
+     });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating2.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar2();
+
+
+
+
+// Star rating for Indi, Pro & Comp Crew Smar
+
+var $cw_radio_star3=$('#crew3')
+var $cw_star_rating3 = $('.crew-star-rating3 .fa');
+
+var Cw_SetRatingStar3 = function() {
+  return $cw_star_rating3.each(function() {
+    if (parseInt($cw_star_rating3.siblings('input.cw-rating-value3').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star3.on('click', function(){
+    if($cw_radio_star3.prop('checked')){
+        $cw_star_rating3.on('click', function() {
+        $cw_star_rating3.siblings('input.cw-rating-value3').val($(this).data('rating'));
+    return Cw_SetRatingStar3();
+        });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating3.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar3();
+
+
 
 </script>
 {% endblock %}

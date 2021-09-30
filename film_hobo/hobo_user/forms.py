@@ -410,7 +410,7 @@ class ProjectCreationForm(forms.ModelForm):
         model = Project       
     
         
-        fields = ( 'title','creator','format','genre','cast_pay_rate', 'sag_aftra',
+        fields = ( 'title','creator','number_of_pages','format','genre','cast_pay_rate', 'sag_aftra',
                    'cast_attachment','visibility','script_visibility','visibility_password',
                     'location','cast_samr', 'script','script_password','cast_audition_password',
                     'team_select_password',
@@ -422,6 +422,7 @@ class ProjectCreationForm(forms.ModelForm):
                
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
                 'creator': forms.Select(attrs={'class': 'inp-line'}),
+                'number_of_pages': forms.TextInput(attrs={"class": "inp-line",'type':'number'}),
                 'format': forms.Select(attrs={'class': 'd-none'}),
                 'genre': forms.Select(attrs={'class': 'd-none'}),
                 'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
