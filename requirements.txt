@@ -1,5 +1,6 @@
 braintree==4.10.0
 channels==3.0.3
+celery==5.1.2
 DateTimeRange==1.0.0
 django-crispy-forms==1.11.2
 Django==3.1
@@ -27,13 +28,16 @@ djangorestframework-simplejwt==4.4.0
 fpdf==1.7.2
 # fitz==0.0.1.dev2
 jsmin==2.2.2
+# mammoth==1.4.17
 paypal-checkout-serversdk==1.0.1
 pdf2image==1.16.0
 phonenumbers==8.12.21
 Pillow==8.2.0
 psycopg2-binary==2.8.6
+PyDocX==0.9.10
 PyPDF2==1.26.0
 PyMuPDF==1.18.17
+redis==3.5.3
 reportlab==3.5.68
 remote-pdb==2.1.0
 setuptools==56.0.0
@@ -43,8 +47,3 @@ validators==0.18.2
 whitenoise==5.2.0
 zappa==0.52.0
 zappa-django-utils==0.4.1
-reportlab==3.5.68
-django-autoslug==1.9.8
-django-ckeditor==6.1.0
-# mammoth==1.4.17
-PyDocX==0.9.10

@@ -29,5 +29,32 @@ services:
     volumes:
     - db-volume:/var/lib/postgresql/data
 
+  redis:
+    image: redis:4.0.9-alpine
+  celery:
+    build:
+      context: .
+    command: celery -A film_hobo worker -l info
+    volumes:
+      - ./app:/app
+    environment:
+      - DEBUG=1
+      # - SECRET_KEY=qyi$gs%)7&cw$(y8e6at3g1%h#sk+jm7ak54dz!st3k!srca^^
+      # - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
+  celery-beat:
+    build:
+      context: .
+    command: celery -A film_hobo beat -l info
+    volumes:
+      - ./app:/app
+    environment:
+      - DEBUG=1
+      # - SECRET_KEY=qyi$gs%)7&cw$(y8e6at3g1%h#sk+jm7ak54dz!st3k!srca^^
+      # - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
+
 volumes:
   db-volume:

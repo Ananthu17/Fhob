@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
+from celery.schedules import crontab
+import film_hobo.tasks
 import environ
+import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
 
@@ -395,3 +397,17 @@ CKEDITOR_CONFIGS = {
 # SUBSCRIPTION_PAYPAL_FORM = 'paypal.standard.forms.PayPalPaymentsForm'
 
 # SUBSCRIPTION_GRACE_PERIOD = 0
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "film_hobo.tasks.sample_task",
+        "schedule": crontab(minute="*/1"),
+    },
+    "send_email_report": {
+        "task": "film_hobo.tasks.send_email_report",
+        "schedule": crontab(hour="*/1"),
+    },
+}

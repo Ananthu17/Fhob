@@ -34,7 +34,7 @@
                                 <th style="font-weight: 500; border: 1px solid #0071bc; padding: 10px; border-right: none; width: 25%;">Date</th>
                             </tr>
                             <tr>
-                                <td style="font-weight: 500;  padding: 10px; color: #ada9a9;">{{ user_name }}</td>
+                                <td style="font-weight: 500;  padding: 10px; color: #ada9a9; text-align: center;" >{{ user_name }}</td>
                                 {% if user_membership == 'IND' %}
                                     <td style="font-weight: 500;  padding: 10px; text-align: center;">Indie</td>
                                 {% elif user_membership == 'PRO' %}
@@ -59,9 +59,9 @@
                             </tr>
                             <tr>
                                 {% if payment_method == 'paypal_account' %}
-                                    <td style="font-weight: 500;  padding: 10px;">PayPal Account Pay</td>
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">PayPal Account Pay</td>
                                 {% else %}
-                                    <td style="font-weight: 500;  padding: 10px;">Card Payment</td>
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Card Payment</td>
                                 {% endif %}
                                 {% if plan == 'monthly' %}
                                     <td style="font-weight: 500;  padding: 10px; text-align: center;">Monthly</td>

@@ -27,6 +27,7 @@ from .models import PaymentOptions, Transaction, EmailRecord, \
     FilmHoboSenderEmail
 from .serializers import DiscountsSerializer, TransactionSerializer, \
     EmailRecordSerializer
+
 # Create your views here.
 
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
@@ -1527,6 +1528,93 @@ class PayPalSendEmail(APIView):
             paid_start_date_sales_tax_value,
             'paid_start_date_order_total_value':
             paid_start_date_order_total_value,
+
+            'privacy_policy_url': privacy_policy_url,
+            'terms_of_service_url': terms_of_service_url,
+        }
+        text_context = {
+            'user_name': transaction_obj.user.get_full_name,
+        }
+        email_subject = "Welcome to FilmHobo. " \
+            "Here are your subscription details."
+        email_body_text = render_to_string(
+            "payment_receipts/email_receipt.txt", text_context, request
+        )
+        email_body_html = render_to_string(
+            "payment_receipts/email_receipt.html", html_context, request
+        )
+        recipient_email = transaction_obj.user.email
+        email_recipients = [recipient_email]
+        email_from = getattr(
+            settings, "PAYPAL_SENDER_EMAIL",
+        )
+        email_from_obj = FilmHoboSenderEmail.objects.get(email=email_from)
+        success = send_mail(
+            subject=email_subject,
+            message=email_body_text,
+            from_email=email_from,
+            recipient_list=email_recipients,
+            html_message=email_body_html,
+        )
+        email_record_obj = EmailRecord.objects.create(
+            sender=email_from_obj,
+            recipient=transaction_obj.user,
+            email=transaction_obj.user.email,
+            subject=email_subject,
+            sent=success,
+        )
+        serialized_obj_dict = {
+            "when": email_record_obj.when,
+            "sender": email_record_obj.sender.id,
+            "recipient": email_record_obj.recipient.id,
+            "email": email_record_obj.email,
+            "subject": email_record_obj.subject,
+            "sent": email_record_obj.sent
+        }
+        serializer = EmailRecordSerializer(data=serialized_obj_dict)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+
+class PayPalSendRemainderEmail(APIView):
+    """
+    API to send receipt for after monthly subscription is taken transaction
+    """
+    def post(self, request, *args, **kwargs):
+        order_id = request.data['order_id']
+        transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
+        order_date = transaction_obj.date
+        order_date_formated = order_date.strftime("%d/%m/%Y")
+        payment_method = transaction_obj.payment_method
+        payment_plan = transaction_obj.payment_plan
+        price = float(transaction_obj.final_amount)
+
+        total_purchase_value = "00.00"
+        sales_tax_percentage = 0.0
+        sales_tax_value = "00.00"
+        order_total_value = "00.00"
+
+        base_url = settings.ORIGIN_URL
+        privacy_policy_url = base_url + '/general/privacy_policy/'
+        terms_of_service_url = base_url + '/general/terms_of_service/'
+
+        html_context = {
+            'user_name': transaction_obj.user.get_full_name(),
+            'user_membership': transaction_obj.user.membership,
+            'order_id': transaction_obj.id,
+            'order_date': order_date_formated,
+
+            'payment_method': payment_method,
+            'plan': payment_plan,
+            'price': price,
+            'free_trial_days': transaction_obj.days_free,
+
+            'total_purchase_value': total_purchase_value,
+            'sales_tax_percentage': sales_tax_percentage,
+            'sales_tax_value': sales_tax_value,
+            'order_total_value': order_total_value,
 
             'privacy_policy_url': privacy_policy_url,
             'terms_of_service_url': terms_of_service_url,
