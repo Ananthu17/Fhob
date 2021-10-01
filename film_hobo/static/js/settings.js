@@ -90,19 +90,10 @@ $('body').on('click' , '#disable-my-account', function(){
 // block members dropdown
 $(document).ready(function() {
     $('#all_members').select2();
-
-    // origin_url = window.location.origin
-    // get_url = origin_url + '/payment/get_membership_fee_detail/'
-    // var token = localStorage.getItem("token");
-    // token_str = "Token "
-    // token_val = String(token)
-    // var authorization_str = token_str.concat(token_val);
-    // debugger
-    // axios.get(get_url, {headers: {'Authorization': authorization_str}})
-    // .then((response) => {
-    //     var membership_type = $('#membership_type').val()
-    // });
 });
+
+
+
 
 
 // block user tab button

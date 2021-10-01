@@ -54,8 +54,15 @@
                     </div>
                     <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">
                         <ul class="list-inline mb-0 mt-20">
-                            <li class="list-inline-item"><i class="fa fa-envelope header-fnt-clr header-icon-pos"
-                                    aria-hidden="true"></i></li>
+                            <li class="list-inline-item">
+                                <i class="fa fa-envelope header-fnt-clr header-icon-pos message-notification"
+                                    aria-hidden="true">
+                                    {% get_msg_notifications_count request.user as msg_count %}
+                                    {% if msg_count %}
+                                    <span class="msg_notification_count_span">{{msg_count}}</span>
+                                    {% endif %}
+                                </i>
+                            </li>
                             <li class="list-inline-item notification_icon"  data-toggle="modal" data-target="#notificationModal">
                                 <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
                                     {% get_notifications_count request.user as count %}

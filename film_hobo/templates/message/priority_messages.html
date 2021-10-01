@@ -20,7 +20,7 @@
                 </div>
                 <div>
                     <div class="mm-all-msg-sec">
-                        All Messages {% if msg_count != '' %}({{msg_count}}){% endif %}
+                        Priority Messages {% if chat_dict %}({{chat_dict|length}}){% endif %}
                     </div>
                     {% if chat_dict %}
                         {% for chat_with, msg in chat_dict.items %}
@@ -62,13 +62,12 @@
                             </div>
                             <div class="mm-msg-grid-col-2">
                                 <div>
-                                    <a href="{% url 'message:messages' chat_with.id %}" class="msg-txt-color remove-decoration">
+                                <a href="{% url 'message:messages' chat_with.id %}" class="msg-txt-color remove-decoration">
                                 <span class="mm-msg-blue-head">
                                     {% if msg.subject %}{{msg.subject}}{% else %}{% endif %}
                                 </span>
-                                {% get_dict_value read_status_dict chat_with.id as read_status %}
+                                {% get_dict_value status_dict chat_with.id as read_status %}
                                 {% if not read_status %}<b class="all-error-msg"> New</b> {% endif%}
-                                {% if not read_status and msg.subject%}</br> {% endif%}
                                 </div>
                                 <div class="mm-msg-content">
                                     <div class="mm-msg-you">{% if msg.from_user == request.user %}You:{% endif %}</div>
@@ -79,8 +78,6 @@
                             </a>
                                 <div class="mm-delete-sec">
                                     <div id="priority_btn_{{msg.msg_thread}}">
-                                        {% get_dict_value priority_status_dict chat_with.id as is_priority %}
-                                        {% if is_priority == True %}
                                         <a class="remove_from_priority cursor-pointer remove-decoration color-style" id="{{msg.msg_thread}}">
                                             <span class="mm-delete-sec-icon">
                                                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -89,16 +86,6 @@
                                                 <span class="mm-delete-sec-icon-a">Priority</span>
                                             </span>
                                         </a>
-                                        {% else %}
-                                            <a class="priority cursor-pointer remove-decoration color-style" id="{{msg.msg_thread}}">
-                                                <span class="mm-delete-sec-icon">
-                                                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                                                </span>
-                                                <span>
-                                                    <span class="mm-delete-sec-icon-a">Priority</span>
-                                                </span>
-                                            </a>
-                                        {% endif %}
 
                                     </div>
                                     <div>

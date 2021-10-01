@@ -29,6 +29,24 @@ notificationSocket.onmessage = function (e) {
                 )
         }
     });
+    $.ajax
+    ({
+        type: "GET",
+        url: "/message/get-message-notification-api/",
+        dataType: 'json',
+        async: false,
+        data: {},
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", token);
+        },
+        error: function(data){},
+        success: function(response){
+            console.log("count: ",response['unread_msg_count'])
+            $('.message-notification').html(
+                '<span class="msg_notification_count_span">'+response['unread_msg_count']+'</span>'
+                )
+        }
+    });
     let data = JSON.parse(e.data);
     // console.log(data)
     var message = data["message"];

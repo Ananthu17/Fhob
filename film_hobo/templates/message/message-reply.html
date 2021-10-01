@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_account_tag %}
+{% load project_rating_tag %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                {% include 'message/message_side_links.html' %}
+            </div>
+            <div class="col-8">
+            <h3>Reply</h3>
+            {% if user_messages is not 0 %}
+            <div class="height-cls">
+            {% for msg in user_messages %}
+            <div class="mt-2">
+                <u>{% if msg.subject %}{{msg.subject}}{% endif %}</u><br>
+                    {% if msg.from_user == request.user %}
+                        You:
+                    {% else %}
+                        {{msg.from_user.get_full_name}}:
+                    {% endif %}
+                    {{msg.message}}
+                    {% get_dict_value_if_exists img_dict msg.id as images %}
+                    {% if images %}
+                        <div>
+                            {% for img in images %}
+                                <img src="{{img.image.url}}" class="msg-img"
+                                data-toggle="modal" data-target="#image_modal-{{msg.id}}"/>
+                            {% endfor %}
+                        </div>
+<!-- The Modal -->
+<div class="modal fade" id="image_modal-{{msg.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+
+        <div class="modal-body">
+            <div class="row mt-2 img-section-modal">
+                <div class="col-12 text-center">
+                    {% for img in images %}
+                        <img src="{{img.image.url}}" class="msg-img-full-size"
+                        data-toggle="modal" data-target="#image_modal"/>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                    {% endif %}
+                    {% get_dict_value_if_exists file_dict msg.id as files %}
+                    {% if files is not 0 %}
+                    <div>
+                        {% for file in files %}
+                            <img src="{% static 'images/pdf_img.png' %}" class="msg-pdf"
+                            data-toggle="modal" data-target="#pdf-modal-{{file.id}}"/>
+                            <!-- Modal -->
+                            <div class="modal fade" id="pdf-modal-{{file.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body crs-modal-hght">
+                                        <div class="crs-modal-inner">
+                                            <iframe src="{{file.file.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            <!-- end of modal -->
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="all-p-light">
+                        {{msg.created_time}}
+                    </div>
+            </div>
+
+            {% endfor %}
+        </div>
+        <div class="mt-4">
+                <!-- <textarea name="mesage" class="form-control" id="user_message"></textarea>
+                <p class="reason-error msg-err"></p>
+                <button class="btn btn-outline-danger btn-sm reply_message "
+                >Reply</button> -->
+                <form method="post" action="{% url 'message:messages' chat_with_id %}"
+                enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="to_user" value="{{chat_with_id}}" />
+                    Message<textarea name="message" class="form-control" id="user_message"></textarea>
+                    Image<input type="file" id="images" name="images"  accept="image/*" multiple="multiple">
+                    File<input type="file" id="files" name="files"  accept="application/pdf" multiple="multiple">
+                    <p class="reason-error msg-err"></p>
+                    <button class="btn btn-outline-danger btn-sm ">Reply</button>
+            </form>
+        </div>
+            {% else %}
+            <p>No messages to show</p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+     $('body').on('click' , '.reply_message', function(){
+       var token = $("#token").val();
+       data_dict = {};
+       var to_user =  "{{ chat_with_id }}";
+       var user_message = $("#user_message").val();
+
+       if(user_message!=""){
+            data_dict['to_user']=to_user;
+            data_dict['subject']="";
+            data_dict['message']= user_message;
+            console.log(data_dict)
+            $.ajax
+            ({
+                type: "POST",
+                url: "/message/compose-message-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    window.location.reload();
+                }
+            });
+       }else{
+                $(".msg-err").html("This field is required.")
+       }
+     });
+</script>
+{% endblock %}

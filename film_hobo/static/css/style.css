@@ -256,6 +256,13 @@ input.pw {
       padding:2px 6px;
       border-radius:50px;
     }
+.msg_notification_count_span
+    {
+      background-color:red;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:50px;
+    }
 .notification_img
     {
       width:100%;
@@ -730,4 +737,52 @@ input.pw {
 .hover_color:hover
   {
     color:#39b660;
+  }
+
+  .height-cls
+    {
+      height:300px;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+.color-style span
+    {
+      color:#b5b4b4!important;
+    }
+.color-style span:hover
+    {
+      color:#b5b4b4!important;
+    }
+.msg-txt-color
+    {
+      color:inherit;
+    }
+.msg-txt-color:hover
+    {
+      color:inherit;
+    }
+.attachments-txt
+    {
+      color:#0e62b5;
+    }
+.msg-pdf
+{
+  width:5%;
+  height:auto;
+}
+.msg-img
+{
+  width:10%;
+  height:auto;
+}
+.msg-img-full-size
+{
+  width:100%;
+  height:auto;
+}
+.img-section-modal
+  {
+    height:350px;
+    overflow-y:scroll;
   }
