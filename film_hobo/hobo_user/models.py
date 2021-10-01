@@ -296,8 +296,10 @@ class CustomUser(AbstractUser):
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
-        else:
+        elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
+        else:
+            name = self.email
         return name
 
     def get_height_in_meters(self):
