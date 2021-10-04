@@ -326,6 +326,7 @@ class CustomUserSignupHobo(APIView):
 class HowTo(View):
 
     def get(self, request, *args, **kwargs):
+        # import pdb; pdb.set_trace()
         return render(request, 'user_pages/how_to.html')
 
 
@@ -336,6 +337,8 @@ class HomePage(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        project_format = self.request.GET.get('format')
+        context["format"] = project_format
         context["scenes"] = Project.objects.filter(
                             format="SCH").order_by('-id')
         context["toprated_scenes"] = Project.objects.filter(
@@ -5374,8 +5377,11 @@ class ProjectView(LoginRequiredMixin, TemplateView):
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
-    def get_context_data(self, user, **kwargs):
+    def get_context_data(self,user,**kwargs):
+        
         context = super().get_context_data(**kwargs)
+        project_format = self.request.GET.get('format')
+        context["format"] = project_format
         context["scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-id')
         context["toprated_scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-rating')
         context["filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-id')
