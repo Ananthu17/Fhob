@@ -5383,7 +5383,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project=Project()
-
+            cast_pay=request.POST.get('checkbx')
             #Passing cast_star rating
             cast_star1=request.POST.get('cast-star1')
             cast_star2=request.POST.get('cast-star2')
@@ -5482,6 +5482,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 project = projectform.save()
                 project.cast_samr=cast_star_smar
                 project.crew_samr=crew_star_smar
+                project.cast_pay_rate=cast_pay
                 writer.project = project
                 project.save()
                 writer.save()
@@ -5517,7 +5518,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project=get_object_or_404(Project, id=self.kwargs.get('id'))
             writer=Writer.objects.get(project=project.id)
             print(request.POST)
-
+            cast_pay=request.POST.get('checkbx')
             #Updating  cast_star rating
             cast_star1=request.POST.get('cast-star1')
             cast_star2=request.POST.get('cast-star2')
@@ -5620,6 +5621,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 project = projectform.save()
                 project.cast_samr=cast_star_smar
                 project.crew_samr=crew_star_smar
+                project.cast_pay_rate=cast_pay
                 writer.project = project
                 writer.name=new_writer
                 project.save()

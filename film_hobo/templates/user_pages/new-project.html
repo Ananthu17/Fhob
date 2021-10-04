@@ -80,6 +80,9 @@
         font-size:1em;
         cursor: pointer;
         }
+
+        
+        
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
@@ -317,16 +320,26 @@
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
                             </div>
-                            <div class="col-6">
-                                {{form.cast_pay_rate}}
+                            <div class=" containercheck"> 
+                                <div class="checkboxnew" style="margin-left: 1.2em; margin-top: 1em; ">
+                                   <input type="checkbox" style="border: 1px solid #f32121 ;" id="checkbox1" name="checkbx" value="0">
+                                        <label for="checkbox1" style="font-weight: bolder;font-size: 17px;">
+                                            <span><b>$ 0</b></span>
+                                        </label>
+                                
+                                   <input type="checkbox" style="margin-left: 1.2em;" id="checkbox2" name="checkbx" value="1">
+                                        <label for="checkbox2" style="font-weight: bolder; font-size: 13px;">
+                                            <span>NEGOTIABLE</span>
+                                        </label>
+                                </div>
                             </div>
-                        </div>
+                            <!-- </div>
 
-                        <div class="row">
-                            <div class="col-md-2 col-sm-6 ">
+                            <div class="row"> -->
+                            <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
                                 <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
-                            </div>
-                            <div class="col-md-10 col-sm-6 mt-3">
+                             <!-- </div>
+                            <div class="col-md-10 col-sm-6 mt-3"> -->
                                 {{form.sag_aftra}}
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">Ultra Low
@@ -785,13 +798,13 @@
         document.getElementById("id_script").value = "";
         $('#filenameblock').addClass('d-none')
     })
-    $('input:checkbox').change(function(){
-    if($(this).is(":checked")) {
-        $('.containerradio .checkmarkagree').addClass("act");
-    } else {
-        $('.containerradio .checkmarkagree').removeClass("act");
-    }
-    });
+    // $('input:checkbox').change(function(){
+    // if($(this).is(":checked")) {
+    //     $('.containerradio .checkmarkagree').addClass("act");
+    // } else {
+    //     $('.containerradio .checkmarkagree').removeClass("act");
+    // }
+    // });
 
 
 // Visibility Password hide and show eye
@@ -1126,6 +1139,26 @@ $('input:radio[name=radiorow8]').change(function(){
 });
 
 Cw_SetRatingStar3();
+
+
+
+// the selector will match all input controls of type :checkbox
+// and attach a click event handler 
+$("input:checkbox").on('click', function() {
+  // in the handler, 'this' refers to the box clicked on
+  var $box = $(this);
+  if ($box.is(":checked")) {
+    // the name of the box is retrieved using the .attr() method
+    // as it is assumed and expected to be immutable
+    var group = "input:checkbox[name='checkbx']";
+    // the checked state of the group/box on the other hand will change
+    // and the current value is retrieved using .prop() method
+    $(group).prop("checked", false);
+    $box.prop("checked", true);
+  } else {
+    $box.prop("checked", false);
+  }
+});
 
 </script>
 {% endblock %}
