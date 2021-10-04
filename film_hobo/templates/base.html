@@ -115,8 +115,8 @@
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
                                 <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
-                                <a class="dropdown-item" href="#">Scenes</a>
-                                <a class="dropdown-item" href="#">Shorts</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Scenes</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Shorts</a>
                                 <a class="dropdown-item" href="#">Pilots/Features</a>
                             </div>
                         </li>
@@ -126,8 +126,12 @@
                                 SCENES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Projects</a>
+                                {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
+                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=SCH">Films</a>
+                                {% else %}
                                 <a class="dropdown-item" href="#">Films</a>
+                                {% endif %}
                             </div>
                         </li>
                         <!-- Dropdown -->
@@ -136,8 +140,12 @@
                                 SHORTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Projects</a>
+                                {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
+                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=SHO">Films</a>
+                                {% else %}
                                 <a class="dropdown-item" href="#">Films</a>
+                                {% endif %}
                             </div>
                         </li>
                         <!-- Dropdown -->
