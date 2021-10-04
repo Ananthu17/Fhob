@@ -10,12 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-# import film_hobo.tasks
 from celery.schedules import crontab
 import environ
 import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
+import film_hobo.tasks
 
 env = environ.Env()
 environ.Env.read_env()
@@ -402,16 +402,12 @@ CKEDITOR_CONFIGS = {
 # CELERY_BROKER_URL = "redis://redis:6379"
 
 # celery settings for local
-CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_BROKER_URL = 'redis://redis:6379'
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "film_hobo.tasks.sample_task",
         "schedule": crontab(minute="*/1"),
-    },
-    "send_email_report": {
-        "task": "film_hobo.tasks.send_email_report",
-        "schedule": crontab(hour="*/1"),
-    },
+    }
 }
