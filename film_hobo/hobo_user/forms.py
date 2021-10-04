@@ -407,8 +407,11 @@ class CheckoutForm(forms.Form):
 class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
-        model = Project
-        fields = ( 'title','creator', 'format', 'genre','cast_pay_rate', 'sag_aftra',
+        model = Project       
+       
+        
+        
+        fields = ( 'title','creator','number_of_pages','format','genre', 'sag_aftra',
                    'cast_attachment','visibility','script_visibility','visibility_password',
                     'location','cast_samr', 'script','script_password','cast_audition_password',
                     'team_select_password',
@@ -417,13 +420,16 @@ class ProjectCreationForm(forms.ModelForm):
                    
                   )
         widgets = {
+               
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
                 'creator': forms.Select(attrs={'class': 'inp-line'}),
+                'number_of_pages': forms.TextInput(attrs={"class": "inp-line",'type':'number'}),
                 'format': forms.Select(attrs={'class': 'd-none'}),
                 'genre': forms.Select(attrs={'class': 'd-none'}),
-                'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
-                                                   "placeholder": '$  0 or\
-                                                   Greater/Negotiable',"required":""}),
+               
+                # 'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
+                #                                    "placeholder": '$  0 or\
+                #                                    Greater/Negotiable',"required":""}),
                 'sag_aftra': forms.Select(attrs={'class': 'd-none'}),
                 'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
                 'visibility': forms.Select(attrs={'class': 'd-none'}),

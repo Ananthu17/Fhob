@@ -291,6 +291,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.get_full_name()
 
+    
     def get_full_name(self):
         if self.is_superuser:
             name = "Admin"
@@ -523,6 +524,42 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
+   
+
+    PRO_AND_COMP_WITH_RATING_1_STAR = 'pro_and_comp_with_rating_1_star'
+    PRO_AND_COMP_WITH_RATING_2_STAR = 'pro_and_comp_with_rating_2_star'
+    PRO_AND_COMP_WITH_RATING_3_STAR = 'pro_and_comp_with_rating_3_star'
+    PRO_AND_COMP_WITH_RATING_4_STAR = 'pro_and_comp_with_rating_4_star'
+    PRO_AND_COMP_WITH_RATING_5_STAR = 'pro_and_comp_with_rating_5_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_1_STAR = 'indie_pro_and_comp_with_rating_1_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_2_STAR = 'indie_pro_and_comp_with_rating_2_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_3_STAR = 'indie_pro_and_comp_with_rating_3_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_4_STAR = 'indie_pro_and_comp_with_rating_4_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_5_STAR = 'indie_pro_and_comp_with_rating_5_star'
+    
+
+    CREW_SAMR_CHOICES =[
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+
+        (PRO_AND_COMP_WITH_RATING_1_STAR , 'pro and comp with rating 1 star'),
+        (PRO_AND_COMP_WITH_RATING_2_STAR , 'pro and comp with rating 2 star'),
+        (PRO_AND_COMP_WITH_RATING_3_STAR , 'pro and comp with rating 3 star'),
+        (PRO_AND_COMP_WITH_RATING_4_STAR , 'pro and comp with rating 4 star'),
+        (PRO_AND_COMP_WITH_RATING_5_STAR , 'pro and comp with rating 5 star'),
+
+        (INDIE_PRO_AND_COMP_WITH_RATING_1_STAR , 'indie pro and comp with rating 1 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_2_STAR , 'indie pro and comp with rating 2 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_3_STAR , 'indie pro and comp with rating 3 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_4_STAR , 'indie pro and comp with rating 4 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_5_STAR , 'indie pro and comp with rating 5 star'),
+
+
+    ]
+
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
     ULB = 'SAG_ultra _low_budget'
@@ -623,6 +660,9 @@ class Project(models.Model):
     format = models.CharField(_("Format Type"),
                               choices=FORMAT_CHOICES,
                               max_length=150, null=True, blank=True)
+
+    number_of_pages=models.IntegerField(_("Number of Pages"),
+                                        null=True, blank=True)
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
@@ -664,9 +704,9 @@ class Project(models.Model):
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     crew_samr = models.CharField(_("Crew SAMR"),
-                                 choices=CAST_SAMR_CHOICES,
+                                 choices=CREW_SAMR_CHOICES,
                                  max_length=150,
-                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+                                 default=PRO_AND_COMP_WITH_RATING_1_STAR)
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
