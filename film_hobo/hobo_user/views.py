@@ -5369,10 +5369,12 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         mode_operation="create" 
         context['mode_operation']=mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
+        context['user'] = user
         return context
 
     def post(self, request):
@@ -5505,12 +5507,14 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project=get_object_or_404(Project, id=self.kwargs.get('id'))
+        user = self.request.user
         mode_operation="update"
         writer=Writer.objects.get(project=project.id)
         context['mode_operation']=mode_operation
         context['project_obj']=project
         context['form'] = ProjectCreationForm(instance=project)
         context['writerform'] = WriterForm(instance=writer)
+        context['user'] = user
         return context
 
     def post(self, request,**kwargs):

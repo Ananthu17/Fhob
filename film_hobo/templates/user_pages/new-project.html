@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
 
 {% block content %}
+<head>
     <style>
         .fileuploaddiv{
             border: 1px solid;
@@ -82,12 +86,13 @@
         }
 
         
-        
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
-
+    
     </style>
+    
+    </head>
     <div class="wrapper flex-grow-1">
         <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -169,6 +174,8 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+
+                                {% if user.membership == 'PRO'  or  user.membership == 'COM' %}
                                 <div class="form-check-inline">
                                     <label class="containerradio bold">PILOT (Pros & Companies)
                                         <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3">
@@ -181,6 +188,46 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+                                {% elif user.membership != 'PRO'  or  user.membership != 'COM'  %}
+
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PILOT (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3" id=pilt>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">FEATURE (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="4" id=feat>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+
+
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                    <h4 class="modal-title warning-modal-title" id="myModalLabel"> Membership Warning!  </h4>
+                                                    <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                            </div>
+                                            <div class="modal-body" style="text-align:center;">
+                                                <p>Please Change Your Membership to Pro or Company to Continue</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal"  id="modalClose1">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <!-- The Modal -->
+                  
+        
+                                {% endif  %}
                             </div>
                         </div>
 
@@ -611,7 +658,7 @@
                                         <div class="form-group d-none" id="script_password">
                                             <label for="inputPassword3" class="bold mr-1"style="margin-right: 4em;" >(Create a Password) </label>
                                             {{form.script_password}}
-                                            <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right: 13em; margin-bottom: 1em;" ></i>
+                                            <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right: 13em; margin-bottom: 2em;" ></i>
 
                                         </div>
                                     </form>
@@ -1160,5 +1207,34 @@ $("input:checkbox").on('click', function() {
   }
 });
 
+// sHOWING MOdal
+$('input:radio[id="pilt"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='pilt']").prop("checked", false);
+   }
+});
+
+$('input:radio[id="feat"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='feat']").prop("checked", false);
+        
+   }
+});
+
+
+    $(function () {
+        $('#modalClose').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#modalClose1').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
 </script>
 {% endblock %}
