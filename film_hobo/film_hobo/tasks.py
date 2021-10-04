@@ -10,6 +10,6 @@ def sample_task():
     logger.info("The sample task just ran.")
 
 
-@shared_task
-def send_email_report():
-    call_command("email_report", )
+# @shared_task
+# def send_email_report():
+#     call_command("email_report", )

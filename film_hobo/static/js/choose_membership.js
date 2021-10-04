@@ -19,13 +19,6 @@ $( document ).ready(function() {
     });
 
     $('#success-alert-box').hide();
-    // var modal = $("#membershipModal")
-    // var title = "Enter Code"
-    // var modal_text = "Enter a Beta Tester Code"
-    // modal.find('.modal-title').text(title)
-    // modal.find('.modal-body').text(modal_text)
-    // $("#membershipModal").modal('show');
-
 });
 
 function withJquery(){

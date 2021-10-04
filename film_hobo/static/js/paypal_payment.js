@@ -1,7 +1,6 @@
 $(document).ready(function() {
     $('#payment-success-div').hide();
 });
-
 origin_url = window.location.origin
 create_url = origin_url + '/payment/paypal/create/'
 send_email_url = origin_url + '/payment/paypal/send_email_recepit/'
@@ -66,6 +65,12 @@ if(window.location.href.indexOf("company") != -1){
     var membership = 'company'
 }
 
+success_redirect = origin_url + '/hobo_user/user_login/'
+
+$('#close-payment-btn').click(function(){
+    window.location.href=success_redirect
+});
+
 var betacode = getUrlParameter('beta_code');
 if(betacode){
     beta_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
@@ -111,7 +116,6 @@ const headers = {
     'Content-Type': 'application/json',
   }
 
-success_redirect = origin_url + '/hobo_user/user_login/'
 paypal.Buttons({
 
 createSubscription: function(data, actions) {
@@ -144,10 +148,9 @@ onApprove: function(data, actions) {
         },
         body: JSON.stringify(transaction_args),
     }).then(function(res) {
-        alert('You have successfully created subscription ' + data.subscriptionID);
-        sendSuccessEmail(data)
-        var delay = 1000;
-        setTimeout(function(){ window.location = success_redirect; }, delay);
+        $("#paymentModal").modal('show');
+        // var delay = 120000;
+        // setTimeout(function(){ window.location = success_redirect; }, delay);
     }).then(function(data) {
         return data.id;
     });
@@ -162,19 +165,3 @@ onApprove: function(data, actions) {
 
 }).render('#paypal-div'); // Display payment options on your web page
 
-function sendSuccessEmail(data)
-{
-    var order_id = data.orderID
-    send_email_url_args = {
-        "order_id": order_id
-    }
-
-    axios.post(send_email_url, send_email_url_args)
-    .then((response) => {
-        debugger
-        console.log(response);
-    }, (error) => {
-        debugger
-        console.log(error);
-    });
-}

@@ -1015,6 +1015,17 @@ class CreateUserOrder(APIView):
                 Transaction.objects.filter(id=transaction.id).update(
                     paypal_order_id=data['id'])
                 # return JsonResponse(data)
+                base_url = settings.ORIGIN_URL
+                complete_url = base_url + '/payment/paypal/send_email_recepit/'
+                order_id = data['id']
+                send_email_url_args = {
+                    "order_id": order_id
+                }
+                user_response = requests.post(
+                    complete_url,
+                    data=send_email_url_args)
+                if user_response.status_code == 200:
+                    pass
                 return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(

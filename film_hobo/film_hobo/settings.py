@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+# import film_hobo.tasks
 from celery.schedules import crontab
-import film_hobo.tasks
 import environ
 import os
 from pathlib import Path
@@ -398,7 +398,11 @@ CKEDITOR_CONFIGS = {
 
 # SUBSCRIPTION_GRACE_PERIOD = 0
 
-CELERY_BROKER_URL = "redis://redis:6379"
+# celery settings for demo-server
+# CELERY_BROKER_URL = "redis://redis:6379"
+
+# celery settings for local
+CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 CELERY_BEAT_SCHEDULE = {
