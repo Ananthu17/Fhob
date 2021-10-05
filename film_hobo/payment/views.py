@@ -1633,8 +1633,7 @@ class PayPalSendRemainderEmail(APIView):
         text_context = {
             'user_name': transaction_obj.user.get_full_name,
         }
-        email_subject = "Welcome to FilmHobo. " \
-            "Here are your subscription details."
+        email_subject = "Filmhobo Subscription Receipt"
         email_body_text = render_to_string(
             "payment_receipts/email_receipt.txt", text_context, request
         )

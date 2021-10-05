@@ -68,9 +68,17 @@
                                     Free Trial</th>
                             </tr>
                             <tr>
-                                <td style="font-weight: 500;  padding: 10px;">MasterCard ... 1234</td>
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">Monthly</td>
-                                <td style="font-weight: 500;  padding: 10px; text-align: center;">$15</td>
+                                {% if payment_method == 'paypal_account' %}
+                                    <td style="font-weight: 500;  padding: 10px;">PayPal Account Pay</td>
+                                {% else %}
+                                    <td style="font-weight: 500;  padding: 10px;">Card Payment</td>
+                                {% endif %}
+                                {% if plan == 'monthly' %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Monthly</td>
+                                {% else %}
+                                    <td style="font-weight: 500;  padding: 10px; text-align: center;">Yearly</td>
+                                {% endif %}
+                                <td style="font-weight: 500;  padding: 10px; text-align: center;">${{price}}</td>
                                 <td style="font-weight: 500;  padding: 10px; text-align: center;">Expired</td>
                             </tr>
                         </tbody>
@@ -84,19 +92,19 @@
                                 <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                                     <div style="max-width:130px; width: 100%; word-break: break-word;">Total Purchases:
                                     </div>
-                                    <div>$15.00</div>
+                                    <div>${{total_purchase_value}}</div>
                                 </div>
                                 <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
-                                    <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax (0%):
+                                    <div style="max-width:130px; width: 100%; word-break: break-word;">Sales Tax ({{sales_tax_percentage}}%):
                                     </div>
-                                    <div>$00.00</div>
+                                    <div>${{sales_tax_value}}</div>
                                 </div>
                                 <hr
                                     style="margin-left:0; margin-right:0; margin-top: 4px; max-width:140px; width:100%; color:black; border:none; border-bottom:1px solid; margin-bottom: 20px;">
                                 <div style="display: flex; flex-direction: row; column-gap: 15px; margin-bottom: 1px;">
                                     <div style="max-width:130px; width: 100%; word-break: break-word;">Order Total:
                                     </div>
-                                    <div>$15.00</div>
+                                    <div>${{order_total_value}}</div>
                                 </div>
                             </td>
                         </tr>
