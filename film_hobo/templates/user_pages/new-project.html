@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
 
 {% block content %}
+<head>
     <style>
         .fileuploaddiv{
             border: 1px solid;
@@ -82,12 +86,13 @@
         }
 
         
-        
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
-
+    
     </style>
+    
+    </head>
     <div class="wrapper flex-grow-1">
         <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -169,6 +174,8 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+
+                                {% if user.membership == 'PRO'  or  user.membership == 'COM' %}
                                 <div class="form-check-inline">
                                     <label class="containerradio bold">PILOT (Pros & Companies)
                                         <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3">
@@ -181,6 +188,46 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+                                {% elif user.membership != 'PRO'  or  user.membership != 'COM'  %}
+
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PILOT (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3" id=pilt>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">FEATURE (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="4" id=feat>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+
+
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                    <h4 class="modal-title warning-modal-title" id="myModalLabel"> Membership Warning!  </h4>
+                                                    <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                            </div>
+                                            <div class="modal-body" style="text-align:center;">
+                                                <p>Only Pro and Company Members Can Use This Format</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal"  id="modalClose1">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                <!-- The Modal -->
+                  
+        
+                                {% endif  %}
                             </div>
                         </div>
 
@@ -497,11 +544,10 @@
                                                     <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
                                                     <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
                                                     <input type="hidden" name="cast-star2" class="rating-value2">
-                                                
                                                    <input type="radio" name="radiorow7" id="star2" onclick="selectsamr(this)" value="5">
-                                                 <span class="checkmarkagree"></span>    
+                                                 <span class="checkmarkagree"></span>
                                             </label>
-                                        </div>                
+                                        </div>
                                 </div>
                                 <div class="form-check-inline">
                                     <div class="cast-star-rating3"> 
@@ -515,7 +561,7 @@
                                             <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)" value="10">
                                             <span class="checkmarkagree"></span>
                                       </label>
-                                    </div>   
+                                    </div> 
                                 </div>
                             </div>
                         </div>
@@ -579,11 +625,10 @@
                                 <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
-                                        
                                         <input type="radio" name="radiorow9" id="public_script" onclick="selectscript(this)" value="0">
                                         <span class="checkmarkagree"></span>
                                     </label>
-                              
+
                                     <label class="snf-file-upload d-flex flex-row align-items-left" style="margin-right: 2em; margin-left: 1em;">
                                         {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload">Upload</span>
                                         (PDF)
@@ -594,33 +639,24 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>   
+                        </div>
                         <div class="row">
                             <div class="col-3">
                             </div>
-                            <div class="col-md-6 mt-3">
+                            <div class="col-md-8 mt-3">
                                 <div class="form-check-inline">
                                     <label class="containerradio bold" style="margin-right: 2em;">Private
-                                       
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" required>
                                         <span class="checkmarkagree"></span>
                                     </label>
-                                
-                               
-                                    <form class="form-inline">
-                                        <div class="form-group d-none" id="script_password">
-                                            <label for="inputPassword3" class="bold mr-1"style="margin-right: 4em;" >(Create a Password) </label>
-                                            {{form.script_password}}
-                                            <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right: 13em; margin-bottom: 1em;" ></i>
-
-                                        </div>
-                                    </form>
-                              </div>  
+                                    <div class="flex-row align-items-center d-none" id="script_pass" style="width: -webkit-fill-available;">
+                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit;">(Create a Password) </label>
+                                        {{form.script_password}}
+                                        <i class="bi bi-eye-slash ml-0" id="togglePassword2" style="position: relative;left: -22px;"></i>
+                                    </div>
+                              </div>
                             </div>
-                           
                         </div>
-
-                       
                         {% if mode_operation != 'create' %}
                         <div class="row mt-3">
                             <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER SCRIPT</a> <span
@@ -635,9 +671,7 @@
                                 <form class="form-inline">
                                     <div class="form-group ">
                                         <label for="inputPassword4" class="bold mr-1">(Create a Password) </label>
-                                       
                                     </div>
-                                    
                                 </form>
                                 {{form.cast_audition_password}}
                                 <i class="bi bi-eye-slash" id="togglePassword3"></i>
@@ -776,11 +810,16 @@
         $('option:selected','#id_script_visibility').attr('selected', false);
         $(`#id_script_visibility>option:eq(${data.value})`).attr('selected', true);
     }
+    $('#id_script_password').on('change',()=>{
+        console.log("ANANTHU", $('#id_script_password').val())
+    })
     $('#private_script').on(('click'),()=>{
-        $('#script_password').removeClass('d-none')
+        $('#script_pass').removeClass('d-none')
+        $('#script_pass').addClass('d-flex')
     })
     $('#public_script').on(('click'),()=>{
-        $('#script_password').addClass('d-none')
+        $('#script_pass').addClass('d-none')
+        $('#script_pass').removeClass('d-flex')
     })
     $('#private').on(('click'),()=>{
         $('#visibility_password').removeClass('d-none')
@@ -1160,5 +1199,34 @@ $("input:checkbox").on('click', function() {
   }
 });
 
+// sHOWING MOdal
+$('input:radio[id="pilt"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='pilt']").prop("checked", false);
+   }
+});
+
+$('input:radio[id="feat"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='feat']").prop("checked", false);
+        
+   }
+});
+
+
+    $(function () {
+        $('#modalClose').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#modalClose1').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
 </script>
 {% endblock %}
