@@ -399,11 +399,8 @@ CKEDITOR_CONFIGS = {
 # SUBSCRIPTION_GRACE_PERIOD = 0
 
 # celery settings for demo-server
-# CELERY_BROKER_URL = "redis://redis:6379"
-
-# celery settings for local
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 CELERY_BEAT_SCHEDULE = {
     "send_email_report": {
@@ -411,3 +408,14 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="*/1"),
     }
 }
+
+# celery settings for local
+# CELERY_BROKER_URL = 'redis://localhost:6379'
+# CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+# CELERY_BEAT_SCHEDULE = {
+#     "send_email_report": {
+#         "task": "film_hobo.tasks.send_email_report",
+#         "schedule": crontab(minute="*/1"),
+#     }
+# }
