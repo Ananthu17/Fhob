@@ -718,7 +718,8 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12, null=True, blank=True)
+    script_password = models.CharField(max_length=12,null=True,
+                                            blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,

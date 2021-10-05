@@ -157,13 +157,13 @@
                                 {% if user.membership == 'PRO'  or  user.membership == 'COM' %}
                                 <div class="form-check-inline">
                                     <label class="containerradio bold">PILOT (Pros & Companies)
-                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3">
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)"  {% if project_obj.format == project_obj.PILOT %}checked{% endif%}  value="3">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check-inline">
                                     <label class="containerradio bold">FEATURE (Pros & Companies)
-                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="4">
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" {% if project_obj.format == project_obj.FEATURE %}checked{% endif%}  value="4">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
