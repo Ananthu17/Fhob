@@ -291,7 +291,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.get_full_name()
 
-    
     def get_full_name(self):
         if self.is_superuser:
             name = "Admin"

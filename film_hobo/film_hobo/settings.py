@@ -402,12 +402,12 @@ CKEDITOR_CONFIGS = {
 # CELERY_BROKER_URL = "redis://redis:6379"
 
 # celery settings for local
-CELERY_BROKER_URL = 'redis://redis:6379'
-CELERY_RESULT_BACKEND = "redis://redis:6379"
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 CELERY_BEAT_SCHEDULE = {
-    "sample_task": {
-        "task": "film_hobo.tasks.sample_task",
+    "send_email_report": {
+        "task": "film_hobo.tasks.send_email_report",
         "schedule": crontab(minute="*/1"),
     }
 }

@@ -1639,7 +1639,8 @@ class PayPalSendRemainderEmail(APIView):
             "payment_receipts/email_receipt.txt", text_context, request
         )
         email_body_html = render_to_string(
-            "payment_receipts/email_receipt.html", html_context, request
+            "payment_receipts/email_reminder_receipt.html",
+            html_context, request
         )
         recipient_email = transaction_obj.user.email
         email_recipients = [recipient_email]

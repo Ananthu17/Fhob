@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import PaymentOptions, Transaction, FilmHoboSenderEmail, \
-    EmailRecord
+    EmailRecord, ScheduledEmail
 from hobo_user.importexport import FilmHoboSenderEmailResource
 from import_export.admin import ImportExportModelAdmin
 
@@ -10,6 +10,7 @@ from import_export.admin import ImportExportModelAdmin
 admin.site.register(PaymentOptions)
 admin.site.register(Transaction)
 admin.site.register(EmailRecord)
+admin.site.register(ScheduledEmail)
 
 
 @admin.register(FilmHoboSenderEmail)
