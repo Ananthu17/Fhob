@@ -19,3 +19,4 @@ go to folder with celelry.py file
 
 celery -A film_hobo.celery beat -l info
 ==========================================
+python manage.py send_email_report
