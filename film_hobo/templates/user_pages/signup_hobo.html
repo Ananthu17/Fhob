@@ -132,9 +132,9 @@
                       </div>
                       <div class="row mt-2">
                           <div class="col-12 tos">
-                              By creating this account, you agree to the<span class="tos-t"> <a  class="link-clickable" href="">TERMS OF
+                              By creating this account, you need agree to the<span class="tos-t"> <a  class="link-clickable" href="">TERMS OF
                                   SERVICE</a></span> of Filmhobo
-                                  Corporation. </div>
+                                  Corporation, Please read it before Submitting </div>
                       </div>
 
                          <!-- Modal -->
@@ -156,13 +156,14 @@
                                       <label class="containerradio">I Agree
                                           <input type="radio"  name="{{ form.i_agree.name }}"
                                           id="{{ form.i_agree.id_for_label }}"
-                                          {% if form.i_agree.field.required %}required{% endif %}>
+                                          {% if form.i_agree.field.required %}required{% endif %} >
                                           <span class="checkmarkagree"></span>
                                           {% if form.errors.i_agree %}
                                             <p style="color: red">{{form.errors.i_agree}}</p>
                                           {% endif %}
                                         </label>
                                     </div>
+                                    
                                       <button type="button" class="btn btn-default" data-dismiss="modal"  id="pdfmodalClose1">Close</button>
                                   </div>
                               </div>
@@ -210,7 +211,6 @@ $("a[class='link-clickable']").click(function () {
 
 });
 
-
 $(function () {
   $('#pdfmodalClose').on('click', function () {
       $('#myModalpdf').modal('hide');
@@ -224,8 +224,17 @@ $(function () {
   })
 })
 
+// var swticher = document.getElementById('id_i_agree');
 
-
+// function check(e){
+//     if(e.checked == swticher.checked)
+//     {
+//           // you can set the value for on as default by set valirable in it
+//           var val = swticher.value = "1";
+//           alert('on -> '+val);
+       
+//      }
+//     }
 </script>
 {% endblock %}
 
