@@ -3,17 +3,25 @@ import ast
 import operator
 import requests
 import json
+import mammoth
+from braces.views import JSONResponseMixin
+from pydocx import PyDocX
+import pandas as pd 
+from xlsx2html import xlsx2html
 
 from django.db.models import Count
 from django.shortcuts import render
 from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
 from django.db.models import Count, Sum
-from django.views.generic import TemplateView
+from django.template import loader
+from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.template.loader import render_to_string
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.db.models import Q
+from django.core.mail import send_mail
 
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
@@ -25,7 +33,8 @@ from .models import MessageStatus, SpamMessage, UserMessage, \
     MessageNotification, UserMessageImages, UserMessageFileUpload
 from hobo_user.models import CustomUser, CustomUserSettings
 
-from .serializers import UserMessageSerializer, MessageThreadSerializer
+from .serializers import UserMessageSerializer, MessageThreadSerializer, \
+    ComposeMessageFileUploadSerializer
 from project.serializers import IdSerializer
 from hobo_user.utils import notify
 
@@ -57,9 +66,6 @@ class ComposeMessageView(LoginRequiredMixin, TemplateView):
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         if message or images or files:
-            print("message", message)
-            print("images", images)
-            print("files", files)
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/message/compose-message-api/'
             user_response = requests.post(
@@ -85,6 +91,15 @@ class ComposeMessageView(LoginRequiredMixin, TemplateView):
                             file_obj = UserMessageFileUpload()
                             file_obj.message = msg_obj
                             file_obj.file = file
+                            filename = file.name
+                            #Add file type .xlsx,.xls,.doc, .docx,.pdf,.csv
+                            if filename.endswith('.xlsx') or filename.endswith(
+                                            '.xls') or filename.endswith('.csv'):
+                                file_obj.file_type = UserMessageFileUpload.EXCEL
+                            if filename.endswith('.pdf'):
+                                file_obj.file_type = UserMessageFileUpload.PDF
+                            if filename.endswith('.doc') or filename.endswith('.docx'):
+                                file_obj.file_type = UserMessageFileUpload.WORD
                             file_obj.save()
                     messages.success(self.request, "Message send.")
                 except UserMessage.DoesNotExist:
@@ -240,22 +255,25 @@ class ComposeMessageAPI(APIView):
                         msg_status_from.is_read = True
                         msg_status_from.save()
 
-                    # update message notification table
-                    notification = MessageNotification()
-                    notification.user = to_user
-                    notification.from_user = logged_in_user
-                    notification.notification_message = "You have a message from "+str(logged_in_user.get_full_name())
-                    notification.save()
-                    # send notification
-                    room_name = "user_"+str(to_user.id)
-                    notification_msg = {
-                            'type': 'send_message_notification',
-                            'message': str(notification.notification_message),
-                            'from': logged_in_user.get_full_name(),
-                            "event": "USER_MESSAGES"
-                        }
-                    notify(room_name, notification_msg)
-                    # end notification section
+                    if self.request.user.id not in to_user_blocked_members:
+                        # update message notification table
+                        notification = MessageNotification()
+                        notification.user = to_user
+                        notification.from_user = logged_in_user
+                        notification.msg_thread = user_message_obj.msg_thread
+                        notification.notification_message = "You have a message from "+str(logged_in_user.get_full_name())
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(to_user.id)
+                        notification_msg = {
+                                'type': 'send_message_notification',
+                                'message': str(notification.notification_message),
+                                'from': logged_in_user.get_full_name(),
+                                "event": "USER_MESSAGES",
+                                "msg_thread": user_message_obj.msg_thread
+                            }
+                        notify(room_name, notification_msg)
+                        # end notification section
 
                     messages.success(self.request, "Message Send")
                     response = {'message': "Message Send",
@@ -394,6 +412,24 @@ class ReportSpamAPI(APIView):
                     spam_msg_obj.reported_by = self.request.user
                     spam_msg_obj.save()
 
+                    # send email
+                    # to_email =  ['spam@filmhobo.com',]
+                    to_email = ['roopa@techversantinfo.com',]
+                    subject = "Spam Message Report"
+                    message = 'Spam Message Report'
+                    html_message = loader.render_to_string(
+                                        'message/spam_mail.html',
+                                        {
+                                            'site_url': settings.ORIGIN_URL,
+                                            'from_user': self.request.user,
+                                            'spam_user': spam_user,
+                                        }
+                                    )
+                    send_mail(subject, message,
+                              settings.EMAIL_FROM,
+                              to_email, fail_silently=True,
+                              html_message=html_message)
+
                     # remove messages from blocked user
                     try:
                         msg_status = MessageStatus.objects.get(
@@ -412,6 +448,7 @@ class ReportSpamAPI(APIView):
                     response = {'message': "Message reported and sender is blocked.",
                                 'status': status.HTTP_200_OK}
                     messages.success(self.request, "Message reported and sender is blocked.")
+
                 except CustomUserSettings.DoesNotExist:
                     response = {'errors': "Custom User Settings not found",
                                 'status': status.HTTP_400_BAD_REQUEST}
@@ -507,7 +544,7 @@ class MessageDetailView(LoginRequiredMixin, TemplateView):
                                 Q(msg_thread=msg_thread) &
                                 Q(user=self.request.user)
                             )
-            # if msg_status_obj.is_spam is True or msg_status_obj.is_deleted is True:
+
             if msg_status_obj.is_spam is True:
                 user_messages = []
             else:
@@ -516,6 +553,7 @@ class MessageDetailView(LoginRequiredMixin, TemplateView):
                                 ~Q(delete_for=logged_in_user)
                                 ).order_by('-created_time')
 
+                context['first_msg'] = user_messages.first()
                 # check if there are attachments
                 for msg in user_messages:
                     images = UserMessageImages.objects.filter(message=msg)
@@ -528,9 +566,12 @@ class MessageDetailView(LoginRequiredMixin, TemplateView):
                 msg_status_obj.is_read = True
                 msg_status_obj.save()
 
+                context['priority_status'] = msg_status_obj.is_priority
+
                 # remove message notification
                 try:
                     chat_with_user = CustomUser.objects.get(pk=chat_with_id)
+                    context['chat_with_user'] = chat_with_user
                     unread_msg_notifications = MessageNotification.objects.filter(
                                         Q(user=self.request.user) &
                                         Q(from_user=chat_with_user) &
@@ -566,9 +607,6 @@ class MessageDetailView(LoginRequiredMixin, TemplateView):
         key = Token.objects.get(user=user).key
         token = 'Token '+key
         if message or images or files:
-            print("message", message)
-            print("images", images)
-            print("files", files)
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/message/compose-message-api/'
             user_response = requests.post(
@@ -594,6 +632,15 @@ class MessageDetailView(LoginRequiredMixin, TemplateView):
                             file_obj = UserMessageFileUpload()
                             file_obj.message = msg_obj
                             file_obj.file = file
+                            # Add file type .xlsx,.xls,.doc, .docx,.pdf,.csv
+                            filename = file.name
+                            if filename.endswith('.xlsx') or filename.endswith(
+                                        '.xls') or filename.endswith('.csv'):
+                                file_obj.file_type = UserMessageFileUpload.EXCEL
+                            if filename.endswith('.pdf'):
+                                file_obj.file_type = UserMessageFileUpload.PDF
+                            if filename.endswith('.doc') or filename.endswith('.docx'):
+                                file_obj.file_type = UserMessageFileUpload.WORD
                             file_obj.save()
                 except UserMessage.DoesNotExist:
                     messages.warning(self.request, "Failed to send message.")
@@ -621,4 +668,131 @@ class GetMessageNotificationAPI(APIView):
                             Q(status_type=MessageNotification.UNREAD)
                             ).count()
         response['unread_msg_count'] = unread_msg_count
+        return Response(response)
+
+
+class GetNewMessageAJAXView(View, JSONResponseMixin):
+    template_name = 'message/new_message.html'
+
+    def get(self, request):
+        context = dict()
+        msg_thread = self.request.GET.get('msg_thread')
+        new_msg = UserMessage.objects.filter(
+                            Q(to_user=self.request.user) &
+                            Q(msg_thread=msg_thread)
+                            ).order_by('-created_time').first()
+        # check if there are attachments
+        images = UserMessageImages.objects.filter(message=new_msg)
+        pdf_files = UserMessageFileUpload.objects.filter(message=new_msg)
+
+        new_message_html = render_to_string(
+                                'message/new_message.html',
+                                {'msg': new_msg,
+                                 'images': images,
+                                 'files': pdf_files
+                                })
+        context['new_message_html'] = new_message_html
+        return self.render_json_response(context)
+
+
+class ComposeMessageUploadAPI(APIView):
+    serializer_class = ComposeMessageFileUploadSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        response = {}
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            if 'message_id' in data_dict:
+                msg_id = data_dict['message_id']
+            images = self.request.FILES.getlist('images')
+            files = self.request.FILES.getlist('files')
+
+            try:
+                msg_obj = UserMessage.objects.get(pk=msg_id)
+                if images:
+                    for img in images:
+                        img_obj = UserMessageImages()
+                        img_obj.message = msg_obj
+                        img_obj.image = img
+                        img_obj.save()
+                if files:
+                    for file in files:
+                        file_obj = UserMessageFileUpload()
+                        file_obj.message = msg_obj
+                        file_obj.file = file
+                        file_obj.save()
+                response = {'message': "Files uploaded",
+                            'status': status.HTTP_400_BAD_REQUEST}
+            except UserMessage.DoesNotExist:
+                response = {'errors': "Invalid Message ID",
+                            'status': status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CovertWordToHtmlView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        response = {}
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            file_id = data_dict['id']
+            try:
+                attached_file = UserMessageFileUpload.objects.get(pk=file_id)
+                # with open(attached_file.file.path, "rb") as docx_file:
+                #     result = mammoth.convert_to_html(docx_file)
+                # html_file = result.value
+                html_file = PyDocX.to_html(attached_file.file.path)
+                response = {'message': "Html generated",
+                            'status': status.HTTP_200_OK,
+                            'html_file': html_file,
+                            'file_url': attached_file.file.url
+                            }
+            except UserMessageFileUpload.DoesNotExist:
+                response = {'error': "Invalid file ID",
+                            'status': status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class CovertExcelToHtmlView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        response = {}
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            data_dict = serializer.data
+            file_id = data_dict['id']
+            try:
+                attached_file = UserMessageFileUpload.objects.get(pk=file_id)
+                # wb = pd.read_excel(attached_file.file.path)
+                # html_file = wb.to_html()
+                out_stream = xlsx2html(attached_file.file.path)
+                out_stream.seek(0)
+                html_file = out_stream.read()
+                response = {'message': "Html generated",
+                            'status': status.HTTP_200_OK,
+                            'html_file': html_file,
+                            'file_url': attached_file.file.url
+                            }
+            except UserMessageFileUpload.DoesNotExist:
+                response = {'error': "Invalid file ID",
+                            'status': status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
         return Response(response)

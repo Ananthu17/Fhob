@@ -108,6 +108,9 @@ class MessageNotification(models.Model):
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
     notification_message = models.TextField(_("Message"), null=True, blank=True)
+    msg_thread = models.CharField(_("Message thread ID"),
+                                  max_length=1000,
+                                  null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -133,12 +136,24 @@ class UserMessageImages(models.Model):
 
 
 class UserMessageFileUpload(models.Model):
+    PDF = 'pdf'
+    EXCEL = 'excel'
+    WORD = 'word'
+    FILE_TYPE_CHOICES = [
+                    (PDF, 'Pdf'),
+                    (EXCEL, 'Excel'),
+                    (WORD, 'Word'),
+                    ]
     message = models.ForeignKey(UserMessage,
                                 on_delete=models.CASCADE,
                                 related_name='msg_file',
                                 verbose_name=_("User"),
                                 null=True)
     file = models.FileField(upload_to='message_files/')
+    file_type = models.CharField(_("File Type"),
+                                 choices=FILE_TYPE_CHOICES,
+                                 max_length=150,
+                                 default=PDF)
 
     def __str__(self):
         return str(self.message)

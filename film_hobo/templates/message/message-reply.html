@@ -9,32 +9,182 @@
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-    <div class="container">
-        <div class="row">
-            <div class="col-4">
-                {% include 'message/message_side_links.html' %}
-            </div>
-            <div class="col-8">
-            <h3>Reply</h3>
-            {% if user_messages is not 0 %}
-            <div class="height-cls">
-            {% for msg in user_messages %}
-            <div class="mt-2">
-                <u>{% if msg.subject %}{{msg.subject}}{% endif %}</u><br>
-                    {% if msg.from_user == request.user %}
-                        You:
-                    {% else %}
-                        {{msg.from_user.get_full_name}}:
-                    {% endif %}
-                    {{msg.message}}
-                    {% get_dict_value_if_exists img_dict msg.id as images %}
-                    {% if images %}
+    <div class="container-fluid">
+        <div class="mm-container">
+
+            <!-- Reply Message -->
+
+            <div class="mm-container-display">
+                <div>
+                    {% include 'message/message_side_links.html' %}
+                </div>
+                <div class="mm-rply-msg-sec">
+                    <div class="mm-rply-head-sec">
                         <div>
-                            {% for img in images %}
-                                <img src="{{img.image.url}}" class="msg-img"
-                                data-toggle="modal" data-target="#image_modal-{{msg.id}}"/>
-                            {% endfor %}
+                            <span>
+
+                            </span>
+                            <span class="mm-rply-blue-head">
+                                <a href="{{chat_with_user.get_profile_url}}"
+                                class="msg-txt-color">{{ chat_with_user.get_full_name }}</a>
+                            </span>
                         </div>
+                        <div class="mm-rply-delete-sec">
+                            <div id="priority_btn_{{first_msg.msg_thread}}">
+                                {% if priority_status %}
+                                <a class="remove_from_priority cursor-pointer remove-decoration color-style" id="{{first_msg.msg_thread}}">
+                                    <span class="mm-delete-sec-icon">
+                                        <i class="fa fa-star" aria-hidden="true"></i>
+                                    </span>
+                                    <span>
+                                        <span class="mm-delete-sec-icon-a">Priority</span>
+                                    </span>
+                                </a>
+                                {% else %}
+                                <a class="priority cursor-pointer remove-decoration color-style" id="{{first_msg.msg_thread}}">
+                                    <span class="mm-delete-sec-icon">
+                                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                                    </span>
+                                    <span>
+                                        <span  class="mm-delete-sec-icon-a">Priority</span>
+                                    </span>
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <a class="cursor-pointer remove-decoration color-style" data-toggle="modal"
+                                        data-target="#report_spam">
+                                <span class="mm-delete-sec-icon">
+                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                </span>
+                                <span>
+                                    <span class="mm-delete-sec-icon-a">Spam</span>
+                                </span>
+                            </a>
+<!-- The Modal -->
+<div class="modal fade" id="report_spam">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Are you sure you want to report this message as spam?</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">This message and all other messages from this sender will be removed from
+                your inbox list, and this sender will no longer be able to contact you.</p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer spam_sending_btn">
+        <input type="hidden" id="msg_id" name="msg_id" value="{{msg.id}}" />
+        <button class="btn btn-outline-danger btn-sm report_spam "
+        id="{{first_msg.id}}">Report</button>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Cancel</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                            </div>
+                            <div>
+                                <a class="cursor-pointer remove-decoration color-style" data-toggle="modal"
+                                data-target="#delete_message">
+                                <span class="mm-delete-sec-icon">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </span>
+                                <span>
+                                    <span class="mm-delete-sec-icon-a">Delete</span>
+                                </span>
+                                </a>
+<!-- The Modal -->
+<div class="modal fade" id="delete_message">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Delete Message</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">Do you want to delete this message ? </p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button class="btn btn-outline-danger btn-sm delete_msg"
+        id="{{first_msg.msg_thread}}">Delete</button>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Cancel</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- message section  -->
+                    <div class="mm-rply-msg-display " id="new_message_{{first_msg.msg_thread}}">
+                        {% if user_messages is not 0 %}
+                        {% for msg in user_messages %}
+                        <div class="{% if msg.to_user == request.user %}mm-rply-msg-white-bg {% else %}mm-rply-msg-dark-bg{% endif %}">
+                            <div class="mm-rply-img-dp-sec">
+                                <div class="mm-rply-img-pro-sec">
+                                    <div>
+                                        {% if msg.from_user.get_profile_photo %}
+                                        <img src="{{ msg.from_user.get_profile_photo }}" alt="" class="mm-round-img">
+                                        {% else %}
+                                        <img src="{% static 'images/default_profile_pic.png' %}" alt="" class="mm-round-img">
+                                        {% endif %}
+                                    </div>
+                                    <div class="mm-msg-pro">
+                                        <div class="mm-msg-pro-lgth" title="Pro">
+                                            {{ msg.from_user.get_membership_display }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mm-rply-msg-pro-you">
+                                    {% if msg.from_user == request.user %}
+                                        You:
+                                    {% else %}
+                                        {{msg.from_user.get_full_name}}:
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mm-rply-msg-pro-message">
+                                {% if msg.subject %}
+                                    <span class="">
+                                        <span>
+                                            Subject:
+                                        </span>
+                                        <span class="mm-rply-blue-head">
+                                            {{msg.subject}}
+                                        </span>
+                                    </span>
+                                {% endif %}
+                                {{msg.message}}
+                                <div class="mm-rply-msg-img-pdf-sec">
+                                    {% get_dict_value_if_exists img_dict msg.id as images %}
+                                    {% if images %}
+                                    <div class="mm-rply-msg-img-sec">
+                                        {% for img in images %}
+                                        <div class="mm-rply-msg-img-frame">
+                                            <img src="{{img.image.url}}" alt="" class="mm-rply-msg-img"
+                                            data-toggle="modal" data-target="#image_modal-{{msg.id}}">
+                                        </div>
+                                        {% endfor %}
+                                    </div>
 <!-- The Modal -->
 <div class="modal fade" id="image_modal-{{msg.id}}">
     <div class="modal-dialog">
@@ -51,6 +201,8 @@
             <div class="row mt-2 img-section-modal">
                 <div class="col-12 text-center">
                     {% for img in images %}
+
+                        <a href="{{img.image.url}}" download class="download_link">Download</a>
                         <img src="{{img.image.url}}" class="msg-img-full-size"
                         data-toggle="modal" data-target="#image_modal"/>
                     {% endfor %}
@@ -62,97 +214,217 @@
     </div>
 </div>
 <!-- end of modal -->
-                    {% endif %}
-                    {% get_dict_value_if_exists file_dict msg.id as files %}
-                    {% if files is not 0 %}
-                    <div>
-                        {% for file in files %}
-                            <img src="{% static 'images/pdf_img.png' %}" class="msg-pdf"
-                            data-toggle="modal" data-target="#pdf-modal-{{file.id}}"/>
-                            <!-- Modal -->
-                            <div class="modal fade" id="pdf-modal-{{file.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    </div>
-                                    <div class="modal-body crs-modal-hght">
-                                        <div class="crs-modal-inner">
-                                            <iframe src="{{file.file.url}}" class="pdf-style" frameborder="0"></iframe>
+                                    {% endif %}
+                                    {% get_dict_value_if_exists file_dict msg.id as files %}
+                                    {% if files is not 0 %}
+                                    <div class="mm-rply-msg-pdf-sec">
+                                        {% for file in files %}
+                                        <div class="mm-rply-msg-pdf-frame">
+                                            {% if file.file_type == 'pdf' %}
+                                            <img src="{% static 'images/pdf_img.png' %}" alt=""
+                                            class="mm-rply-msg-pdf" data-toggle="modal"
+                                            data-target="#pdf-modal-{{file.id}}">
+                                            {% elif file.file_type == 'word' %}
+                                            <img src="{% static 'images/word_img.jpeg' %}" alt=""
+                                            class="mm-rply-msg-pdf word_modal" id="{{file.id}}">
+                                            {% elif file.file_type == 'excel' %}
+                                            <img src="{% static 'images/excel_img.png' %}" alt=""
+                                            class="mm-rply-msg-pdf excel_modal" id="{{file.id}}">
+                                            {% endif %}
                                         </div>
+                                         <!-- Modal -->
+                                        <div class="modal fade" id="pdf-modal-{{file.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <a class="float-left " href="{{file.url}}" download>Download</a>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                </div>
+                                                <div class="modal-body crs-modal-hght">
+                                                    <div class="crs-modal-inner">
+                                                        {% if file.file_type == 'pdf' %}
+                                                        <iframe src="{{file.file.url}}" class="pdf-style" frameborder="0"></iframe>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <!-- end of modal -->
+                                        {% endfor %}
                                     </div>
-                                </div>
+                                    {% endif %}
                                 </div>
                             </div>
-                            <!-- end of modal -->
+                        </div>
                         {% endfor %}
+                        {% endif %}
                     </div>
-                    {% endif %}
-
-                    <div class="all-p-light">
-                        {{msg.created_time}}
+                    <form method="post" action="{% url 'message:messages' chat_with_id %}"
+                    enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="to_user" value="{{chat_with_id}}" />
+                    <div class="mm-rply-msg-txt-editor-sec">
+                        <div class="mm-msg-editor-icon-sec">
+                            <div class="mm-msg-editor-icon-area">
+                                    <input type="file" id="mm-rply-image-upload" hidden="hidden" name="images"
+                                    accept="image/*" multiple="multiple" />
+                                    <label for="mm-rply-image-upload" class="mm-msg-editor-upload-label">
+                                        <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                    </label>
+                            </div>
+                            <div class="mm-msg-editor-icon-area">
+                                <input type="file" id="mm-rply-file-upload" hidden="hidden"
+                                name="files"  accept=".xlsx,.xls,.doc,.docx,.pdf" multiple="multiple"/>
+                                    <a id="mm-rply-file-upload-btn" class="mm-msg-editor-upload-btn msg-txt-color remove-decoration cursor-pointer">
+                                        <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                    </a>
+                            </div>
+                            <div class="mm-msg-image-file-select">
+                                <div class="mm-msg-editor-filename-area" id="mm-rply-msg-editor-imagename-area-id">
+                                    <!-- image path -->
+                                </div>
+                                <div class="mm-msg-editor-filename-area" id="mm-rply-msg-editor-filename-area-id">
+                                    <!-- file path -->
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                               <textarea class="mm-msg-textarea" name="message"></textarea>
+                        </div>
+                       <div class="mm-reply-btn-sec">
+                           <button class="mm-reply-btn">Reply</button>
+                       </div>
                     </div>
+                </form>
+                </div>
             </div>
 
-            {% endfor %}
-        </div>
-        <div class="mt-4">
-                <!-- <textarea name="mesage" class="form-control" id="user_message"></textarea>
-                <p class="reason-error msg-err"></p>
-                <button class="btn btn-outline-danger btn-sm reply_message "
-                >Reply</button> -->
-                <form method="post" action="{% url 'message:messages' chat_with_id %}"
-                enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="to_user" value="{{chat_with_id}}" />
-                    Message<textarea name="message" class="form-control" id="user_message"></textarea>
-                    Image<input type="file" id="images" name="images"  accept="image/*" multiple="multiple">
-                    File<input type="file" id="files" name="files"  accept="application/pdf" multiple="multiple">
-                    <p class="reason-error msg-err"></p>
-                    <button class="btn btn-outline-danger btn-sm ">Reply</button>
-            </form>
-        </div>
-            {% else %}
-            <p>No messages to show</p>
-            {% endif %}
-            </div>
+            <!-- Reply Message end  -->
+
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade html_modal"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+        <span class="download_file"></span>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body crs-modal-hght">
+            <div class="crs-modal-inner html_file_content">
+
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+<!-- Modal -->
+<div class="modal fade excel_html_modal"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+        <span class="download_excel_file"></span>
+        <button type="button" class="close close-modal-2" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body crs-modal-hght">
+            <div class="crs-modal-inner html_excel_content">
+
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/messenger.js' %}"></script>
 <script>
-     $('body').on('click' , '.reply_message', function(){
-       var token = $("#token").val();
-       data_dict = {};
-       var to_user =  "{{ chat_with_id }}";
-       var user_message = $("#user_message").val();
+    var input = document.getElementById( 'mm-rply-image-upload' );
+    var infoArea = document.getElementById( 'mm-rply-msg-editor-imagename-area-id' );
+    input.addEventListener( 'change', showFileName );
+    function showFileName( event ) {
+        // the change event gives us the input it occurred in 
+        var input = event.srcElement;
+        // the input has an array of files in the `files` property, each one has a name that you can use. We're just using the name here.
+        var fileName = input.files.length;
+        // use fileName however fits your app best, i.e. add it into a div
+        infoArea.textContent = fileName+' Image selected';
+    }
+    const realFileBtn = document.getElementById("mm-rply-file-upload");
+    const customBtn = document.getElementById("mm-rply-file-upload-btn");
+    const customTxt = document.getElementById("mm-rply-msg-editor-filename-area-id");
+    customBtn.addEventListener("click", function() {
+    realFileBtn.click();
+    });
+    realFileBtn.addEventListener("change", function() {
+    if (realFileBtn.value) {
+        customTxt.innerHTML = realFileBtn.files.length +' files selected';
+    } else {
+        customTxt.innerHTML = "No file chosen, yet.";
+    }
+    });
 
-       if(user_message!=""){
-            data_dict['to_user']=to_user;
-            data_dict['subject']="";
-            data_dict['message']= user_message;
-            console.log(data_dict)
-            $.ajax
-            ({
-                type: "POST",
-                url: "/message/compose-message-api/",
-                dataType: 'json',
-                async: false,
-                data: data_dict,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function(response){
-                    window.location.reload();
-                }
-            });
-       }else{
-                $(".msg-err").html("This field is required.")
-       }
-     });
+</script>
+<script>
+ // display word file
+ $('body').on('click' , '.word_modal', function(){
+    var file_id = $(this).attr("id");
+    var token = $("#token").val();
+    $.ajax
+    ({
+        type: "POST",
+        url: "/message/word-to-html-api/",
+        dataType: 'json',
+        async: false,
+        data: {"id": file_id},
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", token);
+        },
+        success: function(response){
+            $(".html_file_content").html('<span>'+response['html_file']+'</span>')
+            $(".download_file").html('<a class="float-left txt_style" href="'+response['file_url']+'" download>Download</a>')
+            $(".html_modal").modal('show');
+        }
+    });
+  });
+  $('body').on('click' , '.close-modal', function(){
+        $(".html_modal").modal('hide');
+    });
+ // display excel file
+ $('body').on('click' , '.excel_modal', function(){
+    var file_id = $(this).attr("id");
+    var token = $("#token").val();
+    $.ajax
+    ({
+        type: "POST",
+        url: "/message/excel-to-html-api/",
+        dataType: 'json',
+        async: false,
+        data: {"id": file_id},
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", token);
+        },
+        success: function(response){
+            $(".html_excel_content").html('<span>'+response['html_file']+'</span>')
+            $(".download_excel_file").html('<a class="float-left txt_style" href="'+response['file_url']+'" download>Download</a>')
+            $(".excel_html_modal").modal('show');
+        }
+    });
+  });
+  $('body').on('click' , '.close-modal-2', function(){
+        $(".excel_html_modal").modal('hide');
+    });
+
 </script>
 {% endblock %}

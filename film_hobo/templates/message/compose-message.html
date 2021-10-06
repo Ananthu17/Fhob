@@ -3,36 +3,108 @@
 
 
 {% block extracss %}
+<style>
+.select2-container .select2-selection--single{
+   width: 100%;
+   padding: 5px 10px;
+   font-family:'Courier New', Courier, monospace;
+   font-weight: 600;
+   margin-top: 7px;
+   border: 1px solid black!important;
+   border-radius:0;
+   height:33px;
+}
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="wrapper flex-grow-1">
-    <div class="container">
-        <div class="row">
-            <div class="col-4">
-                {% include 'message/message_side_links.html' %}
+    <div class="container-fluid">
+        <div class="mm-container">
+
+            <!-- Compose section  -->
+
+            <div class="mm-container-display">
+                <div>
+                    {% include 'message/message_side_links.html' %}
+                </div>
+                <form method="post" action="{% url 'message:compose-message' %}"
+                enctype="multipart/form-data">
+                    {% csrf_token %}
+                <div class="mm-msg-sec">
+                    <div class="mm-msg-sec-head">
+                        New Message
+                    </div>
+                    <hr class="mm-msg-sec-bottom">
+                    <div class="mm-msg-input-width">
+                        <div class="mm-msg-input-sec">
+                            <div>
+                                <div>
+                                    To:
+                                </div>
+                                <div>
+                                    <!-- <input type="text" class="mm-msg-input-field" placeholder="Write a members's Name"/> -->
+                                    <select  class="mm-msg-input-field to_user" id="to_user" name="to_user" class="form-control" id="" required>
+                                        <option value="" selected disabled hidden >Write a members's Name</option>
+                                        {% for user in users %}
+                                        <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <div>
+                                    Subject:
+                                </div>
+                                <div>
+                                    <input type="text" name="subject"  class="mm-msg-input-field"
+                                    autocomplete="off"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mm-msg-head-txt">
+                            Message
+                        </div>
+                        <div class="mm-msg-editor">
+                            <div class="mm-msg-editor-icon-sec">
+                                <div class="mm-msg-editor-icon-area">
+                                        <input type="file" id="mm-image-upload" hidden="hidden"
+                                        name="images"  accept="image/*" multiple="multiple" />
+                                        <label for="mm-image-upload" class="mm-msg-editor-upload-label">
+                                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                        </label>
+                                </div>
+                                <div class="mm-msg-editor-icon-area">
+                                    <input type="file" id="mm-file-upload" hidden="hidden"
+                                    name="files"  accept=".xlsx,.xls,.doc,.docx,.pdf" multiple="multiple"/>
+                                        <a id="mm-file-upload-btn" class="mm-msg-editor-upload-btn msg-txt-color remove-decoration cursor-pointer">
+                                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                        </a>
+                                </div>
+                                <div class="mm-msg-image-file-select">
+                                    <div class="mm-msg-editor-filename-area" id="mm-msg-editor-imagename-area-id">
+                                        <!-- image path -->
+                                    </div>
+                                    <div class="mm-msg-editor-filename-area" id="mm-msg-editor-filename-area-id">
+                                        <!-- file path -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                   <textarea class="mm-msg-textarea"  name="message"></textarea>
+                            </div>
+                        </div>
+                        <div class="mm-btn-sec">
+                                <button class="mm-btn-send">Send</button>
+                                <label class="mm-btn-cancel ">Cancel</label>
+                        </div>
+                    </div>
+                </div>
+                </form>
             </div>
-            <div class="col-8">
-            <h3>Message</h3>
-            <form method="post" action="{% url 'message:compose-message' %}"
-            enctype="multipart/form-data">
-                {% csrf_token %}
-                To<select class="car-input-field to_user" id="to_user" name="to_user" class="form-control" id="" required>
-                    <option value="" selected disabled hidden >Type here</option>
-                    {% for user in users %}
-                    <option value="{{user.id}}">{{user.get_full_name}}</option>
-                    {% endfor %}
-                </select>
-                <p class="reason-error to-user-err"></p>
-                Subject<input name="subject" class="form-control" id="subject"/>
-                Message<textarea name="message" class="form-control" id="user_message"></textarea>
-                Image<input type="file" id="images" name="images"  accept="image/*" multiple="multiple">
-                File<input type="file" id="files" name="files"  accept="application/pdf" multiple="multiple">
-                <p class="reason-error msg-err"></p>
-                <button class="btn btn-outline-danger btn-sm ">Send</button>
-            </form>
-                <p></p>
-            </div>
+
+            <!-- Compose section End  -->
+
         </div>
     </div>
 </div>
@@ -43,5 +115,32 @@
         $(document).ready(function() {
         $('.to_user').select2();
     });
+</script>
+<script>
+    var input = document.getElementById( 'mm-image-upload' );
+    var infoArea = document.getElementById( 'mm-msg-editor-imagename-area-id' );
+    input.addEventListener( 'change', showFileName );
+    function showFileName( event ) {
+        // the change event gives us the input it occurred in 
+        var input = event.srcElement;
+        // the input has an array of files in the `files` property, each one has a name that you can use. We're just using the name here.
+        var fileName = input.files.length;
+        // use fileName however fits your app best, i.e. add it into a div
+        infoArea.textContent = fileName+' Image selected'
+    }
+    const realFileBtn = document.getElementById("mm-file-upload");
+    const customBtn = document.getElementById("mm-file-upload-btn");
+    const customTxt = document.getElementById("mm-msg-editor-filename-area-id");
+    customBtn.addEventListener("click", function() {
+    realFileBtn.click();
+    });
+    realFileBtn.addEventListener("change", function() {
+    if (realFileBtn.value) {
+        customTxt.innerHTML = realFileBtn.files.length +' files selected';
+    } else {
+        customTxt.innerHTML = "No file chosen, yet.";
+    }
+    });
+
 </script>
 {% endblock %}

@@ -20,7 +20,11 @@
                 </div>
                 <div>
                     <div class="mm-all-msg-sec">
+                        {% if chat_dict %}
                         Priority Messages {% if chat_dict %}({{chat_dict|length}}){% endif %}
+                        {% else %}
+                        No messages to show
+                        {% endif %}
                     </div>
                     {% if chat_dict %}
                         {% for chat_with, msg in chat_dict.items %}
@@ -174,8 +178,7 @@
 </div>
 <!-- end of modal -->
                         {% endfor %}
-                    {% else %}
-                        <p class="all-p-light">No messages to show</p>
+
                     {% endif %}
 
                 </div>

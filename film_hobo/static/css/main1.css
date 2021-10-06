@@ -5438,16 +5438,18 @@ ul.chm-cam-ul-right li{
 }
 .mm-icon-button__badge {
    position: absolute;
-   right: -7px;
-   width: 14px;
-   height: 9px;
+   right: -12px;
+   top: 14px;
+   width: 19px;
+   height: 14px;
    background: red;
    color: #ffffff;
    display: flex;
-   font-size: 7px;
+   font-size: 10px;
    justify-content: center;
    align-items: center;
    border-radius: 50%;
+   font-weight: 700;
 } 
 .mm-container{
    max-width: 1310px;
@@ -5849,7 +5851,8 @@ ul.chm-cam-ul-right li{
 }
 .mm-msg-editor-filename-area{
    padding: 2px 5px;
-   color: #cbcbcb;
+   color: #6c6c6c;
+   font-weight: 700;
 }
 .mm-msg-image-file-select{
    display: flex;

@@ -20,7 +20,11 @@
                 </div>
                 <div>
                     <div class="mm-all-msg-sec">
+                        {% if chat_dict %}
                         All Messages {% if msg_count != '' %}({{msg_count}}){% endif %}
+                        {% else %}
+                        No messages to show
+                        {% endif %}
                     </div>
                     {% if chat_dict %}
                         {% for chat_with, msg in chat_dict.items %}
@@ -157,7 +161,7 @@
 </div>
 <!-- end of modal -->
 <!-- The Modal -->
-<div class="modal fade" id="report_spam_{{msg.id}}">
+<div class="modal fade report_spam_modal" id="report_spam_{{msg.id}}">
     <div class="modal-dialog">
     <div class="modal-content">
 
@@ -174,11 +178,11 @@
         </div>
 
         <!-- Modal footer -->
-        <div class="modal-footer">
+        <div class="modal-footer spam_sending_btn">
         <input type="hidden" id="msg_id" name="msg_id" value="{{msg.id}}" />
-        <button class="btn btn-outline-danger btn-sm report_spam"
+        <button class="btn btn-outline-danger btn-sm report_spam spam_sending_btn"
         id="{{msg.id}}">Report</button>
-        <button class="btn btn-outline-danger btn-sm"
+        <button class="btn btn-outline-danger btn-sm spam_cancel_btn"
         data-dismiss="modal">Cancel</button>
         </div>
 
@@ -187,8 +191,6 @@
 </div>
 <!-- end of modal -->
                         {% endfor %}
-                    {% else %}
-                        <p class="all-p-light">No messages to show</p>
                     {% endif %}
 
                 </div>

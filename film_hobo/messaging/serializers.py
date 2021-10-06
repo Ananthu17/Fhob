@@ -22,3 +22,13 @@ class MessageThreadSerializer(serializers.Serializer):
     )
 
 
+class ComposeMessageFileUploadSerializer(serializers.Serializer):
+    message_id = serializers.CharField(
+        max_length=150,
+        required=True,
+    )
+    images = serializers.ImageField(required=False)
+    files = serializers.FileField(required=False)
+
+
+

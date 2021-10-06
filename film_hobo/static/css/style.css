@@ -786,3 +786,26 @@ input.pw {
     height:350px;
     overflow-y:scroll;
   }
+.html_file_content, .html_excel_content
+  {
+    height:350px;
+    overflow-y:scroll;
+  }
+.download_link
+  {
+    position:absolute;
+    color:#fff;
+    background:rgba(0,0,0,0.3);
+    padding:1px 2px;
+  }
+.download_link:hover
+  {
+    text-decoration: none;
+    color:#fff;
+    background:rgba(0,0,0,0.7);
+  }
+.txt_style
+  {
+    font-family: Courier Bold;
+    font-size: 13px;
+  }

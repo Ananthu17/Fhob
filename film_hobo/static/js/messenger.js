@@ -67,19 +67,20 @@
  $('body').on('click' , '.report_spam', function(){
     var msg_id = $(this).attr("id");
     var token = $("#token").val();
-
+    $('.spam_sending_btn').html(" ");
+    $('.spam_sending_btn').html("<span class='red-f bold'>Sending...</span>");
     $.ajax
     ({
         type: "POST",
         url: "/message/report-spam-api/",
         dataType: 'json',
-        async: false,
+        // async: false,
         data: {"id":msg_id},
         beforeSend: function (xhr) {
             xhr.setRequestHeader ("Authorization", token);
         },
         success: function(response){
-            window.location.reload();
+            window.location.href = "/message/all-messages/";
         }
     });
   });

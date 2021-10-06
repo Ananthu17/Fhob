@@ -220,6 +220,7 @@ class NotificationConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message,
             'event': "USER_MESSAGES",
+            'msg_thread': event['msg_thread'],
         }))
 
 

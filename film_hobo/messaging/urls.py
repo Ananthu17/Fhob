@@ -1,8 +1,9 @@
 from django.urls import path
 from .views import ComposeMessageView, ComposeMessageAPI, AllMessagesView, \
      AddToPriorityAPI, PriorityMessagesView, GetMessageNotificationAPI, \
-     DeleteMessageAPI, RemoveFromPriorityAPI, \
-     ReportSpamAPI, MessageDetailView
+     DeleteMessageAPI, RemoveFromPriorityAPI, GetNewMessageAJAXView, \
+     ReportSpamAPI, MessageDetailView, ComposeMessageUploadAPI, \
+     CovertWordToHtmlView, CovertExcelToHtmlView
 
 urlpatterns = [
      path('compose-message/', ComposeMessageView.as_view(),
@@ -23,4 +24,12 @@ urlpatterns = [
           name='report-spam-api'),
      path('get-message-notification-api/', GetMessageNotificationAPI.as_view(),
           name='get-message-notification-api'),
+     path('compose-message-file-upload-api/', ComposeMessageUploadAPI.as_view(),
+          name='compose-message-file-upload-api'),
+     path('get-new-message-html/', GetNewMessageAJAXView.as_view(),
+          name='get-new-message-html'),
+     path('word-to-html-api/', CovertWordToHtmlView.as_view(),
+          name='word-to-html-api'),
+     path('excel-to-html-api/', CovertExcelToHtmlView.as_view(),
+          name='excel-to-html-api'),
 ]
