@@ -3,7 +3,8 @@ import datetime
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, \
+    RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -11,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
+# from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
@@ -207,8 +208,16 @@ class CustomUser(AbstractUser):
                                        max_length=250,
                                        null=True,
                                        blank=True,)
-    company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    company_phone = models.CharField(_("Phone Number"),
+                                     validators=[phone_number_regex],
+                                     max_length=16, null=True,
                                      unique=True)
+    # company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    #                                  unique=True)
     title = models.CharField(_('Title'),
                              max_length=150, null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
@@ -245,8 +254,16 @@ class CustomUser(AbstractUser):
     eyes = models.CharField(_("Eyes"),
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
-    phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    phone_number = models.CharField(_("Phone Number"),
+                                    validators=[phone_number_regex],
+                                    max_length=16, null=True,
                                     unique=True)
+    # phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    #                                 unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
     date_of_joining = models.DateField(_("Date of Joining"),
@@ -523,7 +540,6 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
-   
 
     PRO_AND_COMP_WITH_RATING_1_STAR = 'pro_and_comp_with_rating_1_star'
     PRO_AND_COMP_WITH_RATING_2_STAR = 'pro_and_comp_with_rating_2_star'
@@ -535,7 +551,6 @@ class Project(models.Model):
     INDIE_PRO_AND_COMP_WITH_RATING_3_STAR = 'indie_pro_and_comp_with_rating_3_star'
     INDIE_PRO_AND_COMP_WITH_RATING_4_STAR = 'indie_pro_and_comp_with_rating_4_star'
     INDIE_PRO_AND_COMP_WITH_RATING_5_STAR = 'indie_pro_and_comp_with_rating_5_star'
-    
 
     CREW_SAMR_CHOICES =[
         (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
@@ -660,8 +675,8 @@ class Project(models.Model):
                               choices=FORMAT_CHOICES,
                               max_length=150, null=True, blank=True)
 
-    number_of_pages=models.IntegerField(_("Number of Pages"),
-                                        null=True, blank=True)
+    number_of_pages = models.IntegerField(_("Number of Pages"),
+                                          null=True, blank=True)
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
@@ -1653,10 +1668,18 @@ class UserAgentManager(models.Model):
                                   null=True,
                                   blank=True
                                   )
-    agent_phone = PhoneNumberField(_("Agent's phone number"),
-                                   null=True,
-                                   blank=True
-                                   )
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    agent_phone = models.CharField(_("Agent's phone number"),
+                                   validators=[phone_number_regex],
+                                   max_length=16, null=True,
+                                   blank=True, unique=True)
+    # agent_phone = PhoneNumberField(_("Agent's phone number"),
+    #                                null=True,
+    #                                blank=True
+    #                                )
     agent_email = models.EmailField(_("Agent's email address"),
                                     null=True,
                                     blank=True)

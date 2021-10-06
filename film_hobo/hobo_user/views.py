@@ -325,7 +325,6 @@ class CustomUserSignupHobo(APIView):
 class HowTo(View):
 
     def get(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         return render(request, 'user_pages/how_to.html')
 
 
@@ -5130,7 +5129,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        mode_operation="create" 
+        mode_operation="create"
         context['mode_operation']=mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
@@ -5150,10 +5149,10 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             cast_star1=request.POST.get('cast-star1')
             cast_star2=request.POST.get('cast-star2')
             cast_star3=request.POST.get('cast-star3')
-            
+
             cast_star_smar=0
-           
-            
+
+
             if (cast_star1!=''):
                 if (cast_star1=='1'):
                     cast_star1=project.INDIE_WITH_RATING_1_STAR
@@ -5195,9 +5194,9 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             crew_star1=request.POST.get('crew-star1')
             crew_star2=request.POST.get('crew-star2')
             crew_star3=request.POST.get('crew-star3')
-            
+
             crew_star_smar=0
-            
+
             if (crew_star1!=''):
                 if (crew_star1=='1'):
                     crew_star1=project.INDIE_WITH_RATING_1_STAR
@@ -5287,9 +5286,9 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             cast_star1=request.POST.get('cast-star1')
             cast_star2=request.POST.get('cast-star2')
             cast_star3=request.POST.get('cast-star3')
-            
+
             cast_star_smar=0
-            
+
             if (cast_star1!=''):
                 if (cast_star1=='1'):
                     cast_star1=project.INDIE_WITH_RATING_1_STAR
@@ -5331,9 +5330,9 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             crew_star1=request.POST.get('crew-star1')
             crew_star2=request.POST.get('crew-star2')
             crew_star3=request.POST.get('crew-star3')
-            
+
             crew_star_smar=0
-            
+
             if (crew_star1!=''):
                 if (crew_star1=='1'):
                     crew_star1=project.INDIE_WITH_RATING_1_STAR
@@ -5374,13 +5373,13 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
             writerform = WriterForm(request.POST or None,instance=writer)
             new_writer=request.POST.get('new_writer')
-            
+
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
             print("valid ahno writer:", writerform.is_valid())
             print('form error writer', writerform.errors)
             if projectform.is_valid() and writerform.is_valid():
-                
+
                 writer = writerform.save()
                 project = projectform.save()
                 project.cast_samr=cast_star_smar
