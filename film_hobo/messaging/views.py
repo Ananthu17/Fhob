@@ -3,7 +3,7 @@ import ast
 import operator
 import requests
 import json
-# import mammoth
+import mammoth
 from braces.views import JSONResponseMixin
 from pydocx import PyDocX
 # import pandas as pd 
@@ -747,10 +747,10 @@ class CovertWordToHtmlView(APIView):
             file_id = data_dict['id']
             try:
                 attached_file = UserMessageFileUpload.objects.get(pk=file_id)
-                # with open(attached_file.file.path, "rb") as docx_file:
-                #     result = mammoth.convert_to_html(docx_file)
-                # html_file = result.value
-                html_file = PyDocX.to_html(attached_file.file.path)
+                with open(attached_file.file.path, "rb") as docx_file:
+                    result = mammoth.convert_to_html(docx_file)
+                html_file = result.value
+                # html_file = PyDocX.to_html(attached_file.file.path)
                 response = {'message': "Html generated",
                             'status': status.HTTP_200_OK,
                             'html_file': html_file,
