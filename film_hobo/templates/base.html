@@ -48,7 +48,7 @@
                             {% if request.user.is_anonymous %}
                                 <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
                             {% else %}
-                            <form action="" method="get">
+                            <form action="javascript:void(0)" method="get">
                                 <input type="text" name="q" placeholder="Search" class="search-placeholder" id="search">
                             </form>
                             {% endif %}
