@@ -3525,6 +3525,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
+        project_obj = Project.objects.all()
+
+        context['projects'] = project_obj
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
