@@ -29,4 +29,4 @@ local.env
 film_hobo/film_hobo/.env
 
 # ignore media files
-film_hobo/media
+film_hobo/media/
