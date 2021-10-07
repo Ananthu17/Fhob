@@ -5182,6 +5182,7 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -5192,15 +5193,15 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset()).filter(
-                                        creator=request.user)
+                   creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
 
 class ProjectCreateAPIView(CreateAPIView):
-  permission_classes = (IsAuthenticated,)
-  queryset = Project.objects.all()
-  serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -5242,23 +5243,8 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class ProjectSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         context = self.project_segregator(queryset)
-#         return Response(context)
-
-
 #Search API for Pages
-
 #API for Searching things in a page
-
 class PageSearchView(ListAPIView):
     template_name = 'search_results.html'
     serializer_class = ProjectSerializer
