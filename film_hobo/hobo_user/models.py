@@ -1337,10 +1337,10 @@ class CompanyClient(models.Model):
 
 
 class UserInterest(models.Model):
-    SCENE = 'scene'
-    SHORT = 'short'
-    PILOT = 'pilot'
-    FEATURE = 'feature'
+    SCENE = 'SCH'
+    SHORT = 'SHO'
+    PILOT = 'PIL'
+    FEATURE = 'FTR'
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
     ULB = 'SAG_ultra _low_budget'
