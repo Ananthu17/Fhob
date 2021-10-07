@@ -73,11 +73,6 @@
   text-align: center; 
 }
 
-a:hover.link-color{
-  color:#0105f8 !important;
-}
-
-
 .search-placeholder{
   width: 75%;
   height: 18px;
@@ -1662,6 +1657,8 @@ input#visa:focus {
  margin: 10px 30px 30px 30px;
  background-color: #EDEEF0 !important;
  border-radius: 12px;
+ position: relative;
+ top: -42px;
 }
 .help-blu-link{
  color: #0a67bd;
@@ -1714,5 +1711,59 @@ input#visa:focus {
  margin-bottom: 3rem;
  border: 0;
  border-top: 1px solid #b6b6b6;
+}
+.help-profile-sec{
+ padding: 2px 8px 2px 8px;
+ font-weight: 500;
+ font-size: 15px;
+
+}
+.help-profile-head{
+ color: #0071bc;
+ font-style: italic;
+ font-size: 16px;
+}
+.help-ol-margin{
+ margin-left: 15px;
+}
+.help-profile-tag{
+ color: #0071bc;
+}
+.help-profile-project-tag{
+ color: #212529;
+ text-decoration: underline;
+}
+.help-profile-project-tag:hover{
+ color: #212529;
+}
+.help-top-get-sec{
+ margin-left: 38px;
+ margin-right: 38px;
+ display: flex;
+ align-items: center;
+}
+.help-top-get-sec div:last-child{
+ margin-left: auto;
+}
+
+/* media Query */
+
+@media(max-width:380px){
+ .help-top-get-sec{
+    margin-left: 25px;
+    margin-right: 25px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    align-items: flex-start;
+ }
+ .help-top-get-sec div:last-child{
+    margin-left:0;
+ }
+}
+.help-arrow{
+ height: 20px;
+  position: relative;
+  left: -14px;
 }
 /*help logistics end*/
