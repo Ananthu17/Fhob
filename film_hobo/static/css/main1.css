@@ -1173,10 +1173,10 @@ ul.proj-cnt-menu-li a:hover{
 .proj-owl-right-margin{
    margin-right: 15px;
 }
-#project-owl .owl-nav button.owl-prev{
+#project-owl1 .owl-nav button.owl-prev{
    visibility: hidden;
 }
-#project-owl .owl-nav button.owl-next {
+#project-owl1 .owl-nav button.owl-next {
    position: absolute;
    left: 98%;
    margin-left: 15px;

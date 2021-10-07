@@ -2,10 +2,9 @@ import ast
 import io
 import json
 import requests
-import boto3
-import datetime
+# import boto3
+# import datetime
 from django.utils import timezone
-import mammoth
 import fitz
 import PyPDF2
 import PIL
@@ -13,12 +12,13 @@ import PIL
 from fpdf import FPDF
 from django.core import files
 from io import BytesIO
-from pdf2image import convert_from_path
+# from pdf2image import convert_from_path
 
 from braces.views import JSONResponseMixin
-from reportlab.lib.units import cm
+# from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate
-from reportlab.platypus import Paragraph, Table
+from reportlab.platypus import Paragraph
+# from reportlab.platypus import Table
 from reportlab.lib.styles import getSampleStyleSheet
 
 from django.http import FileResponse, Http404, HttpResponse
@@ -2845,7 +2845,7 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
         context = dict()
         user_list = []
         user_rating_objs = UserRatingCombined.objects.all()
-
+        
         try:
             actoractress = JobType.objects.get(slug='actoractress')
             actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]

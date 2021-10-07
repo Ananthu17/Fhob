@@ -18,13 +18,7 @@ $( document ).ready(function() {
         $('#monthly_company').text(response.data.monthly_company);
     });
 
-    // var modal = $("#membershipModal")
-    // var title = "Enter Code"
-    // var modal_text = "Enter a Beta Tester Code"
-    // modal.find('.modal-title').text(title)
-    // modal.find('.modal-body').text(modal_text)
-    // $("#membershipModal").modal('show');
-
+    $('#success-alert-box').hide();
 });
 
 function withJquery(){
@@ -67,6 +61,7 @@ function CopyToClipboard(value, showNotification, notificationText) {
 
 $('#close-membership-btn').click(function(event){
     $("#membershipModal").modal('hide');
+    location.reload();
 });
 
 $('#close-cross').click(function(event){
@@ -81,20 +76,21 @@ $('#beta-tester-modal').click(function(event){
 });
 
 $('#check-code').click(function(event){
-    debugger
     check_url = origin_url + '/hobo_user/check-beta-tester-code/'
     var check_args = {
-        "code": document.getElementById("input_code").value,
+        "code": $('#input_code').val(),
     }
 
-    axios.get(check_url, check_args)
+    axios.post(check_url, check_args)
     .then((response) => {
+
     if (response.status == 200){
-            var modal = $("#membershipModal")
-            var modal_text = "Code Applied Successfully"
-            modal.find('.modal-body').text(modal_text)
+            localStorage.setItem('beta-code', response.data.code);
+            $("#membershipModalForm").hide()
+            $("#membershipModalBody").append($('#success-alert-box').html());
         }
     }, (error) => {
-        console.log(error);
+        $('#input_code').css('border-color', 'red');
+        $('#invlid-error').show();
     });
 });

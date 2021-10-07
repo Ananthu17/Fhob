@@ -3,10 +3,10 @@ import ast
 import operator
 import requests
 import json
-import mammoth
+# import mammoth
 from braces.views import JSONResponseMixin
 from pydocx import PyDocX
-import pandas as pd 
+# import pandas as pd 
 from xlsx2html import xlsx2html
 
 from django.db.models import Count

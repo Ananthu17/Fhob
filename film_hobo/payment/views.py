@@ -1,10 +1,13 @@
 import braintree
+import datetime
 import json
 import requests
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -19,9 +22,12 @@ from datetimerange import DateTimeRange
 from film_hobo import settings
 from hobo_user.models import HoboPaymentsDetails, IndiePaymentDetails, \
     ProPaymentDetails, CompanyPaymentDetails, PromoCode, CustomUser, \
-    BraintreePromoCode
-from .models import PaymentOptions, Transaction
-from .serializers import DiscountsSerializer, TransactionSerializer
+    BraintreePromoCode, BetaTesterCodes
+from .models import PaymentOptions, Transaction, EmailRecord, \
+    FilmHoboSenderEmail
+from .serializers import DiscountsSerializer, TransactionSerializer, \
+    EmailRecordSerializer
+
 # Create your views here.
 
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
@@ -32,6 +38,118 @@ from paypalcheckoutsdk.orders import OrdersCreateRequest, \
 class IsSuperUser(IsAdminUser):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)
+
+
+class UpdateMembershipFeeDetailsAPI(APIView):
+    """
+    API for superuser to update the membership fee details to film_hobo backend
+    """
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, *args, **kwargs):
+        token_generation_url = \
+            'https://api.sandbox.paypal.com/v1/oauth2/token'
+
+        token_generation_url_username = settings.PAYPAL_CLIENT_ID
+        token_generation_url_password = settings.PAYPAL_SECRET_ID
+        full_user = token_generation_url_username + ':' +\
+            token_generation_url_password
+
+        token_generation_url_response = requests.get(
+            token_generation_url,
+            headers={'Accept': 'application/json',
+                     'Accept-Language': 'en_US'},
+            params={'grant_type': 'client_credentials'},
+            auth=(token_generation_url_username, token_generation_url_password))
+        if indie_monthly_user_response.status_code == 200:
+            passindie_monthly_user_response
+        else:
+            pass
+
+        # details_url_origin = \
+        #     'https://api-m.sandbox.paypal.com/v1/billing/plans/'
+        # indie_monthly_details_url = \
+        #     details_url_origin + settings.INDIE_PAYMENT_MONTHLY
+        # indie_yearly_details_url = \
+        #     details_url_origin + settings.INDIE_PAYMENT_YEARLY
+        # pro_monthly_details_url = \
+        #     details_url_origin + settings.PRO_PAYMENT_MONTHLY
+        # pro_yearly_details_url = \
+        #     details_url_origin + settings.PRO_PAYMENT_YEARLY
+        # company_monthly_details_url = \
+        #     details_url_origin + settings.COMPANY_PAYMENT_MONTHLY
+        # company_yearly_details_url = \
+        #     details_url_origin + settings.COMPANY_PAYMENT_YEARLY
+
+        # indie_monthly_user_response = requests.get(
+        #     indie_monthly_details_url,
+        #     headers={'Content-type': 'application/json',
+        #              'Authorization': ''})
+        # if indie_monthly_user_response.status_code == 200:
+        #     new_user = CustomUser.objects.get(
+        #                 email=request.POST['email'])
+        #     if must_validate_email:
+        #         ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
+        #         signup_code = SignupCode.objects.create_signup_code(
+        #                 new_user, ipaddr)
+        #         signup_code.send_signup_email()
+
+        #     return render(request,
+        #                     'user_pages/user_email_verification.html',
+        #                     {'user': new_user})
+        # else:
+        #     return HttpResponse('Could not save data')
+
+
+class BetaUserPlanDetails(APIView):
+    """
+    API to get beta user plan details
+    """
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        code = data['code']
+        membership_plan = data['membership']
+        period = data['period']
+        if not code or not membership_plan or not period:
+            return Response(
+                {"status": "failure",
+                 "message": "please enter a valid code/memebrship/period"
+                 }, status=status.HTTP_204_NO_CONTENT)
+        else:
+            extra_data = {'code': '', 'days': '',
+                          'bill_date': '',
+                          'selected_plan_id': ''}
+            bet_user_code_obj = BetaTesterCodes.objects.get(code=code)
+            free_evaluation_time = bet_user_code_obj.days
+            date_today = datetime.date.today()
+            date_interval = datetime.timedelta(days=int(free_evaluation_time))
+            bill_date = date_today + date_interval
+            extra_data['code'] = code
+            extra_data['days'] = bet_user_code_obj.days
+            extra_data['bill_date'] = bill_date.strftime("%d/%m/%Y")
+            if membership_plan == 'indie':
+                if period == 'monthly':
+                    selected_plan_id = bet_user_code_obj.indie_monthly_plan_id
+                else:
+                    selected_plan_id = bet_user_code_obj.indie_yearly_plan_id
+            elif membership_plan == 'pro':
+                if period == 'monthly':
+                    selected_plan_id = bet_user_code_obj.pro_monthly_plan_id
+                else:
+                    selected_plan_id = bet_user_code_obj.pro_yearly_plan_id
+            elif membership_plan == 'company':
+                if period == 'monthly':
+                    selected_plan_id = \
+                        bet_user_code_obj.company_monthly_plan_id
+                else:
+                    selected_plan_id = \
+                        bet_user_code_obj.company_yearly_plan_id
+            else:
+                pass
+            extra_data['selected_plan_id'] = selected_plan_id
+            data.update(extra_data)
+            return Response(extra_data, status=status.HTTP_200_OK)
 
 
 class GetMembershipFeeDetailsAPI(APIView):
@@ -897,6 +1015,17 @@ class CreateUserOrder(APIView):
                 Transaction.objects.filter(id=transaction.id).update(
                     paypal_order_id=data['id'])
                 # return JsonResponse(data)
+                base_url = settings.ORIGIN_URL
+                complete_url = base_url + '/payment/paypal/send_email_recepit/'
+                order_id = data['id']
+                send_email_url_args = {
+                    "order_id": order_id
+                }
+                user_response = requests.post(
+                    complete_url,
+                    data=send_email_url_args)
+                if user_response.status_code == 200:
+                    pass
                 return Response(data, status=status.HTTP_201_CREATED)
         else:
             return Response(
@@ -1152,41 +1281,41 @@ class InitialRequest(APIView):
             status=status.HTTP_200_OK)
 
 
-class UpdateSubscription(APIView):
-    """
-    API to update the braintree subscription
-    """
-    permission_classes = (IsAdminUser,)
+# class UpdateSubscription(APIView):
+#     """
+#     API to update the braintree subscription
+#     """
+#     permission_classes = (IsAdminUser,)
 
-    def post(self, request, *args, **kwargs):
-        new_indie_monthly = request.data['indie_monthly']
-        new_indie_yearly = request.data['indie_yearly']
-        new_pro_monthly = request.data['pro_monthly']
-        new_pro_yearly = request.data['pro_yearly']
-        new_company_monthly = request.data['company_monthly']
-        new_company_yearly = request.data['company_yearly']
+#     def post(self, request, *args, **kwargs):
+#         new_indie_monthly = request.data['indie_monthly']
+#         new_indie_yearly = request.data['indie_yearly']
+#         new_pro_monthly = request.data['pro_monthly']
+#         new_pro_yearly = request.data['pro_yearly']
+#         new_company_monthly = request.data['company_monthly']
+#         new_company_yearly = request.data['company_yearly']
 
-        gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                braintree.Environment.Sandbox,
-                merchant_id=settings.BRAINTREE_MERCHANT_ID,
-                public_key=settings.BRAINTREE_PUBLIC_KEY,
-                private_key=settings.BRAINTREE_PRIVATE_KEY
-            )
-        )
-        result = gateway.subscription.update("a_subscription_id", {
-            "id": "new_id",
-            "payment_method_token": "new_payment_method_token",
-            "price": "new_price",
-            "plan_id": "new_plan",
-        })
-        if not result.is_success:
-            return Response(
-                {"status": "braintree subscription updation unsuccsessful "},
-                status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            {"status": "braintree subscription updation succsessful "},
-            status=status.HTTP_200_OK)
+#         gateway = braintree.BraintreeGateway(
+#             braintree.Configuration(
+#                 braintree.Environment.Sandbox,
+#                 merchant_id=settings.BRAINTREE_MERCHANT_ID,
+#                 public_key=settings.BRAINTREE_PUBLIC_KEY,
+#                 private_key=settings.BRAINTREE_PRIVATE_KEY
+#             )
+#         )
+#         result = gateway.subscription.update("a_subscription_id", {
+#             "id": "new_id",
+#             "payment_method_token": "new_payment_method_token",
+#             "price": "new_price",
+#             "plan_id": "new_plan",
+#         })
+#         if not result.is_success:
+#             return Response(
+#                 {"status": "braintree subscription updation unsuccsessful "},
+#                 status=status.HTTP_400_BAD_REQUEST)
+#         return Response(
+#             {"status": "braintree subscription updation succsessful "},
+#             status=status.HTTP_200_OK)
 
 
 class GetBraintreeDiscountDetailListAPI(APIView):
@@ -1352,3 +1481,196 @@ class GetNewPlanDetailsJSON(APIView):
                              }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return JsonResponse(data_dict, safe=False)
+
+
+class PayPalSendEmail(APIView):
+    """
+    API to send receipt for paypal transaction
+    """
+    def post(self, request, *args, **kwargs):
+        order_id = request.data['order_id']
+        transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
+        start_date = transaction_obj.date
+        start_date_formated = start_date.strftime("%d/%m/%Y")
+        free_days = datetime.timedelta(days=int(transaction_obj.days_free))
+        start_date_after_trial = start_date + free_days
+        start_date_after_trial_formated = \
+            start_date_after_trial.strftime("%d/%m/%Y")
+        payment_method = transaction_obj.payment_method
+        payment_plan = transaction_obj.payment_plan
+        price = float(transaction_obj.final_amount)
+
+        start_date_total_purchase_value = "00.00"
+        start_date_sales_tax_percentage = 0.0
+        start_date_sales_tax_value = "00.00"
+        start_date_order_total_value = "00.00"
+
+        paid_start_date_total_purchase_value = '{:.2f}'.format(round(price, 2))
+        paid_start_date_sales_tax_percentage = 0.0
+        paid_start_date_sales_tax_value = "00.00"
+        paid_start_date_order_total_value = '{:.2f}'.format(round(price, 2))
+
+        base_url = settings.ORIGIN_URL
+        privacy_policy_url = base_url + '/general/privacy_policy/'
+        terms_of_service_url = base_url + '/general/terms_of_service/'
+
+        html_context = {
+            'user_name': transaction_obj.user.get_full_name(),
+            'user_membership': transaction_obj.user.membership,
+            'order_id': transaction_obj.id,
+            'start_date': start_date_formated,
+            'start_date_after_trial': start_date_after_trial_formated,
+
+            'payment_method': payment_method,
+            'plan': payment_plan,
+            'price': price,
+            'free_trial_days': transaction_obj.days_free,
+
+            'start_date_total_purchase_value': start_date_total_purchase_value,
+            'start_date_sales_tax_percentage': start_date_sales_tax_percentage,
+            'start_date_sales_tax_value': start_date_sales_tax_value,
+            'start_date_order_total_value': start_date_order_total_value,
+
+            'paid_start_date_total_purchase_value':
+            paid_start_date_total_purchase_value,
+            'paid_start_date_sales_tax_percentage':
+            paid_start_date_sales_tax_percentage,
+            'paid_start_date_sales_tax_value':
+            paid_start_date_sales_tax_value,
+            'paid_start_date_order_total_value':
+            paid_start_date_order_total_value,
+
+            'privacy_policy_url': privacy_policy_url,
+            'terms_of_service_url': terms_of_service_url,
+        }
+        text_context = {
+            'user_name': transaction_obj.user.get_full_name,
+        }
+        email_subject = "Welcome to FilmHobo. " \
+            "Here are your subscription details."
+        email_body_text = render_to_string(
+            "payment_receipts/email_receipt.txt", text_context, request
+        )
+        email_body_html = render_to_string(
+            "payment_receipts/email_receipt.html", html_context, request
+        )
+        recipient_email = transaction_obj.user.email
+        email_recipients = [recipient_email]
+        email_from = getattr(
+            settings, "PAYPAL_SENDER_EMAIL",
+        )
+        email_from_obj = FilmHoboSenderEmail.objects.get(email=email_from)
+        success = send_mail(
+            subject=email_subject,
+            message=email_body_text,
+            from_email=email_from,
+            recipient_list=email_recipients,
+            html_message=email_body_html,
+        )
+        email_record_obj = EmailRecord.objects.create(
+            sender=email_from_obj,
+            recipient=transaction_obj.user,
+            email=transaction_obj.user.email,
+            subject=email_subject,
+            sent=success,
+        )
+        serialized_obj_dict = {
+            "when": email_record_obj.when,
+            "sender": email_record_obj.sender.id,
+            "recipient": email_record_obj.recipient.id,
+            "email": email_record_obj.email,
+            "subject": email_record_obj.subject,
+            "sent": email_record_obj.sent
+        }
+        serializer = EmailRecordSerializer(data=serialized_obj_dict)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+
+class PayPalSendRemainderEmail(APIView):
+    """
+    API to send receipt for after monthly subscription is taken transaction
+    """
+    def post(self, request, *args, **kwargs):
+        order_id = request.data['order_id']
+        transaction_obj = Transaction.objects.get(paypal_order_id=order_id)
+        order_date = transaction_obj.date
+        order_date_formated = order_date.strftime("%d/%m/%Y")
+        payment_method = transaction_obj.payment_method
+        payment_plan = transaction_obj.payment_plan
+        price = float(transaction_obj.final_amount)
+
+        total_purchase_value = "00.00"
+        sales_tax_percentage = 0.0
+        sales_tax_value = "00.00"
+        order_total_value = "00.00"
+
+        base_url = settings.ORIGIN_URL
+        privacy_policy_url = base_url + '/general/privacy_policy/'
+        terms_of_service_url = base_url + '/general/terms_of_service/'
+
+        html_context = {
+            'user_name': transaction_obj.user.get_full_name(),
+            'user_membership': transaction_obj.user.membership,
+            'order_id': transaction_obj.id,
+            'order_date': order_date_formated,
+
+            'payment_method': payment_method,
+            'plan': payment_plan,
+            'price': price,
+            'free_trial_days': transaction_obj.days_free,
+
+            'total_purchase_value': total_purchase_value,
+            'sales_tax_percentage': sales_tax_percentage,
+            'sales_tax_value': sales_tax_value,
+            'order_total_value': order_total_value,
+
+            'privacy_policy_url': privacy_policy_url,
+            'terms_of_service_url': terms_of_service_url,
+        }
+        text_context = {
+            'user_name': transaction_obj.user.get_full_name,
+        }
+        email_subject = "Filmhobo Subscription Receipt"
+        email_body_text = render_to_string(
+            "payment_receipts/email_receipt.txt", text_context, request
+        )
+        email_body_html = render_to_string(
+            "payment_receipts/email_reminder_receipt.html",
+            html_context, request
+        )
+        recipient_email = transaction_obj.user.email
+        email_recipients = [recipient_email]
+        email_from = getattr(
+            settings, "PAYPAL_SENDER_EMAIL",
+        )
+        email_from_obj = FilmHoboSenderEmail.objects.get(email=email_from)
+        success = send_mail(
+            subject=email_subject,
+            message=email_body_text,
+            from_email=email_from,
+            recipient_list=email_recipients,
+            html_message=email_body_html,
+        )
+        email_record_obj = EmailRecord.objects.create(
+            sender=email_from_obj,
+            recipient=transaction_obj.user,
+            email=transaction_obj.user.email,
+            subject=email_subject,
+            sent=success,
+        )
+        serialized_obj_dict = {
+            "when": email_record_obj.when,
+            "sender": email_record_obj.sender.id,
+            "recipient": email_record_obj.recipient.id,
+            "email": email_record_obj.email,
+            "subject": email_record_obj.subject,
+            "sent": email_record_obj.sent
+        }
+        serializer = EmailRecordSerializer(data=serialized_obj_dict)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)

@@ -14,7 +14,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, CustomUserLogout, \
-                   ExtendedRegisterCompanyView, \
+                   ExtendedRegisterCompanyView, PageSearchView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
@@ -55,19 +55,19 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
                    TeamDeleteAPIView, \
                    GetProfileRatingNotificationAjaxView, \
-                   GetAllUsersAPI, \
-                   EditUserInterestAPI, VideoRatingView, ProjectView, \
+                   GetAllUsersAPI, EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, \
                    FindVideoRatingAPI, VideoListAPI, \
-                   CreateProjectView, ScreeningProjectDeatilView, \
+                   CreateProjectView, EditProjectView, \
+                   ScreeningProjectDeatilView, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
-                   TermsOfService, PrivacyPolicy, AddBetaTesterCode, \
-                   ListBetaTesterCode, DeleteBetaTesterCode, \
-                   EditBetaTesterCode, CheckBetaTesterCode, \
-                   TeamDeleteAPIView, VideoRatingView, \
-                   FindVideoRatingAPI, VideoListAPI, ProjectView, \
-                   CreateProjectView, TeamDeleteAPIView, RateCompanyAPI, \
-                   ProjectDateFilterAPI
+                   AddBetaTesterCode, ListBetaTesterCode, \
+                   DeleteBetaTesterCode, \
+                   CheckBetaTesterCode, ProjectDateFilterAPI, \
+                   GetBetaTesterCodeId, HomeProjectAPIView, \
+                   HomeProjectDateFilterAPI, HomeProjectSearchView, \
+                   ProjectSearchView
 
 
 app_name = "hobo_user"
@@ -186,25 +186,21 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
-
-    path('get-all-users-api/', GetAllUsersAPI.as_view(), name='get-all-users-api'),
-
+    path('get-all-users-api/', GetAllUsersAPI.as_view(),
+         name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
          name='add-beta-tester-code'),
     path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
          name='list-beta-tester-code'),
     path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
          name='delete-beta-tester-code'),
-    path('edit-beta-tester-code/', EditBetaTesterCode.as_view(),
-         name='edit-beta-tester-code'),
     path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
          name='check-beta-tester-code'),
-
+    path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
+         name='get-beta-tester-code-id'),
 
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
-    path('terms_of_service/', TermsOfService.as_view(), name='terms_of_service'),
-    path('privacy_policy/', PrivacyPolicy.as_view(), name='privacy_policy'),
     path('user_home/', HomePage.as_view(), name='user_home'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),
@@ -309,7 +305,7 @@ urlpatterns = [
     path('projects/delete/<id>', ProjectDeleteAPIView.as_view(),
          name='delete-project'),
     path('projects/update/<id>', ProjectUpdateAPIView.as_view(),
-         name='delete-project'),
+         name='update-project'),
     path('teams/', TeamAPIView.as_view(),
          name='team-list'),
     path('teams/create/', TeamCreateAPIView.as_view(),
@@ -324,10 +320,6 @@ urlpatterns = [
     path('get-screeing-project-notification-html/',
          GetScreeningProjectInviteNotificationAjaxView.as_view(),
          name='get-screeing-project-notification-html'),
-    # path('projects/rating', UserRatingAPI.as_view(),
-    #      name="rate-api"),
-    # path('projects/search/',  ProjectSearchView.as_view(),
-    #      name="project-search"),
     path('video/rate/',  VideoRatingView.as_view(),
          name="videorate-api"),
     path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
@@ -338,6 +330,16 @@ urlpatterns = [
          name='projects'),
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
+    path('projectview/update/<int:id>', EditProjectView.as_view(),
+         name='update-project'),
+    path('projects/search/',  ProjectSearchView.as_view(),
+         name="project-search"),
     path('projects/date/', ProjectDateFilterAPI.as_view(),
-         name="date_filter")
+         name="date_filter"),
+    path('user_home-projects/date/', HomeProjectDateFilterAPI.as_view(),
+         name="user-date_filter"),
+    path('user_home-projects/search/',  HomeProjectSearchView.as_view(),
+         name="user-project-search"),
+    path('user_home-projects/', HomeProjectAPIView.as_view(),
+         name='user-project-list'),
 ]

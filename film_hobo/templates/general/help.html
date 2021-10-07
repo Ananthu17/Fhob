@@ -7,33 +7,31 @@
 {% block content %}
 <div class="container wrapper flex-grow-1">
     <div class="row help-sec-outer mt-3 mb-4">
-        <div class="col-11 mt-4 mb-2">
+        <div class="col-11 mt-4 mb-4">
             <a class="help-blu-link float-left ml-3">Surfing Film Hobo</a>
-            <button class="btn help-top-btn float-right">Report a Problem</button>
+            <button class="btn help-top-btn float-right mb-3">Report a Problem</button>
         </div>
         <div class="bg-light-help">
             <div class="col-12 mt-1">
-            <a class="help-links">Getting started</a>
+            <a href="{% url 'general:help_getting_started' %}" class="help-links">Getting started</a>
             <hr class="help-hr">
-            <a class="help-links">Projects</a>
+            <a href="{% url 'general:help_project' %}" class="help-links">Projects</a>
             <hr class="help-hr">
-            <a class="help-links">Rating</a>
+            <a href="{% url 'general:help_rating' %}" class="help-links">Rating</a>
             <hr class="help-hr">
-            <a class="help-links">Showcase</a>
+            <a href="{% url 'general:help_showcase' %}" class="help-links">Showcase</a>
             <hr class="help-hr">
-            <a class="help-links">SAMR</a>
+            <a href="{% url 'general:help_samr' %}" class="help-links">SAMR</a>
             <hr class="help-hr">
-            <a class="help-links">Networking</a>
+            <a href="{% url 'general:help_networking' %}" class="help-links">Networking</a>
             <hr class="help-hr">
-            <a class="help-links">Community Rules</a>
+            <a href="{% url 'general:help_community_rules' %}" class="help-links">Community Rules</a>
             <hr class="help-hr">
-            <a href="{% url 'hobo_user:choose-membership'  %}" class="help-links">Membership</a>
+            <a href="{% url 'general:help_membership'  %}" class="help-links">Membership</a>
             <hr class="help-hr-btm">
         </div>
         </div>
-
     </div>
-
 </div>
 {% endblock %}
 {% block extrajs %}

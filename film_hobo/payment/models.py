@@ -1,9 +1,11 @@
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from datetime import timedelta
 
+from django.db import models
+from django.db.models.signals import post_save
+from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
-from hobo_user.models import PromoCode
+from hobo_user.models import CustomUser
 
 # Create your models here.
 
@@ -84,3 +86,79 @@ class Transaction(models.Model):
 
     def __str__(self):
         return "{}:{}".format(self.id, self.user.email)
+
+
+class FilmHoboSenderEmail(models.Model):
+    """
+    Model to store all the sender emails.
+    """
+    email = models.EmailField(_('Email'))
+
+    class Meta:
+        verbose_name = 'Sender Email'
+        verbose_name_plural = 'Sender Emails'
+
+    def __str__(self):
+        return "{}:{}".format(self.id, self.email)
+
+
+class EmailRecord(models.Model):
+    """
+    Model to store all the outgoing emails.
+    """
+
+    when = models.DateTimeField(null=False, auto_now_add=True)
+    sender = models.ForeignKey(
+        FilmHoboSenderEmail,
+        related_name="sent_messages",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    recipient = models.ForeignKey(
+        CustomUser,
+        related_name="recv_messages",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    email = models.EmailField(_('Recipient Email'), null=False, blank=False)
+    subject = models.CharField(null=False, max_length=128)
+    sent = models.BooleanField(null=False, default=False)
+
+
+class ScheduledEmail(models.Model):
+    user = models.ForeignKey('hobo_user.CustomUser',
+                             verbose_name=_("User"),
+                             on_delete=models.CASCADE)
+    user_email = models.EmailField(null=False, blank=False)
+    last_run_at = models.DateTimeField(null=True, blank=True)
+    next_run_at = models.DateTimeField(null=True, blank=True)
+
+
+def change_registration_complete_to_true(sender, instance, **kwargs):
+    paid_user_obj = CustomUser.objects.get(email=instance.user.email)
+    paid_user_obj.registration_complete = True
+    paid_user_obj.save()
+
+
+def update_the_sheduled_email_table(sender, instance, **kwargs):
+    user_email = instance.email
+    user_obj = CustomUser.objects.get(email=user_email)
+    last_run_at = instance.when
+    transaction_obj = Transaction.objects.get(user=user_obj)
+    days_free = int(transaction_obj.days_free)
+    if (days_free > 0):
+        next_run_at = last_run_at + timedelta(days=days_free)
+    elif (user_obj.payment_plan == "monthly"):
+        next_run_at = last_run_at + timedelta(days=30)
+    elif (user_obj.payment_plan == "yearly"):
+        next_run_at = last_run_at + timedelta(days=365)
+    ScheduledEmail.objects.create(
+        user=user_obj, user_email=user_email,
+        last_run_at=last_run_at, next_run_at=next_run_at
+    )
+
+
+post_save.connect(change_registration_complete_to_true, sender=Transaction)
+post_save.connect(update_the_sheduled_email_table, sender=EmailRecord)

@@ -48,29 +48,6 @@ function deleteCodeFunction(obj_id) {
   $("#payment_admin_modal").modal('show');
 }
 
-function editCodeFunction(obj_id) {
-  edit_field_element = '#modify_edit_' + obj_id
-  edit_state = $(edit_field_element).text()
-  if (edit_state === 'Edit'){
-      $(edit_field_element).html("Save");
-
-      editable_fields = 'edit' + obj_id
-      var editable_elements = document.getElementsByClassName(editable_fields);
-      for (var i = 0; i < editable_elements.length; i++) {
-          element_to_change = editable_elements
-          if (editable_elements.item(i).contentEditable == true) {
-              editable_elements.item(i).contentEditable = false;
-          } else {
-              editable_elements.item(i).contentEditable = true;
-          }
-      }
-      editable_elements.item(2).children[0].readOnly = false
-      editable_elements.item(2).children[1].readOnly = false
-  }
-  else{
-  }
-}
-
 $( document ).ready(function() {
   axios.get(get_list_url, {headers: {'Authorization': authorization_str}})
   .then((response) => {
@@ -81,7 +58,7 @@ $( document ).ready(function() {
       obj_id = d.id
       delete_url = origin_url + '/hobo_user/delete-beta-tester-code/' + d.id
       table += '<tr><td contenteditable="false" class="edit'+d.id+'">'+d.code+'</td><td contenteditable="false" class="edit'+d.id+'">'+d.days+'</td>';
-      table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteCodeFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td><td> <a id="modify_edit_'+d.id+'" alt="modify_edit" class="admin-bill-link" href="#" onclick="return editCodeFunction('+obj_id+')">Edit</a></td></tr>';
+      table += '<td><a id="remove_btn'+d.id+'" class="modify_remove_id admin-bill-link" data-toggle="modal" data-target="#payment_admin_modal" alt="modify_remove" value="'+d.id+'" href="#" onclick="return deleteCodeFunction('+obj_id+')" data-title="Remove Discount">Remove</a></td></tr>';
     })
     table += '</tbody>';
     $('#beta_user_code_table').empty().html(table);
@@ -93,13 +70,10 @@ $("#modal_delete").click(function(){
   delete_url = origin_url + '/hobo_user/delete-beta-tester-code/' + obj_id + '/'
   axios.delete(delete_url, {headers: {'Authorization': authorization_str}})
   .then((response) => {
-  debugger
   if (response.status == 200){
-    debugger
           location.reload();
       }
   }, (error) => {
-    debugger
       console.log(error);
   });
 });

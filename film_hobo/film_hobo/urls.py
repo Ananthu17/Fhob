@@ -26,6 +26,7 @@ from initial_user import views as initial_user_views
 # from initial_user.views import InitialUserDetailSavePage
 from hobo_user.views import HowTo
 
+
 urlpatterns = [
     # path('', InitialUserDetailSavePage.as_view(),
     #      name='landing_home'),

@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
+from celery.schedules import crontab
 import environ
+import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
+import film_hobo.tasks
 
 env = environ.Env()
 environ.Env.read_env()
@@ -36,14 +38,56 @@ SECRET_KEY = env("SECRET_KEY")
 # 3 - AWS_PRODUCTION
 
 PROJECT_ENVIRONMENT = "LOCAL"
+# PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
     # ORIGIN_URL = "http://202.88.246.92:8041"
-    ORIGIN_URL = "http://172.22.0.1:8041"
+    DEBUG = False
+    ORIGIN_URL = "http://172.19.0.3:8041"
+    # demo server database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+            'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+            'USER': env("DEMO_SERVER_DATABASE_USER"),
+            'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+            'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+            'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://redis:6379'
+    CELERY_RESULT_BACKEND = "redis://redis:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
+
 elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
     ORIGIN_URL = "http://www.filmhobo.com"
 else:
+    DEBUG = True
     ORIGIN_URL = "http://127.0.0.1:8000"
+    # local database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DATABASE_ENGINE"),
+            'NAME': env("DATABASE_NAME"),
+            'USER': env("DATABASE_USER"),
+            'PASSWORD': env("DATABASE_PASSWORD"),
+            'HOST': env("DATABASE_HOST"),
+            'PORT': env("DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
 
 # # for development
 DEBUG = True
@@ -162,28 +206,6 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 #     }
 # }
 
-# local database credentials
-DATABASES = {
-    'default': {
-        'ENGINE': env("DATABASE_ENGINE"),
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT"),
-    }
-}
-
-# demo server database credentials
-# DATABASES = {
-#   'default': {
-#     'ENGINE': 'django.db.backends.postgresql',
-#     'HOST': os.environ.get('DB_HOST'),
-#     'NAME': os.environ.get('DB_NAME'),
-#     'USER': os.environ.get('DB_USER'),
-#     'PASSWORD': os.environ.get('DB_PASS'),
-#   }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -299,6 +321,7 @@ CHANNEL_LAYERS = {
     }
 }
 # PAYPAL SETTINGS
+PAYPAL_SENDER_EMAIL = env("PAYPAL_SENDER_EMAIL")
 PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
 PAYPAL_TEST = True
 PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID")
@@ -374,7 +397,8 @@ CKEDITOR_CONFIGS = {
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
-            'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
+             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
+             'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
             ['Undo', 'Redo'],
             ['Format', 'Styles', 'Font'],
         ],

@@ -15,11 +15,9 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     UserRatingCombined, UserRating, UserAgentManager, \
                     Photo, UserNotification, CompanyProfile, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
-                    Video, VideoRatingCombined, \
+                    VideoRatingCombined, CompanyRatingCombined, \
                     UserProject, GroupUsers, Feedback, CompanyRating, \
-                    CompanyRatingCombined, \
-                    VideoRating, ProjectMemberRating, \
-                    BraintreePromoCode, VideoRatingCombined, BetaTesterCodes
+                    VideoRating, ProjectMemberRating, BetaTesterCodes
 
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
@@ -62,6 +60,8 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
                              'email', 'password', 'date_of_joining')}),
         ('Terms and Conditions', {'fields': ('i_agree',)}),
         ('Registration Process', {'fields': ('registration_complete',)}),
+        ('Beta User', {'fields': ('beta_user', 'beta_user_code',
+                                  'beta_user_end')}),
         ('Membership', {'fields': ('membership', 'guild_membership',
                                    'payment_plan')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
@@ -112,7 +112,6 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
-admin.site.register(BraintreePromoCode)
 admin.site.register(HoboPaymentsDetails)
 admin.site.register(IndiePaymentDetails)
 admin.site.register(ProPaymentDetails)

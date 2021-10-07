@@ -1,21 +1,18 @@
 
 import datetime
 
-from django.db.models import Q
-from autoslug import AutoSlugField
-from django.contrib.auth.hashers import make_password
-from phonenumber_field.modelfields import PhoneNumberField
-
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, \
+    RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
+# from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
@@ -188,6 +185,19 @@ class CustomUser(AbstractUser):
         help_text=_(
             'Designates whether the user fully completed the registration.'),
     )
+    beta_user = models.BooleanField(
+        _('Beta User'),
+        default=False,
+        help_text=_(
+            'Designates whether the user started as a beta user.'),
+    )
+    beta_user_code = models.ForeignKey("hobo_user.BetaTesterCodes",
+                                       on_delete=models.SET_NULL,
+                                       related_name='user_betatestercode',
+                                       verbose_name=_("BetaTesterCode"),
+                                       null=True)
+    beta_user_end = models.DateField(_('Beta User End Date and Time'),
+                                     null=True, blank=True)
     company_name = models.CharField(_("Company Name"), max_length=500,
                                     null=True, blank=True)
     # company_address = models.TextField(_("Address"), null=True, blank=True)
@@ -198,8 +208,16 @@ class CustomUser(AbstractUser):
                                        max_length=250,
                                        null=True,
                                        blank=True,)
-    company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    company_phone = models.CharField(_("Phone Number"),
+                                     validators=[phone_number_regex],
+                                     max_length=16, null=True,
                                      unique=True)
+    # company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    #                                  unique=True)
     title = models.CharField(_('Title'),
                              max_length=150, null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
@@ -236,8 +254,16 @@ class CustomUser(AbstractUser):
     eyes = models.CharField(_("Eyes"),
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
-    phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    phone_number = models.CharField(_("Phone Number"),
+                                    validators=[phone_number_regex],
+                                    max_length=16, null=True,
                                     unique=True)
+    # phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    #                                 unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
     date_of_joining = models.DateField(_("Date of Joining"),
@@ -280,15 +306,17 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return self.get_full_name()
 
     def get_full_name(self):
         if self.is_superuser:
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
-        else:
+        elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
+        else:
+            name = self.email
         return name
 
     def get_height_in_meters(self):
@@ -512,6 +540,40 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
+
+    PRO_AND_COMP_WITH_RATING_1_STAR = 'pro_and_comp_with_rating_1_star'
+    PRO_AND_COMP_WITH_RATING_2_STAR = 'pro_and_comp_with_rating_2_star'
+    PRO_AND_COMP_WITH_RATING_3_STAR = 'pro_and_comp_with_rating_3_star'
+    PRO_AND_COMP_WITH_RATING_4_STAR = 'pro_and_comp_with_rating_4_star'
+    PRO_AND_COMP_WITH_RATING_5_STAR = 'pro_and_comp_with_rating_5_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_1_STAR = 'indie_pro_and_comp_with_rating_1_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_2_STAR = 'indie_pro_and_comp_with_rating_2_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_3_STAR = 'indie_pro_and_comp_with_rating_3_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_4_STAR = 'indie_pro_and_comp_with_rating_4_star'
+    INDIE_PRO_AND_COMP_WITH_RATING_5_STAR = 'indie_pro_and_comp_with_rating_5_star'
+
+    CREW_SAMR_CHOICES =[
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+
+        (PRO_AND_COMP_WITH_RATING_1_STAR , 'pro and comp with rating 1 star'),
+        (PRO_AND_COMP_WITH_RATING_2_STAR , 'pro and comp with rating 2 star'),
+        (PRO_AND_COMP_WITH_RATING_3_STAR , 'pro and comp with rating 3 star'),
+        (PRO_AND_COMP_WITH_RATING_4_STAR , 'pro and comp with rating 4 star'),
+        (PRO_AND_COMP_WITH_RATING_5_STAR , 'pro and comp with rating 5 star'),
+
+        (INDIE_PRO_AND_COMP_WITH_RATING_1_STAR , 'indie pro and comp with rating 1 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_2_STAR , 'indie pro and comp with rating 2 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_3_STAR , 'indie pro and comp with rating 3 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_4_STAR , 'indie pro and comp with rating 4 star'),
+        (INDIE_PRO_AND_COMP_WITH_RATING_5_STAR , 'indie pro and comp with rating 5 star'),
+
+
+    ]
+
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
     ULB = 'SAG_ultra _low_budget'
@@ -612,11 +674,15 @@ class Project(models.Model):
     format = models.CharField(_("Format Type"),
                               choices=FORMAT_CHOICES,
                               max_length=150, null=True, blank=True)
+
+    number_of_pages = models.IntegerField(_("Number of Pages"),
+                                          null=True, blank=True)
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
-    rating = models.FloatField(_("Rating"), null=True, blank=True)
-    video_rating = models.FloatField(_("Video Rating"), null=True, blank=True)
+    rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True, blank=True,
+                                 default=1)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
@@ -652,9 +718,9 @@ class Project(models.Model):
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     crew_samr = models.CharField(_("Crew SAMR"),
-                                 choices=CAST_SAMR_CHOICES,
+                                 choices=CREW_SAMR_CHOICES,
                                  max_length=150,
-                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+                                 default=PRO_AND_COMP_WITH_RATING_1_STAR)
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
@@ -666,7 +732,8 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12, null=True, blank=True)
+    script_password = models.CharField(max_length=12,null=True,
+                                            blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,
@@ -675,7 +742,7 @@ class Project(models.Model):
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
 
     timestamp = models.DateField(auto_now_add=True)
-
+    # test = models.CharField(max_length=1000,  null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -821,7 +888,7 @@ class Team(models.Model):
                                  on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.project.title +" - "+ self.job_type.title
+        return self.project.title + " - " + self.job_type.title
 
     def save(self, *args, **kwargs):
         try:
@@ -1352,7 +1419,8 @@ class UserRatingCombined(models.Model):
                                  )
     rating = models.FloatField(_("Rating"), null=True, blank=True)
     no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
-    no_of_projects = models.IntegerField(_("No of Projects"), null=True, blank=True)
+    no_of_projects = models.IntegerField(
+        _("No of Projects"), null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -1600,10 +1668,18 @@ class UserAgentManager(models.Model):
                                   null=True,
                                   blank=True
                                   )
-    agent_phone = PhoneNumberField(_("Agent's phone number"),
-                                   null=True,
-                                   blank=True
-                                   )
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="invalid phone number",
+                                        code="invalid_phone_number"
+                                        )
+    agent_phone = models.CharField(_("Agent's phone number"),
+                                   validators=[phone_number_regex],
+                                   max_length=16, null=True,
+                                   blank=True, unique=True)
+    # agent_phone = PhoneNumberField(_("Agent's phone number"),
+    #                                null=True,
+    #                                blank=True
+    #                                )
     agent_email = models.EmailField(_("Agent's email address"),
                                     null=True,
                                     blank=True)
@@ -1843,8 +1919,36 @@ class UserProject(models.Model):
 class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
+    indie_monthly_plan_id = models.CharField(
+        _("Indie Monthly Plan ID"), max_length=40, unique=True)
+    indie_yearly_plan_id = models.CharField(
+        _("Indie Yearly Plan ID"), max_length=40, unique=True)
+    pro_monthly_plan_id = models.CharField(
+        _("Pro Monthly Plan ID"), max_length=40, unique=True)
+    pro_yearly_plan_id = models.CharField(
+        _("Pro Yearly Plan ID"), max_length=40, unique=True)
+    company_monthly_plan_id = models.CharField(
+        _("Company Monthly Plan ID"), max_length=40, unique=True)
+    company_yearly_plan_id = models.CharField(
+        _("Company Yearly Plan ID"), max_length=40, unique=True)
+
+    def __str__(self):
+        return str(self.code)
 
     class Meta:
         verbose_name = 'Beta Tester Code'
         verbose_name_plural = 'Beta Tester Codes'
 
+
+def create_profile_for_admin_user(sender, instance, **kwargs):
+    if kwargs['created']:
+        if instance.membership == 'ADMIN':
+            UserProfile.objects.create(user=instance)
+            CustomUserSettings.objects.create(
+                user=instance, profile_visibility=CustomUserSettings.NO_ONE,
+                who_can_contact_me=CustomUserSettings.NO_ONE,
+                who_can_track_me=CustomUserSettings.NO_ONE,
+                account_status=CustomUserSettings.ENABLED)
+
+
+post_save.connect(create_profile_for_admin_user, sender=CustomUser)
