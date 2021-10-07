@@ -235,29 +235,23 @@
                             </div>
                            {% endfor %}
                         </div>
-                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                        <div class="row">
+                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{ my_projects.count }})</div>
+                        {% for obj in my_projects|slice:":6" %}
+                        {% if forloop.first or forloop.counter0|divisibleby:3 %}
+                        <div class="row ">
+                        {% endif %}
                             <div class="col-4 ">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#{{obj.id}}</span>
                                 </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Dynamo</span>
-                                </div>
-                            </div>
-                            <div class="col-4 mem-set-track-padding-sec2">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#56</span>
-                                </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Jack</span>
+                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
                                 </div>
                             </div>
-                            <div class="col-4 mem-set-track-padding-sec2 pl-0">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#457</span>
-                                </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Hammer</span>
-                                </div>
-                            </div>
+                        {% if forloop.last or forloop.counter|divisibleby:3 %}
                         </div>
-                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
-                        <div class="row">
+                        {% endif %}
+                        {% endfor %}
+                        <!-- <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                        <div class="row">mem-set-track-padding-sec2 pl-0
                             <div class="col-6">
                                 <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
                                 </div>
@@ -272,7 +266,7 @@
                                 <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
                                         York</span></div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 {% endif %}
@@ -327,7 +321,7 @@
                             <label class="form-title">
                                 {% if profile.imdb %}
                                 {% get_url profile.imdb as imdb %}
-                                <a href="{{imdb}}" class="mem-setup-blu-f" >IMDB</a>
+                                <a href="{{imdb}}" target="_blank" class="mem-setup-blu-f" >IMDB</a>
                                 {% endif %}
                             </label>
                         </div>

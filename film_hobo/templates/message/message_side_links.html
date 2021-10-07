@@ -1,0 +1,10 @@
+
+<div class="mm-left-menu">
+    <a class="mm-menu-item" href="{% url 'message:compose-message' %}">Compose</a>
+    <a class="mm-menu-item" href="{% url 'message:all-messages' %}">All Messages
+        {% if msg_count != '' %}({{msg_count}}){% endif %}
+    </a>
+    <a class="mm-menu-item" href="{% url 'message:priority-messages'%}">
+        <i class="fa fa-star mm-left-red-star" aria-hidden="true"></i>Priority
+    </a>
+</div>

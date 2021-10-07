@@ -37,6 +37,7 @@ SECRET_KEY = env("SECRET_KEY")
 # 2 - DEMO_SERVER
 # 3 - AWS_PRODUCTION
 
+# PROJECT_ENVIRONMENT = "LOCAL"
 PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
@@ -134,6 +135,7 @@ INSTALLED_APPS = [
     'payment',
     'general',
     'project',
+    'messaging',
 
     'bootstrap_datepicker_plus',
     'django_select2',

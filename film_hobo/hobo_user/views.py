@@ -70,6 +70,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
+from messaging.models import MessageStatus
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -1341,7 +1342,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
+                blocked_members[obj.id] = obj.get_full_name()
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1363,6 +1364,22 @@ class BlockMembersAPI(APIView):
                     blocked_members.append(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = True
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Blocked %s" % (
                                 block_user.email),
@@ -1399,6 +1416,22 @@ class UnBlockMembersAPI(APIView):
                     blocked_members.remove(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = False
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Un Blocked %s" % (
                                 block_user.email),
@@ -1633,8 +1666,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        context['transaction'] = \
-            Transaction.objects.get(user_id=user.id)
+        # context['transaction'] = \
+        #     Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -3492,6 +3525,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
+        project_obj = Project.objects.all()
+
+        context['projects'] = project_obj
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
