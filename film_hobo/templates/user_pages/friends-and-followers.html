@@ -652,24 +652,19 @@
                                 <div class="sm-12">
                                     <label class="intrest-lab">Gender:</label>
                                     <select class="inp-interest format-space"
-                                    name="gender" id ="budget_1" required >
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
+                                    name="gender" id ="gender"  >
+                                        {% for item in my_interest_form.gender %}
+                                            {{item}}
+                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="sm-12">
                                     <label class="intrest-lab">Age:</label>
                                     <select class="inp-interest format-space"
-                                    name="age" id ="budget_1" required >
-                                        <option value="1">5 to 7</option>
-                                        <option value="2">7 to 10</option>
-                                        <option value="3">10 to 15</option>
-                                        <option value="4">15 to 20</option>
-                                        <option value="5">20 to 30</option>
-                                        <option value="6">30 to 40</option>
-                                        <option value="7">40 to 50</option>
-                                        <option value="8">50 to 60</option>
-                                        <option value="9">60 to 70</option>
+                                    name="age" id ="age"  >
+                                        {% for item in my_interest_form.age %}
+                                            {{item}}
+                                        {% endfor %}
                                     </select>
                                 </div>
                            </div>
@@ -720,21 +715,20 @@
                                     <th></th>
                                     <th></th>
                                 </tr>
-                                <tr>
+                                     <tr>
                                     {% for prj in projects  %}
-
-                                   
-                                    {% if prj.format == obj.format and prj.location == obj.location and prj.sag_aftra == obj.budget %}
+                                        {% if prj.format == obj.format and prj.location == obj.location and prj.sag_aftra == obj.budget %}
+                                        
+                                            <td><a class="tbl-tag" href="">Project # {{ prj.id }}</a></td>
+                                            <td>Title:  {{ prj.title }} </td>
+                                            <td>Posted on {{ prj.timestamp }}</td>
+                                            <td class="int-applied">Applied</td>
+                                            <td class="int-red">Passed</td>
+                                            <td class="int-grey">Attached</td>
+                                            <td class="int-red">(on 08/05/21)</td>
+                                        {% endif %}
+                                    </tr>
                                     
-                                    <td><a class="tbl-tag" href="">Project # {{ prj.id }}</a></td>
-                                    <td>Title:  {{ prj.title }} </td>
-                                    <td>Posted on {{ prj.timestamp }}</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr>
-                                   {% endif %}
                                 <!-- <tr>
                                     <td><a class="tbl-tag" href="">Project # 233</a></td>
                                     <td>Title: Ripples of Moonlight</td>
@@ -744,7 +738,7 @@
                                     <td class="int-grey">Attached</td>
                                     <td class="int-red">(on 08/05/21)</td>
                                 </tr> -->
-                                {% endfor %}
+                                  {% endfor %}
                                 <!-- The Modal -->
                                 <div class="modal fade" id="edit-{{obj.id}}">
                                     <div class="modal-dialog">
@@ -820,13 +814,51 @@
                                                                         <label class="intrest-lab">Location:</label>
                                                                     </div>
                                                                     <div class="col-6">
-                                                                        <select class="inp-interest-2 modal-location form-control"
+                                                                        <select class="inp-interest-2 modal-location "
                                                                         id ="location_{{obj.id}}"
                                                                         name="location" required >
                                                                         {% for location in locations %}
                                                                                 <option value="{{location.id}}"
                                                                                 {% if obj.location.id == location.id %} selected {% endif %}>
                                                                                 {{location}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Gender:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2"
+                                                                        id ="gender_{{obj.id}}"
+                                                                        name="gender" required >
+                                                                        {% for item in gender %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.gender == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Age:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        id ="age_{{obj.id}}"
+                                                                        name="age" required >
+                                                                        {% for item in age %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.age == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
                                                                             </option>
                                                                         {% endfor %}
                                                                         </select>
@@ -933,9 +965,8 @@
 <script>
 
     $(document).ready(function() {
-        $('#location_1').select2();
-        $('.modal-location').select2();
-
+        // $('#location_1').select2();
+        // $('.modal-location').select2();
 
         var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
@@ -1049,10 +1080,14 @@ $('body').on('click' , '#add-more-interests', function(){
         var format_id = "#format_"+id
         var budget_id = "#budget_"+id
         var location_id = "#location_"+id
+        var gender_id = "#gender_"+id
+        var age_id = "#age_"+id
         var position = $(position_id).val();
         var format = $(format_id).val();
         var budget = $(budget_id).val();
         var location = $(location_id).val();
+        var gender = $(gender_id).val();
+        var age = $(age_id).val();
 
         data_dict['id'] = id
         if(position){
@@ -1067,6 +1102,13 @@ $('body').on('click' , '#add-more-interests', function(){
         if(location){
             data_dict['location'] = location
         }
+        if(gender){
+            data_dict['gender'] = gender
+        }
+        if(age){
+            data_dict['age'] = age
+        }
+        console.log(data_dict)
         $.ajax
         ({
             type: "POST",

@@ -32,4 +32,22 @@
             {% endfor %}
         </select>
     </div>
+    <div class="col-md-3 col-sm-3 form-group">
+        <label class="intrest-lab">Gender:</label>
+        <select class="inp-interest format-space"
+        name="gender" id ="gender"  >
+            {% for item in my_interest_form.gender %}
+                {{item}}
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 col-sm-3 form-group">
+        <label class="intrest-lab">Age:</label>
+        <select class="inp-interest format-space"
+        name="age" id ="age"  >
+            {% for item in my_interest_form.age %}
+                {{item}}
+            {% endfor %}
+        </select>
+    </div>
 </div>

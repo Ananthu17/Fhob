@@ -1351,8 +1351,8 @@ class CompanyClient(models.Model):
 
 
 class UserInterest(models.Model):
-    MALE = 'MALE'
-    FEMALE = 'FEMALE'
+    MALE = 'male'
+    FEMALE = 'female'
     SCENE = 'SCH'
     SHORT = 'SHO'
     PILOT = 'PIL'
