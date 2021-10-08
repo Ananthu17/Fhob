@@ -1,4 +1,4 @@
-<div class="row intrest-input ">
+<div class="row intrest-input mt-3">
     <div class="sm-12">
         <label class="intrest-lab">Position:</label>
         <select class="inp-interest" id="position_{{count}}"
@@ -33,6 +33,29 @@
             {% for item in my_interest_form.budget %}
             {{item}}
             {% endfor %}
+        </select>
+    </div>
+    <div class="sm-12">
+        <label class="intrest-lab">Gender:</label>
+        <select class="inp-interest format-space"
+        name="gender" id ="budget_1" required >
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+    </div>
+    <div class="sm-12">
+        <label class="intrest-lab">Age:</label>
+        <select class="inp-interest format-space"
+        name="age" id ="budget_1" required >
+            <option value="1">5 to 7</option>
+            <option value="2">8 to 10</option>
+            <option value="3">11 to 15</option>
+            <option value="4">16 to 20</option>
+            <option value="5">21 to 30</option>
+            <option value="6">31 to 40</option>
+            <option value="7">41 to 50</option>
+            <option value="8">51 to 60</option>
+            <option value="9">61 to 70</option>
         </select>
     </div>
 </div>

@@ -963,7 +963,7 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location', 'budget']
+        fields = ['position', 'format', 'location', 'budget', 'age', 'gender']
 
 
 class EditUserInterestSerializer(serializers.ModelSerializer):

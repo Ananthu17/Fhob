@@ -3663,6 +3663,7 @@ class AddUserInterestAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
+            print(data_dict)
             obj = UserInterest()
             obj.user = self.request.user
             obj.position = JobType.objects.get(pk=data_dict['position'])

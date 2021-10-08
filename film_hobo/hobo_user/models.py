@@ -1351,6 +1351,8 @@ class CompanyClient(models.Model):
 
 
 class UserInterest(models.Model):
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
     SCENE = 'SCH'
     SHORT = 'SHO'
     PILOT = 'PIL'
@@ -1364,11 +1366,35 @@ class UserInterest(models.Model):
     ShB = 'SAG_short_film_budget'
     MiB = 'SAG_micro_budget'
     StB = 'SAG_studet_budget'
+    FIVE_TO_SEVEN = 'five_to_seven'
+    EIGHT_TO_TEN = 'eight_to_ten'
+    ELEVEN_TO_FIFTEEN = 'eleven_to_fifteen'
+    SIXTEEN_TO_TWENTY = 'sixteen_to_twenty'
+    TWENTYONE_TO_THIRTY = 'twentyone_to_thirty'
+    THIRTYONE_TO_FOURTY = 'thirtyone_to_fourty'
+    FOURTYONE_TO_FIFTY = 'fourtyone_to_fifty'
+    FIFTYONE_TO_SIXTY = 'fiftyone_to_sixty'
+    SIXTYONE_TO_SEVENTY = 'sixtyone_to_seventy'
+    GENDER_CHOICES = [
+                    (MALE, 'Male'),
+                    (FEMALE, 'Female'),
+                    ]
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
                     (SHORT, 'Short Film'),
                     (PILOT, 'Pilot'),
                     (FEATURE, 'Feature'),
+                    ]
+    AGE_CHOICES = [
+                    (FIVE_TO_SEVEN, '5 to 7'),
+                    (EIGHT_TO_TEN, '8 to 10'),
+                    (ELEVEN_TO_FIFTEEN, '11 to 15'),
+                    (SIXTEEN_TO_TWENTY, '16 to 20'),
+                    (TWENTYONE_TO_THIRTY, '21 to 30'),
+                    (THIRTYONE_TO_FOURTY, '31 to 40'),
+                    (FOURTYONE_TO_FIFTY, '41 to 50'),
+                    (FIFTYONE_TO_SIXTY, '51 to 60'),
+                    (SIXTYONE_TO_SEVENTY, '61 to 70'),
                     ]
     BUDGET_CHOICES = [
                     (No_PAYMENT, 'No Payment'),
@@ -1399,6 +1425,14 @@ class UserInterest(models.Model):
                               choices=BUDGET_CHOICES,
                               max_length=150,
                               default=No_PAYMENT, null=True)
+    gender = models.CharField(_("Gender"),
+                              choices=GENDER_CHOICES,
+                              max_length=150,
+                              default=FEMALE, null=True)
+    age = models.CharField(_("Age"),
+                           choices=AGE_CHOICES,
+                           max_length=150,
+                           default=FEMALE, null=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
