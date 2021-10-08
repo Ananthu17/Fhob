@@ -28,7 +28,7 @@ djangorestframework-simplejwt==4.4.0
 fpdf==1.7.2
 # fitz==0.0.1.dev2
 jsmin==2.2.2
-# mammoth==1.4.17
+mammoth==1.4.17
 paypal-checkout-serversdk==1.0.1
 pdf2image==1.16.0
 phonenumbers==8.12.21

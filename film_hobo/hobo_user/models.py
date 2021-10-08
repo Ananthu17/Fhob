@@ -209,7 +209,7 @@ class CustomUser(AbstractUser):
                                        null=True,
                                        blank=True,)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     company_phone = models.CharField(_("Phone Number"),
@@ -255,7 +255,7 @@ class CustomUser(AbstractUser):
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     phone_number = models.CharField(_("Phone Number"),
@@ -732,8 +732,8 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12,null=True,
-                                            blank=True)
+    script_password = models.CharField(max_length=12, null=True,
+                                       blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,
@@ -1669,7 +1669,7 @@ class UserAgentManager(models.Model):
                                   blank=True
                                   )
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     agent_phone = models.CharField(_("Agent's phone number"),
