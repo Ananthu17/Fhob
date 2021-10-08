@@ -697,21 +697,20 @@
                                     <th></th>
                                     <th></th>
                                 </tr>
-                                <tr>
+                                     <tr>
                                     {% for prj in projects  %}
-
-                                   
-                                    {% if prj.format == obj.format and prj.location == obj.location and prj.sag_aftra == obj.budget %}
+                                        {% if prj.format == obj.format and prj.location == obj.location and prj.sag_aftra == obj.budget %}
+                                        
+                                            <td><a class="tbl-tag" href="">Project # {{ prj.id }}</a></td>
+                                            <td>Title:  {{ prj.title }} </td>
+                                            <td>Posted on {{ prj.timestamp }}</td>
+                                            <td class="int-applied">Applied</td>
+                                            <td class="int-red">Passed</td>
+                                            <td class="int-grey">Attached</td>
+                                            <td class="int-red">(on 08/05/21)</td>
+                                        {% endif %}
+                                    </tr>
                                     
-                                    <td><a class="tbl-tag" href="">Project # {{ prj.id }}</a></td>
-                                    <td>Title:  {{ prj.title }} </td>
-                                    <td>Posted on {{ prj.timestamp }}</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr>
-                                   {% endif %}
                                 <!-- <tr>
                                     <td><a class="tbl-tag" href="">Project # 233</a></td>
                                     <td>Title: Ripples of Moonlight</td>
@@ -721,7 +720,7 @@
                                     <td class="int-grey">Attached</td>
                                     <td class="int-red">(on 08/05/21)</td>
                                 </tr> -->
-                                {% endfor %}
+                                  {% endfor %}
                                 <!-- The Modal -->
                                 <div class="modal fade" id="edit-{{obj.id}}">
                                     <div class="modal-dialog">
