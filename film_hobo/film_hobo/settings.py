@@ -41,9 +41,10 @@ SECRET_KEY = env("SECRET_KEY")
 PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
-    # ORIGIN_URL = "http://202.88.246.92:8041"
     DEBUG = False
-    ORIGIN_URL = "http://172.19.0.3:8041"
+    # ORIGIN_URL = "http://202.88.246.92:8041"
+    # ORIGIN_URL = "http://172.19.0.3:8041"
+    ORIGIN_URL = "http://app:8041"
     # demo server database credentials
     DATABASES = {
         'default': {

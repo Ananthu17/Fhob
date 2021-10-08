@@ -1906,7 +1906,7 @@ class UpdateAuditionStatusAPI(APIView):
                 else:
                     msg = "Audition status updated to "+audition.get_audition_status_display()
 
-                #update notification table
+                # update notification table
                 notification = UserNotification()
                 notification.user = audition.user
                 notification.project = audition.project
@@ -1945,7 +1945,6 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
     template_name = 'project/chemistry-room.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2845,7 +2844,7 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
         context = dict()
         user_list = []
         user_rating_objs = UserRatingCombined.objects.all()
-        
+
         try:
             actoractress = JobType.objects.get(slug='actoractress')
             actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]

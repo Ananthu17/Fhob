@@ -43,6 +43,7 @@ remote-pdb==2.1.0
 setuptools==56.0.0
 # signals==0.0.2
 # utils==1.0.1
+urllib3==1.26.7
 validators==0.18.2
 whitenoise==5.2.0
 zappa==0.52.0
