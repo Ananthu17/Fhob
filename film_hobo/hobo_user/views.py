@@ -5271,7 +5271,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                             }
                         notify(room_name, notification_msg)
 
-                messages.success(request, "New project added.")
+                messages.success(request, "New project"+"  "+str(project.title)+"  "+"added")
                 return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))
             messages.error(request, "Form not valid")
