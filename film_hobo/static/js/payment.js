@@ -203,30 +203,30 @@ $( document ).ready(function() {
     });
 
     // data to load if the promo-code from the braintree
-    get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'
+    // get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'
 
-    axios.get(get_braintree_discounts, {headers: {'Authorization': authorization_str}})
-    .then((response) => {
-      discount_objs = response.data
+    // axios.get(get_braintree_discounts, {headers: {'Authorization': authorization_str}})
+    // .then((response) => {
+    //   discount_objs = response.data
 
-      let table = '<thead> <tr> <th>Braintree ID</th> <th>Promocode (Name)</th> <th>Description</th><th>Amount</th><th>Number of Billing Cycles</th></tr></thead><tbody></tbody>';
-        discount_objs.forEach(function(d){
-        obj_id = d.braintree_id
-        if (d.billing_cycles == null){
-            var billing_cycles_dur = 'For Duration of Subscription'
-        }
-        else{
-            var billing_cycles_dur = d.billing_cycles
-        }
-        table += '<tr><td contenteditable="false" class="edit'+d.braintree_id+'">'+d.braintree_id+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.promo_code+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.description+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.amount+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+billing_cycles_dur+'</td>';
-    })
-      table += '</tbody>';
-      $('#braintree_discount_table').empty().html(table);
-    });
+    //   let table = '<thead> <tr> <th>Braintree ID</th> <th>Promocode (Name)</th> <th>Description</th><th>Amount</th><th>Number of Billing Cycles</th></tr></thead><tbody></tbody>';
+    //     discount_objs.forEach(function(d){
+    //     obj_id = d.braintree_id
+    //     if (d.billing_cycles == null){
+    //         var billing_cycles_dur = 'For Duration of Subscription'
+    //     }
+    //     else{
+    //         var billing_cycles_dur = d.billing_cycles
+    //     }
+    //     table += '<tr><td contenteditable="false" class="edit'+d.braintree_id+'">'+d.braintree_id+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.promo_code+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.description+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.amount+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+billing_cycles_dur+'</td>';
+    // })
+    //   table += '</tbody>';
+    //   $('#braintree_discount_table').empty().html(table);
+    // });
 });
 /*
 make the table column field editable

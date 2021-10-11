@@ -417,6 +417,8 @@ class UpdateMembershipFeeAPI(APIView):
                     final_result['monthly_indie'] = \
                         IndiePaymentDetails.objects.first().__dict__[
                             'monthly_amount']
+                    # indie_payment_users = CustomUser.objects.filter(
+                    #     membership='IND', payment_plan='monthly')
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -1674,3 +1676,11 @@ class PayPalSendRemainderEmail(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+
+class PayPalSendPlanChangeEmail(APIView):
+    """
+    API to send email to users when there is a change in subscription plan
+    """
+    def post(self, request, *args, **kwargs):
+        pass

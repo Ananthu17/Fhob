@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load friend_request_tag %}
+{% load project_rating_tag %}
 
 {% block extracss %}
 <style>
@@ -715,30 +716,34 @@
                                     <th></th>
                                     <th></th>
                                 </tr>
-                                     <tr>
-                                    {% for prj in projects  %}
-                                        {% if prj.format == obj.format and prj.location == obj.location and prj.sag_aftra == obj.budget %}
-                                        
-                                            <td><a class="tbl-tag" href="">Project # {{ prj.id }}</a></td>
-                                            <td>Title:  {{ prj.title }} </td>
-                                            <td>Posted on {{ prj.timestamp }}</td>
+                                {% get_dict_value_if_exists project_cast_dict obj.id  as cast_list %}
+                                {% if cast_list %}
+                                  {% for character in cast_list  %}
+                                    <tr>
+                                            <td><a class="tbl-tag" href="{% url 'project:single-film-project' character.project.id %}">Project # {{ character.project.id }}</a></td>
+                                            <td>Title:  {{ character.project.title }} </td>
+                                            <td>Posted on {{ character.project.timestamp }}</td>
                                             <td class="int-applied">Applied</td>
                                             <td class="int-red">Passed</td>
                                             <td class="int-grey">Attached</td>
                                             <td class="int-red">(on 08/05/21)</td>
-                                        {% endif %}
                                     </tr>
-                                    
-                                <!-- <tr>
-                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
-                                    <td>Title: Ripples of Moonlight</td>
-                                    <td>Posted on 07/23/21</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr> -->
                                   {% endfor %}
+                                {% endif %}
+                                {% get_dict_value_if_exists project_crew_dict obj.id  as crew_list %}
+                                {% if crew_list %}
+                                {% for crew in crew_list %}
+                                    <tr>
+                                            <td><a class="tbl-tag" href="{% url 'project:single-film-project' crew.project.id %}">Project # {{ crew.project.id }}</a></td>
+                                            <td>Title:  {{ crew.project.title }} </td>
+                                            <td>Posted on {{ crew.project.timestamp }}</td>
+                                            <td class="int-applied">Applied</td>
+                                            <td class="int-red">Passed</td>
+                                            <td class="int-grey">Attached</td>
+                                            <td class="int-red">(on 08/05/21)</td>
+                                    </tr>
+                                  {% endfor %}
+                                  {% endif %}
                                 <!-- The Modal -->
                                 <div class="modal fade" id="edit-{{obj.id}}">
                                     <div class="modal-dialog">
@@ -836,6 +841,7 @@
                                                                         <select class="inp-interest-2"
                                                                         id ="gender_{{obj.id}}"
                                                                         name="gender" required >
+                                                                        <option value="">---</option>
                                                                         {% for item in gender %}
                                                                             <option value="{{item.0}}"
                                                                                 {% if obj.gender == item.0 %} selected {% endif %}>
@@ -855,6 +861,7 @@
                                                                         <select class="inp-interest-2 "
                                                                         id ="age_{{obj.id}}"
                                                                         name="age" required >
+                                                                        <option value="">---</option>
                                                                         {% for item in age %}
                                                                             <option value="{{item.0}}"
                                                                                 {% if obj.age == item.0 %} selected {% endif %}>

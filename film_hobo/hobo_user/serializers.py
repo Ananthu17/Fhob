@@ -164,7 +164,7 @@ class RegisterIndieSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
-    phone_number = serializers.RegexField("/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm",
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
                                           max_length=16,
                                           allow_blank=True)
     date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
@@ -372,7 +372,7 @@ class RegisterProSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
-    phone_number = serializers.RegexField("/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm",
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
                                           max_length=16,
                                           required=True)
     date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
@@ -498,7 +498,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
-    phone_number = serializers.RegexField("/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm",
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
                                           max_length=16)
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
@@ -509,7 +509,7 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     company_name = serializers.CharField()
     company_address = serializers.CharField()
     company_website = serializers.CharField(allow_blank=True)
-    company_phone = serializers.RegexField("/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm",
+    company_phone = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
                                            max_length=16)
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
@@ -880,7 +880,7 @@ class AgentManagerSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
-    agent_phone = serializers.RegexField("/^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$/gm",
+    agent_phone = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
                                          max_length=16, required=False)
     agent_job_type = serializers.CharField(
         max_length=150,

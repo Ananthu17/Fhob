@@ -209,7 +209,7 @@ class CustomUser(AbstractUser):
                                        null=True,
                                        blank=True,)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     company_phone = models.CharField(_("Phone Number"),
@@ -255,7 +255,7 @@ class CustomUser(AbstractUser):
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     phone_number = models.CharField(_("Phone Number"),
@@ -732,8 +732,8 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12,null=True,
-                                            blank=True)
+    script_password = models.CharField(max_length=12, null=True,
+                                       blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,
@@ -1428,11 +1428,11 @@ class UserInterest(models.Model):
     gender = models.CharField(_("Gender"),
                               choices=GENDER_CHOICES,
                               max_length=150,
-                              default=FEMALE, null=True)
+                              null=True, blank=True)
     age = models.CharField(_("Age"),
                            choices=AGE_CHOICES,
                            max_length=150,
-                           default=FEMALE, null=True)
+                           null=True, blank=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
@@ -1703,7 +1703,7 @@ class UserAgentManager(models.Model):
                                   blank=True
                                   )
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     agent_phone = models.CharField(_("Agent's phone number"),
@@ -1770,6 +1770,7 @@ class UserNotification(models.Model):
     CAST_ATTACH_RESPONSE = 'cast_attach_response'
     CREW_ATTACH_REQUEST = 'crew_attach_request'
     CREW_ATTACH_RESPONSE = 'crew_attach_response'
+    USER_INTEREST = 'user_interest'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1793,6 +1794,7 @@ class UserNotification(models.Model):
                                 (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
                                 (CREW_ATTACH_REQUEST, 'Crew Attach Request'),
                                 (CREW_ATTACH_RESPONSE, 'Crew Attach Response'),
+                                (USER_INTEREST, 'User Interest'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),

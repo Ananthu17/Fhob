@@ -100,6 +100,7 @@ from payment.views import IsSuperUser
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from project.models import Character, ProjectCrew
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -2629,7 +2630,7 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
         return context
 
@@ -3525,9 +3526,37 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
-        project_obj = Project.objects.all()
+        project_crew_dict = {}
+        project_cast_dict = {}
+        try:
+            actor_actress = JobType.objects.get(slug='actoractress')
+            cast_wishlist = myinterests.filter(position=actor_actress)
+            for item in cast_wishlist:
+                project_cast_dict[item.id] = Character.objects.filter(
+                            Q(project__format = item.format) &
+                            Q(project__location = item.location) &
+                            Q(project__sag_aftra = item.budget) &
+                            Q(age = item.age) &
+                            Q(gender = item.gender)
+                        )
+            context['project_cast_dict'] = project_cast_dict
+            print(project_cast_dict)
+        except JobType.DoesNotExist:
+            context['project_cast_dict'] = {}
+        try:
+            actor_actress = JobType.objects.get(slug='actoractress')
+            crew_wishlist = myinterests.exclude(position=actor_actress)
+            for item in crew_wishlist:
+                project_crew_dict[item.id] = ProjectCrew.objects.filter(
+                            Q(project__format = item.format) &
+                            Q(project__location = item.location) &
+                            Q(project__sag_aftra = item.budget)
+                        )
+            context['project_crew_dict'] = project_crew_dict
+            print(project_crew_dict)
+        except JobType.DoesNotExist:
+            context['project_crew_dict'] = {}
 
-        context['projects'] = project_obj
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
@@ -4930,6 +4959,7 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -4940,15 +4970,15 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset()).filter(
-                                        creator=request.user)
+                   creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
 
 class ProjectCreateAPIView(CreateAPIView):
-  permission_classes = (IsAuthenticated,)
-  queryset = Project.objects.all()
-  serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -4990,23 +5020,8 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class ProjectSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         context = self.project_segregator(queryset)
-#         return Response(context)
-
-
 #Search API for Pages
-
 #API for Searching things in a page
-
 class PageSearchView(ListAPIView):
     template_name = 'search_results.html'
     serializer_class = ProjectSerializer

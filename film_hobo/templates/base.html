@@ -48,7 +48,7 @@
                             {% if request.user.is_anonymous %}
                                 <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
                             {% else %}
-                            <form action="" method="get">
+                            <form action="javascript:void(0)" method="get">
                                 <input type="text" name="q" placeholder="Search" class="search-placeholder" id="search">
                             </form>
                             {% endif %}
@@ -61,7 +61,7 @@
                                     <button class="mm-icon-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="fa fa-envelope header-fnt-clr header-icon-pos " aria-hidden="true"></span>
                                         <span class="message-notification">
-                                        {% get_msg_notifications_count request.user as msg_count %}
+                                        {% get_msg_notifications_count request.user.id as msg_count %}
                                         {% if msg_count %}
                                         <span class="mm-icon-button__badge">{{msg_count}}</span>
                                         {% endif %}
@@ -78,7 +78,7 @@
                             </li>
                             <li class="list-inline-item notification_icon"  data-toggle="modal" data-target="#notificationModal">
                                 <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
-                                    {% get_notifications_count request.user as count %}
+                                    {% get_notifications_count request.user.id as count %}
                                     {% if count %}
                                     <span class="notification_count_span">{{count}}</span>
                                     {% endif %}
