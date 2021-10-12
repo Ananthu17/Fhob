@@ -5513,8 +5513,3 @@ class SentPaymentMail(APIView):
             response = {'message': 'Invalid data'}
         return Response(response)
 
-
-class TopMembersView(TemplateView):
-    template_name = 'user_pages/top_members_demo.html'
-    login_url = '/hobo_user/user_login/'
-    redirect_field_name = 'login_url'
