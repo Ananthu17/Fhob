@@ -680,11 +680,14 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
                 json_dict['password'] = passwords[i]
             else:
                 json_dict['password'] = ""
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/update/' + character_ids[i]+'/'
             user_response = requests.put(
-                                'http://127.0.0.1:8000/project/charater/update/'+character_ids[i]+'/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
-                                        'Authorization': token})
+                                         'Authorization': token})
             byte_str = user_response.content
             dict_str = byte_str.decode("UTF-8")
             response = ast.literal_eval(dict_str)
@@ -750,8 +753,11 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             else:
                 json_dict['password'] = None
             json_dict['project'] = project_id
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/create/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/project/charater/create/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                          'Authorization': token})

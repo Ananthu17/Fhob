@@ -1173,10 +1173,10 @@ ul.proj-cnt-menu-li a:hover{
 .proj-owl-right-margin{
    margin-right: 15px;
 }
-#project-owl1 .owl-nav button.owl-prev{
+#project-owl .owl-nav button.owl-prev{
    visibility: hidden;
 }
-#project-owl1 .owl-nav button.owl-next {
+#project-owl .owl-nav button.owl-next {
    position: absolute;
    left: 98%;
    margin-left: 15px;
@@ -2092,9 +2092,11 @@ ul.cas-cast-menu li{
    cursor: pointer;
    outline: none;
    height: 14px;
+   padding: 7px 2px;
 }
 .cas-date-inp::placeholder{
    text-align: center;
+   color: #8b8b8b;
 }
 .cas-inp-align{
    padding-left: 8px;
@@ -2155,6 +2157,11 @@ ul.cas-cast-menu li{
 .cas-input-field{
    border: solid 1px;
    width: 100%;
+   padding: 0px 5px;
+   font-size: 13px;
+}
+.cas-input-field:focus{
+   border: solid 1px!important;
 }
 .cas-input-field::placeholder{
    text-align: center;
@@ -2166,7 +2173,12 @@ ul.cas-cast-menu li{
    width: 100%;
    height: 65px;
    resize: none;
-   
+   padding: 0px 5px;
+   font-size: 13px;
+}
+.cas-input-txtarea:focus{
+   outline: none!important;
+   border: solid 1px!important;
 }
 .cas-input-txtarea::placeholder{
    color: #adadad;
@@ -2179,6 +2191,11 @@ ul.cas-cast-menu li{
    border: solid 1px;
    height: 19px;
    width: 100px;
+   padding: 3px 5px;
+   font-size: 13px;
+}
+.cas-input-password:focus{
+   border: solid 1px!important;
 }
 .cas-input-password::placeholder{
    text-align: center;
@@ -2186,6 +2203,7 @@ ul.cas-cast-menu li{
    font-size: 12px;
    font-weight: 400;
 }
+
 .cas-addmore-btn{
    font-size: 13px;
    font-weight: 600;
@@ -2202,6 +2220,30 @@ ul.cas-cast-menu li{
    padding-top: 4px;
    padding-bottom: 4px;
 }
+.cas-radio-label-1{
+   font-weight: 500;
+   font-size: 14px;
+}
+.cas-radio-label-2{
+   font-weight: 500;
+   font-size: 14px;
+   margin-left: 15px;
+}
+.cas-select-style{
+   max-width: 100px;
+   width: 100%;
+   outline: 0;
+   padding: 0px 5px;
+   height: 20px;
+   font-size: 12px;
+   font-weight: 600;
+   text-align: center;
+   border-radius: 0px;
+}
+.cas-select-style option{
+   font-weight: 600;
+}
+
 /* Media query */
 
 @media(max-width:1200px){
@@ -6186,3 +6228,86 @@ ul.swc-proj-cnt-menu-li a:hover{
 
 
 /* 1 FH ShowCase End  */
+/* FH top members  */
+
+.rsct-center-section-align{
+   margin-left: 20px;
+   background-color: #f3f3f3;
+   padding: 5px 15px;
+   border-radius: 9px;
+   margin-right: -15px;
+   margin-bottom: 15px;
+}
+.rsct-orange-head{
+   color: #e88b24;
+   font-weight: 600;
+}
+.rsct-list-cont{
+   font-size: 14px;
+   color: #0e62b5;
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+   margin-bottom: 4px;
+   margin-top: 5px;
+   list-style-position: inside;
+   text-align: left;
+}
+
+
+/* Media query */
+
+@media(max-width:1200px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+   }
+}
+@media(max-width:1080px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+   }
+}
+@media(max-width:991px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      
+   }
+   .rsct-center-section-align{
+      margin-left: 0px;
+      margin-right: 0px;
+   }
+}
+@media(max-width:767px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+   }
+}
+@media(max-width:670px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr ;
+   }
+}
+@media(max-width:560px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr ;
+   }
+}
+@media(max-width:420px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr 1fr  ;
+   }
+}
+@media(max-width:320px){
+   .rsct-list-cont{
+      display: grid;
+      grid-template-columns: 1fr ;
+   }
+}
+
+/* FH  Top members End  */
