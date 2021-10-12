@@ -56,7 +56,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, Video, \
+                    GuildMembership, GroupUsers, UserInterestJob, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
@@ -3526,37 +3526,25 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
-        project_crew_dict = {}
-        project_cast_dict = {}
-        try:
-            actor_actress = JobType.objects.get(slug='actoractress')
-            cast_wishlist = myinterests.filter(position=actor_actress)
-            for item in cast_wishlist:
-                project_cast_dict[item.id] = Character.objects.filter(
-                            Q(project__format = item.format) &
-                            Q(project__location = item.location) &
-                            Q(project__sag_aftra = item.budget) &
-                            Q(age = item.age) &
-                            Q(gender = item.gender)
-                        )
-            context['project_cast_dict'] = project_cast_dict
-            print(project_cast_dict)
-        except JobType.DoesNotExist:
-            context['project_cast_dict'] = {}
-        try:
-            actor_actress = JobType.objects.get(slug='actoractress')
-            crew_wishlist = myinterests.exclude(position=actor_actress)
-            for item in crew_wishlist:
-                project_crew_dict[item.id] = ProjectCrew.objects.filter(
-                            Q(project__format = item.format) &
-                            Q(project__location = item.location) &
-                            Q(project__sag_aftra = item.budget)
-                        )
-            context['project_crew_dict'] = project_crew_dict
-            print(project_crew_dict)
-        except JobType.DoesNotExist:
-            context['project_crew_dict'] = {}
 
+        user_jobs_dict = {}
+        job_list = UserInterestJob.objects.filter(user=user)
+        for item in job_list:
+            if item.user_interest.id in user_jobs_dict:
+                user_jobs_dict[item.user_interest.id].append(item)
+            else:
+                 user_jobs_dict[item.user_interest.id] = []
+                 user_jobs_dict[item.user_interest.id].append(item)
+
+        context['user_jobs_dict'] = user_jobs_dict
+
+        applied_projects = UserProject.objects.filter(
+                            Q(user=user) &
+                            (
+                                Q(relation_type = UserProject.APPLIED) |
+                                Q(relation_type = UserProject.ATTACHED)
+                            )).order_by('-created_time')
+        
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
@@ -3703,6 +3691,7 @@ class AddUserInterestAPI(APIView):
             obj.age = data_dict['age']
             obj.gender = data_dict['gender']
             obj.save()
+
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
         else:

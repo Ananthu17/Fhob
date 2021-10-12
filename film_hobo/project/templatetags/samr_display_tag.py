@@ -76,6 +76,7 @@ def get_samr_display_value(project_id):
 def get_crew_samr_display_value(project_id):
     project = get_object_or_404(Project, pk=project_id)
     samr = project.crew_samr
+    print("----------------", samr)
     samr_data = []
 
     if samr == 'indie_with_rating_1_star':

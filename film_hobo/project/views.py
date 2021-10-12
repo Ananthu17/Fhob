@@ -46,7 +46,7 @@ from rest_framework.generics import (UpdateAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined, UserInterest
+     VideoRatingCombined, UserInterest, UserInterestJob
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
@@ -658,6 +658,12 @@ class CharacterCreateAPIView(APIView):
                                 )
                     for usin in interest:
                         user = usin.user
+                        # update user interest list table
+                        user_interest_job = UserInterestJob()
+                        user_interest_job.user = user
+                        user_interest_job.user_interest = usin
+                        user_interest_job.cast = character_obj
+                        user_interest_job.save()
                         # update notification table
                         notification = UserNotification()
                         notification.user = user
@@ -1104,6 +1110,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             if url.startswith('vimeo.com/'):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
+        audition_obj.status_update_date = timezone.now()
         audition_obj.save()
         # update user-project-table
         user_project_obj = UserProject()
@@ -1114,6 +1121,18 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.character = character
         user_project_obj.save()
         # end
+
+        # update user interest job list table
+        try:
+            user_interest_job = UserInterestJob.objects.get(
+                                    Q(user=user) &
+                                    Q(cast=character)
+                                )
+            user_interest_job.cast_application = audition_obj
+            user_interest_job.save()
+        except UserInterestJob.DoesNotExist:
+            pass
+
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -1216,6 +1235,7 @@ class SubmitAuditionAPI(APIView):
                     audition_obj.video_url = video_url
             if video_type == 'facebook':
                 audition_obj.video_url = url
+            audition_obj.status_update_date = timezone.now()
             audition_obj.save()
 
             # update user-project-table
@@ -1227,6 +1247,17 @@ class SubmitAuditionAPI(APIView):
             user_project_obj.character = character
             user_project_obj.save()
             # end
+
+            # update user interest job list table
+            try:
+                user_interest_job = UserInterestJob.objects.get(
+                                        Q(user=self.request.user) &
+                                        Q(cast=character)
+                                    )
+                user_interest_job.cast_application = audition_obj
+                user_interest_job.save()
+            except UserInterestJob.DoesNotExist:
+                pass
 
             response = {'message': "Audition Submitted",
                         'status': status.HTTP_200_OK}
@@ -3423,6 +3454,7 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
             crew_apply_obj.agent = agent_user
         except CustomUser.DoesNotExist:
             pass
+        crew_apply_obj.status_update_date = timezone.now()
         crew_apply_obj.save()
 
         # update user-project-table
@@ -3434,6 +3466,17 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.crew = project_crew
         user_project_obj.save()
         # end
+
+        # update user interest job list table
+        try:
+            user_interest_job = UserInterestJob.objects.get(
+                                    Q(user=user) &
+                                    Q(crew=project_crew)
+                                )
+            user_interest_job.crew_application = crew_apply_obj
+            user_interest_job.save()
+        except UserInterestJob.DoesNotExist:
+            pass
         messages.success(self.request, "Application submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -3475,6 +3518,7 @@ class CrewApplyAPI(APIView):
                 crew_apply_obj.cover_letter = cover_letter
             except KeyError:
                 raise ParseError('Request has no cover image attached')
+            crew_apply_obj.status_update_date = timezone.now()
             crew_apply_obj.save()
             # update user-project-table
             user_project_obj = UserProject()
@@ -3485,6 +3529,16 @@ class CrewApplyAPI(APIView):
             user_project_obj.crew = project_crew
             user_project_obj.save()
             # end
+            # update user interest job list table
+            try:
+                user_interest_job = UserInterestJob.objects.get(
+                                        Q(user=self.request.user) &
+                                        Q(crew=project_crew)
+                                    )
+                user_interest_job.crew_application = crew_apply_obj
+                user_interest_job.save()
+            except UserInterestJob.DoesNotExist:
+                pass
             response = {'message': "Application submitted",
                         'status': status.HTTP_200_OK}
 
@@ -3913,6 +3967,37 @@ class AddProjectCrewAPI(APIView):
                 crew_obj.job_type = job_type
                 crew_obj.count = data_dict['count']
                 crew_obj.save()
+                interest = UserInterest.objects.filter(
+                                Q(position=job_type) &
+                                Q(format=project.format) &
+                                Q(location=project.location) &
+                                Q(budget=project.sag_aftra)
+                            )
+                for usin in interest:
+                    user = usin.user
+                    # update user interest list table
+                    user_interest_job = UserInterestJob()
+                    user_interest_job.user = user
+                    user_interest_job.user_interest = usin
+                    user_interest_job.crew = crew_obj
+                    user_interest_job.save()
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = user
+                    notification.notification_type = UserNotification.USER_INTEREST
+                    notification.project =  project
+                    notification.from_user = project.creator
+                    notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(user.id)
+                    notification_msg = {
+                            'type': 'send_user_interest_notification',
+                            'message': str(notification.message),
+                            'from': str(project.creator.id),
+                            "event": "USER_INTEREST"
+                        }
+                    notify(room_name, notification_msg)
             response = {'message': 'Project Crew Added', 'status':
                         status.HTTP_200_OK}
         else:

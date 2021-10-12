@@ -695,16 +695,16 @@
                         <!-- Table -->
                         <div class="card ml-3 mr-3">
                             <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
-                            <hr class="mem-set-acc-hr-interest">
                             <table class="table mem-table table-responsive-sm">
                                 <colgroup>
                                     <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 40%;">
+                                    <col span="1" style="width: 10%;">
+                                    <col span="1" style="width: 35%;">
+                                    <col span="1" style="width: 20%;">
                                     <col span="1" style="width: 5%;">
-                                    <col span="1" style="width: 5%;">
-                                    <col span="1" style="width: 6%;">
-                                    <col span="1" style="width: 8%;">
+                                    <!-- <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 6%;"> -->
+                                    <col span="1" style="width: 10%;">
                                  </colgroup>
                             {% for obj in myinterests %}
                                 <tr class="interest-font my-interest-table-th" >
@@ -715,35 +715,51 @@
                                     <th></th>
                                     <th></th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
-                                {% get_dict_value_if_exists project_cast_dict obj.id  as cast_list %}
-                                {% if cast_list %}
-                                  {% for character in cast_list  %}
-                                    <tr>
-                                            <td><a class="tbl-tag" href="{% url 'project:single-film-project' character.project.id %}">Project # {{ character.project.id }}</a></td>
-                                            <td>Title:  {{ character.project.title }} </td>
-                                            <td>Posted on {{ character.project.timestamp }}</td>
-                                            <td class="int-applied">Applied</td>
-                                            <td class="int-red">Passed</td>
-                                            <td class="int-grey">Attached</td>
-                                            <td class="int-red">(on 08/05/21)</td>
-                                    </tr>
-                                  {% endfor %}
+                                {% get_dict_value_if_exists user_jobs_dict obj.id as job_list %}
+                                {% if job_list %}
+                                    {% for job in job_list  %}
+                                        {% if job.cast %}
+                                            <tr>
+                                                    <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.cast.project.id %}">Project # {{ job.cast.project.id }}</a></td>
+                                                    <td>Title:  {{ job.cast.project.title }} </td>
+                                                    <td>Character:  {{ job.cast.name }} </td>
+                                                    <td>Posted on {{ job.cast.created_time }}</td>
+                                                    {% if job.cast_application %}
+                                                        <td
+                                                        {% if job.cast_application.audition_status == 'applied' %}class="int-applied"
+                                                        {% elif job.cast_application.audition_status == 'attached' %}class="int-green"
+                                                        {% elif job.cast_application.audition_status == 'passed' %}class="int-red"
+                                                        {% endif %}>{{job.cast_application.audition_status}}</td>
+                                                        <td class="int-red">(on {{job.cast_application.status_update_date}})</td>
+                                                    {% else %}
+                                                        <td></td>
+                                                        <td></td>
+                                                    {% endif %}
+                                            </tr>
+                                        {% elif job.crew %}
+                                            <tr>
+                                                <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.crew.project.id %}">Project # {{ job.crew.project.id }}</a></td>
+                                                <td>Title:  {{ job.crew.project.title }} </td>
+                                                <td></td>
+                                                <td>Posted on {{ job.crew.created_time }}</td>
+                                                {% if job.crew_application %}
+                                                    <td
+                                                    {% if job.crew_application.application_status == 'applied' %}class="int-applied"
+                                                    {% elif job.crew_application.application_status == 'attached' %}class="int-green"
+                                                    {% elif job.crew_application.application_status == 'passed' %}class="int-red"
+                                                    {% endif %}>{{job.crew_application.application_status}}</td>
+                                                    <td class="int-red">(on {{job.crew_application.status_update_date}})</td>
+                                                {% else %}
+                                                    <td></td>
+                                                    <td></td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endif %}
-                                {% get_dict_value_if_exists project_crew_dict obj.id  as crew_list %}
-                                {% if crew_list %}
-                                {% for crew in crew_list %}
-                                    <tr>
-                                            <td><a class="tbl-tag" href="{% url 'project:single-film-project' crew.project.id %}">Project # {{ crew.project.id }}</a></td>
-                                            <td>Title:  {{ crew.project.title }} </td>
-                                            <td>Posted on {{ crew.project.timestamp }}</td>
-                                            <td class="int-applied">Applied</td>
-                                            <td class="int-red">Passed</td>
-                                            <td class="int-grey">Attached</td>
-                                            <td class="int-red">(on 08/05/21)</td>
-                                    </tr>
-                                  {% endfor %}
-                                  {% endif %}
+
                                 <!-- The Modal -->
                                 <div class="modal fade" id="edit-{{obj.id}}">
                                     <div class="modal-dialog">
