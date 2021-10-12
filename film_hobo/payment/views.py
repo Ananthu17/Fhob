@@ -417,8 +417,6 @@ class UpdateMembershipFeeAPI(APIView):
                     final_result['monthly_indie'] = \
                         IndiePaymentDetails.objects.first().__dict__[
                             'monthly_amount']
-                    # indie_payment_users = CustomUser.objects.filter(
-                    #     membership='IND', payment_plan='monthly')
                 except ValueError:
                     return Response(
                         {"status": "failure",
@@ -1683,4 +1681,126 @@ class PayPalSendPlanChangeEmail(APIView):
     API to send email to users when there is a change in subscription plan
     """
     def post(self, request, *args, **kwargs):
-        pass
+        email_status = False
+        payment_plans = {
+            "indie_monthly": settings.INDIE_PAYMENT_MONTHLY,
+            "indie_yearly": settings.INDIE_PAYMENT_YEARLY,
+            "pro_monthly": settings.PRO_PAYMENT_MONTHLY,
+            "pro_yearly": settings.PRO_PAYMENT_MONTHLY,
+            "company_monthly": settings.COMPANY_PAYMENT_MONTHLY,
+            "company_yearly": settings.COMPANY_PAYMENT_YEARLY
+        }
+
+        changed_plan_id = request.data['changed_plan_id']
+        for plan_name, plan_id in payment_plans.items():
+            if plan_id == changed_plan_id:
+                if plan_name == 'indie_monthly':
+                    indie_monthly_users = CustomUser.objects.filter(
+                        membership='IND', payment_plan='monthly')
+                    for user in indie_monthly_users:
+                        revised_rate = \
+                            IndiePaymentDetails.objects.first().monthly_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
+                elif plan_name == 'indie_yearly':
+                    indie_yearly_users = CustomUser.objects.filter(
+                        membership='IND', payment_plan='yearly')
+                elif plan_name == 'pro_monthly':
+                    pro_monthly_users = CustomUser.objects.filter(
+                        membership='PRO', payment_plan='monthly')
+                elif plan_name == 'pro_yearly':
+                    pro_yearly_users = CustomUser.objects.filter(
+                        membership='PRO', payment_plan='yearly')
+                elif plan_name == 'company_monthly':
+                    company_monthly_users = CustomUser.objects.filter(
+                        membership='COM', payment_plan='monthly')
+                elif plan_name == 'company_yearly':
+                    company_yearly_users = CustomUser.objects.filter(
+                        membership='COM', payment_plan='yearly')
+                else:
+                    pass
+        if email_status:
+            return Response({"status": "success"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"status": "failure"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class PayPalChangeNotifyEmail(APIView):
+    """
+    API to send email to users when there is a payment plan change
+    """
+    def post(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        revised_rate = request.data['revised_rate']
+        user_obj = CustomUser.objects.get(id=user_id)
+
+        base_url = settings.ORIGIN_URL
+        privacy_policy_url = base_url + '/general/privacy_policy/'
+        terms_of_service_url = base_url + '/general/terms_of_service/'
+
+        html_context = {
+            'user_name': user_obj.get_full_name(),
+            'user_membership': user_obj.membership,
+            'revised_rate': revised_rate,
+            'plan_term': user_obj.payment_plan,
+            'privacy_policy_url': privacy_policy_url,
+            'terms_of_service_url': terms_of_service_url,
+        }
+        text_context = {
+            'user_name': user_obj.get_full_name,
+        }
+        email_subject = "Filmhobo Plan Change Notification"
+        email_body_text = render_to_string(
+            "payment_receipts/email_receipt.txt", text_context, request
+        )
+        email_body_html = render_to_string(
+            "payment_receipts/plan_change_email.html",
+            html_context, request
+        )
+        recipient_email = user_obj.email
+        email_recipients = [recipient_email]
+        email_from = getattr(
+            settings, "PAYPAL_SENDER_EMAIL",
+        )
+        email_from_obj = FilmHoboSenderEmail.objects.get(email=email_from)
+        success = send_mail(
+            subject=email_subject,
+            message=email_body_text,
+            from_email=email_from,
+            recipient_list=email_recipients,
+            html_message=email_body_html,
+        )
+        email_record_obj = EmailRecord.objects.create(
+            sender=email_from_obj,
+            recipient=user_obj,
+            email=user_obj.email,
+            subject=email_subject,
+            sent=success,
+        )
+        serialized_obj_dict = {
+            "when": email_record_obj.when,
+            "sender": email_record_obj.sender.id,
+            "recipient": email_record_obj.recipient.id,
+            "email": email_record_obj.email,
+            "subject": email_record_obj.subject,
+            "sent": email_record_obj.sent
+        }
+        serializer = EmailRecordSerializer(data=serialized_obj_dict)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)

@@ -117,7 +117,7 @@
                 <ul class="navbar-nav justify-content-between w-100">
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item">
-                            <a id="showcase" class="nav-link" href="">SHOWCASE</a>
+                            <a id="showcase" class="nav-link" href="{% url 'hobo_user:showcase' %}">SHOWCASE</a>
                         </li>
                     {% endif %}
                     {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}

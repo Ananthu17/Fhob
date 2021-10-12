@@ -349,6 +349,12 @@ class HomePage(TemplateView):
         return context
 
 
+class ShowCase(TemplateView):
+    template_name = 'user_pages/showcase.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 3
     page_size_query_param = 'page_size'
