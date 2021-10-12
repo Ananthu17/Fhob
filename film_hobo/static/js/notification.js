@@ -273,6 +273,19 @@ notificationSocket.onmessage = function (e) {
                      }
              });
             break;
+        case "USER_INTEREST":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-user-interest-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
         case "USER_MESSAGES":
              // get membership change notification html
              data_dict = {}

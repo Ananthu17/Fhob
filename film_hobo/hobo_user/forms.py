@@ -378,7 +378,7 @@ class EditAgencyManagementCompanyProfileForm(forms.ModelForm):
 class UserInterestForm(forms.ModelForm):
     class Meta:
         model = UserInterest
-        fields = ('position', 'format', 'location', 'budget')
+        fields = ('position', 'format', 'location', 'budget', 'age', 'gender')
 
 
 class FeedbackForm(forms.ModelForm):

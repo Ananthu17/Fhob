@@ -80,6 +80,28 @@
                             <span class="cas-input-item-align">
                                 <input type="text" class="cas-input-field" placeholder="Character's Name"
                                 name="name" autocomplete="off" value="{{character.name}}"  disabled >
+                                <div >
+                                    <label for="cas-male" class="cas-radio-label-1">Male</label>
+                                    <input type="radio" id="cas-male" value="male" name="gender_{{character.id}}"
+                                    {% if character.gender == 'male' %}checked {% endif %} disabled>
+                                    <label for="cas-female" class="cas-radio-label-2">Female</label>
+                                    <input type="radio" id="cas-female" value="female"  name="gender_{{character.id}}"
+                                    {% if character.gender == 'female' %}checked {% endif %} disabled>
+                                </div>
+                                <div>
+                                    <label class="cas-radio-label-1">Age</label>
+                                    <select  class="cas-select-style"
+                                            id ="age_{{obj.id}}"
+                                            name="age" disabled>
+                                            <option value="">---</option>
+                                            {% for item in age %}
+                                                <option value="{{item.0}}"
+                                                    {% if character.age == item.0 %} selected {% endif %}>
+                                                    {{item.1}}
+                                                </option>
+                                            {% endfor %}
+                                    </select>
+                                </div>
                             </span>
                             <span class="cas-txt-area-align">
                                 <textarea class="cas-input-txtarea " placeholder="Description" name="description"
@@ -120,6 +142,27 @@
                                     <span class="cas-input-item-align">
                                         <input type="text" class="cas-input-field" placeholder="Character's Name"
                                         name="name" autocomplete="off" required>
+                                        <div >
+                                            <label for="cas-male" class="cas-radio-label-1">Male</label>
+                                            <input type="radio" id="cas-male" value="male" name="gender_1"
+                                            {% if character.gender == 'male' %}checked {% endif %} required>
+                                            <label for="cas-female" class="cas-radio-label-2">Female</label>
+                                            <input type="radio" id="cas-female" value="female"  name="gender_1"
+                                            {% if character.gender == 'female' %}checked {% endif %} required>
+                                        </div>
+                                        <div>
+                                            <label class="cas-radio-label-1">Age</label>
+                                            <select  class="cas-select-style"
+                                                    id ="age_{{obj.id}}"
+                                                    name="age" required >
+                                                    <option value="">---</option>
+                                                    {% for item in age %}
+                                                        <option value="{{item.0}}">
+                                                            {{item.1}}
+                                                        </option>
+                                                    {% endfor %}
+                                            </select>
+                                        </div>
                                     </span>
                                     <span class="cas-txt-area-align">
                                         <textarea class="cas-input-txtarea" placeholder="Description"
@@ -134,8 +177,6 @@
                                             name="password" autocomplete="off">
                                         </span>
                                     </div>
-                                    <span class="cas-side-display">
-                                    </span>
                                 </div>
                             </span>
 

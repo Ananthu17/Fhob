@@ -963,7 +963,7 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location', 'budget']
+        fields = ['position', 'format', 'location', 'budget', 'age', 'gender']
 
 
 class EditUserInterestSerializer(serializers.ModelSerializer):
@@ -987,10 +987,18 @@ class EditUserInterestSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+    age = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    gender = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
 
     class Meta:
         model = UserInterest
-        fields = ['id', 'position', 'format', 'location', 'budget']
+        fields = ['id', 'position', 'format', 'location', 'budget', 'age', 'gender']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):

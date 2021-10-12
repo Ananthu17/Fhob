@@ -57,6 +57,15 @@
                 <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
                 {% endif %}
             </a>
+            {% elif obj.notification_type == 'user_interest' %}
+            <a href="{% url 'hobo_user:friends-and-followers' %}"
+            target="_blank" id ="{{obj.id}}" class="notification_link">
+                {% if obj.from_user.get_profile_photo %}
+                <img src="{{ obj.from_user.get_profile_photo }}" class="notification_img"/>
+                {% else %}
+                <img src="{% static 'images/default_profile_pic.png' %}" class="notification_img"/>
+                {% endif %}
+            </a>
             {% elif obj.from_user %}
             <a href="{{ obj.from_user.get_profile_url }}"
             target="_blank" id ="{{obj.id}}" class="notification_link">
@@ -117,7 +126,16 @@
                     {{time}} ago.
                 </div>
             </div>
-            {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response' %}
+            {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response'  %}
+            <div class="row">
+                <div class="col-10">
+                    {{obj.message|safe}}<br>
+                    <b>{{ obj.project.creator.get_membership_display  }}</b><br>
+                    {% get_notifications_time obj.created_time as time %}
+                    {{time}} ago.
+                </div>
+            </div>
+            {% elif obj.notification_type == 'user_interest'  %}
             <div class="row">
                 <div class="col-10">
                     {{obj.message|safe}}<br>

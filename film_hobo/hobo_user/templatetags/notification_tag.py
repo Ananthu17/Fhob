@@ -8,9 +8,9 @@ register = template.Library()
 
 
 @register.simple_tag()
-def get_notifications_count(email):
+def get_notifications_count(id):
     try:
-        user = CustomUser.objects.get(email=email)
+        user = CustomUser.objects.get(pk=id)
         notifications_count = UserNotification.objects.filter(
                         Q(user=user) &
                         Q(status_type='unread')
@@ -23,9 +23,9 @@ def get_notifications_count(email):
 
 
 @register.simple_tag()
-def get_msg_notifications_count(email):
+def get_msg_notifications_count(id):
     try:
-        user = CustomUser.objects.get(email=email)
+        user = CustomUser.objects.get(pk=id)
         unread_msg_count = MessageNotification.objects.filter(
                             Q(user=user) &
                             Q(status_type=MessageNotification.UNREAD)

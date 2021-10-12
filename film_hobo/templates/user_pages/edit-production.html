@@ -499,6 +499,24 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            <div class="col-md-3 col-sm-3 form-group">
+                                <label class="intrest-lab">Gender:</label>
+                                <select class="form-control form-control-input"
+                                name="gender" id ="gender"  >
+                                    {% for item in my_interest_form.gender %}
+                                        {{item}}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-sm-3 form-group">
+                                <label class="intrest-lab">Age:</label>
+                                <select class="form-control form-control-input"
+                                name="age" id ="age"  >
+                                    {% for item in my_interest_form.age %}
+                                        {{item}}
+                                    {% endfor %}
+                                </select>
+                            </div>
                     </div>
                     </div>
                     <div class="row mt-0 mb-1">
@@ -513,7 +531,7 @@
                 </form>
                     <hr class="mem-set-acc-hr">
                 </div>
-                <div class=" pl-2 pb-2">
+                <!-- <div class=" pl-2 pb-2">
                     <div class="bold mt-3 mem-setup-blu-f "><a href="#" class="mem-blu-link">M<span
                         class="mem-small-f">Y</span>
                     P<span
@@ -540,8 +558,8 @@
                             <div class="pc-img-title">Project......</div>
                         </div>
                     </div>
-                </div>
-                <div class="left-mode-sec p-2 mt-3">
+                </div> -->
+                <!-- <div class="left-mode-sec p-2 mt-3">
                     <div class="row pcb-mem-white-bg">
                         <div class="col-5 form-group">
                             <input type="password" class="form-control form-control-input mem-b-placeholder"
@@ -556,7 +574,7 @@
                                 placeholder="Messenger">
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
             </div>

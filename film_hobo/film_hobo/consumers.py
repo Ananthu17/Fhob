@@ -223,4 +223,11 @@ class NotificationConsumer(WebsocketConsumer):
             'msg_thread': event['msg_thread'],
         }))
 
+    def send_user_interest_notification(self, event):
+        message = event['message']
+        self.send(text_data=json.dumps({
+            'message': message,
+            'event': "USER_INTEREST"
+        }))
+
 
