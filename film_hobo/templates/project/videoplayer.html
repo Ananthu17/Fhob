@@ -330,13 +330,23 @@
                     <span class="to-input">To</span>
                         <div id="all_mail" class="all-mail">
                         </div>
-                        <input id="enter_email" type="text" name="email" class="enter-mail-id" placeholder="Enter the user names .." />
+                       
+                    
+                     
+                        <select class="form-control" name="languageSelect" multiple id="languageSelect">
+                            {% for friend in friends %}
+                            <option value="{{friend.id}}" >{{friend}} </option>
+                                {% endfor %}
+                        </select>
+                        <div class="modal-footer">
+                            <button id="url_send" type="submit" class="btn btn-primary">Send</button>
+                            <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                           
+                        </div>
+                   
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="invite_send" type="button" class="btn btn-primary">Send</button>
-                <button id="invite_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
+           
         </div>
     </div>
 </div>
@@ -349,8 +359,27 @@
 <script src="{% static 'js/project_tracking.js' %}"></script>
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
+<link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
+
+
 <script>
 var  availableTags = [];
+
+jQuery('#languageSelect').multiselect({
+    columns: 1,
+    placeholder: 'Select Users',
+    search: true,
+    selectAll: true
+});
+
+
+
+
 var token = $("#token").val();
 $(document).ready(function(){
 

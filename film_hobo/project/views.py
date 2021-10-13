@@ -46,7 +46,7 @@ from rest_framework.generics import (UpdateAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined
+     VideoRatingCombined, Friend
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
@@ -77,6 +77,9 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user.id
+        friend_obj = Friend.objects.get(user=user)
+        friends = friend_obj.friends.all()
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         rating_dict = {}
@@ -110,6 +113,7 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
         context["project"] = project
+        context['friends'] = friends
         return context
 
 
