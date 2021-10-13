@@ -5188,8 +5188,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        mode_operation="create"
-        context['mode_operation']=mode_operation
+        mode_operation = "create"
+        context['mode_operation'] = mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
         context['user'] = user
@@ -5203,13 +5203,12 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project = Project()
-  
             cast_pay = request.POST.get('checkbx')
             # Passing cast_star rating
             cast_star1 = request.POST.get('cast-star1')
             cast_star2 = request.POST.get('cast-star2')
             cast_star3 = request.POST.get('cast-star3')
-            cast_star_smar=0
+            cast_star_smar = 0
 
             if (cast_star1 != ''):
                 if (cast_star1 == '1'):
@@ -5269,27 +5268,27 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 crew_star_smar = crew_star1
             if (crew_star2 != ''):
                 if (crew_star2 == '1'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_1_STAR
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
                 elif (crew_star2 == '2'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_2_STAR
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
                 elif (crew_star2 == '3'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_3_STAR
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
                 elif (crew_star2 == '4'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_4_STAR
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
                 elif (crew_star2 == '5'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_5_STAR
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
                 crew_star_smar = crew_star2
             if (crew_star3 != ''):
                 if (crew_star3 == '1'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
                 if (crew_star3 == '2'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
                 if (crew_star3 == '3'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
                 if (crew_star3 == '4'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
                 if (crew_star3 == '5'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
                 crew_star_smar = crew_star3
 
             print("valid ahno project:", projectform.is_valid())
@@ -5370,7 +5369,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
             cast_star_smar = 0
 
-            if (cast_star1 !=''):
+            if (cast_star1 != ''):
                 if (cast_star1 == '1'):
                     cast_star1 = project.INDIE_WITH_RATING_1_STAR
                 elif(cast_star1 == '2'):
@@ -5383,77 +5382,77 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                     cast_star1 = project.INDIE_WITH_RATING_5_STAR
                 cast_star_smar = cast_star1
             elif(cast_star2 != ''):
-                if (cast_star2=='1'):
-                    cast_star2=project.PRO_WITH_RATING_1_STAR
-                elif(cast_star2=='2'):
-                    cast_star2=project.PRO_WITH_RATING_2_STAR
-                elif(cast_star2=='3'):
-                    cast_star2=project.PRO_WITH_RATING_3_STAR
-                elif(cast_star2=='4'):
-                    cast_star2=project.PRO_WITH_RATING_4_STAR
-                elif(cast_star2=='5'):
-                    cast_star2=project.PRO_WITH_RATING_5_STAR
-                cast_star_smar=cast_star2
-            elif(cast_star3!=''):
-                if (cast_star3=='1'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_1_STAR
-                elif(cast_star3=='2'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_2_STAR
-                elif(cast_star3=='3'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_3_STAR
-                elif(cast_star3=='4'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_4_STAR
-                elif(cast_star3=='5'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_5_STAR
-                cast_star_smar=cast_star3
+                if (cast_star2 == '1'):
+                    cast_star2 = project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2 == '2'):
+                    cast_star2 = project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2 == '3'):
+                    cast_star2 = project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2 == '4'):
+                    cast_star2 = project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2 == '5'):
+                    cast_star2 = project.PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star2
+            elif(cast_star3 != ''):
+                if (cast_star3 == '1'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3 == '2'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3 == '3'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3 == '4'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3 == '5'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star3
 
-            #Updating crew_star rating
-            crew_star1=request.POST.get('crew-star1')
-            crew_star2=request.POST.get('crew-star2')
-            crew_star3=request.POST.get('crew-star3')
+            # Updating crew_star rating
+            crew_star1 = request.POST.get('crew-star1')
+            crew_star2 = request.POST.get('crew-star2')
+            crew_star3 = request.POST.get('crew-star3')
 
-            crew_star_smar=0
+            crew_star_smar = 0
 
-            if (crew_star1!=''):
-                if (crew_star1=='1'):
-                    crew_star1=project.INDIE_WITH_RATING_1_STAR
-                elif (crew_star1=='2'):
-                    crew_star1=project.INDIE_WITH_RATING_2_STAR
-                elif (crew_star1=='3'):
-                    crew_star1=project.INDIE_WITH_RATING_3_STAR
-                elif (crew_star1=='4'):
-                    crew_star1=project.INDIE_WITH_RATING_4_STAR
-                elif (crew_star1=='5'):
-                    crew_star1=project.INDIE_WITH_RATING_5_STAR
-                crew_star_smar=crew_star1
-            if (crew_star2!=''):
-                if (crew_star2=='1'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_1_STAR
-                elif (crew_star2=='2'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_2_STAR
-                elif (crew_star2=='3'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_3_STAR
-                elif (crew_star2=='4'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_4_STAR
-                elif (crew_star2=='5'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_5_STAR
-                crew_star_smar=crew_star2
-            if (crew_star3!=''):
-                if (crew_star3=='1'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
-                if (crew_star3=='2'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
-                if (crew_star3=='3'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
-                if (crew_star3=='4'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
-                if (crew_star3=='5'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
-                crew_star_smar=crew_star3
+            if (crew_star1 != ''):
+                if (crew_star1 == '1'):
+                    crew_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1 == '2'):
+                    crew_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1 == '3'):
+                    crew_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1 == '4'):
+                    crew_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1 == '5'):
+                    crew_star1 = project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar = crew_star1
+            if (crew_star2 != ''):
+                if (crew_star2 == '1'):
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
+                elif (crew_star2 == '2'):
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
+                elif (crew_star2 == '3'):
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
+                elif (crew_star2 == '4'):
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
+                elif (crew_star2 == '5'):
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star2
+            if (crew_star3 != ''):
+                if (crew_star3 == '1'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                if (crew_star3 == '2'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                if (crew_star3 == '3'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                if (crew_star3 == '4'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                if (crew_star3 == '5'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star3
 
-            projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
-            writerform = WriterForm(request.POST or None,instance=writer)
-            new_writer=request.POST.get('new_writer')
+            projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
+            writerform = WriterForm(request.POST or None, instance=writer)
+            new_writer = request.POST.get('new_writer')
 
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
@@ -5463,11 +5462,11 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
                 writer = writerform.save()
                 project = projectform.save()
-                project.cast_samr=cast_star_smar
-                project.crew_samr=crew_star_smar
-                project.cast_pay_rate=cast_pay
+                project.cast_samr = cast_star_smar
+                project.crew_samr = crew_star_smar
+                project.cast_pay_rate = cast_pay
                 writer.project = project
-                writer.name=new_writer
+                writer.name = new_writer
                 project.save()
                 writer.save()
                 messages.success(request, "Project Updated Successfully.")
@@ -5493,7 +5492,7 @@ class ScreeningProjectDeatilInviteView(APIView):
             project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)
 
-            #update notification table
+            # update notification table
             notification = UserNotification()
             notification.user = to_user
             notification.notification_type = UserNotification.INVITE
@@ -5543,7 +5542,7 @@ class GetBetaTesterCodeId(APIView):
         else:
             return Response(
             {"status": "no content"},
-            status=status.HTTP_204_NO_CONTENT)
+            status = status.HTTP_204_NO_CONTENT)
 
 
 class SentPaymentMail(APIView):
