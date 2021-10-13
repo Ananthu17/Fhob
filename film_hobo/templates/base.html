@@ -37,9 +37,15 @@
             <header class="fh-header">
                 <div class="row no-wrap justify-content-between align-items-center">
                     <div class="col-md-3 col-xs-6">
-                        <a href="{% url 'hobo_user:user_home' %}">
-                            <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
-                        </a>
+                        {% if request.user.is_anonymous %}
+                            <a href="{% url 'hobo_user:how_to' %}">
+                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'hobo_user:user_home' %}">
+                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
+                            </a>
+                        {% endif %}
                     </div>
                     <div class="col-md-5 col-xs-6 text-center">
                         <div class="head-tp mt-20">Stardom starts with one scene</div>
@@ -128,7 +134,7 @@
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="project-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 PROJECTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -140,7 +146,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="scene-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 SCENES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -154,7 +160,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="shorts-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 SHORTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -168,7 +174,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 PILOTS/FEATURES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -185,28 +191,28 @@
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()"  >
                             PROJECTS
                         </a>
-                      
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             SCENES
                         </a>
-                       
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             SHORTS
                         </a>
-                      
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             PILOTS/FEATURES
                         </a>
-                        
+
                     </li>
                     <li class="nav-item">
                         <a id="how_to" class="nav-link" href="#">HOW TO</a>
@@ -252,8 +258,8 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        
+
+
                         <!-- The Modal -->
                     {% else %}
                     {% endif %}
@@ -276,9 +282,8 @@
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
-                                        <a class="dropdown-item" href="#">Support</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
-                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <a class="dropdown-item" href="#">Membership</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
@@ -294,11 +299,10 @@
                                     {% endif %}
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
-                                        <a class="dropdown-item" href="#">Support</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
-                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
-                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <!-- <a class="dropdown-item" href="#">Membership</a> -->
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% endif %}
@@ -472,31 +476,43 @@
 
 
 $("a[class='nav-link-non-clickable']").click(function () {
-  
         $('#myModal').modal('show');
         return false;
-        
-   
 });
 
 
     $(function () {
         $('#modalClose').on('click', function () {
             $('#myModal').modal('hide');
-           
+
         })
     })
     $(function () {
         $('#modalClose1').on('click', function () {
             $('#myModal').modal('hide');
-           
+
         })
     })
 
+</script>
+<script>
+    $( document ).ready(function() {
+        var pathurl = window.location.pathname;
+        var search = window.location.search;
+        var desired_path = pathurl + search
+        if (desired_path == '/hobo_user/projectview/create/'){
+            $("#project-nav-item").addClass('active');
+        }
+        else if (desired_path == '/hobo_user/projectview/?format=SCH'){
+            $("#scene-nav-item").addClass('active');
+        }
+        else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+            $("#shorts-nav-item").addClass('active');
+        }
+        else{
 
-
-
-    
+        }
+    });
 </script>
 </body>
 </html>

@@ -563,7 +563,7 @@
                         {% comment %}
                         <form class="billing-form">
                         {% endcomment %}
-                            <div class="row ml-2 mt-3 ">
+                            <!-- <div class="row ml-2 mt-3 ">
                                 <div class="col-3">
                                     <label class="billing-label">Card on File:</label>
                                 </div>
@@ -581,7 +581,7 @@
                                 <div class="col-2">
                                     <a href="" class="billing-nw-card">Add New Card</a>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="row ml-2 mt-2 ">
                                 <div class="col-12">
                                     <label class="billing-label">Description</label>
@@ -612,7 +612,7 @@
                                     Taxes: $<span id="membership_tax_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Total Amount: $<span id="membership_total_fee">0.00</span>
+                                    Total Amount: $<span id="membership_total_fee">{{ transaction.final_amount }}</span>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">
@@ -622,28 +622,28 @@
                                 <div class="col-9">
                                     <div class="form-check-inline">
                                         <label class="containerradio">Recurring
-                                            <input type="radio" name="radio">
+                                            <input id="recurring_btn" type="radio" name="radio" checked>
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
                                     <div class="form-check-inline">
-                                        <label class="containerradio">One Time
+                                        <!-- <label class="containerradio">One Time
                                             <input type="radio" name="radio">
                                             <span class="checkmarkagree"></span>
-                                        </label>
+                                        </label> -->
                                     </div>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">
-                                <div class="col-3">
+                                <!-- <div class="col-3">
                                     <label class="billing-label">Change to Annual</label>
-                                </div>
+                                </div> -->
                                 <div class="col-9">
                                     <div class="form-check-inline">
-                                        <label class="containerradio">
+                                        <!-- <label class="containerradio">
                                             <input type="radio" name="radio">&nbsp;
                                             <span class="checkmarkagree"></span>
-                                        </label>
+                                        </label> -->
                                     </div>
                                 </div>
                             </div>

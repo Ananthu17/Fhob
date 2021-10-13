@@ -1673,8 +1673,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        # context['transaction'] = \
-        #     Transaction.objects.get(user_id=user.id)
+        context['transaction'] = \
+            Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -4890,15 +4890,14 @@ class CheckBetaTesterCode(APIView):
 
 
 class FeedbackWebView(View):
-    # renderer_classes = [TemplateHTMLRenderer]
-    # template_name = 'user_pages/feedback.html'
+    template_name = 'user_pages/feedback.html'
     """
     Web View to load the feedback page
     """
 
-    def get(self, request, *args, **kwargs):
-        template = loader.get_template("user_pages/feedback.html")
-        return HttpResponse(template.render())
+    def get(self, request):
+        context = { }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         serializer = FeedbackSerializer(data=json.dumps(request.POST))
@@ -4907,6 +4906,17 @@ class FeedbackWebView(View):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReportAProblemWebView(View):
+    template_name = 'general/report_page.html'
+    """
+    Web View to load the report page
+    """
+
+    def get(self, request):
+        context = { }
+        return render(request, self.template_name, context)
 
 
 # Project CRUD
@@ -5118,7 +5128,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'login_url'
 
     def get_context_data(self,user,**kwargs):
-        
+
         context = super().get_context_data(**kwargs)
         project_format = self.request.GET.get('format')
         context["format"] = project_format
@@ -5202,7 +5212,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project = Project()
-  
+
             cast_pay = request.POST.get('checkbx')
             # Passing cast_star rating
             cast_star1 = request.POST.get('cast-star1')

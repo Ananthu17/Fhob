@@ -67,7 +67,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CheckBetaTesterCode, ProjectDateFilterAPI, \
                    GetBetaTesterCodeId, HomeProjectAPIView, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
-                   ProjectSearchView, ShowCase
+                   ProjectSearchView, ShowCase, ReportAProblemWebView
 
 
 app_name = "hobo_user"
@@ -298,6 +298,10 @@ urlpatterns = [
     path('feedback/',
          FeedbackWebView.as_view(),
          name='feedback-web'),
+    path('report-a-problem/',
+         ReportAProblemWebView.as_view(),
+         name='report-a-problem'),
+
 
     path('projects/', ProjectAPIView.as_view(),
          name='project-list'),
