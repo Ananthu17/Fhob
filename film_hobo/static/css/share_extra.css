@@ -1,0 +1,36 @@
+body{
+    text-align: center;
+  }
+  #autocomplete{
+    width: 300px;
+    padding: 7px;
+    text-align: left;
+  }
+
+  .ui-autocomplete .highlight {
+    color: blue;
+   }
+  .ui-autocomplete .m-icon {
+    float: left;
+    max-width: 62px;
+  }
+  .ui-autocomplete .x-icon {
+    float: left;
+    width: 62px;
+    /* opacity: .5; */
+    font-size: small;
+    text-align: center;
+  }
+  .ui-autocomplete .m-name {
+    display: block;
+    margin-left: 40px;
+  }
+  .ui-autocomplete div::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  .ui-menu-item .ui-state-active  {
+    background:  #bae1ff;
+  }
+

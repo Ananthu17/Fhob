@@ -5,6 +5,13 @@
 
 {% block extracss %}
 {{ form.media.css }}
+<style>
+    .select2-container {
+    border:1px solid #000!important;
+    border-radius:.25rem;
+    outline:none;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -31,6 +38,11 @@
                     <li class="mt-3">
                         <a class="fh-link-blck" data-toggle="pill" href="#blocking" id="block-user-tab">Blocking</a>
                     </li>
+                    {% if request.user.membership != 'COM' %}
+                    <li class="mt-3">
+                        <a class="fh-link-blck" data-toggle="pill" href="#profile" id="block-user-tab">Profile</a>
+                    </li>
+                    {% endif %}
                     <li class="mt-3 mb-3">
                         <a class="fh-link-blck" data-toggle="pill" href="#notification">Notification</a>
                     </li>
@@ -90,7 +102,7 @@
                                 maxlength=150
                                 autocomplete="off"
                                 disabled>
-                                <br><span class="setting-sf">Member since 06.01.2021</span>
+                                <br><span class="setting-sf">Member since {{user.date_of_joining}}</span>
                             </div>
                             <div class="col-2">
                                 <a class="settings-font" type = "button" id="edit_last_name">
@@ -184,7 +196,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio"  class="radio-settings form-check-input" name="profile_visibility"
+                                                <input type="radio"  class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility"
                                                 value="all_members" {% if user_settings.profile_visibility == 'all_members' %}checked{% endif %}>
                                                All Members
                                             </label>
@@ -193,7 +205,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="members_with_rating"
+                                                <input type="radio" class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility" value="members_with_rating"
                                                 {% if user_settings.profile_visibility != 'no_one' and user_settings.profile_visibility != 'pros_and_companies_only' and user_settings.profile_visibility != 'all_members' %}checked
                                                 {% endif %}>
                                                 <span class="rate"> Members with Rating &nbsp;
@@ -224,8 +236,8 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" name="profile_visibility" class="radio-settings form-check-input" 
-                                                value="pros_and_companies_only" {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
+                                                <input type="radio" name="profile_visibility" class="radio-settings form-check-input float-left"
+                                                style="position: initial;" value="pros_and_companies_only" {% if user_settings.profile_visibility == 'pros_and_companies_only' %}checked{% endif %}/>
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -233,7 +245,7 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" class="radio-settings form-check-input" name="profile_visibility" value="no_one"
+                                                <input type="radio" class="radio-settings form-check-input float-left" style="position: initial;" name="profile_visibility" value="no_one"
                                                 {% if user_settings.profile_visibility == 'no_one' %}checked{% endif %}/>
                                                 No one
                                             </label>
@@ -255,7 +267,7 @@
                                                 {% if user_settings.who_can_contact_me != 'no_one' and user_settings.who_can_contact_me != 'pros_and_companies_only'%}
                                                 checked
                                                 {% endif %}
-                                                class="form-check-input radio-settings">
+                                                class="form-check-input radio-settings float-left" style="position: initial;">
                                                 <span class="rate"> Members with Rating &nbsp;
 
                                                     <input type="radio" id="contact_star5" name="contact_rate" value="5"
@@ -292,7 +304,7 @@
                                                 {% if user_settings.who_can_contact_me == 'pros_and_companies_only' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -307,7 +319,7 @@
                                                 {% if user_settings.who_can_contact_me == 'no_one' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 No one
                                             </label>
                                         </div>
@@ -330,7 +342,7 @@
                                                 {% if user_settings.who_can_track_me == 'all_members' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 All Members
                                             </label>
                                         </div>
@@ -343,7 +355,7 @@
                                                 {% if user_settings.who_can_track_me != 'no_one' and user_settings.who_can_track_me != 'pros_and_companies_only' and user_settings.who_can_track_me != 'all_members' %}
                                                     checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 <span class="rate"> Members with Rating &nbsp;
                                                     <input type="radio" id="tracking_star5" name="tracking_rate" value="5"
                                                     {% if user_settings.who_can_track_me == 'members_with_rating_5_star' %}checked{% endif %}/>
@@ -372,12 +384,12 @@
                                     <li>
                                         <div class="form-check">
                                             <label class="form-check-label">
-                                                <input type="radio" 
+                                                <input type="radio"
                                                 name="who_can_track_me" value="pros_and_companies_only"
                                                 {% if user_settings.who_can_track_me == 'pros_and_companies_only' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input" />
+                                                class="radio-settings form-check-input float-left" style="position: initial;" />
                                                 Pros and Companies only
                                             </label>
                                         </div>
@@ -391,7 +403,7 @@
                                                 {% if user_settings.who_can_track_me == 'no_one' %}
                                                 checked
                                                 {% endif %}
-                                                class="radio-settings form-check-input">
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
                                                 No one
                                             </label>
                                         </div>
@@ -438,6 +450,30 @@
                             </div>
                         </div>
 
+                    </div>
+                    <div id="profile" class="container tab-pane fade m-0 p-0">
+                        <div class="bor-bottom pl-4 top-h-xs-screen">Profile Settings</div>
+                        <div class="row mt-3 ml-2">
+                            <div class="col-12 noti-title">
+                            </div>
+                            <div class="row ml-noti mt-1">
+                                <ul class="list-unstyled noti-checkbx-f w-100">
+                                    <li>
+                                        <div class="form-check">
+                                            {% if request.user.membership != 'COM' %}
+                                            <label class="form-check-label">Hide ratings from my profile
+                                                <input type="checkbox"
+                                                name="hide_ratings"
+                                                class="form-check-input"
+                                                style="margin-left: 1rem;"
+                                                {% if user_settings.hide_ratings == True %}checked{% endif %}>
+                                            </label>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div id="notification" class="container tab-pane fade m-0 p-0">
                         <div class="bor-bottom pl-4 top-h-xs-screen">Notification Account Settings</div>
@@ -502,7 +538,6 @@
                                                 <input type="checkbox"
                                                 name="friend_request"
                                                 class="form-check-input"
-                                                style="margin-left: 1rem;"
                                                 {% if user_settings.friend_request == True %}checked{% endif %}>
                                             </label>
                                         </div>
@@ -528,7 +563,7 @@
                         {% comment %}
                         <form class="billing-form">
                         {% endcomment %}
-                            <div class="row ml-2 mt-3 ">
+                            <!-- <div class="row ml-2 mt-3 ">
                                 <div class="col-3">
                                     <label class="billing-label">Card on File:</label>
                                 </div>
@@ -546,25 +581,38 @@
                                 <div class="col-2">
                                     <a href="" class="billing-nw-card">Add New Card</a>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="row ml-2 mt-2 ">
                                 <div class="col-12">
                                     <label class="billing-label">Description</label>
                                 </div>
                                 <div class="col-12">
-                                    Pro Membership
+                                    {% if user.membership == 'IND' %}
+                                        <span id="membership_type">Indie</span> Membership
+                                    {% elif user.membership == 'PRO' %}
+                                        <span id="membership_type">Pro</span> Membership
+                                    {% elif user.membership == 'COM' %}
+                                        <span id="membership_type">Company</span> Membership
+                                    {% elif user.membership == 'ADMIN' %}
+                                        <span id="membership_type">Admin</span> Membership
+                                    {% else %}
+                                        <span id="membership_type">Hobo</span> Membership
+                                    {% endif %}
                                 </div>
-                                <div class="col-12 text-muted">
-                                    Annual: $100
+                                {% if transaction.payment_plan == 'annually' %}
+                                    <div class="col-12 text-muted">
+                                        Annual: $<span id="membership_annual_fee">{{ transaction.final_amount }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="col-12">
+                                        Monthly: $<span id="membership_monthly_fee">{{ transaction.final_amount }}</span>
+                                    </div>
+                                {% endif %}
+                                <div class="col-12">
+                                    Taxes: $<span id="membership_tax_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Monthly: $15.00
-                                </div>
-                                <div class="col-12">
-                                    Taxes: $0.00
-                                </div>
-                                <div class="col-12">
-                                    Total Amount: $15.00
+                                    Total Amount: $<span id="membership_total_fee">{{ transaction.final_amount }}</span>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">
@@ -574,28 +622,28 @@
                                 <div class="col-9">
                                     <div class="form-check-inline">
                                         <label class="containerradio">Recurring
-                                            <input type="radio" name="radio">
+                                            <input id="recurring_btn" type="radio" name="radio" checked>
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
                                     <div class="form-check-inline">
-                                        <label class="containerradio">One Time
+                                        <!-- <label class="containerradio">One Time
                                             <input type="radio" name="radio">
                                             <span class="checkmarkagree"></span>
-                                        </label>
+                                        </label> -->
                                     </div>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">
-                                <div class="col-3">
+                                <!-- <div class="col-3">
                                     <label class="billing-label">Change to Annual</label>
-                                </div>
+                                </div> -->
                                 <div class="col-9">
                                     <div class="form-check-inline">
-                                        <label class="containerradio">
+                                        <!-- <label class="containerradio">
                                             <input type="radio" name="radio">&nbsp;
                                             <span class="checkmarkagree"></span>
-                                        </label>
+                                        </label> -->
                                     </div>
                                 </div>
                             </div>

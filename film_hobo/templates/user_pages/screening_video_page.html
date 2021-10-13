@@ -1,0 +1,326 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% load social_share %}
+
+{% block extracss %}
+<!-- <link rel="stylesheet" href="{% static 'css/share.css' %}"> -->
+<!-- <link rel="stylesheet" href="{% static 'css/email_invite.css' %}"> -->
+<!-- <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/> -->
+<!-- <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link> -->
+<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>
+<link rel="stylesheet" href="{% static 'css/share_extra.css' %}">
+<link rel="stylesheet" href="{% static 'css/share_modal.css' %}">
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"> -->
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper flex-grow-1">
+        <div class="container-fluid">
+
+            <!-- Main Row  -->
+            <div class="row">
+
+                <!-- Left section -->
+
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                    <div class="left-mode-sec p-2 text-center ">
+                        <div class="log-left-sec">
+                            <ul class="list-unstyled">
+                                <li id="track-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">T<span class="mem-small-f">RACK</span></a>
+                                </li>
+                                <li id="share-link" class="mt-1" ><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
+                                </li>
+                                <li><a href="#" class="red-f log-fnt-weight">R<span class="mem-small-f">EPORT THIS</span> V<span
+                                    class="mem-small-f">IDEO</span></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="left-mode-sec  p-2   mt-2">
+                        <div class="add-space d-flex justify-content-center log-addspace">
+                            <span class="">Ad Banner</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Left section  End-->
+                <!-- Center section  -->
+
+                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                    <div class="vdo-menu-bg">
+                        <ul class="log-menu">
+                            <li><span class="video-menu-head">PROJECT </span><a href="" >#{{ project.id }}</a></li>
+                            <li><span class="video-menu-head">TEAM </span><a href="" ># 7 (Boston)</a></li>
+                            <li><span >Title: </span><span class="vdo-details-blue">{{ project.title }}</span></li>
+                            {% if project.format == 'SCH' %}
+                                <li><span>Format: </span><span class="vdo-details-blue">Scene</span></li>
+                            {% else %}
+                                <li><span>Format: </span><span class="vdo-details-blue">Shorts</span></li>
+                            {% endif %}
+
+                            {% if project.format == 'ACT' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Action</span></li>
+                            {% elif project.format == 'ADV' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Adventure</span></li>
+                            {% elif project.format == 'ANI' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Animation</span></li>
+                            {% elif project.format == 'BIO' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Biography</span></li>
+                            {% elif project.format == 'COM' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Comedy</span></li>
+                            {% elif project.format == 'CRI' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Crime</span></li>
+                            {% elif project.format == 'DOC' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Documentary</span></li>
+                            {% elif project.format == 'DRA' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Drama</span></li>
+                            {% elif project.format == 'FAM' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Family</span></li>
+                            {% elif project.format == 'FAN' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Fantasy</span></li>
+                            {% elif project.format == 'FIL' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Film Noir</span></li>
+                            {% elif project.format == 'GAM' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Game Show</span></li>
+                            {% elif project.format == 'HIS' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">History</span></li>
+                            {% elif project.format == 'HOR' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Horror</span></li>
+                            {% elif project.format == 'LGB' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">LGBTQ</span></li>
+                            {% elif project.format == 'MIL' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Military</span></li>
+                            {% elif project.format == 'MUS' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Musical</span></li>
+                            {% elif project.format == 'MYS' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Mystery</span></li>
+                            {% elif project.format == 'REA' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Reality Tv</span></li>
+                            {% elif project.format == 'ROM' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Romance</span></li>
+                            {% elif project.format == 'SCI' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Science Fiction</span></li>
+                            {% elif project.format == 'SPO' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Sport</span></li>
+                            {% elif project.format == 'TAL' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Talk Show</span></li>
+                            {% elif project.format == 'THR' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Thriller</span></li>
+                            {% elif project.format == 'WES' %}
+                                <li><span>Genre: </span><span class="vdo-details-blue">Western</span></li>
+                            {% endif %}
+
+                            <li class=""><a href="#" class="red-fnt bold log-rate-font">Rate this Team</a></li>
+                        </ul>
+                    </div>
+                    <div class="row align-row">
+                        <div class="col-md-9 ">
+                            <div class="video-frame">
+                                <video width="600" height="400" controls >
+                                    <source src="{{ project.video_url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <!-- <img src="{% static 'images/1.jpeg' %}" class=" video-img"> -->
+                            </div>
+                            <div class="vdo-menu-bg log-back-align mt-2">
+                                <div class="log-back-sec-align">
+                                    <span class="log-btn-align"><a href=""><img src="{% static 'images/right-arrow.png' %}" class="log-back-btn" ></a></span>
+                                    <span class="log-back-sec"><span class="log-back-cap">T</span>HIS IS A COLLABORATIVE AND LEARNING PLATFORM, <span class="log-back-cap">P</span>LEASE GIVE CONSTRUCTIVE AND HELPFUL FEEDBACK ONLY.</span>
+                                </div>
+                            </div>
+                            <div class="log-comment mt-2">
+                                COMMENTS
+                            </div>
+                            <div class="left-mode-search mt-2 ">
+                                <div class="log-comment-hgt">
+                                    <div class="log-comment-txt">
+                                        Use @Filmmaker’s name - to address your comment to that filmmaker.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 left-mode-sec vdo-align">
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Writer: <a href="" class="vdo-details-blue">Tom Smith</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Producer: <a href="" class="vdo-details-blue">Sarah Lee</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Director: <a href="" class="vdo-details-blue">Sarah Lee</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    John: <a href="" class="vdo-details-blue">Greg Ma</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Scott: <a href="" class="vdo-details-blue">Aaron McCarty</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    DP: <a href="" class="vdo-details-blue">Sarah Lee</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Makeup: <a href="" class="vdo-details-blue">Nikita selivan</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    Editor: <a href="" class="vdo-details-blue">Sarah Lee</a>
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+                            </div>
+                            <hr class="log-hr">
+                            <div class="vdo-total">
+                                <span class="vdo-detail-txt">
+                                    Video Total:
+                                    <span class="log-star">
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                        <span class="fa fa-star-o"></span>
+                                    </span>
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center section  End-->
+                <!-- Right section -->
+
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
+                </div>
+
+                <!-- Right section  End-->
+
+            </div>
+            <!-- Main Row End  -->
+        </div>
+    </div>
+    <!-- Share Modal Start -->
+    <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content col-12">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+                </div>
+
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate>
+                      <div class="form-group">
+                        <label for="exampleInputUser" style="display:inline-block; width:100%; text-align:left;">To</label>
+                        <input type="text" name="restaurant" id="autocomplete" placeholder="Enter user"/>
+                        <p id="autocomplete-suggestion"></p>
+                    </div>
+                    </form>
+                  </div>
+
+                <div class="modal-footer">
+                    <button id="invite_send" type="button" class="btn btn-primary">Send</button>
+                    <button id="invite_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <!-- Share Modal End -->
+    <!-- Invite Modal Srart -->
+    <div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content col-12">
+                <div class="modal-header">
+                    <h5 class="modal-title">Invite</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="inviteModalClose" aria-hidden="true">&times;</span> </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                  <button id="invite_send_btn" type="button" style="font-size:15px;" class="btn btn-primary btn-lg modal-btn add-friend-to-groups"
+                  data-dismiss="modal">Invite</button>
+                  <button id="cancel_invite_btn" type="button" style="font-size:15px;" class="btn btn-secondary btn-lg modal-btn close-add-togroup-modal"
+                  data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Invite Modal End -->
+{% endblock %}
+
+{% block extrajs %}
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>
+<script src="{% static 'js/share_extra.js' %}"></script>
+<!-- <script src="{% static 'js/screening_video_page.js' %}"></script> -->
+<!-- <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script> -->
+<!-- <script src="{% static 'js/email_invite.js' %}"></script> -->
+{% endblock %}

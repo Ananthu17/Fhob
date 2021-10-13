@@ -1,0 +1,41 @@
+<div class="cas-input-sec-flex mt-4">
+    <span class="cas-input-item-align">
+        <input type="text" class="cas-input-field" placeholder="Character's Name"
+        name="name"  autocomplete="off" required>
+        <div >
+            <label for="cas-male" class="cas-radio-label-1">Male</label>
+            <input type="radio" id="cas-male" value="male" name="gender_{{count}}"
+            {% if character.gender == 'male' %}checked {% endif %} required>
+            <label for="cas-female" class="cas-radio-label-2">Female</label>
+            <input type="radio" id="cas-female" value="female"  name="gender_{{count}}"
+            {% if character.gender == 'female' %}checked {% endif %} required>
+        </div>
+        <div>
+            <label class="cas-radio-label-1">Age</label>
+            <select  class="cas-select-style"
+                    id ="age_{{obj.id}}"
+                    name="age" required >
+                    <option value="">---</option>
+                    {% for item in age %}
+                        <option value="{{item.0}}">
+                            {{item.1}}
+                        </option>
+                    {% endfor %}
+            </select>
+        </div>
+    </span>
+    <span class="cas-txt-area-align">
+        <textarea class="cas-input-txtarea" placeholder="Description"
+        name="description"  autocomplete="off" required></textarea>
+    </span>
+    <div class="cas-side-display">
+        <span>
+            <span class="cas-cast-side-txt"><a href="">SIDES</a></span>
+        </span>
+        <span>
+            <input type="password" class="cas-input-password password" placeholder="PASSWORD"
+            name="password"  autocomplete="off">
+        </span>
+    </div>
+
+</div>

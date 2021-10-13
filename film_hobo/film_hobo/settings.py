@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
+from celery.schedules import crontab
 import environ
+import os
 from pathlib import Path
+from corsheaders.defaults import default_headers
+import film_hobo.tasks
 
 env = environ.Env()
 environ.Env.read_env()
@@ -28,6 +31,65 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+# PROJECT_ENVIRONMENT valid options
+# 1 - LOCAL
+# 2 - DEMO_SERVER
+# 3 - AWS_PRODUCTION
+
+PROJECT_ENVIRONMENT = "DEMO_SERVER"
+# PROJECT_ENVIRONMENT = "DEMO_SERVER"
+
+
+if PROJECT_ENVIRONMENT == "DEMO_SERVER":
+    DEBUG = False
+    # ORIGIN_URL = "http://202.88.246.92:8041"
+    # ORIGIN_URL = "http://172.19.0.3:8041"
+    ORIGIN_URL = "http://app:8041"
+    # demo server database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+            'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+            'USER': env("DEMO_SERVER_DATABASE_USER"),
+            'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+            'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+            'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://redis:6379'
+    CELERY_RESULT_BACKEND = "redis://redis:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
+
+elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
+    ORIGIN_URL = "http://www.filmhobo.com"
+else:
+    DEBUG = True
+    ORIGIN_URL = "http://127.0.0.1:8000"
+    # local database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DATABASE_ENGINE"),
+            'NAME': env("DATABASE_NAME"),
+            'USER': env("DATABASE_USER"),
+            'PASSWORD': env("DATABASE_PASSWORD"),
+            'HOST': env("DATABASE_HOST"),
+            'PORT': env("DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
 
 # # for development
 DEBUG = True
@@ -53,6 +115,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party packages
+    'environ',
     'rest_auth',
     'rest_framework',
     'django.contrib.sites',
@@ -64,17 +127,28 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'authemail',
     'allauth.socialaccount',
+    'django_filters',
+    'django_social_share',
+    # 'subscription',
 
     # project apps
     'initial_user',
     'hobo_user',
     'payment',
+    'general',
+    'project',
+    'messaging',
 
     'bootstrap_datepicker_plus',
     'django_select2',
     'crispy_forms',
     'django_s3_storage',
-    'zappa_django_utils'
+    'zappa_django_utils',
+    'channels',
+    'paypal.standard.ipn',
+    'corsheaders',
+    'ckeditor',
+    'ckeditor_uploader'
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -82,9 +156,11 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     # 'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -111,7 +187,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'film_hobo.wsgi.application'
-
+# Channels
+ASGI_APPLICATION = "film_hobo.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -130,18 +207,6 @@ WSGI_APPLICATION = 'film_hobo.wsgi.application'
 #         }
 #     }
 # }
-
-# local database credentials
-DATABASES = {
-    'default': {
-        'ENGINE': env("DATABASE_ENGINE"),
-        'NAME': env("DATABASE_NAME"),
-        'USER': env("DATABASE_USER"),
-        'PASSWORD': env("DATABASE_PASSWORD"),
-        'HOST': env("DATABASE_HOST"),
-        'PORT': env("DATABASE_PORT"),
-    }
-}
 
 
 # Password validation
@@ -186,12 +251,16 @@ STATICFILES_DIRS = [
 ]
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ],
     'DATE_INPUT_FORMATS': ["%Y-%m-%d"],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
 }
 
 
@@ -213,16 +282,16 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_FROM = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_FROM', 'avin@techversantinfo.com')
-EMAIL_HOST_USER = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_USER', 'avin@techversantinfo.com')
-EMAIL_HOST_PASSWORD = os.environ.get(
-    'AUTHEMAIL_EMAIL_HOST_PASSWORD', 'avinpython19')
-EMAIL_BCC = os.environ.get(
-    'AUTHEMAIL_DEFAULT_EMAIL_BCC', '')
+
+EMAIL_FROM = env("AUTHEMAIL_DEFAULT_EMAIL_FROM")
+EMAIL_HOST_USER = env("AUTHEMAIL_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("AUTHEMAIL_EMAIL_HOST_PASSWORD")
+EMAIL_BCC = ''
 
 OLD_PASSWORD_FIELD_ENABLED = True
+
+SITE_URL = os.environ.get('SITE_URL', '')
+
 
 # # production settings
 
@@ -242,3 +311,110 @@ OLD_PASSWORD_FIELD_ENABLED = True
 # # AWS_S3_PUBLIC_URL_STATIC = "https://static.zappaguide.com/"
 
 # # AWS_S3_MAX_AGE_SECONDS_STATIC = "94608000"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # }
+        # 'ROUTING': 'notification_channels.routing.channel_routing',
+    }
+}
+# PAYPAL SETTINGS
+PAYPAL_SENDER_EMAIL = env("PAYPAL_SENDER_EMAIL")
+PAYPAL_RECEIVER_EMAIL = env("PAYPAL_RECEIVER_EMAIL")
+PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET_ID = env("PAYPAL_SECRET_ID")
+
+PRODUCT_ID = env("PRODUCT_ID")
+INDIE_PAYMENT_MONTHLY = env("INDIE_PAYMENT_MONTHLY")
+INDIE_PAYMENT_YEARLY = env("INDIE_PAYMENT_YEARLY")
+
+PRO_PAYMENT_MONTHLY = env("PRO_PAYMENT_MONTHLY")
+PRO_PAYMENT_YEARLY = env("PRO_PAYMENT_YEARLY")
+
+COMPANY_PAYMENT_MONTHLY = env("COMPANY_PAYMENT_MONTHLY")
+COMPANY_PAYMENT_YEARLY = env("COMPANY_PAYMENT_YEARLY")
+
+
+AWS_CLIENT_ID = env("AWS_CLIENT_ID")
+AWS_CLIENT_SECRET = env("AWS_CLIENT_SECRET")
+S3_BUCKET_NAME = "filmhobo-videos"
+
+CORS_ORIGIN_ALLOW = True
+CORS_ALLOWED_ORIGINS = (
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://0.0.0.0',
+    'http://202.88.246.92:8041',
+)
+
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Access-Control-Allow-Origin',
+)
+
+if DEBUG:
+    BRAINTREE_PRODUCTION = False
+else:
+    BRAINTREE_PRODUCTION = True
+
+BRAINTREE_MERCHANT_ID = env("BRAINTREE_MERCHANT_ID")
+BRAINTREE_PUBLIC_KEY = env("BRAINTREE_PUBLIC_KEY")
+BRAINTREE_PRIVATE_KEY = env("BRAINTREE_PRIVATE_KEY")
+
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# development
+CORS_ORIGIN_ALLOW_ALL = True
+
+# production
+# CORS_ORIGIN_ALLOW_ALL = False
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:8000',
+# )
+
+BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_INDIE_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_INDIE_PAYMENT_YEARLY")
+BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_PRO_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_PRO_PAYMENT_YEARLY")
+BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY = \
+    env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_MONTHLY")
+BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY = \
+    env("BRAINTREE_PLAN_ID_COMPANY_PAYMENT_YEARLY")
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+CKEDITOR_UPLOAD_PATH = "ckeditor"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-',
+             'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock',
+             'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat'],
+            ['Undo', 'Redo'],
+            ['Format', 'Styles', 'Font'],
+        ],
+        'width': 'auto',
+        'height': 140,
+        'margin-left': '10%',
+    },
+}
+
+# tijptjik/django-paypal-subscription package settings
+# SUBSCRIPTION_PAYPAL_SETTINGS = {
+#     'bussiness': 'kselivan@filmhobo.com'
+# }
+
+# SUBSCRIPTION_PAYPAL_FORM = 'paypal.standard.forms.PayPalPaymentsForm'
+
+# SUBSCRIPTION_GRACE_PERIOD = 0

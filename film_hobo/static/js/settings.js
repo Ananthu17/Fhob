@@ -93,6 +93,9 @@ $(document).ready(function() {
 });
 
 
+
+
+
 // block user tab button
      $('body').on('click' , '#block-user-tab', function(){
         var token = $("#token").val();
@@ -138,7 +141,6 @@ $(document).ready(function() {
         if(user_id){
             data_dict['user_id'] = user_id;
         }
-        console.log(data_dict)
         $.ajax
         ({
             type: "POST",

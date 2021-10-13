@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container mt-3 mb-3">
+        <div class="signup-form signup-section signup-border">
+            <!-- Nav pills -->
+            <ul class="nav nav-pills nav-justified" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="pill" href="#membership">Report a Problem</a>
+                </li>
+            </ul>
+            <hr class="m-0 signup-border-hr">
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="membership" class="container tab-pane active">
+                    <div class="signup-form mt-2 mb-2 ">
+                        <div class="row mt-3">
+                            <div class="col-2">Describe the problem</div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="4" id="comment" name="text"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-2">
+                                <label class="form-title">Name:</label>
+                            </div>
+                            <div class="col-6">
+                                <input class="inp-line" placeholder="Name" />
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-2">
+                                <label class="form-title">Phone number:</label>
+                            </div>
+                            <div class="col-6">
+                                <input class="inp-line" placeholder="Phone number" />
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-2">
+                                <label class="form-title">Email:</label>
+                            </div>
+                            <div class="col-6">
+                                <input class="inp-line" placeholder="Email" />
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center  mt-4 mb-4">
+                                <button class="btn btn-login">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extrajs %}
+{% endblock %}

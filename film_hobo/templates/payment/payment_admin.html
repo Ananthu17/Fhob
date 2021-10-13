@@ -1,150 +1,299 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    {% if title %}
-    <title>Film Hobo - {{ title }}</title>
-    {% else %}
-        <title>Film Hobo</title>
-    {% endif %}
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="{% static 'initial_user/css/main.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
+{% block extracss %}
+<link rel="stylesheet" href="{% static 'css/payment_admin.css' %}">
+{% endblock %}
 
-<body>
-    <h3>Admin Payment Set-up</h3><br>
-    <button id="membership_fee_edit" class="btn btn-primary">Edit</button>
-    <h3>Membership Annual Price</h3>
-    <table>
-        <tr>
-          <th>Membership</th>
-          <th>Price</th>
-        </tr>
-        <tr>
-          <td>Hobo</td>
-          <td id="annual_hobo" contenteditable='false'></td>
-        </tr>
-        <tr>
-          <td>Indie</td>
-          <td id="annual_indie" contenteditable='false'>$ </td>
-        </tr>
-        <tr>
-            <td>Pro</td>
-            <td id="annual_pro" contenteditable='false'>$ </td>
-        </tr>
-        <tr>
-            <td>Company</td>
-            <td id="annual_company" contenteditable='false'>$ </td>
-        </tr>
-      </table>
-      <br>
-      <h3>Membership Monthly Price</h3>
-      <table>
-        <tr>
-          <th>Membership</th>
-          <th>Price</th>
-        </tr>
-        <tr>
-          <td>Hobo</td>
-          <td id="monthly_hobo" contenteditable='false'></td>
-        </tr>
-        <tr>
-          <td>Indie</td>
-          <td id="monthly_indie" contenteditable='false'></td>
-        </tr>
-        <tr>
-            <td>Pro</td>
-            <td id="monthly_pro" contenteditable='false'></td>
-        </tr>
-        <tr>
-            <td>Company</td>
-            <td id="monthly_company" contenteditable='false'></td>
-        </tr>
-      </table>
-      <button id="membership_fee_save" class="btn btn-primary">Save</button>
-</body>
-<!-- Axios -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script>
-    /*
-    get membership fee details and render to html
-    */
-    $( document ).ready(function() {
-        origin_url = window.location.origin
-        get_url = origin_url + '/payment/get_membership_fee_detail/'
-        var token = localStorage.getItem("token");
-        token_str = "Token "
-        token_val = String(token)
-        var authorization_str = token_str.concat(token_val);
-        axios.get(get_url, {headers: {'Authorization': authorization_str}})
-        .then((response) => {
-            document.getElementById("annual_hobo").innerHTML = "$ " + response.data.annual_hobo;
-            document.getElementById("annual_indie").innerHTML = "$ " + response.data.annual_indie;
-            document.getElementById("annual_pro").innerHTML = "$ " + response.data.annual_pro;
-            document.getElementById("annual_company").innerHTML = "$ " + response.data.annual_company;
+{% block content %}
+      <div class="wrapper flex-grow-1">
+          <div class="container admin-bill-sec pb-4">
+              <div class="row mt-3">
+                  <div class="col-2 bold">Admin Payment Set-up</div>
+                  <div class="col-10">
+                      <button id="membership_fee_edit" class="btn btn-admin-bill">Edit</button>
+                  </div>
+              </div>
+              <div class="row mt-3">
+                  <div class="col-2 p-0">Membership Annual Price:</div>
+                  <div class="col-4  table-responsive">
+                      <table class="table table-striped admin-bill-tbl">
+                          <tbody>
+                              <tr>
+                                  <th>Hobo</th>
+                                  <td><input id="annual_hobo" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Indie</th>
+                                  <td><input id="annual_indie" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Pro</th>
+                                  <td><input id="annual_pro" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Company</th>
+                                  <td><input id="annual_company" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="col-2 p-0">Membership Monthly Price:</div>
+                  <div class="col-4  table-responsive">
+                      <table class="table table-striped admin-bill-tbl">
+                          <tbody>
+                              <tr>
+                                  <th>Hobo</th>
+                                  <td><input id="monthly_hobo" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Indie</th>
+                                  <td><input id="monthly_indie" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Pro</th>
+                                  <td><input id="monthly_pro" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                              <tr>
+                                  <th>Company</th>
+                                  <td><input id="monthly_company" type="text" class="form-control admin-bill-form-cntrl" placeholder=""></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+              <hr class="admin-bill-hr">
+              <div class="row mt-3">
+                  <div class="col-2">Add Discount:</div>
+                  <div class="col-6  table-responsive">
+                      <table class="table table-bordered admin-bill-tbl-bordered admin-bill-tbl">
+                        <tbody>
+                            <tr>
+                                <th>Discount Name</th>
+                                <td class="text-muted">
+                                    <input id="discount_name_input" type="text" class="form-control admin-bill-form-cntrl-b" placeholder="write it here">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Amount</th>
+                                <td id="discount_amount"><span id="doller-percentage-toggle">$ </span><input id="discount_amount_input" type="number" class="form-control admin-bill-form-cntrl-b w-42" placeholder="">
+                                    <button id="percentage" name="amount" value="%" class="btn btn-default-doller-per ml-1 toggle_dp">%</button>
+                                    <button id="doller" name="amount" value="$" class="btn btn-default-doller-per ml-1 toggle_dp dp_active_toggle">$</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Timeframe</th>
+                                <td id="discount_timeframe" class="text-muted"><input id="valid_from" type="date" class="form-control admin-bill-form-cntrl-b w-42" placeholder="___/___/___">
+                                     to
+                                     <input id="valid_to" type="date" class="form-control admin-bill-form-cntrl-b w-42" placeholder="___/___/___">
+                                </td>
+                            </tr>
+                        </tbody>
+                      </table>
+                      <a id="discount_add" href="#" class="btn admin-bill-link">Add</a>
+                  </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-2">Discount List:</div>
+                <div class="col-10 table-responsive">
+                    <table id="discount_table" class="table table-bordered admin-bill-tbl-bordered admin-bill-tbl">
+                        <thead>
+                            <tr>
+                                <th>Discount Name</th>
+                                <th>Amount</th>
+                                <th>Timeframe</th>
+                                <th colspan="2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+              <!-- <div class="row mt-3">
+                <div class="col-2">Discount List:</div>
+                <div class="col-10 table-responsive">
+                    <table id="braintree_discount_table" class="table table-bordered admin-bill-tbl-bordered admin-bill-tbl">
+                        <thead>
+                            <tr>
+                                <th>Braintree ID</th>
+                                <th>Promocode (Name)</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Number of Billing Cycles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div> -->
+              <hr class="admin-bill-hr">
+              <div class="row mt-3">
+                  <div class="col-2 ">Tax:</div>
+                  <div class="col-10">
+                    <span id="tax_value" class="admin-bill-time">0</span> % Added to the Total price
+                  </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-2">Membership Annual Price (With Tax):</div>
+                <div class="col-4  table-responsive">
+                    <table class="table table-striped admin-bill-tbl">
+                        <tbody>
+                            <tr>
+                                <th>Hobo</th>
+                                <td><input id="annual_hobo_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Indie</th>
+                                <td><input id="annual_indie_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Pro</th>
+                                <td><input id="annual_pro_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Company</th>
+                                <td><input id="annual_company_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-2">Membership Monthly Price: (With Tax)</div>
+                <div class="col-4  table-responsive">
+                    <table class="table table-striped admin-bill-tbl">
+                        <tbody>
+                            <tr>
+                                <th>Hobo</th>
+                                <td><input id="monthly_hobo_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Indie</th>
+                                <td><input id="monthly_indie_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Pro</th>
+                                <td><input id="monthly_pro_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                            <tr>
+                                <th>Company</th>
+                                <td><input id="monthly_company_with_tax" type="text" class="form-control admin-bill-form-cntrl" placeholder="" readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+              <hr class="admin-bill-hr">
+              <div class="row mt-3">
+                  <div class="col-2 " contenteditable="true">Free Evaluation Time</div>
+                  <div class="col-10">
+                      <span id="days_value" class="admin-bill-time">0</span> Days
+                  </div>
+              </div>
+              <hr class="admin-bill-hr">
+              <div class="row mt-3">
+                  <div class="col-2 ">Auto-Renew</div>
+                  <div class="col-10">
+                      <div class="form-check-inline">
+                          <label id="on_value" class="containerradio">On
+                              <input id="on_click" type="radio" name="renew_radio">
+                              <span id="on_click_span" class="checkmarkagree"></span>
+                          </label>
+                      </div>
+                      <div class="form-check-inline">
+                          <!-- <label id="off_value" class="containerradio">Off
+                              <input id="off_click" type="radio" name="renew_radio">
+                              <span id="off_click_span" class="checkmarkagree"></span>
+                          </label> -->
+                      </div>
+                  </div>
+              </div>
+              <hr class="admin-bill-hr">
+              <div class="row">
+                  <div class="col-2"></div>
+                  <div class="col-10">
+                      <button id="membership_fee_save" class="btn admin-bill-btnsave"> Save</button>
+                  </div>
+              </div>
+              <!-- <input type="button" id="btnShow" value="Show Popup" /> -->
+                <div id="dialog" style="display: none" align = "center">
+                    This is a jQuery Dialog.
+                </div>
+              <!-- <hr class="admin-bill-hr"> -->
+              <!-- <div class="bold mt-3 mb-3">Electronic Receipt Set-Up</div> -->
+              <!-- <div class="row">
+                  <div class="col-12 bold">
+                      Email #1 (when a new member creates account)<span class="ml-4">Gives the Members information about free (30) trial,
+                      when his credic card will be charged and the amount.</span>
+                      <input type="text" class="form-control mt-2 mb-2 ml-4 admin-bill-placeholder" placeholder="Text here">
+                  </div>
+              </div> -->
+              <!-- <div class="row">
+                  <div class="col-12 bold">
+                      Email #2 ( Seven days before credit card will be charged)<span class="ml-4">Gives the Members heads up that thier
+                      credit card will be charged on this day with this amount.</span>
+                      <input type="text" class="form-control mt-2 mb-2 ml-4 admin-bill-placeholder" placeholder="Text here">
+                  </div>
+              </div> -->
+              <!-- <div class="row">
+                  <div class="col-12 bold">
+                      Email #3 (Receipt) - The Receipt after thje credit card has been proccessed
+                      <input type="text" class="form-control mt-2 mb-2 ml-4 admin-bill-placeholder" placeholder="Text here">
+                  </div>
+              </div> -->
+          </div>
+      </div>
 
-            document.getElementById("monthly_hobo").innerHTML = "$ " + response.data.monthly_hobo;
-            document.getElementById("monthly_indie").innerHTML = "$ " + response.data.monthly_indie;
-            document.getElementById("monthly_pro").innerHTML = "$ " + response.data.monthly_pro;
-            document.getElementById("monthly_company").innerHTML = "$ " + response.data.monthly_company;
-        });
-    });
-    /*
-    make the table column field editable
-    */
-    document.getElementById("membership_fee_edit").addEventListener("click", function() {
-        $("#annual_hobo").attr("contenteditable", "true");
-        $("#annual_hobo").attr("style", "background: #b5b3b3;");
-        $("#annual_indie").attr("contenteditable", "true");
-        $("#annual_indie").attr("style", "background: #b5b3b3;");
-        $("#annual_pro").attr("contenteditable", "true");
-        $("#annual_pro").attr("style", "background: #b5b3b3;");
-        $("#annual_company").attr("contenteditable", "true");
-        $("#annual_company").attr("style", "background: #b5b3b3;");
-        $("#monthly_hobo").attr("contenteditable", "true");
-        $("#monthly_hobo").attr("style", "background: #b5b3b3;");
-        $("#monthly_indie").attr("contenteditable", "true");
-        $("#monthly_indie").attr("style", "background: #b5b3b3;");
-        $("#monthly_pro").attr("contenteditable", "true");
-        $("#monthly_pro").attr("style", "background: #b5b3b3;");
-        $("#monthly_company").attr("contenteditable", "true");
-        $("#monthly_company").attr("style", "background: #b5b3b3;");
-    });
-    /*
-    post membership fee details and render to html
-    */
-    document.getElementById("membership_fee_save").addEventListener("click", function() {
-        put_url = origin_url + '/payment/update_membership_fee/'
-        extra_args = {
-            "monthly_hobo": $("#monthly_hobo").text().replace(/[A-Za-z$-]/g, ""),
-            "monthly_indie": $("#monthly_indie").text().replace(/[A-Za-z$-]/g, ""),
-            "monthly_pro": $("#monthly_pro").text().replace(/[A-Za-z$-]/g, ""),
-            "monthly_company": $("#monthly_company").text().replace(/[A-Za-z$-]/g, ""),
-            "annual_hobo": $("#annual_hobo").text().replace(/[A-Za-z$-]/g, ""),
-            "annual_indie": $("#annual_indie").text().replace(/[A-Za-z$-]/g, ""),
-            "annual_pro": $("#annual_pro").text().replace(/[A-Za-z$-]/g, ""),
-            "annual_company": $("#annual_company").text().replace(/[A-Za-z$-]/g, "")
-        }
-        var token = localStorage.getItem("token");
-        token_str = "Token "
-        token_val = String(token)
-        var authorization_str = token_str.concat(token_val);
-        axios.put(put_url, extra_args, {headers: {'Authorization': authorization_str}})
-        .then((response) => {
-            location.reload();
-        }, (error) => {
-            console.log(error);
-        });
-    });
-    </script>
-</html>
-</body>
+    <!-- The Modal -->
+    <div class="modal fade" id="payment_admin_modal">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h5 class="modal-title">Modal Heading</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+            Modal body..
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+            <button id="modal_cancel" type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal">Close</button>
+            <button id="modal_delete" type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">Delete</button>
+            </div>
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extrajs %}
+<script src="{% static 'js/payment.js' %}"></script>
+{% endblock %}

@@ -1,38 +1,49 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
 
 {% block content %}
-<div class="wrapper flex-grow-1"></div>
+<div class="wrapper flex-grow-1">
 <div class="container">
-    <div class="row">
-        {% if content.status == 200 and content.user_membership == 'IND' %}
-            <p>Email address verified.</p>
-            <a href = "{% url 'hobo_user:payment_plan_indie' %}?email={{content.email}}">Complete Registration Process</a>
-
-        {% elif content.status == 200 and content.user_membership == 'PRO' %}
-            <p>Email address verified.</p>
-            <a href = "{% url 'hobo_user:payment_plan_pro' %}?email={{content.email}}">Complete Registration Process</a>
-
-        {% elif content.status == 200 and content.user_membership == 'COM' %}
-            <p>Email address verified.</p>
-            <a href = "{% url 'hobo_user:payment_plan_company' %}?email={{content.email}}">Complete Registration Process</a>
-
-        {% elif content.status == 200 and content.user_membership == 'HOB' %}
-            <p>Email address verified.</p>
-            <a href = "{% url 'hobo_user:login' %}">Login</a>
-
-        {% else %}
-            <p>Invalid Link.</p>
-            <a href = "{% url 'hobo_user:login' %}">Login</a>
-        {% endif %}
-
-        {% for obj in queryset %}
-          {{ obj.membership }}
-        {% endfor %}
+    <div class="row align-items-center pt-4 pb-4">
+        <img class="content-page-logo" src="{% static 'images/FH_Logo.png' %}">
     </div>
+    {% if content.status == 200 and content.user_membership == 'IND' %}
+        <div class="row m-2 d-flex justify-content-center">
+            <h4>Email address verified.</h4>
+            <h4><a href = "{% url 'hobo_user:payment_plan_indie' %}?email={{content.email}}">Complete Registration Process</a></h4>
+        </div>
+
+    {% elif content.status == 200 and content.user_membership == 'PRO' %}
+        <div class="row m-2 d-flex justify-content-center">
+            <h4>Email address verified.</h4>
+            <h4><a href = "{% url 'hobo_user:payment_plan_pro' %}?email={{content.email}}">Complete Registration Process</a></h4>
+        </div>
+
+    {% elif content.status == 200 and content.user_membership == 'COM' %}
+        <div class="row m-2 d-flex justify-content-center">
+            <h4>Email address verified.</h4>
+            <h4><a href = "{% url 'hobo_user:payment_plan_company' %}?email={{content.email}}">Complete Registration Process</a></h4>
+        </div>
+
+    {% elif content.status == 200 and content.user_membership == 'HOB' %}
+        <div class="row m-2 d-flex justify-content-center">
+            <h4>Email address verified.</h4>
+            <h4><a href = "{% url 'hobo_user:user_login' %}">Login</a></h4>
+        </div>
+
+    {% else %}
+        <div class="row m-2 d-flex justify-content-center">
+            <h4>Invalid Link.</h4>
+            <h4><a href = "{% url 'hobo_user:user_login' %}">Login</a></h4>
+        </div>
+    {% endif %}
+
+    {% for obj in queryset %}
+        {{ obj.membership }}
+    {% endfor %}
 </div>
 </div>
 

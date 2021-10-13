@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div style="max-width: 1080px; width: 100%; margin-left: auto; margin-right: auto;">
+        <div style="margin: 10px;">
+            <div style="margin-left:18px">
+                <div style="width: 343px; height: 243px; margin:0 auto">
+                    <img src="static/img/Film Hobo Logo.jpg" style="width: 100%; height: 100%;" alt="">
+                </div>
+                <div style="font-size: 16px; font-family: sans-serif;">
+                    <p>
+                        Dear {{user_name}} thank you for being a valuable member of FilmHobo tribe!
+                    </p>
+                    {% if user_membership == 'IND' %}
+                        <p>
+                            This is to inform you that there is a change in the plan: Indie you are following
+                            the revised rate is ${{revised_rate}} per {{plan_term}}.
+                        </p>
+                    {% elif user_membership == 'PRO' %}
+                        <p>
+                            This is to inform you that there is a change in the plan: Pro you are following
+                            the revised rate is ${{revised_rate}} per {{plan_term}}.
+                        </p>
+                    {% elif user_membership == 'COM' %}
+                        <p>
+                            This is to inform you that there is a change in the plan: Company you are following
+                            the revised rate is ${{revised_rate}} per {{plan_term}}.
+                        </p>
+                    {% endif %}
+
+                </div>
+                <div style="font-size: 16px; font-family: sans-serif; overflow-x:auto;">
+                </div>
+                <div style="font-size: 16px; font-family: sans-serif; margin-top: 30px; overflow-x:auto;">
+                </div>
+                <div style="margin-top: 15px; overflow-x:auto;">
+                </div>
+            </div>
+            <footer style="margin-top: 35px; margin-bottom: 45px;">
+                <hr
+                    style="margin-left:0; margin-right:0; margin-top: 4px;  width:100%; color:#0071bc; border:none; border-bottom:1px solid; margin-bottom: 20px;">
+                <div style="margin-top: 35px;font-size: 13px; font-family: sans-serif;">
+                    <div style="margin: 0 auto;text-align: center;">
+                        <a href="" style="color: #2c43ff;text-decoration: none;">Privacy Policy</a> | <a href=""
+                            style="color:#2c43ff;text-decoration: none;">Terms
+                            of Service</a>
+                    </div>
+                    <div style="margin: 0 auto;text-align: center;">
+                        © 2021 All rights reserved - FilmHobo®
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+</body>
+
+</html>
+</body>

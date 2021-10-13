@@ -1,0 +1,3 @@
+
+Dear {{ user_name }} thank you for joining FilmHobo tribe! We are supper excited to see your work!
+Here are the details of your membership.

@@ -1,0 +1,1317 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load friend_request_tag %}
+{% load project_rating_tag %}
+
+{% block extracss %}
+<style>
+.select2-container--default .select2-selection--single
+    {
+        border-radius: 0!important;
+        border:none!important;
+        border-bottom:1px solid#9c9c9c!important;
+    }
+.select2-container .select2-selection--single {
+    height:19px!important;
+    }
+.select2-container--default .select2-selection--single .select2-selection__rendered
+    {
+        line-height:19px;
+    }
+.select2-container--default .select2-selection--single .select2-selection__arrow
+    {
+        height:15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid member-setup-sec">
+        <div class="row">
+        <!-- Screen row -->
+
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
+                <div class="left-mode-sec p-2">View profile in:
+                    <a href="{{request.user.get_edit_profile_url}}"
+                    class="btn btn-mem-mode btn-block mt-2 clickable-mode">Edit Mode</a>
+                    <a href="{{request.user.get_profile_url}}"
+                    class="clickable-mode btn btn-mem-mode btn-block mt-2">Public Mode</a>
+                </div>
+                <div class="left-mode-sec mt-3 p-2">
+                    <ul class="list-unstyled p-2 mb-0">
+                        <li><a href="#" class="membr-setup-m">My Interests ({{myinterests.count}})</a></li>
+                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
+                    </ul>
+                </div>
+                <div class="left-mode-sec mt-3 p-2 blank-add-scene">
+                </div>
+            </div>
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3">
+                <div class="row">
+                    <!-- center row -->
+                    <div class="col-lg-3">
+                        <!-- image group -->
+                        <div class="left-mode-sec mem-img-p-add">
+                            <div class="row">
+                                <div class="col-12 mem-set-img">
+                                    {% if profile.user.get_profile_photo  %}
+                                    <img src="{{ profile.user.get_profile_photo}}" class="img-fluid mem-set-top-img" />
+                                    {% else %}
+                                    <img src="{% static 'images/default_profile_pic.png' %}" class="img-fluid mem-set-top-img" />
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mt-1 mem-set-top-align">
+                                {% for photo in photos %}
+                                <div class="col-4 mem-set-img">
+                                    <img src="{{photo.image.url}}" class="img-fluid  mem-set-img-s" />
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- End image group -->
+                    </div>
+                    <div class="col">
+                        <!-- Add or Remove picture -->
+                        <div>
+                            <h2 class="h5 mem-setup-blu-f mt-3"> Add/Remove Pictures </h2>
+                        </div><br>
+                            <div class="row ">
+                                {% for photo in all_photos %}
+                                <div class="s-12 m-3 l-3 ">
+                                    <img src="{{ photo.image.url }}" class=" mem-set-img-addremove" >
+                                    <input type="hidden" value="{{photo.id}}" name="image_id" />
+                                    <nav aria-label="Page navigation example">
+                                        <div class="radio-toolbar add-or-btn">
+                                            <ul class="pagination justify-content-center">
+                                            <li class="ml-2"><a id="1_{{photo.id}}" class="{% if photo.position != 1 %}pos{%else%}img-btn{% endif %}"><label >1</label></a></li>
+                                            <li class="ml-2"><a id="2_{{photo.id}}" class="{% if photo.position != 2 %}pos{%else%}img-btn{% endif %}"><label >2</label></a></li>
+                                            <li class="ml-2"><a id="3_{{photo.id}}" class="{% if photo.position != 3 %}pos{%else%}img-btn{% endif %}"><label >3</label></a></li>
+                                            <li class="ml-2"><a id="4_{{photo.id}}" class="{% if photo.position != 4 %}pos{%else%}img-btn{% endif %}"><label >4</label></a></li>
+                                            </ul>
+                                            </div>
+                                      </nav>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="container">
+                                <form method="post" enctype="multipart/form-data"
+                                action="{% url 'hobo_user:upload-image' %}">
+                                        {% csrf_token %}
+                                <div class="row ">
+                                    <div class="col" class="choose-hgt" >
+                                        <label class="Choose-Location">Choose Location</label>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <div class="radio-toolbar">
+                                            <ul class="pagination ">
+                                                <li class="ml-2">
+                                                    <input type="radio" class="mem-page-link" id="radio1"
+                                                    value="1" name="position">
+                                                    <label for="radio1">1</label>
+                                                </li>
+                                                <li class="ml-2"><input type="radio" class="mem-page-link" id="radio2"
+                                                    value="2" name="position">
+                                                    <label for="radio2">2</label>
+                                                </li>
+                                                <li class="ml-2"><input type="radio" class="mem-page-link" id="radio3"
+                                                    value="3" name="position">
+                                                    <label for="radio3">3</label>
+                                                </li>
+                                                <li class="ml-2"><input type="radio" class="mem-page-link" id="radio4"
+                                                    value="4" name="position">
+                                                    <label for="radio4">4</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <label for="file" class="custom-file-upload ">
+                                            <span class="image-filename">Upload Photo(JPEG,PNG)</span></label>
+                                        <input type="file" id="file" name="image" class="inp-file">
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <input type="submit" class="btn btn-light  btn-sm font-clr font-weight-bold" value="save">
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                    <!-- End add or remove picture -->
+                    </div>
+                    <!-- end center row -->
+                </div>
+                <hr class="mem-set-acc-hr-1">
+                <div class="row">
+                    <!-- second row Network and friends -->
+                    <div class="container mt-4 ">
+                        <div class="card">
+                            <!-- dropdown bar -->
+                            <div class="row">
+                                <div class="col-md-4 col-sm-12">
+                                    <label class="net-or-friend float-left ml-2">Network / Friends </label>
+                                </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <div class="all-dropdown ml-1">
+                                        <select class="all-button dropdown-toggle" name="friends_groups" id="filter-friends">
+                                            <option value="all">All</option>
+                                            {% for obj in groups %}
+                                            <option value="{{obj.id}}">{{obj.title}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="button"
+                                        class="btn bg-transparent dropdown-toggle new-grp-button"
+                                        data-toggle="modal" data-target="#newgroupmodal">
+                                            Groups
+                                        </button>
+                                        <!-- The Modal -->
+                                        <div class="modal fade modal-font" id="newgroupmodal" tabindex="-1" role="dialog"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                  <h5 class="modal-title" id="exampleModalLabel">Add Groups</h5>
+                                                  <button type="button" class="close " data-dismiss="modal" aria-label="Close"
+                                                  id="close-friend-group-modal">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <span class="friend-group">
+                                                    {% for group in groups %}
+                                                    <div class="row ">
+                                                        <div class="col">
+                                                            <label class="modal-font">{{group}}</label>
+                                                        </div>
+                                                        <div class="col">
+                                                            <a class="modal-tag float-left remove-friend-group cursor-pointer"
+                                                            id="{{group.id}}">Remove</a>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </span>
+                                                    <hr class="mt-1">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <label class="modal-font">New group: </label>
+                                                            <input class="inp-interest pl-2" name="group_name"
+                                                            id="group_name" autocomplete="off"/>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <a class="modal-tag float-left cursor-pointer"
+                                                            id="save-group">Save</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                  <button type="button" class="btn btn-secondary btn-sm"
+                                                  id="close-friend-group-modal"
+                                                  data-dismiss="modal">Close</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        <!-- end of modal -->
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-12">
+                                    <!-- drop-down-friend request -->
+                                    <div class="dropdown keep-inside-clicks-open ">
+                                        <button type="button" class="btn  bg-transparent  dropdown-toggle  net-drop-btn font-weight-bold " data-toggle="dropdown" data-flip="false">
+                                            ({{friend_request_count}})Friend Requests
+                                        </button>
+                                        <!-- <div class="dropdown-menu border border-dark "> -->
+                                            <ul class=" dropdown-menu border border-dark item-flow">
+                                                <li class="ml-4 mb-4">
+                                                    {{friend_request_count}} Friend Requests
+                                                </li>
+                                                {% for request in friend_request%}
+                                                <li class="ml-2 mb-3">
+                                                    <div class="net-friend-req" >
+                                                        <div class="net-friend-req-img">
+                                                            {% if request.requested_by.get_profile_photo %}
+                                                            <img src="{{ request.requested_by.get_profile_photo }}" class="rounded-circle-img">
+                                                            {% else %}
+                                                            <img src="{% static 'images/default_profile_pic.png' %}" class="rounded-circle-img">
+                                                            {% endif %}
+                                                        </div>
+                                                        <div>
+                                                                <p class="net-friend-req-name " id="friend-request-{{request.requested_by.id}}">{{request.requested_by.get_full_name}}</p>
+                                                                <div class="net-friend-req-pro">
+                                                                    <span  class="pro-font net-friend-req-name-pro">{{request.requested_by.get_membership_display}}</span>
+                                                                    <span class="net-friend-req-name-btn " id="btns-{{request.requested_by.id}}">
+                                                                        <a class="btn btn-primary btn-sm drop-btn-1 rounded-0 accept_friend_request"
+                                                                        id="{{request.requested_by.id}}">Confirm</a>
+                                                                        <a class="btn btn-light btn-sm drop-btn ml-2 delete_friend_request"
+                                                                        id="{{request.requested_by.id}}">Delete</a>
+                                                                    </span>
+                                                                </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        <!-- </div> -->
+                                    </div>
+                                    <!-- drop-down-friend request End -->
+
+                                </div>
+                            </div>
+                            <!-- end dropdown bar     -->
+
+                            <div class="container mb-1">
+                                <div class="card border border-dark img-grp-flow">
+                                    <div class="ml-2 mt-2 mb-2 friend-list">
+
+                                        {% for friend in all_friends %}
+                                        {% if forloop.first or forloop.counter0|divisibleby:5 %}
+                                        <div class="row ">
+                                        {% endif %}
+                                            <div class="s-12 m-3 l-3  img-group">
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-12">
+                                                        <a href="{{friend.get_profile_url}}">
+                                                        {% if friend.get_profile_photo %}
+                                                        <img src="{{friend.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                        {% else %}
+                                                        <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                                                        {% endif %}
+                                                    </a>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                            <span >
+                                                                <lable class="name-alg" >{{friend.get_full_name|truncatechars:"18"}}</lable>
+                                                            </span>
+                                                            <span class="symbols user-group">
+                                                                <a class="net-user" data-toggle="modal" data-target="#unfriend-{{friend.id}}"
+                                                                title="Unfriend">
+                                                                    <i class="fa fa-user-times " aria-hidden="true"></i>
+                                                                </a>
+                                                                <a class="net-user-grp" data-toggle="modal"
+                                                                data-target="#add-to-group-{{friend.id}}" title="Group">
+                                                                <i class="fa fa-users" aria-hidden="true"></i>
+                                                                </a>
+                                                            </span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                            <span class="fa fa-star checked "></span>
+                                                            <span class="fa fa-star checked "></span>
+                                                            <span class="fa fa-star checked"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                            <span class="fa fa-star-o"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        {% if forloop.last or forloop.counter|divisibleby:5 %}
+                                        </div>
+                                        {% endif %}
+                                         <!-- modal -->
+                                         <div class="modal fade modal-font" id="add-to-group-{{friend.id}}" tabindex="-1" role="dialog"
+                                         aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+                                              <div class="modal-content modal-width">
+                                                <div class="modal-header">
+                                                  <h5 class="modal-title" id="exampleModalLongTitle">Groups</h5>
+                                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    {% get_groups friend as friend_groups %}
+                                                    {% if groups %}
+                                                    {% for group in groups %}
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="group_{{friend.id}}"
+                                                        class="group" value="{{group.id}}"
+                                                        {% if group in friend_groups %} checked {% endif %}>
+                                                        <label class="" for="{{group}}">{{group}}</label>
+                                                    </div>
+                                                    {% endfor %}
+                                                    {% else %}
+                                                    <div class="form-check">
+                                                    <p>No groups available.</p>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    {% if groups %}
+                                                  <button type="button" class="btn btn-primary btn-sm modal-btn add-friend-to-groups"
+                                                  data-dismiss="modal" id="{{friend.id}}">Save</button>
+                                                  <button type="button" class="btn btn-secondary btn-sm modal-btn close-add-togroup-modal"
+                                                  data-dismiss="modal">Cancel</button>
+                                                  {% else %}
+                                                  <button type="button" class="btn btn-secondary btn-sm modal-btn "
+                                                  data-dismiss="modal">Cancel</button>
+                                                  {% endif %}
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                        <!-- end of modal  -->
+                                        <!-- The Modal -->
+                                        <div class="modal fade" id="unfriend-{{friend.id}}">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+
+                                                    <!-- Modal Header -->
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title mem-setup-blu-f">Unfriend {{friend.get_full_name}}!!!</h5>
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    </div>
+
+                                                    <!-- Modal body -->
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                            <p>Do you want to unfriend {{friend.get_full_name}}?</p>
+                                                            <input type ="hidden" name="unfriend-user-name"
+                                                            id="unfriend-user-name" value ="{{friend.get_full_name}}" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Modal footer -->
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm unfriend-user"
+                                                            data-dismiss="modal" id="{{friend.id}}">Unfriend</button>
+                                                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                                            data-dismiss="modal" >Close</button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end of modal -->
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                                <div class="step-links text-center mt-1">
+                                    {% if all_friends.has_previous %}
+                                        <a href="?page1={{ all_friends.previous_page_number }}" class="page-nav">
+                                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                    <span class="current current-page">
+                                        {{ all_friends.number }}/{{ all_friends.paginator.num_pages }}
+                                    </span>
+                                    {% if all_friends.has_next %}
+                                        <a href="?page1={{ all_friends.next_page_number }}" class="page-nav">
+                                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                        </a>
+                                    {% endif %}
+                                    </div>
+                            </div>
+                    
+                        </div>
+                <hr class="mem-set-acc-hr-1">
+                <!-- Tracking and trackers -->
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="net-set-tracker-sec mt-5 mb-4">
+                            <div class="mb-1 float-left"><a href="#" class="mem-setup-orng-f">({{tracking_list_count}})Tracking</a></div>
+                            <div class="float-right"><a href="#" class="mem-setup-blu-f">({{trackers_list_count}})Trackers</a></div>
+                            <hr class="mem-setup-network-hr">
+                            <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list_count}})</div>
+                            <div class="row pl-3 pr-3">
+                                {% for obj in tracking_list|slice:"5" %}
+                                <div class="col-2 mem-set-img">
+                                    <a href="{{obj.user.get_profile_url}}">
+                                    {% if obj.user.get_profile_photo %}
+                                    <img src="{{ obj.user.get_profile_photo}}" title="{{obj.user.get_full_name}}"
+                                    class="img-fluid mem-set-img-track-sec2">
+                                    {% else %}
+                                    <img src="{% static 'images/default_profile_pic.png' %}" title="{{obj.user.get_full_name}}"
+                                    class="img-fluid mem-set-img-track-sec2">
+                                    {% endif %}
+                                    </a>
+                                    <div class="mem-set-img-track-nam">{{obj.user.get_full_name|truncatechars:"5" }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
+                            <div class="row">
+                                <div class="col-4 ">
+                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Dynamo</span>
+                                    </div>
+                                </div>
+                                <div class="col-4 mem-set-track-padding-sec2">
+                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#56</span>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Jack</span>
+                                    </div>
+                                </div>
+                                <div class="col-4 mem-set-track-padding-sec2 pl-0">
+                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#457</span>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Hammer</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#3</span></div>
+                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">Dallas</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 mem-set-track-padding">
+                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#178</span>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#1</span></div>
+                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
+                                            York</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Tracking and Trackers img-->
+                    <div class="col">
+                        <div class="container mt-5 ">
+                            <div class="card">
+                                    <div class="row mb-1 mt-1" id="trackandtracking">
+                                        <div class="col">
+                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu1');" >(11)Tracking </a>
+                                        </div>
+                                        <div class="col">
+                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu2');">(7)Trackers</a>
+                                        </div>
+                                    </div>
+                                <!-- end dropdown bar     -->
+
+                                <div class="container mb-2">
+                                    <!-- Tracking div  -->
+                                    <div class="card border border-dark img-grp-flow-tracker" id="Menu1">
+                                        <div class="ml-2 mt-2 mb-2">
+                                            <!-- Tracking  first row -->
+                                            {% for obj in tracking_list %}
+                                            {% if forloop.first or forloop.counter0|divisibleby:5 %}
+                                            <div class="row ">
+                                            {% endif %}
+
+                                                <div class="s-12 m-3 l-3 ">
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-sm-12">
+                                                            {% if obj.get_profile_photo %}
+                                                            <img src="{{obj.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            {% else %}
+                                                            <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                                                            {% endif %}
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                                <span>
+                                                                    <lable class="name-alg">{{obj.user.get_full_name|truncatechars:"18"}}</lable> 
+                                                                </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            {% if forloop.last or forloop.counter|divisibleby:5 %}
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                            <!-- Tracking  first row End-->
+                                        </div>
+                                    </div>
+
+                                    <!-- Tracking div end  -->
+                                    <div class="card border border-dark img-grp-flow-tracker" id="Menu2" style="display: none;">
+                                        <div class="ml-2 mt-2 mb-2">
+                                            <!-- Trackers first row -->
+                                            {% for obj in trackers_list %}
+                                            {% if forloop.first or forloop.counter0|divisibleby:5 %}
+                                            <div class="row ">
+                                            {% endif %}
+                                                <div class="s-12 m-3 l-3 ">
+                                                    <div class="row">
+                                                        <div class="col-md-6 col-sm-12">
+                                                            {% if obj.get_profile_photo %}
+                                                            <img src="{{obj.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            {% else %}
+                                                            <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                                <span>
+                                                                    <lable class="name-alg">{{obj.get_full_name|truncatechars:"18"}}</lable>
+                                                                </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% if forloop.last or forloop.counter|divisibleby:5 %}
+                                            </div>
+                                            {% endif %}
+                                            {% endfor %}
+                                            <!-- Trackers First row End-->
+                                        </div>
+                                    </div>
+                                    <div class="step-links text-center menu1-pagination">
+                                        {% if tracking_list.has_previous %}
+                                            <a href="?page1={{ tracking_list.previous_page_number }}&tracking=true" class="page-nav">
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                        <span class="current current-page">
+                                            {{ tracking_list.number }}/{{ tracking_list.paginator.num_pages }}
+                                        </span>
+                                        {% if tracking_list.has_next %}
+                                            <a href="?page1={{ tracking_list.next_page_number }}&tracking=true" class="page-nav">
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="step-links text-center menu2-pagination" style="display:none;">
+                                        {% if trackers_list.has_previous %}
+                                            <a href="?page1={{ trackers_list.previous_page_number }}&trackers=true" class="page-nav">
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                        <span class="current current-page">
+                                            {{ trackers_list.number }}/{{ trackers_list.paginator.num_pages }}
+                                        </span>
+                                        {% if trackers_list.has_next %}
+                                            <a href="?page1={{ trackers_list.next_page_number }}&trackers=true" class="page-nav">
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                    <!-- Tracking and Trackers img End -->
+                    </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- End Tracking and trackers -->
+                    <hr class="mem-set-acc-hr-1">
+                    <div class="row">
+                        
+                        <!-- My Interest Row -->
+                        <div class="col mt-3 ">
+                            <label class="my-interest">My Interests :<span class="intrest-lab-tit"> feature lets you set a
+                                    search and notification for a desirable positions in sertain locations when it gets
+                                    created.</span></label>
+                                    <hr class="mt-1 hr-int-line">
+                        </div>
+                        
+                        <div class="container font-weight-bold interest-font">
+                            <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
+                                {% csrf_token %}
+                            <span class="my-interests-section">
+                            <div class="row intrest-input ">
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Position:</label>
+                                    <select class="inp-interest" id="position_1"
+                                    name="position" required>
+                                        {% for position in my_interest_form.position %}
+                                            {{position}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Format:</label>
+                                    <select class="inp-interest format-space"
+                                    name="format" id = "format_1" required>
+                                        {% for item in my_interest_form.format %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Location:</label>
+                                    <select class="inp-interest" id ="location_1"
+                                    name="location" required >
+                                        {% for item in my_interest_form.location %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Budget:</label>
+                                    <select class="inp-interest format-space"
+                                    name="budget" id ="budget_1" required >
+                                        {% for item in my_interest_form.budget %}
+                                        {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Gender:</label>
+                                    <select class="inp-interest format-space"
+                                    name="gender" id ="gender"  >
+                                        {% for item in my_interest_form.gender %}
+                                            {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12">
+                                    <label class="intrest-lab">Age:</label>
+                                    <select class="inp-interest format-space"
+                                    name="age" id ="age"  >
+                                        {% for item in my_interest_form.age %}
+                                            {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                           </div>
+                           </span>
+                            <div class="row mt-2">
+                                <div class="col-md-6 col-sm-4">
+                                    <a class="btn btn-light btn-sm btn rounded-0 border border-dark font-weight-bold ad-or-save"
+                                        id="add-more-interests">Add
+                                        More</a>
+                                    <input type="submit" class="btn btn-light btn-sm  btn rounded-0 border border-dark font-weight-bold ad-or-save font-clr" value="save">
+
+                                </div>
+                            </div>
+                            </form>
+                            <div class="row mt-2">
+                                <div class="col-md-12 col-sm-4">
+                                    <span class="intrest-lab-md">
+                                        <label>
+                                        When someone post a project meeting your criteria you will
+                                        get a notification so you can apply for the position.
+                                    </label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <!-- Table -->
+                        <div class="card ml-3 mr-3">
+                            <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
+                            <table class="table mem-table table-responsive-sm">
+                                <colgroup>
+                                    <col span="1" style="width: 15%;">
+                                    <col span="1" style="width: 10%;">
+                                    <col span="1" style="width: 35%;">
+                                    <col span="1" style="width: 20%;">
+                                    <col span="1" style="width: 5%;">
+                                    <!-- <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 6%;"> -->
+                                    <col span="1" style="width: 10%;">
+                                 </colgroup>
+                            {% for obj in myinterests %}
+                                <tr class="interest-font my-interest-table-th" >
+                                    <th>Position: <u>{{obj.position}}</u> </th>
+                                    <th>Format: <u>{% if obj.format == 'SCH' %}Scene {% elif obj.format == 'SHO'  %}Short Film {% elif obj.format == 'PIL'  %}Pilot{% elif obj.format == 'FTR'  %}Feature{% endif %}    </u> </th>
+                                    <th>Location: <u>{{obj.location}}</u></th>
+                                    <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                                {% get_dict_value_if_exists user_jobs_dict obj.id as job_list %}
+                                {% if job_list %}
+                                    {% for job in job_list  %}
+                                        {% if job.cast %}
+                                            <tr>
+                                                    <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.cast.project.id %}">Project # {{ job.cast.project.id }}</a></td>
+                                                    <td>Title:  {{ job.cast.project.title }} </td>
+                                                    <td>Character:  {{ job.cast.name }} </td>
+                                                    <td>Posted on {{ job.cast.created_time }}</td>
+                                                    {% if job.cast_application %}
+                                                        <td
+                                                        {% if job.cast_application.audition_status == 'applied' %}class="int-applied"
+                                                        {% elif job.cast_application.audition_status == 'attached' %}class="int-green"
+                                                        {% elif job.cast_application.audition_status == 'passed' %}class="int-red"
+                                                        {% endif %}>{{job.cast_application.audition_status}}</td>
+                                                        <td class="int-red">(on {{job.cast_application.status_update_date}})</td>
+                                                    {% else %}
+                                                        <td></td>
+                                                        <td></td>
+                                                    {% endif %}
+                                            </tr>
+                                        {% elif job.crew %}
+                                            <tr>
+                                                <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.crew.project.id %}">Project # {{ job.crew.project.id }}</a></td>
+                                                <td>Title:  {{ job.crew.project.title }} </td>
+                                                <td></td>
+                                                <td>Posted on {{ job.crew.created_time }}</td>
+                                                {% if job.crew_application %}
+                                                    <td
+                                                    {% if job.crew_application.application_status == 'applied' %}class="int-applied"
+                                                    {% elif job.crew_application.application_status == 'attached' %}class="int-green"
+                                                    {% elif job.crew_application.application_status == 'passed' %}class="int-red"
+                                                    {% endif %}>{{job.crew_application.application_status}}</td>
+                                                    <td class="int-red">(on {{job.crew_application.status_update_date}})</td>
+                                                {% else %}
+                                                    <td></td>
+                                                    <td></td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                                <!-- The Modal -->
+                                <div class="modal fade" id="edit-{{obj.id}}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <!-- Modal Header -->
+                                            <div class="modal-header">
+                                                <h5 class="modal-title mem-setup-blu-f">Edit My Interests </h5>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <!-- Modal body -->
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="row ">
+                                                            <div class="col-12">
+                                                            <div class="row mb-2">
+                                                                <div class="offset-1 col-3">
+                                                                    <label class="intrest-lab">Position:</label>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <select class="inp-interest-2" id="position_{{obj.id}}"
+                                                                    name="position" required>
+                                                                        {% for position in positions %}
+                                                                             <option value="{{position.id}}"
+                                                                             {% if obj.position.id == position.id %} selected {% endif %}>
+                                                                             {{position}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Format:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="format" id = "format_{{obj.id}}" required>
+                                                                            {% for item in format %}
+                                                                                <option value="{{item.0}}"
+                                                                                    {% if obj.format == item.0 %} selected {% endif %}>
+                                                                                    {{item.1}}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Budget:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        name="budget" id ="budget_{{obj.id}}" required >
+                                                                        {% for item in budget %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.budget == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Location:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 modal-location "
+                                                                        id ="location_{{obj.id}}"
+                                                                        name="location" required >
+                                                                        {% for location in locations %}
+                                                                                <option value="{{location.id}}"
+                                                                                {% if obj.location.id == location.id %} selected {% endif %}>
+                                                                                {{location}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Gender:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2"
+                                                                        id ="gender_{{obj.id}}"
+                                                                        name="gender" required >
+                                                                        <option value="">---</option>
+                                                                        {% for item in gender %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.gender == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Age:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        id ="age_{{obj.id}}"
+                                                                        name="age" required >
+                                                                        <option value="">---</option>
+                                                                        {% for item in age %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.age == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                       </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal footer -->
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm edit-my-interest"
+                                                    id="{{obj.id}}">Save</button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                                    data-dismiss="modal" >Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end of modal -->
+                            {% endfor %}
+                        </table>
+
+                        </div>
+                        <!-- End My Interest Row -->
+                    </div>
+                    <hr class="mem-set-acc-hr-1">
+                    <div class="row">
+                        <hr class="mem-set-acc-hr-1">
+                        <!-- Add your post -->
+                        <div class="container mt-5">
+                            <div class="card mb-12 collapse-dropdwn">
+                                <div class="row ml-2 mr-2">
+                                    <div class="col-md-8 col-sm-12  mt-3 mb-2">
+                                        <button type="button" class="btn  text-secondary border btn-block" id="msg-drop"
+                                            class="inp-file" data-toggle="collapse" data-target="#post-ur-mind" >What’s on Your Mind</button>
+                                        <div class="collapse multi-collapse" id="post-ur-mind">
+                                            <div class="card card-body collapse-card mt-4">
+                                                <button type="button" class="close" aria-label="Close" data-target="#post-ur-mind" data-toggle="collapse">
+                                                    <span class="float-right" aria-hidden="true">&times;</span>
+                                                </button>
+                                                <div class="row mb-4">
+                                                    <div class="col-md-2 col-sm-2 dropdwn-img" >
+                                                        <img src="static/img/img1.PNG" class="rounded-circle-img">
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-3">
+                                                        <span>Name Name</span>
+                                                        <hr class="post-hr">
+                                                        <span> This post is for:
+                                                            <select class="all-button dropdown-toggle" name="All" id="all-button">
+                                                                <option disabled selected hidden>Groups All</option>
+                                                                <option value="saab">Editor</option>
+                                                                <option value="opel">Actress</option>
+                                                                <option value="audi">Director</option>
+                                                            </select>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <textarea class="form-control dropdwn-txt" id="exampleFormControlTextarea1" rows="4"
+                                                        placeholder="Write your post here"></textarea>
+                                                </div>
+                                                <div class="col-md-6 col-sm ">
+                                                    <label for="file-upload" class=" inp-file-msg"
+                                                        >Add to your post <i
+                                                            class="fa fa-picture-o dropdwn-file-img" aria-hidden="true"></i> <button
+                                                            class="emoji-btn btn-light" id="emoji-button"><i
+                                                                class="fa fa-smile-o"
+                                                                aria-hidden="true"></i></button></label>
+                                                    <input type="file" id="file-upload" class="inp-file">
+    
+                                                </div>
+                                                <div class="col-md-6 col-sm mt-2">
+                                                    <input type="button" class="btn btn-post-mind" value="Post">
+                                                </div>        
+                                            </div>
+                                         </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 float-right mt-3 mb-1  ">
+                                        <!-- <input class="form-control text-center " name="myBrowser" placeholder="Messenger" /> -->
+                                        <button type="button" class="btn  text-secondary border btn-block" >Messenger</button>
+                                    </div>
+                                </div>
+                             </div>
+
+                        </div>
+                        
+                        <!-- End Add your post -->
+                    </div>
+                </div>
+
+            <!-- End screen row -->
+            </div>
+        </div>
+    </div>       
+</div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+
+    $(document).ready(function() {
+        // $('#location_1').select2();
+        // $('.modal-location').select2();
+
+        var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+            return false;
+        };
+        var trackers = getUrlParameter('trackers');
+        var tracking = getUrlParameter('tracking');
+        if(tracking == 'true'){
+            toggleVisibility("Menu1");
+        }
+        if(trackers == 'true'){
+            toggleVisibility("Menu2");
+        }
+    });
+
+// add more - my interests
+var count=1;
+$('body').on('click' , '#add-more-interests', function(){
+    count++
+    var location_id ="#location_"+count
+    var position_id ="#position_"+count
+    var format_id ="#format_"+count
+    var data_dict = {}
+    data_dict = {'count':count, 'form':'form2'}
+    // get add coworker form
+    $.get('/hobo_user/add-user-interest-form/',data_dict)
+    .done(function(data) {
+    if(data.results!='')
+        {
+            $('.my-interests-section').append(data['add_my_interests_form_html']);
+            $(location_id).select2();
+            // $(position_id).select2();
+            // $(format_id).select2();
+        }
+    });
+});
+</script>
+<script>
+        $("input[id='file']").change(function (e) {
+            var $this = $(this);
+            console.log($this.val().split('\\').pop())
+            $(".image-filename").html($this.val().split('\\').pop());
+        });
+    </script>
+
+<script>
+    $('body').on('click' , '.pos', function(){
+        var id = $(this).attr('id');
+        position=id.split("_")[0]
+        image_id=id.split("_")[1]
+        data_dict = {"id":image_id, "position":position}
+        console.log(data_dict)
+        $.get('/hobo_user/swap-image-position/', data_dict)
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            location.reload();
+                        }
+                });
+    });
+</script>
+<script>
+    $('body').on('click' , '#save-group', function(){
+        var token = $("#token").val();
+        data_dict = {}
+        var group_name = $("#group_name").val();
+        if(group_name){
+            data_dict['title'] = group_name
+        }
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/add-group-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                $.get('/hobo_user/update-friend-groups/')
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            $("#group_name").val("");
+                            $('.friend-group').html(" ")
+                            $('.friend-group').html(data['groups_html']);
+                        }
+                });
+            }
+        });
+    });
+</script>
+<script>
+    $('body').on('click' , '.edit-my-interest', function(){
+        id = $(this).attr('id');
+        var token = $("#token").val();
+        data_dict = {}
+        var position_id = "#position_"+id
+        var format_id = "#format_"+id
+        var budget_id = "#budget_"+id
+        var location_id = "#location_"+id
+        var gender_id = "#gender_"+id
+        var age_id = "#age_"+id
+        var position = $(position_id).val();
+        var format = $(format_id).val();
+        var budget = $(budget_id).val();
+        var location = $(location_id).val();
+        var gender = $(gender_id).val();
+        var age = $(age_id).val();
+
+        data_dict['id'] = id
+        if(position){
+            data_dict['position'] = position
+        }
+        if(format){
+            data_dict['format'] = format
+        }
+        if(budget){
+            data_dict['budget'] = budget
+        }
+        if(location){
+            data_dict['location'] = location
+        }
+        if(gender){
+            data_dict['gender'] = gender
+        }
+        if(age){
+            data_dict['age'] = age
+        }
+        console.log(data_dict)
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/edit-user-interest-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+    });
+</script>
+<script>
+    $('body').on('click' , '.add-friend-to-groups', function(){
+        var friend = $(this).attr('id');
+        var token = $("#token").val();
+        var data_dict = {}
+        var groups = [];
+            $.each($("input[name='group_"+friend+"']:checked"), function(){
+                groups.push($(this).val());
+            });
+        if(friend){
+            data_dict['friend'] = friend
+        }
+        if(groups){
+            data_dict['groups'] = groups
+        }
+        console.log(data_dict)
+        $.ajaxSetup({traditional: true});
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/add-friend-to-group-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            error: function(data){
+                console.log(data);
+                $('#warning_message').fadeIn().html("Failed to update groups");
+                setTimeout(function() {$('#warning_message').fadeOut("slow");}, 2000 );
+            },
+            success: function (response){
+                $('#success_message').fadeIn().html("Groups Updated");
+                setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+            }
+        });
+    });
+</script>
+<script>
+    $('body').on('change' , '#filter-friends', function(){
+        var group = $(this).find("option:selected").val();
+        data_dict = {'group':group}
+        $.get('/hobo_user/filter-friend-by-groups/', data_dict)
+        .done(function(data) {
+            if(data.results!='')
+                {
+                    $('.friend-list').html(" ")
+                    $('.friend-list').html(data['friends_html']);
+                }
+        });
+    });
+</script>
+<script>
+    $('body').on('click' , '.remove-friend-group', function(){
+        var group = $(this).attr('id');
+        var token = $("#token").val();
+        var data_dict = {}
+        if(group){
+            data_dict['group'] = group
+        }
+        $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/remove-friend-group-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            error: function(data){
+                $('#warning_message').fadeIn().html("Failed to remove group");
+                setTimeout(function() {$('#warning_message').fadeOut("slow");}, 2000 );
+            },
+            success: function (response){
+                $.get('/hobo_user/update-friend-groups/')
+                .done(function(data) {
+                    if(data.results!='')
+                        {
+                            $('.friend-group').html(" ")
+                            $('.friend-group').html(data['groups_html']);
+                        }
+                });
+            }
+        });
+    });
+    $('body').on('click' , '#close-friend-group-modal', function(){
+        window.location.reload();
+    });
+</script>
+<script>
+    // unfriend a user
+$('body').on('click' , '.unfriend-user', function(){
+    var token = $("#token").val();
+    var profile_user = $(this).attr('id');
+    var data_dict = {}
+    if(profile_user){
+        data_dict['user'] = profile_user;
+    }
+    console.log(data_dict)
+    $.ajax
+        ({
+            type: "POST",
+            url: "/hobo_user/unfriend-user-api/",
+            dataType: 'json',
+            async: false,
+            data: data_dict,
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", token);
+            },
+            success: function (response){
+                window.location.reload();
+            }
+        });
+});
+
+</script>
+<script>
+$('body').on('click' , '.close-add-togroup-modal', function(){
+    window.location.reload();
+});
+</script>
+ <script>
+    var divs = ["Menu1", "Menu2"];
+    var visibleDivId = null;
+    function toggleVisibility(divId) {
+    if(visibleDivId === divId) {
+        //visibleDivId = null;
+    } else {
+        visibleDivId = divId;
+    }
+    if(divId=="Menu1") {
+        $(".menu1-pagination").show();
+        $(".menu2-pagination").hide();
+    }else{
+        $(".menu2-pagination").show();
+        $(".menu1-pagination").hide();
+    }
+    hideNonVisibleDivs();
+    }
+    function hideNonVisibleDivs() {
+    var i, divId, div;
+    for(i = 0; i < divs.length; i++) {
+        divId = divs[i];
+        div = document.getElementById(divId);
+        if(visibleDivId === divId) {
+        div.style.display = "block";
+        } else {
+        div.style.display = "none";
+        }
+    }
+    }
+
+</script>
+<script>
+ $(document).on('click.bs.dropdown.data-api', '.dropdown.keep-inside-clicks-open', function (e) {
+        e.stopPropagation();
+        });
+        jQuery("#trackandtracking .net-tracker-text").click(function(){
+        jQuery("#trackandtracking .net-tracker-text").removeClass('net-tracker-text-color');
+        jQuery(this).toggleClass('net-tracker-text-color'); 
+        });
+</script>
+{% endblock %}
+
+

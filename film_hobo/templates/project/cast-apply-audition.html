@@ -1,0 +1,494 @@
+{% extends 'base.html' %}
+{% load samr_display_tag %}
+{% load static %}
+{% block extracss %}
+<style>
+.select2-container--default .select2-selection--single
+    {
+        border-radius: 0!important;
+        border:none!important;
+        border-bottom:1px solid #000!important;
+    }
+.select2-container .select2-selection--single {
+    height:19px!important;
+    }
+.select2-container--default .select2-selection--single .select2-selection__rendered
+    {
+        line-height:19px;
+        background-color:#f3f3f3;
+        border-bottom:1px solid #000!important;
+        font-size:13px;
+        color:#000;
+    }
+.select2-container--default .select2-selection--single .select2-selection__arrow
+    {
+        height:15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg caa-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+                <div class="caa-center-section-align">
+                    <!-- project menu  -->
+
+                    <div class="sds-menu-bg">
+                        <div class="cta-menu-align">
+                            <ul class="sds-menu sds-menu-padding">
+                                <li><span class="video-menu-head">PROJECT </span>
+                                    <a href="{% url 'project:single-film-project' project.id %}" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                                <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
+                                <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
+                                <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
+                                <li><span>Location: </span><span class="sgl-menu-blue">{{project.location}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- project menu  End-->
+                    <!-- Audition menu  -->
+                    <div class="sds-menu-bg">
+                        <div class="cta-menu-align">
+                            <ul class="caa-side-setup-menu sds-menu-padding">
+                                <li><span class="caa-head-txt">AUDITION:</span><span class="video-menu-head"> {{character.name}}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Audition menu End -->
+                    <!-- Main section 1 -->
+
+                    <div class="caa-menu-bg">
+                        <!-- col 1 -->
+                        <div class="caa-sec-bg">
+                            <div class="caa-creator-align">
+                                <div>
+                                    <span class="sgl-black-txt">CREATOR: </span>
+                                    <span class="sgl-blue-txt"><a href="">{{project.creator.get_full_name}}</a></span>
+                                    <span>
+                                        <span class="caa-rate-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:{{project_creator_rating}}%;"></div>
+                                                  </div>
+                                            </div>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="sgl-black-txt">Cast Attachment: </span>
+                                    <span class="sgl-blue-txt">{{project.get_cast_attachment_display}}</span>
+                                </div>
+                                <div>
+                                    <span class="sgl-black-txt">Cast Pay Rate: </span>
+                                    <span class="sgl-blue-txt">{{project.get_cast_pay_rate_display}}</span>
+                                </div>
+                                <div>
+                                    <span class="sgl-black-txt">Cast SAMR: </span>
+                                    {% get_samr_display_value project.id as samr_data %}
+                                    <span class="sgl-black-txt">{{ samr_data.0 }}</span>
+                                    <span>
+                                        <span class="caa-rate-star">
+                                            <span class="fa {% if samr_data.1 >= 1 %}fa-star checked {% else %}fa-star-o{% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 2 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 3 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 4 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                            <span class="fa {% if samr_data.1 >= 5 %}fa-star checked {% else %}fa-star-o {% endif %}"></span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span class="">
+                                        <a class="video-menu-head cursor-pointer add_to_favorites favorites-btn remove-decoration"
+                                        id="{{project.id}}">Add to Favorites</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col-2   -->
+                        <div class="caa-sec-bg">
+                            <div class="caa-character-align">
+                                <div>
+                                    <span class="sgl-black-txt">Character Description / Info</span>
+                                </div>
+                                <div>
+                                    <div class="card caa-input-textarea">
+                                        <div class="caa-input-textarea-align">
+                                            <span>
+                                                {{character.description}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- col-3  -->
+                        <div class="caa-sec-bg">
+                            <div class="caa-audition-info-align"
+                            {% if samr_data.1 > logged_user_rating or request.user.membership not in samr_data.2 %}
+                            data-toggle="modal" data-target="#cannotapply"
+                            {% endif %}>
+                                <form  method="post"
+                                action="{% url 'project:cast-apply-audition' project.id %}"
+                                id="sidesform" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="character_id" value="{{character.id}}" />
+                                    <div>
+                                        <span class="sgl-black-txt">CAST AUDITION INFO & VIDEO</span>
+                                    </div>
+                                    <div class="cas-input-display-align">
+                                        <div class="caa-input-display mt-2">
+                                            <span class="caa-input-name">Name</span>
+                                            <span class="caa-input-align">
+                                                <input name="name" class="caa-input-field" autocomplete='off'
+                                                required></span>
+                                        </div>
+                                        <div class="caa-input-display mt-1">
+                                            <span class="caa-input-name">Agent:</span>
+                                            <span class="caa-input-align">
+                                                <input class="caa-input-field" name="agent_name" autocomplete='off'></span>
+                                        </div>
+                                        <div class="caa-input-display mt-1">
+                                            <span class="caa-input-name">Agent Email:</span>
+                                            <span class="caa-input-align">
+                                                <input class="caa-input-field" type="email" name="agent_email"
+                                                autocomplete='off'></span>
+                                        </div>
+                                        <div class="caa-input-display-loc-type mt-1">
+                                            <span>
+                                                <select class="caa-drop-down " name="location" id="location" required>
+                                                    <option value="" disabled selected hidden>Location</option>
+                                                    {% for item in locations %}
+                                                        <option value="{{item.id}}">{{item}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <select class="caa-drop-down " name="video_type" id="video_type" required>
+                                                    <option value="" disabled selected hidden>Video type</option>
+                                                    {% for item in video_types %}
+                                                        <option value="{{item.0}}">{{item.1}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </span>
+                                        </div>
+                                        <div class="caa-input-display-typeinfo">
+                                            <div class="cas-video-typ-info" title="Video url information">
+                                                This video must be confidential! Please use the "Unlisted" option for Youtube, or the "Private" and/or "Hide from Video" option for Vimeo. Only people with the link to your video will be able to watch it
+                                            </div>
+                                        </div>  
+                                        <div class="caa-input-display mt-1">
+                                            <span class="caa-input-name">Video Url:</span>
+                                            <span class="caa-input-align">
+                                                <input class="video_url caa-input-field" name='video_url' id='video_url'
+                                                autocomplete="off" required>
+                                            </span>
+                                        </div>
+                                        <div class="caa-input-display">
+                                            <div class="cas-video-url-info video_url_section" title="Video url information">
+                                                Video url information
+                                            </div>
+                                        </div>
+                                        <div class="caa-input-display mt-1">
+                                            <span class="caa-input-name">Cover Image:</span>
+                                            <span class="caa-input-align">
+                                                <input type="file" name="cover_image" accept="image/*"
+                                                class="caa-img-field" required/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="caa-submit-sec">
+                                        <span class="caa-submit-txt">Submit Video by: <span class="caa-date-span">{{project.last_date}}</span></span>
+                                        <span class="caa-upload-tag">
+                                            <a
+                                            {% if samr_data.1 <= logged_user_rating and request.user.membership in samr_data.2 %}
+                                            data-toggle="modal" data-target="#form_submission_modal"
+                                            {% endif %}
+                                            class="caa-upload-save-btn cursor-pointer">Submit</a>
+
+                                        </span>
+                                    </div>
+<!-- The Modal -->
+<div class="modal fade" id="form_submission_modal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Submit Audition</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <p>
+                        <span class="all-p-light">By FilmHobo Terms of Service you have agreed to, you acknowledge here that by applying to
+                        any Project on the website as a Cast, Filmmaker or Crew, you agree and irrevocably give
+                        permission to FilmHobo to use and display Your name, voice, performance, and likeness in
+                        such Project and/or Content created and being posted on the FilmHobo website, as well as the
+                        right to use Your Name, voice, performance, and likeness in FilmHobo marketing campaigns.
+                        (Terms of Service, Paragraph 6</span> <span class="all-p">“Representations and Warranties”</span>,
+                        <span class="all-p-light">Item (d)</span>
+                        <span class="all-p">“Your release for participation in Projects and Content created on the website”</span>
+                        <span class="all-p-light">).</span>
+                        <p class="alert-style">If you disagree with the statement above, please do not apply for any roles
+                        or positions on the FilmHobo website!</p>
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="offset-1 col-3 ">
+                    <span class="">
+                        <input type="checkbox" name="i_agree" required/> 
+                        <span class="all-p">I Agree</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <input type="submit" class='btn btn-outline-danger btn-sm cursor-pointer save_logline'
+        id='{{project.id}}' value="Submit"/>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+</form>
+
+<!-- The Modal -->
+<div class="modal fade" id="cannotapply">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Sorry, You cannot apply for this Project!!</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">Your Actor/Actress rating does not satisfy the cast SAMR. </p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main section 1  End-->
+                    <!-- Main section 2 -->
+
+                    <div class="caa-sides-scripts-sec mt-3">
+                        <div class="caa-side-script-align">
+                           <div>
+                               <div class="caa-side-script-txt-align" id="sidesandscripts">
+                                   <span class="caa-side-script-txt">
+                                       <!-- <a href="#?" class="caa-side-switch-tag" id="sides-tag" onclick="toggleVisibility('sides');">Sides</a>/<a href="#?" class="caa-side-switch-tag" id="script-tag" onclick="toggleVisibility('script');">script</a> -->
+                                       <a  class="caa-side-switch-tag" id="sides-tag" >Sides</a>
+                                    </span>
+                               </div>
+                               <div id="sides">
+                                {% if sides%}
+                                   <div class="caa-download-display mt-1">
+                                       <span>
+                                        <!-- {% if sides.scenes_combined %}
+                                           <a class="download_sides cursor-pointer" id="download_sides"
+                                           href="{{sides.scenes_combined.url}}">
+                                               Download</a>
+                                        {% endif %} -->
+                                        </span>
+                                        <span>
+                                            <!-- <a class="cursor-pointer" id="print_sides"
+                                            onclick="PrintElem('#printableArea')">Print</a>
+                                            <div id="editor"></div> -->
+                                        </span>
+                                   </div>
+                                   <div class="caa-script-sec-frame">
+                                   <div class="caa-script-sec-pdf-frame-inner">
+                                        {% if sides.scenes_combined %}
+                                        <iframe src="{{ sides.scenes_combined.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        <!-- {% if sides.scene_2_pdf %}
+                                        <iframe src="{{ sides.scene_2_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}
+                                        {% if sides.scene_3_pdf %}
+                                        <iframe src="{{ sides.scene_3_pdf.url}}" class="pdf-style" frameborder="0"></iframe>
+                                        {% endif %}-->
+                                    </div>
+                                    </div>
+                                {% endif %}
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+
+                    <!-- Main section 2  End-->
+
+                </div>
+
+                
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $(document).ready(function() {
+        $('#location').select2();
+    });
+</script>
+<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+<!-- <script src="https://printjs-4de6.kxcdn.com/print.min.css"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+<script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    // var doc = new jsPDF();
+    // var specialElementHandlers = {
+    //     '#editor': function (element, renderer) {
+    //         return true;
+    //     }
+    // };
+
+    // $('body').on('click' , '#download_sides', function(){
+    //     console.log("hsdakjd")
+    //     doc.fromHTML($('#printableArea').html(), 15, 15, {
+    //         'width': 170,
+    //             'elementHandlers': specialElementHandlers
+    //     });
+    //     doc.save('sides.pdf');
+    // });
+</script>
+<script type="text/javascript">
+
+    // function PrintElem(elem)
+    // {
+    //     var data = $(elem).html();
+    //     var mywindow = window.open('', 'new div', 'height=400,width=800');
+    //     mywindow.document.write('<html><head><title>Sides</title>');
+    //     mywindow.document.write('<h1>Sides</h1>');
+    //     mywindow.document.write('</head><body >');
+    //     mywindow.document.write(data);
+    //     mywindow.document.write('</body></html>');
+    //     mywindow.print();
+    //     mywindow.close();
+    //     return true;
+    // }
+
+</script>
+<script>
+
+    $('body').on('change' , '#video_type', function(){
+    var choice = $(this).find("option:selected").val();
+    if(choice=='vimeo'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append("<span>Eg:https://vimeo.com/123456789</span>");
+    }else if(choice=='youtube'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append("<span>Eg:https://www.youtube.com/watch?v=ZABcDEfgHIJK</span>");
+    }else if(choice=='facebook'){
+        $('.video_url_section').html("");
+        $('.video_url_section').append("<span>Eg:https://fb.watch/v/1kcFv1QXk/</span>");
+    }
+});
+</script>
+<script>
+    var divs = ["sides", "script"];
+    var visibleDivId = null;
+    function toggleVisibility(divId) {
+    if(visibleDivId === divId) {
+        //visibleDivId = null;
+    } else {
+        visibleDivId = divId;
+    }
+    hideNonVisibleDivs();
+    }
+    function hideNonVisibleDivs() {
+    var i, divId, div;
+    for(i = 0; i < divs.length; i++) {
+        divId = divs[i];
+        div = document.getElementById(divId);
+        if(visibleDivId === divId) {
+        div.style.display = "block";
+        } else {
+        div.style.display = "none";
+        }
+    }
+    }
+    $("#sides-tag").toggleClass('caa-side-switch-tag-active');
+    jQuery("#sidesandscripts .caa-side-switch-tag").click(function(){
+    jQuery("#sidesandscripts .caa-side-switch-tag").removeClass('caa-side-switch-tag-active');
+    jQuery(this).toggleClass('caa-side-switch-tag-active');
+    });
+
+</script>
+<script>
+    $('body').on('click' , '.add_to_favorites', function(){
+       var project_id = $(this).attr("id");
+       var token = $("#token").val();
+       data_dict = {};
+       data_dict['project']=project_id;
+       data_dict['character']= '{{ character.id }}';
+
+       $.ajax
+       ({
+           type: "POST",
+           url: "/project/add-to-favorites-api/",
+           dataType: 'json',
+           async: false,
+           data: data_dict,
+           beforeSend: function (xhr) {
+               xhr.setRequestHeader ("Authorization", token);
+           },
+           success: function(response){
+               console.log(response)
+               $('#success_message').fadeIn().html(response['message']);
+               setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+           }
+       });
+
+     });
+
+</script>
+{% endblock %}
+
+

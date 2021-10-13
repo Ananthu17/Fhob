@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 
 {% block extracss %}
 {% endblock %}
@@ -24,20 +24,18 @@
             <hr class="m-0 signup-border-hr">
             <div class="row mt-2">
                 <div class="col-4 d-flex justify-content-center">
-                    <a href="" class="btn btn-account">Indie</a>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
                     <a href="" class="btn btn-account">Pro</a>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
-                    <a href="" class="btn btn-account">Company</a>
                 </div>
             </div>
             <!-- Tab panes -->
             <div class="tab-content">
                 <div id="paymentplan" class="container tab-pane signup-form active">
                     <div class="row ml-4 mt-3">
-                        <div class="paymnt-hd ml-2">Select payment plan:</div>
+                        <div class="paymnt-hd ml-2">Select payment plan (If you're beta user this plan will be activated after the validity ends):</div>
                     </div>
                     <form action="." method='POST'>
                         <input type="hidden" name="email" value="{{ request.GET.email }}"/>
@@ -70,7 +68,7 @@
             </div>
             <div class="d-flex justify-content-center align-items-center mt-3 signup-footer">
                 <ul class="list-inline m-0">
-                    <li class="list-inline-item fb">Back</li>
+                    <!-- <li class="list-inline-item fb">Back</li> -->
                     <li class="list-inline-item">
                         <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
                     </li>
@@ -84,6 +82,7 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/payment_plan_indie.js' %}"></script>
 {% endblock %}
 
 

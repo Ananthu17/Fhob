@@ -2,26 +2,73 @@ from django.urls import path
 
 from rest_auth.views import LoginView
 
-
 from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CustomUserDetail, HomePage, ExtendedRegisterView, \
-                   ExtendedLoginView, ExtendedLogoutView, ChooseMembershipPage, \
-                   CustomUserSignupIndieView, CustomUserSignupCompany, \
+                   ExtendedLogoutView, \
+                   ChooseMembershipPage, CustomUserSignupIndieView, \
+                   CustomUserSignupCompany, \
                    ExtendedRegisterIndieView, SendEmailVerificationView, \
                    EmailVerificationStatusView, CustomUserSignupProView, \
                    ExtendedRegisterProView, SelectPaymentPlanIndieView, \
                    PaymentPlanAPI, SelectPaymentPlanProView, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
-                   SettingsView, CustomUserLogout, ExtendedRegisterCompanyView, \
+                   SettingsView, CustomUserLogout, \
+                   ExtendedRegisterCompanyView, PageSearchView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \
                    SelectPaymentPlanCompanyView, CompanyPaymentDetailsAPI, \
-                   ForgotPasswordAPI, PasswordResetConfirmView, SettingsAPI, \
+                   ForgotPasswordAPI, SettingsAPI, \
                    PasswordResetTemplateView, GetUnblockedMembersAPI, \
                    GetUnblockedMembersAjaxView, PersonalDetailsAPI, \
-                   PersonalDetailsView
+                   PersonalDetailsView, HowTo, \
+                   UserProfileAPI, UserProfileView, \
+                   AddCoworkerAPI, RemoveCoworkerAPI, \
+                   MemberProfileView, AddAgentManagerAPI, \
+                   AddNewAgentFormAjaxView, RemoveAgentManagerAPI, \
+                   FriendsAndFollowersView, TrackUserAPI, GetAgentManagerAPI, \
+                   GetSettingsAPI, EditAgentManagerAPI, EditCoworkerAPI, \
+                   UnTrackUserAPI, ChangePhotoPositionAPI, SwapImageAjaxView, \
+                   UploadImageView, UploadImageAPI, GetNotificationAPI, \
+                   GetTrackingNotificationAjaxView, \
+                   GetAllNotificationAjaxView, \
+                   ChangeNotificationStatusAPI, ProductionCompanyProfileView, \
+                   ProductionCompanyProfileAPI, EditProductionCompanyView, \
+                   AttachCoworkerAjaxView, AddUserInterestAjaxView, \
+                   AddUserInterestView, AddUserInterestAPI, \
+                   EditAgencyManagementCompanyView, CompanyClientAPI, \
+                   AgencyManagementCompanyProfileAPI, RemoveClientAPI, \
+                   AgencyManagementCompanyProfileView, SendFriendRequestAPI, \
+                   AcceptFriendRequestAPI, ListFriendRequestAPI, \
+                   ListAllFriendsAPI, DeleteFriendRequestAPI, \
+                   UnFriendUserAPI, \
+                   GetFriendRequestNotificationAjaxView, \
+                   CancelFriendRequestAPI, \
+                   GetFriendRequestAcceptNotificationAjaxView, \
+                   FeedbackAPIView, FeedbackWebView, \
+                   AddGroupAPI, RemoveFriendGroupAPI, \
+                   AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
+                   FilterFriendByGroupAjaxView, \
+                   ProjectAPIView, ProjectCreateAPIView, \
+                   ProjectUpdateAPIView, ProjectDeleteAPIView, \
+                   TeamAPIView, TeamCreateAPIView, TeamUpdateAPIView, \
+                   TeamDeleteAPIView, \
+                   GetProfileRatingNotificationAjaxView, \
+                   GetAllUsersAPI, EditUserInterestAPI, \
+                   VideoRatingView, ProjectView, \
+                   FindVideoRatingAPI, VideoListAPI, \
+                   CreateProjectView, EditProjectView, \
+                   ScreeningProjectDeatilView, \
+                   UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
+                   GetScreeningProjectInviteNotificationAjaxView, \
+                   AddBetaTesterCode, ListBetaTesterCode, \
+                   DeleteBetaTesterCode, \
+                   CheckBetaTesterCode, ProjectDateFilterAPI, \
+                   GetBetaTesterCodeId, HomeProjectAPIView, \
+                   HomeProjectDateFilterAPI, HomeProjectSearchView, \
+                   ProjectSearchView, ShowCase, ReportAProblemWebView
+
 
 app_name = "hobo_user"
 
@@ -73,10 +120,98 @@ urlpatterns = [
     path('personal-details-api/',
          PersonalDetailsAPI.as_view(),
          name='personal-details-api'),
-
+    path('profile-api/', UserProfileAPI.as_view(),
+         name='profile-api'),
+    path('production-company-profile-api/',
+         ProductionCompanyProfileAPI.as_view(),
+         name='production-company-profile-api'),
+    path('agency-management-company-profile-api/',
+         AgencyManagementCompanyProfileAPI.as_view(),
+         name='agency-management-company-profile-api'),
+    path('add-coworker-api/', AddCoworkerAPI.as_view(),
+         name='add-coworker-api'),
+    path('edit-coworker-api/', EditCoworkerAPI.as_view(),
+         name='edit-coworker-api'),
+    path('add-agent-manager-api/', AddAgentManagerAPI.as_view(),
+         name='add-agent-manager-api'),
+    path('remove-coworker-api/', RemoveCoworkerAPI.as_view(),
+         name='remove-coworker-api'),
+    path('remove-client-api/', RemoveClientAPI.as_view(),
+         name='remove-client-api'),
+    path('remove-agent-api/', RemoveAgentManagerAPI.as_view(),
+         name='remove-agent-api'),
+    path('track-user-api/', TrackUserAPI.as_view(),
+         name='track-user-api'),
+    path('untrack-user-api/', UnTrackUserAPI.as_view(),
+         name='untrack-user-api'),
+    path('get-agent-manager-api/', GetAgentManagerAPI.as_view(),
+         name='get-agent-manager-api'),
+    path('get-user-settings-api/', GetSettingsAPI.as_view(),
+         name='get-user-settings-api'),
+    path('edit-agent-manager-api/', EditAgentManagerAPI.as_view(),
+         name='edit-agent-manager-api'),
+    path('change-photo-position-api/', ChangePhotoPositionAPI.as_view(),
+         name='change-photo-position-api'),
+    path('upload-image-api/', UploadImageAPI.as_view(),
+         name='upload-image-api'),
+    path('get-notification-api/', GetNotificationAPI.as_view(),
+         name='get-notification-api'),
+    path('change-notification-status-api/',
+         ChangeNotificationStatusAPI.as_view(),
+         name='change-notification-status-api'),
+    path('add-user-interest-api/', AddUserInterestAPI.as_view(),
+         name='add-user-interest-api'),
+    path('edit-user-interest-api/', EditUserInterestAPI.as_view(),
+         name='edit-user-interest-api'),
+    path('company-client-api/', CompanyClientAPI.as_view(),
+         name='company-client-api'),
+    path('send-friend-request-api/', SendFriendRequestAPI.as_view(),
+         name='send-friend-request-api'),
+    path('accept-friend-request-api/', AcceptFriendRequestAPI.as_view(),
+         name='accept-friend-request-api'),
+    path('list-friend-requests-api/', ListFriendRequestAPI.as_view(),
+         name='list-friend-requests-api'),
+    path('list-all-friend-api/', ListAllFriendsAPI.as_view(),
+         name='list-all-friend-api'),
+    path('cancel-friend-request-api/', CancelFriendRequestAPI.as_view(),
+         name='cancel-friend-request-api'),
+    path('delete-friend-request-api/', DeleteFriendRequestAPI.as_view(),
+         name='delete-friend-request-api'),
+    path('unfriend-user-api/', UnFriendUserAPI.as_view(),
+         name='unfriend-user-api'),
+    path('add-group-api/', AddGroupAPI.as_view(),
+         name='add-group-api'),
+    path('add-friend-to-group-api/', AddFriendToGroupAPI.as_view(),
+         name='add-friend-to-group-api'),
+    path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
+         name='remove-friend-group-api'),
+    path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+    path('get-all-users-api/', GetAllUsersAPI.as_view(),
+         name='get-all-users-api'),
+    path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
+         name='add-beta-tester-code'),
+    path('list-beta-tester-code/', ListBetaTesterCode.as_view(),
+         name='list-beta-tester-code'),
+    path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
+         name='delete-beta-tester-code'),
+    path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
+         name='check-beta-tester-code'),
+    path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
+         name='get-beta-tester-code-id'),
 
     # web-view endpoints
+    path('how_to/', HowTo.as_view(), name='how_to'),
     path('user_home/', HomePage.as_view(), name='user_home'),
+    path('showcase/', ShowCase.as_view(), name='showcase'),
+    path('user_home/<int:id>/',
+         ScreeningProjectDeatilView.as_view(),
+         name='projects_detail'),
+    path('user_home/invite/',
+         ScreeningProjectDeatilInviteView.as_view(),
+         name='projects_detail_invite'),
+    path('user_home/project_invite/<int:id>/',
+         UserHomeProjectInvite.as_view(),
+         name='user_home_project_invite'),
     path('signup_hobo/', CustomUserSignupHobo.as_view(), name="signup_hobo"),
     path('signup_company/', CustomUserSignupCompany.as_view(),
          name="signup_company"),
@@ -114,5 +249,102 @@ urlpatterns = [
          name='get-unblocked-members'),
     path('personal-details/', PersonalDetailsView.as_view(),
          name='personal-details'),
+    path('edit-profile/', UserProfileView.as_view(),
+         name='edit-profile'),
+    path('edit-production-company-profile/',
+         EditProductionCompanyView.as_view(),
+         name='edit-production-company-profile'),
+    path('add-new-agent-form/', AddNewAgentFormAjaxView.as_view(),
+         name='add-new-agent-form'),
+    path('profile/<int:id>/', MemberProfileView.as_view(),
+         name='profile'),
+    path('production-company-profile/<int:id>/',
+         ProductionCompanyProfileView.as_view(),
+         name='production-company-profile'),
+    path('agency-management-company-profile/<int:id>/',
+         AgencyManagementCompanyProfileView.as_view(),
+         name='agency-management-company-profile'),
+    path('friends-and-followers/', FriendsAndFollowersView.as_view(),
+         name='friends-and-followers'),
+    path('swap-image-position/', SwapImageAjaxView.as_view(),
+         name='swap-image-position'),
+    path('upload-image/', UploadImageView.as_view(),
+         name='upload-image'),
+    path('get-tracking-notification-html/',
+         GetTrackingNotificationAjaxView.as_view(),
+         name='get-tracking-notification-html'),
+    path('get-friendrequest-notification-html/',
+         GetFriendRequestNotificationAjaxView.as_view(),
+         name='get-friendrequest-notification-html'),
+    path('get-friendrequest-accept-notification-html/',
+         GetFriendRequestAcceptNotificationAjaxView.as_view(),
+         name='get-friendrequest-accept-notification-html'),
+    path('get-all-notification-html/', GetAllNotificationAjaxView.as_view(),
+         name='get-all-notification-html'),
+    path('attach-coworker/', AttachCoworkerAjaxView.as_view(),
+         name='attach-coworker'),
+    path('add-user-interest-form/', AddUserInterestAjaxView.as_view(),
+         name='add-user-interest-form'),
+    path('add-user-interest/', AddUserInterestView.as_view(),
+         name='add-user-interest'),
+    path('edit-agency-management-company-profile/',
+         EditAgencyManagementCompanyView.as_view(),
+         name='edit-agency-management-company-profile'),
+    path('update-friend-groups/',
+         UpdateFriendGroupAjaxView.as_view(),
+         name='update-friend-groups'),
+    path('filter-friend-by-groups/', FilterFriendByGroupAjaxView.as_view(),
+         name='filter-friend-by-groups'),
+    path('feedback/',
+         FeedbackWebView.as_view(),
+         name='feedback-web'),
+    path('report-a-problem/',
+         ReportAProblemWebView.as_view(),
+         name='report-a-problem'),
 
+
+    path('projects/', ProjectAPIView.as_view(),
+         name='project-list'),
+    path('projects/create/', ProjectCreateAPIView.as_view(),
+         name='create-project'),
+    path('projects/delete/<id>', ProjectDeleteAPIView.as_view(),
+         name='delete-project'),
+    path('projects/update/<id>', ProjectUpdateAPIView.as_view(),
+         name='update-project'),
+    path('teams/', TeamAPIView.as_view(),
+         name='team-list'),
+    path('teams/create/', TeamCreateAPIView.as_view(),
+         name='create-team'),
+    path('teams/delete/<id>', TeamDeleteAPIView.as_view(),
+         name='delete-team'),
+    path('teams/update/<id>', TeamUpdateAPIView.as_view(),
+         name='delete-project'),
+    path('get-profile-rating-notification-html/',
+         GetProfileRatingNotificationAjaxView.as_view(),
+         name='get-profile-rating-notification-html'),
+    path('get-screeing-project-notification-html/',
+         GetScreeningProjectInviteNotificationAjaxView.as_view(),
+         name='get-screeing-project-notification-html'),
+    path('video/rate/',  VideoRatingView.as_view(),
+         name="videorate-api"),
+    path('video/find-rating/<id>', FindVideoRatingAPI.as_view(),
+         name="find-videorating"),
+    path('video/top-rated',  VideoListAPI.as_view(),
+         name="top-rated-videos"),
+    path('projectview/', ProjectView.as_view(),
+         name='projects'),
+    path('projectview/create/', CreateProjectView.as_view(),
+         name='new-project'),
+    path('projectview/update/<int:id>', EditProjectView.as_view(),
+         name='update-project'),
+    path('projects/search/',  ProjectSearchView.as_view(),
+         name="project-search"),
+    path('projects/date/', ProjectDateFilterAPI.as_view(),
+         name="date_filter"),
+    path('user_home-projects/date/', HomeProjectDateFilterAPI.as_view(),
+         name="user-date_filter"),
+    path('user_home-projects/search/',  HomeProjectSearchView.as_view(),
+         name="user-project-search"),
+    path('user_home-projects/', HomeProjectAPIView.as_view(),
+         name='user-project-list'),
 ]

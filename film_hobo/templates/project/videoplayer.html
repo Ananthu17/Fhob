@@ -1,0 +1,629 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% load user_account_tag %}
+{% load notification_tag %}
+{% load project_tracking_tag %}
+{% load comment_tag %}
+
+
+{% block extracss %}
+<style>
+    #player.vp-title
+    {
+        visibility:hidden!important;
+        display:none!important;
+    }
+
+    .vp-title-header
+    {
+    visibility:hidden!important;
+    display:none!important;
+    }
+</style>
+<!-- <link rel="stylesheet" href="{% static 'css/share.css' %}">
+<link rel="stylesheet" href="{% static 'css/email_invite.css' %}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"></link> -->
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+
+        <!-- Main Row  -->
+        <div class="row">
+
+            <!-- Left section -->
+
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                <div class="left-mode-sec p-2 text-center ">
+                    <div class="log-left-sec">
+                        <ul class="list-unstyled invite-list">
+                            <!-- <li class="mt-2"><a href="#" class="mem-blu-link log-fnt-weight">I<span
+                                        class="mem-small-f">NVITE</span></a></li> -->
+                            <li class="mt-1">
+
+                            {% get_project_tracking_list request.user project as is_tracking %}
+                            {% if is_tracking %}
+                                    <input type ="hidden" name="project_id" id="project_id" value ="{{project.id}}" />
+                                    <span class="track-btn">
+                                        <a class="mem-blu-link log-fnt-weight cursor-pointer un_track_project" id="{{project.title}}">T<span class="mem-small-f">RACKING</span></a>
+                                    </span>
+                            {% else %}
+                                            <input type ="hidden" name="project_id" id="project_id" value ="{{project.id}}" />
+                                            <span class="track-btn">
+                                                <a class="mem-blu-link log-fnt-weight cursor-pointer track_project" id="{{project.title}}">T<span class="mem-small-f">RACK</span></a>
+                                            </span>
+                            {% endif %}
+                        </li>
+
+
+                            <li id="share-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
+                            </li>
+                            <li><a href="#" class="red-f log-fnt-weight">R<span class="mem-small-f">EPORT THIS</span> V<span
+                                class="mem-small-f">IDEO</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="left-mode-sec  p-2   mt-2">
+                    <div class="add-space d-flex justify-content-center log-addspace">
+                        <span class="">Ad Banner</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Left section  End-->
+            <!-- Center section  -->
+
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-2 mb-2">
+                <div class="vdo-menu-bg">
+                    <div>
+                        <ul class="log-menu">
+                            <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' project.id %}" >#{{project.id}}</a></li>
+                            <li><span >Title: </span><span class="vdo-details-blue txt-capitalize">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="vdo-details-blue">{{project.get_format_display}}</span></li>
+                            <li><span>Genre: </span><span class="vdo-details-blue">{{project.get_genre_display}}</span></li>
+                        </ul>
+                    </div>
+                    <div class="vdo-rate-head-visible">
+                        <a href="#" class="red-fnt bold log-rate-font">Rate this Team</a>
+                    </div>
+                </div>
+                <div class="row align-row">
+                    <div class="col-md-9 ">
+                        <div class="video-frame">
+                            <!-- <img src="{% static 'images/1.jpeg' %}" class=" video-img"> -->
+                            {% if project.video_type == 'vimeo' %}
+                                <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="100%"
+                                data-show-text="false" frameborder="0"  allowfullscreen class=" video-img"></iframe>
+                                <img src=""/>
+                            {% elif project.video_type == 'youtube' %}
+                                <iframe
+                                src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ project.video_url }}&color=white" width="100%" height="100%"
+                                data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0" class=" video-img"></iframe>
+                            {% endif %}
+                        </div>
+                        <div class="vdo-menu-bg log-back-align mt-2">
+                            <div class="log-back-sec-align">
+                                <span class="log-btn-align"><a href=""><img src="{% static 'images/right-arrow.png' %}" class="log-back-btn" ></a></span>
+                                <span class="log-back-sec"><span class="log-back-cap">T</span>HIS IS A COLLABORATIVE AND LEARNING PLATFORM, <span class="log-back-cap">P</span>LEASE GIVE CONSTRUCTIVE AND HELPFUL FEEDBACK ONLY.</span>
+                            </div>
+                        </div>
+                        <div class="log-comment mt-2">
+                            COMMENTS
+                        </div>
+                        <div class="left-mode-search mt-2 ">
+                            <div class="comment-sec">
+                                <div class="log-comment-txt">
+                                        <div class="all-comments">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <textarea class="comment-textarea" placeholder="Write a comment..."
+                                                    name="comment" id="comment_txt" ></textarea>
+                                                    <div class="text-right">
+                                                        <a name="post-comment" id="{{project.id}}"
+                                                        class="post-btn btn-primary cursor-pointer post">Post</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row comment_section">
+                                            {% for comment in comments %}
+                                                <div class="col-12 ">
+                                                    {% if comment.reply_to == none %}
+                                                    <div class="comment-div" >
+                                                        <span class="txt-capitalize comment-name-style">
+                                                            <a href="{{comment.user.get_profile_url}}">{{comment.user.get_full_name}}</a>:
+                                                        </span>
+                                                        <span class="comment-style">{{comment.comment_txt|safe}}</span>
+                                                    </div>
+                                                    <div>
+                                                        {% get_notifications_time comment.created_time as comment_time%}
+                                                        <span class="comment-style-time">{{comment_time}}</span>
+                                                        <span class="comment-style-time pl-2">
+                                                            <a class="cursor-pointer reply comment-style-time remove-decoration" id="{{comment.id}}">Reply</a>
+                                                        </span>
+                                                        <span class="comment-style-time pl-2">
+                                                            {% if request.user == comment.user %}
+                                                            <a class="cursor-pointer delete comment-style-time remove-decoration" id="{{comment.id}}">
+                                                                Delete
+                                                            </a>
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                    <div id="comment-{{comment.id}}" class="comment-reply-box"></div>
+                                                        {% get_reply_comments comment project as reply_comments %}
+                                                        {% if reply_comments != none %}
+                                                            {% include 'project/comment.html' %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+
+                                            {% endfor %}
+                                        </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 left-mode-sec vdo-align">
+
+                        {% for job_type,team_members in job_types_dict.items %}
+                        <div class="log-vdo-details">
+                            <span class="vdo-detail-txt">
+                                <span class="vdo-detail-txt-weight">{{job_type}}:</span>
+                                {% for member in team_members %}
+                                <br>
+                                {% get_dict_value rating_dict member.id as rating %}
+                                <a href="{{member.user.get_profile_url}}" class="vdo-details-blue">{{member.user.get_full_name}}</a>
+                                <span class="log-star">
+                                    <span class="cta-stars-outer" data-toggle="modal"
+                                    data-target="#rating-modal-{{member.id}}">
+                                        <span class="cta-stars-inner" style="width:{{rating}}%;"></span>
+                                    </span>
+                                </span>
+                    <!-- The Modal -->
+                    <div class="modal fade" id="rating-modal-{{member.id}}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header">
+                                    <h6 class="modal-title mem-setup-blu-f">Rate {{member.job_type}} - {{member.user.get_full_name}}</h6>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- Modal body -->
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 ">
+                                                <div class="row" >
+                                                    {% get_my_skill_rating request.user.id member as my_rating %}
+                                                    {% if my_rating != 0 %}
+                                                    <div class="col-12" >
+                                                        <p clss="all-p">You have already given {{my_rating}} star rating for {{member.job_type}} - {{member.user.get_full_name}}.</p>
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="offset-2 col-6 " id="rating-form-{{member.id}}" >
+                                                        <div class="row">
+                                                            <span class="give-rating">
+                                                                    <input type="radio" id="star5-{{member.id}}" name="rate-{{member.id}}" class="rate" value="5"/>
+                                                                    <label for="star5-{{member.id}}" title="5 Star">5 stars</label>
+
+                                                                    <input type="radio" id="star4-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="4"/>
+                                                                    <label for="star4-{{member.id}}" title="4 Star">4 stars</label>
+
+                                                                    <input type="radio" id="star3-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="3"/>
+                                                                    <label for="star3-{{member.id}}" title="3 Star">3 stars</label>
+
+                                                                    <input type="radio" id="star2-{{member.id}}" name="rate-{{member.id}}" class="rate"  value="2"/>
+                                                                    <label for="star2-{{member.id}}" title="2 Star">2 stars</label>
+
+                                                                    <input type="radio" id="star1-{{member.id}}" name="rate-{{member.id}}" class="rate" value="1"/>
+                                                                    <label for="star1-{{member.id}}" title="1 Star">1 star</label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal footer -->
+                                <div class="modal-footer">
+                                    {% if my_rating == 0 %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm submit-rating"
+                                    id="{{member.id}}">Submit</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Cancel</button>
+                                    {% else %}
+                                    <button type="button" class="btn btn-outline-danger btn-sm "
+                                    data-dismiss="modal">Close</button>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal End -->
+                                {% endfor %}
+                            </span>
+                        </div>
+                        {% endfor %}
+
+                        <hr class="log-hr">
+                        <div class="vdo-total">
+                            <span class="vdo-detail-txt">
+                                Video Total:
+                                <span class="log-star">
+                                    <span class="cta-stars-outer" >
+                                        <span class="cta-stars-inner" style="width:{{project.video_rating}}%;"></span>
+                                    </span>
+                                </span>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center section  End-->
+            <!-- Right section -->
+
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
+            </div>
+
+            <!-- Right section  End-->
+
+        </div>
+        <!-- Main Row End  -->
+    </div>
+</div>
+
+
+ <!-- The Modal -->
+ <div class="modal fade" id="delete-comment-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Delete Comment</h6>
+                <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 ">
+                        <p>Do you want to delete this comment ?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <span class="delete-comment-btn-div">
+                </span>
+                <button type="button" class="btn btn-outline-danger btn-sm close-modal"
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+<!-- Share Modal Start -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content col-12">
+            <div class="modal-header">
+                <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 email-id-row">
+                    <span class="to-input">To</span>
+                        <div id="all_mail" class="all-mail">
+                        </div>
+                        <input id="enter_email" type="text" name="email" class="enter-mail-id" placeholder="Enter the user names .." />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="invite_send" type="button" class="btn btn-primary">Send</button>
+                <button id="invite_cancel" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+        </div>
+    </div>
+</div>
+<!-- Share Modal End -->
+
+{% endblock %}
+{% block extrajs %}
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="{% static 'js/user-rating.js' %}"></script>
+<script src="{% static 'js/project_tracking.js' %}"></script>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script>
+var  availableTags = [];
+var token = $("#token").val();
+$(document).ready(function(){
+
+    $.ajax
+            ({
+                type: "GET",
+                url: "/hobo_user/get-all-users-api/",
+                dataType: 'json',
+                async: false,
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    availableTags = response['serializer_list'];
+                    user_dict = response['name_dict'];
+                    name_list = response['name_list'];
+                }
+            });
+    function split(val)
+        {
+        return val.split(/@\s*/);
+        }
+
+    function extractLast(term)
+        {
+        return split(term).pop();
+        }
+$(".comment-textarea")
+    // don't navigate away from the field on tab when selecting an item
+    .bind("keydown", function(event) {
+        if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
+            event.preventDefault();
+        }
+        }).autocomplete({
+                minLength: 0,
+                source: function(request, response) {
+                    var term = request.term,
+                        results = [];
+                    if (term.indexOf("@") >= 0) {
+                        term = extractLast(request.term);
+                        if (term.length > 0) {
+                            results = $.ui.autocomplete.filter(
+                            availableTags, term);
+                        } else {
+                            results = ['Type a name..'];
+                        }
+                    }
+                    response(results);
+                },
+                focus: function() {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function(event, ui) {
+                    var terms = split(this.value);
+                    // remove the current input
+                    terms.pop();
+                    // add the selected item
+                    var hyperlink = ui.item.value
+                    terms.push(hyperlink);
+                    // add placeholder to get the comma-and-space at the end
+                    terms.push("");
+                    this.value = terms.join("");
+                    return false;
+                }
+            });
+
+
+    $('body').on('click' , '.post', function(){
+        var project_id = $(this).attr("id");
+        var token = $("#token").val();
+
+        var comment_txt_2 = $('#comment_txt').val();
+        var name_list_2 = name_list;
+        var name_str = name_list_2.join("|");
+        var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
+        // var found = $('.mention_user', comment_txt);
+        var found = $(comment_txt).filter('.mention_user');
+        var id_list = [];
+        $(found).each(function( link ) {
+            var id = $(this).attr("id");
+            id_list.push(id)
+        });
+        var data_dict = {};
+        data_dict['project'] = project_id
+        data_dict['comment_txt'] = comment_txt
+        data_dict['mentioned_users'] = JSON.stringify(id_list)
+
+        console.log(data_dict)
+        if(comment_txt){
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/post-comment-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload()
+                    // var comment_id = response['id']
+                    // $('#comment_txt').val("");
+                    // $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
+
+                }
+            });
+        }
+    });
+    $('body').on('click' , '.post-reply', function(){
+        var comment_id = $(this).attr("id");
+        var project_id = $("#project_id").val();
+        var token = $("#token").val();
+        var comment_txt_id = '#comment_txt_'+comment_id
+
+        var comment_txt_2 = $(comment_txt_id).val();
+        var name_list_2 = name_list;
+        var name_str = name_list_2.join("|");
+        var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
+
+        var found = $(comment_txt).filter('.mention_user');
+        var id_list = [];
+        $(found).each(function( link ) {
+            var id = $(this).attr("id");
+            id_list.push(id)
+        });
+
+        var div_id = "#comment-"+comment_id;
+        var data_dict = {};
+        var reply_section = "#reply-section-"+comment_id;
+        data_dict['project'] = project_id
+        data_dict['comment_txt'] = comment_txt
+        data_dict['reply_to'] = comment_id
+        data_dict['mentioned_users'] = JSON.stringify(id_list)
+        // console.log(data_dict)
+        if(comment_txt){
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/post-comment-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                    // var comm_id = response['id'];
+                    // $(".comment-reply-box").html("");
+                    // $(reply_section).append('<div class="col-12 "><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comm_id+'">Delete</a></span></div></div>');
+                }
+            });
+        }
+    });
+    $('body').on('click' , '.reply', function(){
+        var comment_id = $(this).attr("id");
+        var div_id = "#comment-"+comment_id;
+        var project_id = $("#project_id").val();
+        var txtbox = '<textarea class="comment-textarea " placeholder="Write a comment..." name="comment" id="comment_txt_'+comment_id+'"></textarea>'
+        var postbtn = '<div class="text-right"><a name="post-comment" id="'+comment_id+'" class="post-btn btn-primary cursor-pointer post-reply">Post</a></div>'
+        $(div_id).html("")
+        $(".comment-reply-box").html("");
+        $(div_id).append(txtbox)
+        $(div_id).append(postbtn)
+        $(".comment-textarea").focus()
+        $(".comment-textarea").select()
+        $.ajax
+            ({
+                type: "GET",
+                url: "/hobo_user/get-all-users-api/",
+                dataType: 'json',
+                async: false,
+                data: {},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    availableTags = response['serializer_list'];
+                    user_dict = response['name_dict'];
+                    name_list = response['name_list'];
+                }
+            });
+    function split(val)
+        {
+        return val.split(/@\s*/);
+        }
+
+    function extractLast(term)
+        {
+        return split(term).pop();
+        }
+$(".comment-textarea")
+    // don't navigate away from the field on tab when selecting an item
+    .bind("keydown", function(event) {
+        if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
+            event.preventDefault();
+        }
+        }).autocomplete({
+                minLength: 0,
+                source: function(request, response) {
+                    var term = request.term,
+                        results = [];
+                    if (term.indexOf("@") >= 0) {
+                        term = extractLast(request.term);
+                        if (term.length > 0) {
+                            results = $.ui.autocomplete.filter(
+                            availableTags, term);
+                        } else {
+                            results = ['Type a name..'];
+                        }
+                    }
+                    response(results);
+                },
+                focus: function() {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function(event, ui) {
+                    var terms = split(this.value);
+                    // remove the current input
+                    terms.pop();
+                    // add the selected item
+                    var hyperlink = ui.item.value
+                    terms.push(hyperlink);
+                    // add placeholder to get the comma-and-space at the end
+                    terms.push("");
+                    this.value = terms.join("");
+                    return false;
+                }
+            });
+    });
+
+});
+
+</script>
+<script>
+    $('body').on('click' , '.close-modal', function(){
+        $("#delete-comment-modal").modal('hide');
+    });
+    $('body').on('click' , '.delete', function(){
+        var comment_id = $(this).attr("id");
+        $(".delete-comment-btn-div").html('<button type="button" class="btn btn-outline-danger btn-sm delete-comment" id="'+comment_id+'">Delete</button>');
+        $("#delete-comment-modal").modal('show');
+    });
+      $('body').on('click' , '.delete-comment', function(){
+        var comment_id = $(this).attr("id");
+        var token = $("#token").val();
+
+        if(comment_id){
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/delete-comment-api/",
+                dataType: 'json',
+                async: false,
+                data: {"comment_id":comment_id},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                   window.location.reload();
+                }
+            });
+        }
+    });
+</script>
+
+
+
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
+<script src="{% static 'js/email_invite.js' %}"></script>
+
+{% endblock %}

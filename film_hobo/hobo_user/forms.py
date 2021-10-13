@@ -1,15 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.utils.translation import ugettext_lazy as _
 from django_select2.forms import Select2Widget
 
 from bootstrap_datepicker_plus import DateTimePickerInput
 from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings, AthleticSkill
-
-from .models import GuildMembership, Country
-
+    CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, CoWorker, \
+    CompanyProfile, Country, Photo, Feedback, Writer
 
 
 class SignUpForm(UserCreationForm):
@@ -62,7 +61,8 @@ class SignUpIndieForm(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'i_agree', 'date_of_birth', 'country')
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country')
         widgets = {
             'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
         }
@@ -70,6 +70,9 @@ class SignUpIndieForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpIndieForm, self).__init__(*args, **kwargs)
         self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
+        self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['i_agree'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -92,6 +95,12 @@ class SignUpIndieForm(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
@@ -158,9 +167,10 @@ class SignUpFormCompany(UserCreationForm):
         model = CustomUser
         fields = ('first_name', 'middle_name', 'last_name', 'email',
                   'password1', 'password2', 'phone_number',
-                  'address', 'i_agree', 'date_of_birth', 'country',
+                  'address', 'beta_user', 'beta_user_code', 'beta_user_end',
+                  'i_agree', 'date_of_birth', 'country',
                   'title', 'company_name', 'company_address',
-                  'company_phone', 'company_website')
+                  'company_phone', 'company_website', 'company_type')
 
         widgets = {
             'date_of_birth': DateTimePickerInput(format='%Y-%m-%d'),
@@ -178,11 +188,15 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
+        self.fields['beta_user'].required = False
+        self.fields['beta_user_code'].required = False
+        self.fields['beta_user_end'].required = False
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True
         self.fields['company_phone'].required = True
         self.fields['title'].required = True
+        self.fields['company_type'].required = True
         self.fields['company_website'].required = False
 
         self.fields['first_name'].widget.attrs['class'] = 'inp-line'
@@ -197,6 +211,12 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].widget.attrs['placeholder'] = 'Phone'
         self.fields['date_of_birth'].widget.attrs['class'] = 'inp-line'
         self.fields['date_of_birth'].widget.attrs['placeholder'] = 'Date of Birth'
+        self.fields['beta_user'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user'].widget.attrs['placeholder'] = 'Beta User'
+        self.fields['beta_user_code'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_code'].widget.attrs['placeholder'] = 'Beta User Code'
+        self.fields['beta_user_end'].widget.attrs['class'] = 'inp-line'
+        self.fields['beta_user_end'].widget.attrs['placeholder'] = 'Beta User Final Day'
         self.fields['address'].widget.attrs['class'] = 'inp-line'
         self.fields['address'].widget.attrs['placeholder'] = 'Address'
         self.fields['title'].widget.attrs['class'] = 'inp-line'
@@ -214,7 +234,6 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['country'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password1'].widget.attrs['class'] = 'form-control form-control-input'
         self.fields['password2'].widget.attrs['class'] = 'form-control form-control-input'
-
 
 
 # class SignUpFormCompany(forms.Form):
@@ -261,7 +280,6 @@ class SignUpFormCompany(UserCreationForm):
 #         self.fields['user_address'].widget.attrs['placeholder'] = 'Address'
 
 
-
 class ChangePasswordForm(forms.Form):
     old_password = forms.CharField(widget=forms.PasswordInput())
     new_password1 = forms.CharField(widget=forms.PasswordInput())
@@ -293,4 +311,152 @@ class PersonalDetailsForm(forms.ModelForm):
         model = CustomUser
         fields = ('gender', 'feet', 'inch', 'lbs', 'start_age',
                   'stop_age', 'physique', 'hair_color', 'hair_length',
-                  'eyes')
+                  'eyes', 'ethnic_appearance')
+
+    def __init__(self, *args, **kwargs):
+        super(PersonalDetailsForm, self).__init__(*args, **kwargs)
+        # self.fields[field].required = True
+
+
+class EditProfileForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=100, required=True,
+                                 help_text='')
+    middle_name = forms.CharField(max_length=100, required=False,
+                                  help_text='')
+    last_name = forms.CharField(max_length=100, required=True,
+                                help_text='')
+    guild_membership = forms.ModelMultipleChoiceField(
+        label="Guild Membership",
+        queryset=GuildMembership.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = ('company', 'company_position',
+                  'company_website', 'imdb', 'bio')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+
+class EditProductionCompanyProfileForm(forms.ModelForm):
+    company_name = forms.CharField(max_length=100, required=True,
+                                   help_text='')
+    company_website = forms.CharField(max_length=100, required=False,
+                                      help_text='')
+
+    class Meta:
+        model = CompanyProfile
+        fields = ('company_name', 'submission_policy_SAMR', 'imdb', 'bio',
+                  'company_website')
+
+    def __init__(self, *args, **kwargs):
+        super(EditProductionCompanyProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+
+class EditAgencyManagementCompanyProfileForm(forms.ModelForm):
+    company_name = forms.CharField(max_length=100, required=True,
+                                   help_text='')
+    company_website = forms.CharField(max_length=100, required=False,
+                                      help_text='')
+    agency_management_type = forms.CharField(max_length=100, required=False,
+                                             help_text='')
+
+    class Meta:
+        model = CompanyProfile
+        fields = ('company_name', 'submission_policy_SAMR', 'imdb', 'bio',
+                  'company_website', 'agency_management_type')
+
+    def __init__(self, *args, **kwargs):
+        super(EditAgencyManagementCompanyProfileForm, self).__init__(*args, **kwargs)
+        # self.fields['company'].required = False
+
+
+class UserInterestForm(forms.ModelForm):
+    class Meta:
+        model = UserInterest
+        fields = ('position', 'format', 'location', 'budget', 'age', 'gender')
+
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        user_feedback = forms.CharField(widget=forms.Textarea)
+
+        model = Feedback
+        fields = '__all__'
+
+
+class CheckoutForm(forms.Form):
+    payment_method_nonce = forms.CharField(
+        max_length=1000,
+        widget=forms.widgets.HiddenInput,
+    )
+
+    def clean(self):
+        self.cleaned_data = super(CheckoutForm, self).clean()
+        # Braintree nonce is missing
+        if not self.cleaned_data.get('payment_method_nonce'):
+            raise forms.ValidationError(_(
+                'We couldn\'t verify your payment. Please try again.'))
+        return self.cleaned_data
+
+
+class ProjectCreationForm(forms.ModelForm):
+
+    class Meta:
+        model = Project
+        fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
+                  'sag_aftra', 'cast_attachment', 'visibility',
+                  'script_visibility', 'visibility_password', 'location',
+                  'cast_samr', 'script', 'script_password',
+                  'cast_audition_password', 'team_select_password',
+                  'video_url', 'video_type', 'video_status',
+                  'video_cover_image', 'logline', 'project_info',
+                  )
+        widgets = {
+
+                'title': forms.TextInput(attrs={"class": "inp-line"}),
+                'creator': forms.Select(attrs={'class': 'inp-line'}),
+                'number_of_pages': forms.TextInput(attrs={"class": "inp-line",
+                                                          'type': 'number'}),
+                'format': forms.Select(attrs={'class': 'd-none'}),
+                'genre': forms.Select(attrs={'class': 'd-none'}),
+                'sag_aftra': forms.Select(attrs={'class': 'd-none'}),
+                'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
+                'visibility': forms.Select(attrs={'class': 'd-none'}),
+                'script_visibility': forms.Select(attrs={'class': 'd-none'}),
+                'visibility_password': forms.PasswordInput(attrs={
+                                                           "class": "form-control\
+                                                           form-control-input mem-b-placeholder",
+                                                           'placeholder': 'password' ,'data-toggle': 'password'
+                                                           }),
+                'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
+                'cast_samr': forms.Select(attrs={'class': 'd-none'}),
+                'script': forms.FileInput(attrs={'accept':'application/pdf'}),
+                    'script_password': forms.PasswordInput(attrs={
+                                                                "class": "form-control form-control-input mem-b-placeholder",
+                                                                'placeholder': 'password'
+                                                                }),
+                'cast_audition_password': forms.PasswordInput(attrs={
+                                                            "class": "form-control form-control-input mem-b-placeholder",
+                                                            'placeholder': 'password'
+                                                            }),
+                'team_select_password': forms.PasswordInput(attrs={
+                                                            "class": "form-control form-control-input mem-b-placeholder",
+                                                            'placeholder': 'password'
+                                                            })
+
+                }
+
+
+class WriterForm(forms.ModelForm):
+
+    class Meta:
+        model = Writer
+        fields = ('name', 'project')
+        widgets = {
+                'name': forms.TextInput(attrs={"class": "inp-line"})
+                }

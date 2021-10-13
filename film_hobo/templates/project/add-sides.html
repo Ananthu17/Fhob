@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                {% if request.user == project.creator %}
+                <!-- project menu  -->
+
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <ul class="sds-menu sds-menu-padding">
+                            <li><span class="video-menu-head">PROJECT </span>
+                                <a href="{% url 'project:single-film-project' project.id %}" class="video-menu-head-tag" >#{{project.id}}</a></li>
+                            <li><span >Title: </span><span class="sgl-menu-blue">{{project.title}}</span></li>
+                            <li><span>Format: </span><span class="sgl-menu-blue">{{project.get_format_display}}</span></li>
+                            <li><span>Genre: </span><span class="sgl-menu-blue">{{project.get_genre_display}}</span></li>
+                            <li><span>Location(s): </span><span class="sgl-menu-blue">{{project.location}}</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- project menu  End-->
+                <!-- Cast menu  -->
+                <div class="sds-menu-bg">
+                    <div class="sds-menu-align">
+                        <form>
+                            <ul class="sds-side-setup-menu sds-menu-padding">
+                                <li><span class="video-menu-head">SIDES SETUP</span></li>
+                                <li><span class="sds-blue-name">CHARACTER: </span><span class="video-menu-head">{{character.name}}</span></li>
+                                <li>
+                                    <!-- <span class="sds-side-menu-btn">
+                                        <a href="" class="cas-cast-menu-save">SAVE</a>
+                                        <a href="" class="cas-cast-menu-edit">EDIT</a>
+                                    </span> -->
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cast menu End -->
+                <!-- side input area  -->
+
+                <div class="sds-input-bg">
+                    <div class="sds-input-padding">
+                        <form  method="post"
+                        action="{% url 'project:add-sides' project.id %}?{{character.id}}"
+                        id="sidesform">
+                            {% csrf_token %}
+                            <input type="hidden" name="character_id" value="{{character.id}}" />
+                            <div class="row">
+                                <div class="col-lg-12 col-sm-12">
+                                    <p class="help_text"><span class="help_txt_title">How to create sides:</span>
+                                        1) Click on the Edit button;
+                                        2) Type the number of the chosen page of the script 
+                                        (you can crop that page to your specifications);
+                                        3) If the scene has more than one page, then 
+                                        choose other pages one at the time, the same way as 
+                                        you did the first page;
+                                        4) When you're done, click "Save".
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-input-right-info">
+                                        <div class="card sds-script-card">
+                                            <div class="sds-card-inneralign">
+                                                <div class="sds-inner-pdf-align">
+                                                    {% if project.script %}
+                                                    <iframe src="{{project.script.url}}" class="pdf-style" frameborder="0"></iframe>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                </div>
+                                <div class="col-lg-6 col-sm-12">
+                                    <div class="sds-side-input-align-mob">
+                                        <div class="sds-scene-head-1">
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"><a href="">SIDES</a></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">EDIT</a>
+                                                </span>
+                                            </div>      
+                                            <!-- <span class="sds-side-txt"><a>SIDES</a></span><span class="sds-scene-txt sds-scene-txt-padding">SCENE ONE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=1">Edit</a>
+                                            </span> -->
+                                        </div>
+                                        <div>
+                                            {% if sides.scene_1_pdf %}
+                                            <iframe src="{{ sides.scene_1_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="sds-textarea-padding">
+                                        <div class="sds-scene-head">
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">EDIT</a>
+                                                </span>
+                                            </div>
+                                            <!-- <span class="sds-scene-txt">SCENE TWO</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=2">Edit</a>
+                                            </span> -->
+                                        </div>
+                                        <div>
+                                            {% if sides.scene_2_pdf %}
+                                            <iframe src="{{ sides.scene_2_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="sds-textarea-padding">
+                                        <div class="sds-scene-head">
+                                            <!-- <span class="sds-scene-txt">SCENE THREE</span>
+                                            <span class="pl-4" >
+                                                <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">Edit</a>
+                                            </span> -->
+                                            <div class="sds-side-txt-flex">
+                                                <span class="sds-side-txt"></span>
+                                                <span class="sds-scene-txt">SCENE ONE</span>
+                                                <span class="sds-scene-edit">
+                                                    <a href="{% url 'project:add-scene-images' project.id  %}?character_id={{character.id}}&scene=3">EDIT</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {% if sides.scene_3_pdf %}
+                                            <iframe src="{{ sides.scene_3_pdf.url}}" class="sides-textbox scenes sides-font-style" frameborder="0"></iframe>
+                                            {% else %}
+                                            <div class="sides-textbox scenes sides-font-style "></div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="sds-card-btn-align">
+                                    <span class="sds-input-card-btn">
+                                        <!-- <input type="submit" class="cas-cast-menu-save btn-style" value="SAVE"/> -->
+                                        <a href="{% url 'project:add-characters' project.id %}" class="remove-decoration cas-cast-menu-edit">BACK</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- side input area  End-->
+            {% else %}
+            <p class="all-p">Invalid page</p>
+            {% endif %}
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+
+{% endblock %}
+
+
