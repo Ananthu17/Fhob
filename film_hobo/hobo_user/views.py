@@ -53,7 +53,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, Video, \
+                    GuildMembership, GroupUsers, UserInterestJob, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
@@ -67,6 +67,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
+from messaging.models import MessageStatus
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -96,6 +97,7 @@ from payment.views import IsSuperUser
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from project.models import Character, ProjectCrew
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -1348,7 +1350,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
+                blocked_members[obj.id] = obj.get_full_name()
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1370,6 +1372,22 @@ class BlockMembersAPI(APIView):
                     blocked_members.append(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = True
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Blocked %s" % (
                                 block_user.email),
@@ -1406,6 +1424,22 @@ class UnBlockMembersAPI(APIView):
                     blocked_members.remove(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = False
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Un Blocked %s" % (
                                 block_user.email),
@@ -1640,8 +1674,8 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        context['transaction'] = \
-            Transaction.objects.get(user_id=user.id)
+        # context['transaction'] = \
+        #     Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2603,7 +2637,7 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
         return context
 
@@ -3499,9 +3533,25 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
-        project_obj = Project.objects.all()
 
-        context['projects'] = project_obj
+        user_jobs_dict = {}
+        job_list = UserInterestJob.objects.filter(user=user)
+        for item in job_list:
+            if item.user_interest.id in user_jobs_dict:
+                user_jobs_dict[item.user_interest.id].append(item)
+            else:
+                 user_jobs_dict[item.user_interest.id] = []
+                 user_jobs_dict[item.user_interest.id].append(item)
+
+        context['user_jobs_dict'] = user_jobs_dict
+
+        applied_projects = UserProject.objects.filter(
+                            Q(user=user) &
+                            (
+                                Q(relation_type = UserProject.APPLIED) |
+                                Q(relation_type = UserProject.ATTACHED)
+                            )).order_by('-created_time')
+        
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
@@ -3513,6 +3563,8 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         context['locations'] = Location.objects.all()
         context['format'] = UserInterest.FORMAT_CHOICES
         context['budget'] = UserInterest.BUDGET_CHOICES
+        context['gender'] = UserInterest.GENDER_CHOICES
+        context['age'] = UserInterest.AGE_CHOICES
         return context
 
 
@@ -3643,7 +3695,10 @@ class AddUserInterestAPI(APIView):
             obj.location = Location.objects.get(pk=data_dict['location'])
             obj.format = data_dict['format']
             obj.budget = data_dict['budget']
+            obj.age = data_dict['age']
+            obj.gender = data_dict['gender']
             obj.save()
+
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
         else:
@@ -3664,12 +3719,15 @@ class EditUserInterestAPI(APIView):
         if serializer.is_valid():
             data_dict = serializer.data
             id = data_dict['id']
+            print("--------------", data_dict)
             try:
                 obj = UserInterest.objects.get(Q(pk=id) & Q(user=self.request.user))
                 obj.position = JobType.objects.get(pk=data_dict['position'])
                 obj.location = Location.objects.get(pk=data_dict['location'])
                 obj.format = data_dict['format']
                 obj.budget = data_dict['budget']
+                obj.age = data_dict['age']
+                obj.gender = data_dict['gender']
                 obj.save()
                 response = {'message': "User interest updated.",
                            'status': status.HTTP_200_OK}
@@ -3690,11 +3748,14 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
+        print(self.request.POST)
         user = self.request.user
         positions = self.request.POST.getlist('position')
         formats = self.request.POST.getlist('format')
         locations = self.request.POST.getlist('location')
         budget = self.request.POST.getlist('budget')
+        age = self.request.POST.getlist('age')
+        gender = self.request.POST.getlist('gender')
         count = len(locations)
         json_dict = {}
         key = Token.objects.get(user=user).key
@@ -3705,6 +3766,8 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
             json_dict['budget'] = budget[i]
+            json_dict['age'] = age[i]
+            json_dict['gender'] = gender[i]
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/hobo_user/add-user-interest-api/'
             user_response = requests.post(
@@ -4407,7 +4470,7 @@ class RemoveFriendGroupAPI(APIView):
 
 
 class UpdateFriendGroupAjaxView(View, JSONResponseMixin):
-    template_name = 'user_pages/add-my-interest-form.html'
+    template_name = 'user_pages/friend-group.html'
 
     def get(self, *args, **kwargs):
         context = dict()
@@ -4892,6 +4955,7 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -4902,15 +4966,15 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset()).filter(
-                                        creator=request.user)
+                   creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
 
 class ProjectCreateAPIView(CreateAPIView):
-  permission_classes = (IsAuthenticated,)
-  queryset = Project.objects.all()
-  serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -4952,23 +5016,8 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class ProjectSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         context = self.project_segregator(queryset)
-#         return Response(context)
-
-
 #Search API for Pages
-
 #API for Searching things in a page
-
 class PageSearchView(ListAPIView):
     template_name = 'search_results.html'
     serializer_class = ProjectSerializer

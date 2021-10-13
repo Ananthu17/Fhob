@@ -1,5 +1,6 @@
 from django import template
 from hobo_user.models import CustomUser, UserNotification
+from messaging.models import MessageNotification
 from django.utils import timezone
 from django.db.models import Q
 
@@ -7,15 +8,30 @@ register = template.Library()
 
 
 @register.simple_tag()
-def get_notifications_count(email):
+def get_notifications_count(id):
     try:
-        user = CustomUser.objects.get(email=email)
+        user = CustomUser.objects.get(pk=id)
         notifications_count = UserNotification.objects.filter(
                         Q(user=user) &
                         Q(status_type='unread')
                         ).count()
         if notifications_count:
             return notifications_count
+    except CustomUser.DoesNotExist:
+        pass
+    return ""
+
+
+@register.simple_tag()
+def get_msg_notifications_count(id):
+    try:
+        user = CustomUser.objects.get(pk=id)
+        unread_msg_count = MessageNotification.objects.filter(
+                            Q(user=user) &
+                            Q(status_type=MessageNotification.UNREAD)
+                            ).count()
+        if unread_msg_count:
+            return unread_msg_count
     except CustomUser.DoesNotExist:
         pass
     return ""

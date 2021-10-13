@@ -46,7 +46,7 @@ from rest_framework.generics import (UpdateAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined
+     VideoRatingCombined, UserInterest, UserInterestJob
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
@@ -399,6 +399,23 @@ class GetProjectRatingNotificationAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
+class GetUserInterestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/cast_attach_response_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.USER_INTEREST)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/cast_attach_response_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
 class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'project/single_film_project.html'
     login_url = '/hobo_user/user_login/'
@@ -625,8 +642,48 @@ class CharacterCreateAPIView(APIView):
                 character_obj.description = data_dict['description']
                 character_obj.project = project
                 character_obj.password = data_dict['password']
-                # character_obj.sort_order = data_dict['sort_order']
+                character_obj.age = data_dict['age']
+                character_obj.gender = data_dict['gender']
                 character_obj.save()
+
+                try:
+                    actoractress = JobType.objects.get(slug='actoractress')
+                    interest = UserInterest.objects.filter(
+                                Q(position=actoractress) &
+                                Q(age=character_obj.age) &
+                                Q(gender=character_obj.gender) &
+                                Q(format=character_obj.project.format) &
+                                Q(location=character_obj.project.location) &
+                                Q(budget=character_obj.project.sag_aftra)
+                                )
+                    for usin in interest:
+                        user = usin.user
+                        # update user interest list table
+                        user_interest_job = UserInterestJob()
+                        user_interest_job.user = user
+                        user_interest_job.user_interest = usin
+                        user_interest_job.cast = character_obj
+                        user_interest_job.save()
+                        # update notification table
+                        notification = UserNotification()
+                        notification.user = user
+                        notification.notification_type = UserNotification.USER_INTEREST
+                        notification.project =  project
+                        notification.from_user = project.creator
+                        notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(user.id)
+                        notification_msg = {
+                                'type': 'send_user_interest_notification',
+                                'message': str(notification.message),
+                                'from': str(project.creator.id),
+                                "event": "USER_INTEREST"
+                            }
+                        notify(room_name, notification_msg)
+                except JobType.DoesNotExist:
+                    actoractress = ""
+
                 response = {'message': "Character added",
                             'status': status.HTTP_200_OK}
             except Project.DoesNotExist:
@@ -658,6 +715,7 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         context['project'] = project
         characters = Character.objects.filter(project=project.id)
         context['characters'] = characters
+        context['age'] = UserInterest.AGE_CHOICES
         return context
 
     def post(self, request, *args, **kwargs):
@@ -668,6 +726,8 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
+        age = self.request.POST.getlist('age')
+        # gender = self.request.POST.getlist('gender')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -676,6 +736,19 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
+
+            gender_id = 'gender_'+str(i+1)
+            gender = self.request.POST.get(gender_id)
+            if gender != "":
+                json_dict['gender'] = gender
+            else:
+                json_dict['gender'] = None
+
+            if age[i] != "":
+                json_dict['age'] = age[i]
+            else:
+                json_dict['age'] = ""
+
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
@@ -724,16 +797,19 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             context['sites_dict'] = sites_dict
         except Project.DoesNotExist:
             context["message"] = "Project not found !!"
+        context['age'] = UserInterest.AGE_CHOICES
         return context
 
     def post(self, request, *args, **kwargs):
         json_dict = {}
+        print(self.request.POST)
         project_id = self.kwargs.get('id')
         user = self.request.user
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
-        # sort_order = self.request.POST.getlist('sort_order')
+        age = self.request.POST.getlist('age')
+        # gender = self.request.POST.getlist('gender')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -741,10 +817,18 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
-            # if sort_order[i] != "":
-            #     json_dict['sort_order'] = sort_order[i]
-            # else:
-            #     json_dict['sort_order'] = 0
+            if age[i] != "":
+                json_dict['age'] = age[i]
+            else:
+                json_dict['age'] = None
+
+            gender_id = 'gender_'+str(i+1)
+            gender = self.request.POST.get(gender_id)
+            if gender != "":
+                json_dict['gender'] = gender
+            else:
+                json_dict['gender'] = None
+
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
@@ -780,7 +864,10 @@ class AddSidesAjaxView(View, JSONResponseMixin):
         count = self.request.GET.get('count')
         form_html = render_to_string(
                                 'project/add-sides-form.html',
-                                {'count': count})
+                                {
+                                 'count': count,
+                                 'age': UserInterest.AGE_CHOICES
+                                 })
         context['form_html'] = form_html
         return self.render_json_response(context)
 
@@ -1023,6 +1110,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             if url.startswith('vimeo.com/'):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
+        audition_obj.status_update_date = timezone.now()
         audition_obj.save()
         # update user-project-table
         user_project_obj = UserProject()
@@ -1033,6 +1121,18 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.character = character
         user_project_obj.save()
         # end
+
+        # update user interest job list table
+        try:
+            user_interest_job = UserInterestJob.objects.get(
+                                    Q(user=user) &
+                                    Q(cast=character)
+                                )
+            user_interest_job.cast_application = audition_obj
+            user_interest_job.save()
+        except UserInterestJob.DoesNotExist:
+            pass
+
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -1135,6 +1235,7 @@ class SubmitAuditionAPI(APIView):
                     audition_obj.video_url = video_url
             if video_type == 'facebook':
                 audition_obj.video_url = url
+            audition_obj.status_update_date = timezone.now()
             audition_obj.save()
 
             # update user-project-table
@@ -1146,6 +1247,17 @@ class SubmitAuditionAPI(APIView):
             user_project_obj.character = character
             user_project_obj.save()
             # end
+
+            # update user interest job list table
+            try:
+                user_interest_job = UserInterestJob.objects.get(
+                                        Q(user=self.request.user) &
+                                        Q(cast=character)
+                                    )
+                user_interest_job.cast_application = audition_obj
+                user_interest_job.save()
+            except UserInterestJob.DoesNotExist:
+                pass
 
             response = {'message': "Audition Submitted",
                         'status': status.HTTP_200_OK}
@@ -1906,7 +2018,7 @@ class UpdateAuditionStatusAPI(APIView):
                 else:
                     msg = "Audition status updated to "+audition.get_audition_status_display()
 
-                #update notification table
+                # update notification table
                 notification = UserNotification()
                 notification.user = audition.user
                 notification.project = audition.project
@@ -1945,7 +2057,6 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
     template_name = 'project/chemistry-room.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2845,7 +2956,7 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
         context = dict()
         user_list = []
         user_rating_objs = UserRatingCombined.objects.all()
-        
+
         try:
             actoractress = JobType.objects.get(slug='actoractress')
             actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
@@ -3343,6 +3454,7 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
             crew_apply_obj.agent = agent_user
         except CustomUser.DoesNotExist:
             pass
+        crew_apply_obj.status_update_date = timezone.now()
         crew_apply_obj.save()
 
         # update user-project-table
@@ -3354,6 +3466,17 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.crew = project_crew
         user_project_obj.save()
         # end
+
+        # update user interest job list table
+        try:
+            user_interest_job = UserInterestJob.objects.get(
+                                    Q(user=user) &
+                                    Q(crew=project_crew)
+                                )
+            user_interest_job.crew_application = crew_apply_obj
+            user_interest_job.save()
+        except UserInterestJob.DoesNotExist:
+            pass
         messages.success(self.request, "Application submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -3395,6 +3518,7 @@ class CrewApplyAPI(APIView):
                 crew_apply_obj.cover_letter = cover_letter
             except KeyError:
                 raise ParseError('Request has no cover image attached')
+            crew_apply_obj.status_update_date = timezone.now()
             crew_apply_obj.save()
             # update user-project-table
             user_project_obj = UserProject()
@@ -3405,6 +3529,16 @@ class CrewApplyAPI(APIView):
             user_project_obj.crew = project_crew
             user_project_obj.save()
             # end
+            # update user interest job list table
+            try:
+                user_interest_job = UserInterestJob.objects.get(
+                                        Q(user=self.request.user) &
+                                        Q(crew=project_crew)
+                                    )
+                user_interest_job.crew_application = crew_apply_obj
+                user_interest_job.save()
+            except UserInterestJob.DoesNotExist:
+                pass
             response = {'message': "Application submitted",
                         'status': status.HTTP_200_OK}
 
@@ -3833,6 +3967,37 @@ class AddProjectCrewAPI(APIView):
                 crew_obj.job_type = job_type
                 crew_obj.count = data_dict['count']
                 crew_obj.save()
+                interest = UserInterest.objects.filter(
+                                Q(position=job_type) &
+                                Q(format=project.format) &
+                                Q(location=project.location) &
+                                Q(budget=project.sag_aftra)
+                            )
+                for usin in interest:
+                    user = usin.user
+                    # update user interest list table
+                    user_interest_job = UserInterestJob()
+                    user_interest_job.user = user
+                    user_interest_job.user_interest = usin
+                    user_interest_job.crew = crew_obj
+                    user_interest_job.save()
+                    # update notification table
+                    notification = UserNotification()
+                    notification.user = user
+                    notification.notification_type = UserNotification.USER_INTEREST
+                    notification.project =  project
+                    notification.from_user = project.creator
+                    notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(user.id)
+                    notification_msg = {
+                            'type': 'send_user_interest_notification',
+                            'message': str(notification.message),
+                            'from': str(project.creator.id),
+                            "event": "USER_INTEREST"
+                        }
+                    notify(room_name, notification_msg)
             response = {'message': 'Project Crew Added', 'status':
                         status.HTTP_200_OK}
         else:

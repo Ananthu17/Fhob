@@ -38,11 +38,14 @@ SECRET_KEY = env("SECRET_KEY")
 # 3 - AWS_PRODUCTION
 
 PROJECT_ENVIRONMENT = "LOCAL"
+# PROJECT_ENVIRONMENT = "DEMO_SERVER"
+
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
-    # ORIGIN_URL = "http://202.88.246.92:8041"
     DEBUG = False
-    ORIGIN_URL = "http://172.19.0.3:8041"
+    # ORIGIN_URL = "http://202.88.246.92:8041"
+    # ORIGIN_URL = "http://172.19.0.3:8041"
+    ORIGIN_URL = "http://app:8041"
     # demo server database credentials
     DATABASES = {
         'default': {
@@ -134,6 +137,7 @@ INSTALLED_APPS = [
     'payment',
     'general',
     'project',
+    'messaging',
 
     'bootstrap_datepicker_plus',
     'django_select2',

@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_account_tag %}
+{% load notification_tag %}
+{% load project_rating_tag %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="mm-container">
+
+            <!-- All Message section  -->
+
+            <div class="mm-container-display">
+                <div>
+                    {% include 'message/message_side_links.html' %}
+                </div>
+                <div>
+                    <div class="mm-all-msg-sec">
+                        {% if chat_dict %}
+                        All Messages {% if msg_count != '' %}({{msg_count}}){% endif %}
+                        {% else %}
+                        No messages to show
+                        {% endif %}
+                    </div>
+                    {% if chat_dict %}
+                        {% for chat_with, msg in chat_dict.items %}
+                        <!-- Grid section  -->
+                        <div class="mm-msg-grid">
+                            <div class="mm-msg-grid-col-1">
+                                <div class="mm-msg-img">
+                                    <div class="mm-img-pro-sec">
+                                        <a href="{{ chat_with.get_profile_url }}">
+                                            {% if chat_with.get_profile_photo %}
+                                            <img src="{{chat_with.get_profile_photo }}" alt="" class="mm-round-img">
+                                            {% else %}
+                                            <img src="{% static 'images/default_profile_pic.png' %}" alt="" class="mm-round-img">
+                                            {% endif %}
+                                        </a>
+                                        <div class="mm-msg-pro">
+                                            <div class="mm-msg-pro-lgth" title="Pro">
+                                                {{chat_with.get_membership_display}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mm-name-hour-sec">
+                                    <div class="mm-msg-name">
+                                        <div class="mm-name-lgth" title="{{chat_with.get_full_name}}">
+                                            {{chat_with.get_full_name}}
+                                        </div>
+                                        {% for item in chat_with.user_profile.first.job_types.all %}
+                                        <div class="mm-name-lgth" title="producer">
+                                            {{ item.title }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="mm-hour-txt">
+                                        {% get_notifications_time msg.created_time %}
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="mm-msg-grid-col-2">
+                                <div>
+                                    <a href="{% url 'message:messages' chat_with.id %}" class="msg-txt-color remove-decoration">
+                                <span class="mm-msg-blue-head">
+                                    {% if msg.subject %}{{msg.subject}}{% else %}{% endif %}
+                                </span>
+                                {% get_dict_value read_status_dict chat_with.id as read_status %}
+                                {% if not read_status %}<b class="all-error-msg"> New</b> {% endif%}
+                                {% if not read_status and msg.subject%}</br> {% endif%}
+                                </div>
+                                <div class="mm-msg-content">
+                                    <div class="mm-msg-you">{% if msg.from_user == request.user %}You:{% endif %}</div>
+                                        <div>{{msg.message|truncatewords:10}}</div>
+                                        {% get_dict_value_if_exists attachment_dict msg.id as attachments %}
+                                        {% if attachments %}<b class="attachments-txt">Attachments</b>{% endif %}
+                                </div>
+                            </a>
+                                <div class="mm-delete-sec">
+                                    <div id="priority_btn_{{msg.msg_thread}}">
+                                        {% get_dict_value priority_status_dict chat_with.id as is_priority %}
+                                        {% if is_priority == True %}
+                                        <a class="remove_from_priority cursor-pointer remove-decoration color-style" id="{{msg.msg_thread}}">
+                                            <span class="mm-delete-sec-icon">
+                                                <i class="fa fa-star" aria-hidden="true"></i>
+                                            </span>
+                                            <span>
+                                                <span class="mm-delete-sec-icon-a">Priority</span>
+                                            </span>
+                                        </a>
+                                        {% else %}
+                                            <a class="priority cursor-pointer remove-decoration color-style" id="{{msg.msg_thread}}">
+                                                <span class="mm-delete-sec-icon">
+                                                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                                                </span>
+                                                <span>
+                                                    <span class="mm-delete-sec-icon-a">Priority</span>
+                                                </span>
+                                            </a>
+                                        {% endif %}
+
+                                    </div>
+                                    <div>
+                                        <a class="cursor-pointer remove-decoration color-style" data-toggle="modal"
+                                        data-target="#report_spam_{{msg.id}}">
+                                        <span class="mm-delete-sec-icon">
+                                            <i class="fa fa-ban" aria-hidden="true"></i>
+                                        </span>
+                                        <span>
+                                            <span class="mm-delete-sec-icon-a">Spam</span>
+                                        </span>
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a class="cursor-pointer remove-decoration color-style" data-toggle="modal"
+                                        data-target="#delete_message_{{msg.id}}">
+                                            <span class="mm-delete-sec-icon">
+                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                            </span>
+                                            <span>
+                                                <span class="mm-delete-sec-icon-a">Delete</span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Grid section  End-->
+
+<!-- The Modal -->
+<div class="modal fade" id="delete_message_{{msg.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Delete Message</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">Do you want to delete this message ? </p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button class="btn btn-outline-danger btn-sm delete_msg"
+        id="{{msg.msg_thread}}">Delete</button>
+        <button class="btn btn-outline-danger btn-sm"
+        data-dismiss="modal">Cancel</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+<!-- The Modal -->
+<div class="modal fade report_spam_modal" id="report_spam_{{msg.id}}">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Are you sure you want to report this message as spam?</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <p class="samr-modal-txt">This message and all other messages from this sender will be removed from
+                your inbox list, and this sender will no longer be able to contact you.</p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer spam_sending_btn">
+        <input type="hidden" id="msg_id" name="msg_id" value="{{msg.id}}" />
+        <button class="btn btn-outline-danger btn-sm report_spam spam_sending_btn"
+        id="{{msg.id}}">Report</button>
+        <button class="btn btn-outline-danger btn-sm spam_cancel_btn"
+        data-dismiss="modal">Cancel</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
+                        {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- All Message section End -->
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script src="{% static 'js/messenger.js' %}"></script>
+{% endblock %}

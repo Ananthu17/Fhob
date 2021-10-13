@@ -19,6 +19,7 @@ film_hobo/initial_user/migrations/
 film_hobo/payment/migrations/
 film_hobo/general/migrations/
 film_hobo/project/migrations/
+film_hobo/messaging/migrations/
 
 # ignore static files
 film_hobo/film_hobo/static/
@@ -26,3 +27,13 @@ film_hobo/film_hobo/static/
 # ignore env files
 local.env
 film_hobo/film_hobo/.env
+
+#ignore media files
+film_hobo/media/gallery/
+film_hobo/media/thumbnail/
+film_hobo/media/message_files/
+film_hobo/media/scene/
+film_hobo/media/script/
+
+
+

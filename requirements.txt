@@ -28,7 +28,7 @@ djangorestframework-simplejwt==4.4.0
 fpdf==1.7.2
 # fitz==0.0.1.dev2
 jsmin==2.2.2
-# mammoth==1.4.17
+mammoth==1.4.17
 paypal-checkout-serversdk==1.0.1
 pdf2image==1.16.0
 phonenumbers==8.12.21
@@ -43,7 +43,9 @@ remote-pdb==2.1.0
 setuptools==56.0.0
 # signals==0.0.2
 # utils==1.0.1
+urllib3==1.26.7
 validators==0.18.2
 whitenoise==5.2.0
 zappa==0.52.0
 zappa-django-utils==0.4.1
+xlsx2html==0.4.0

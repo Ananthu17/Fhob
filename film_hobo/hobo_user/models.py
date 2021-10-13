@@ -209,7 +209,7 @@ class CustomUser(AbstractUser):
                                        null=True,
                                        blank=True,)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     company_phone = models.CharField(_("Phone Number"),
@@ -255,7 +255,7 @@ class CustomUser(AbstractUser):
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     phone_number = models.CharField(_("Phone Number"),
@@ -541,37 +541,22 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
 
-    PRO_AND_COMP_WITH_RATING_1_STAR = 'pro_and_comp_with_rating_1_star'
-    PRO_AND_COMP_WITH_RATING_2_STAR = 'pro_and_comp_with_rating_2_star'
-    PRO_AND_COMP_WITH_RATING_3_STAR = 'pro_and_comp_with_rating_3_star'
-    PRO_AND_COMP_WITH_RATING_4_STAR = 'pro_and_comp_with_rating_4_star'
-    PRO_AND_COMP_WITH_RATING_5_STAR = 'pro_and_comp_with_rating_5_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_1_STAR = 'indie_pro_and_comp_with_rating_1_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_2_STAR = 'indie_pro_and_comp_with_rating_2_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_3_STAR = 'indie_pro_and_comp_with_rating_3_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_4_STAR = 'indie_pro_and_comp_with_rating_4_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_5_STAR = 'indie_pro_and_comp_with_rating_5_star'
-
-    CREW_SAMR_CHOICES =[
+    CREW_SAMR_CHOICES = [
         (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
         (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
         (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
         (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
         (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
-
-        (PRO_AND_COMP_WITH_RATING_1_STAR , 'pro and comp with rating 1 star'),
-        (PRO_AND_COMP_WITH_RATING_2_STAR , 'pro and comp with rating 2 star'),
-        (PRO_AND_COMP_WITH_RATING_3_STAR , 'pro and comp with rating 3 star'),
-        (PRO_AND_COMP_WITH_RATING_4_STAR , 'pro and comp with rating 4 star'),
-        (PRO_AND_COMP_WITH_RATING_5_STAR , 'pro and comp with rating 5 star'),
-
-        (INDIE_PRO_AND_COMP_WITH_RATING_1_STAR , 'indie pro and comp with rating 1 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_2_STAR , 'indie pro and comp with rating 2 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_3_STAR , 'indie pro and comp with rating 3 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_4_STAR , 'indie pro and comp with rating 4 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_5_STAR , 'indie pro and comp with rating 5 star'),
-
-
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
 
     No_PAYMENT = 'no_payment'
@@ -720,7 +705,7 @@ class Project(models.Model):
     crew_samr = models.CharField(_("Crew SAMR"),
                                  choices=CREW_SAMR_CHOICES,
                                  max_length=150,
-                                 default=PRO_AND_COMP_WITH_RATING_1_STAR)
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
@@ -732,8 +717,8 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12,null=True,
-                                            blank=True)
+    script_password = models.CharField(max_length=12, null=True,
+                                       blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,
@@ -1351,6 +1336,8 @@ class CompanyClient(models.Model):
 
 
 class UserInterest(models.Model):
+    MALE = 'male'
+    FEMALE = 'female'
     SCENE = 'SCH'
     SHORT = 'SHO'
     PILOT = 'PIL'
@@ -1364,11 +1351,35 @@ class UserInterest(models.Model):
     ShB = 'SAG_short_film_budget'
     MiB = 'SAG_micro_budget'
     StB = 'SAG_studet_budget'
+    FIVE_TO_SEVEN = 'five_to_seven'
+    EIGHT_TO_TEN = 'eight_to_ten'
+    ELEVEN_TO_FIFTEEN = 'eleven_to_fifteen'
+    SIXTEEN_TO_TWENTY = 'sixteen_to_twenty'
+    TWENTYONE_TO_THIRTY = 'twentyone_to_thirty'
+    THIRTYONE_TO_FOURTY = 'thirtyone_to_fourty'
+    FOURTYONE_TO_FIFTY = 'fourtyone_to_fifty'
+    FIFTYONE_TO_SIXTY = 'fiftyone_to_sixty'
+    SIXTYONE_TO_SEVENTY = 'sixtyone_to_seventy'
+    GENDER_CHOICES = [
+                    (MALE, 'Male'),
+                    (FEMALE, 'Female'),
+                    ]
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
                     (SHORT, 'Short Film'),
                     (PILOT, 'Pilot'),
                     (FEATURE, 'Feature'),
+                    ]
+    AGE_CHOICES = [
+                    (FIVE_TO_SEVEN, '5 to 7'),
+                    (EIGHT_TO_TEN, '8 to 10'),
+                    (ELEVEN_TO_FIFTEEN, '11 to 15'),
+                    (SIXTEEN_TO_TWENTY, '16 to 20'),
+                    (TWENTYONE_TO_THIRTY, '21 to 30'),
+                    (THIRTYONE_TO_FOURTY, '31 to 40'),
+                    (FOURTYONE_TO_FIFTY, '41 to 50'),
+                    (FIFTYONE_TO_SIXTY, '51 to 60'),
+                    (SIXTYONE_TO_SEVENTY, '61 to 70'),
                     ]
     BUDGET_CHOICES = [
                     (No_PAYMENT, 'No Payment'),
@@ -1399,11 +1410,78 @@ class UserInterest(models.Model):
                               choices=BUDGET_CHOICES,
                               max_length=150,
                               default=No_PAYMENT, null=True)
+    gender = models.CharField(_("Gender"),
+                              choices=GENDER_CHOICES,
+                              max_length=150,
+                              null=True, blank=True)
+    age = models.CharField(_("Age"),
+                           choices=AGE_CHOICES,
+                           max_length=150,
+                           null=True, blank=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
                                  verbose_name=_("Location"),
                                  null=True)
+
+
+# class UserRatingCombined(models.Model):
+#     user = models.ForeignKey("hobo_user.CustomUser",
+#                              on_delete=models.CASCADE,
+#                              related_name='user_rating_combined',
+#                              verbose_name=_("User"),
+#                              null=True)
+#     job_type = models.ForeignKey('hobo_user.JobType',
+#                                  on_delete=models.CASCADE,
+#                                  related_name="user_job_type_rating_combined",
+#                                  verbose_name=_("Job Types")
+#                                  )
+#     rating = models.FloatField(_("Rating"), null=True, blank=True)
+#     no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
+#     no_of_projects = models.IntegerField(
+#         _("No of Projects"), null=True, blank=True)
+
+#     def __str__(self):
+#         return str(self.user)
+
+#     class Meta:
+#         verbose_name = 'User Rating Combined'
+#         verbose_name_plural = 'User Rating Combined'
+
+
+class UserInterestJob(models.Model):
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='user_interest_job',
+                             verbose_name=_("User"))
+    user_interest = models.ForeignKey("hobo_user.UserInterest",
+                                      on_delete=models.CASCADE,
+                                      related_name='user_interest',
+                                      verbose_name=_("User"),
+                                      null=True)
+    crew = models.ForeignKey('project.ProjectCrew',
+                             verbose_name=_("Crew"),
+                             on_delete=models.CASCADE,
+                             null=True, blank=True)
+    cast = models.ForeignKey('project.Character',
+                             verbose_name=_("Character"),
+                             on_delete=models.CASCADE,
+                             null=True, blank=True)
+    crew_application = models.ForeignKey('project.CrewApplication',
+                                         verbose_name=_("Crew Application"),
+                                         on_delete=models.CASCADE,
+                                         null=True, blank=True)
+    cast_application = models.ForeignKey('project.Audition',
+                                         verbose_name=_("Cast Application"),
+                                         on_delete=models.CASCADE,
+                                         null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user)
+
+    class Meta:
+        verbose_name = 'User Interest Job'
+        verbose_name_plural = 'User Interest Jobs'
 
 
 class UserRatingCombined(models.Model):
@@ -1669,7 +1747,7 @@ class UserAgentManager(models.Model):
                                   blank=True
                                   )
     phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
-                                        message="invalid phone number",
+                                        message="Invalid Phone Number",
                                         code="invalid_phone_number"
                                         )
     agent_phone = models.CharField(_("Agent's phone number"),
@@ -1736,6 +1814,7 @@ class UserNotification(models.Model):
     CAST_ATTACH_RESPONSE = 'cast_attach_response'
     CREW_ATTACH_REQUEST = 'crew_attach_request'
     CREW_ATTACH_RESPONSE = 'crew_attach_response'
+    USER_INTEREST = 'user_interest'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1759,6 +1838,7 @@ class UserNotification(models.Model):
                                 (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
                                 (CREW_ATTACH_REQUEST, 'Crew Attach Request'),
                                 (CREW_ATTACH_RESPONSE, 'Crew Attach Response'),
+                                (USER_INTEREST, 'User Interest'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),

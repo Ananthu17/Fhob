@@ -256,6 +256,13 @@ input.pw {
       padding:2px 6px;
       border-radius:50px;
     }
+.msg_notification_count_span
+    {
+      background-color:red;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:50px;
+    }
 .notification_img
     {
       width:100%;
@@ -397,7 +404,7 @@ input.pw {
   }
   .my-interest-table-th{
     border: 0;
-    border-bottom: 1px solid#656565;
+    border-top: 1px solid#656565;
  }
  .inp-interest-2 {
   border:none;
@@ -730,4 +737,75 @@ input.pw {
 .hover_color:hover
   {
     color:#39b660;
+  }
+
+  .height-cls
+    {
+      height:300px;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+.color-style span
+    {
+      color:#b5b4b4!important;
+    }
+.color-style span:hover
+    {
+      color:#b5b4b4!important;
+    }
+.msg-txt-color
+    {
+      color:inherit;
+    }
+.msg-txt-color:hover
+    {
+      color:inherit;
+    }
+.attachments-txt
+    {
+      color:#0e62b5;
+    }
+.msg-pdf
+{
+  width:5%;
+  height:auto;
+}
+.msg-img
+{
+  width:10%;
+  height:auto;
+}
+.msg-img-full-size
+{
+  width:100%;
+  height:auto;
+}
+.img-section-modal
+  {
+    height:350px;
+    overflow-y:scroll;
+  }
+.html_file_content, .html_excel_content
+  {
+    height:350px;
+    overflow-y:scroll;
+  }
+.download_link
+  {
+    position:absolute;
+    color:#fff;
+    background:rgba(0,0,0,0.3);
+    padding:1px 2px;
+  }
+.download_link:hover
+  {
+    text-decoration: none;
+    color:#fff;
+    background:rgba(0,0,0,0.7);
+  }
+.txt_style
+  {
+    font-family: Courier Bold;
+    font-size: 13px;
   }

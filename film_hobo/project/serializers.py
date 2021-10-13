@@ -55,14 +55,14 @@ class CharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['name', 'description', 'project', 'password']
+        fields = ['name', 'description', 'project', 'password', 'age', 'gender']
 
 
 class UpdateCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['name', 'description', 'project', 'password']
+        fields = ['name', 'description', 'project', 'password', 'age', 'gender']
 
 
 class SidesSerializer(serializers.ModelSerializer):
