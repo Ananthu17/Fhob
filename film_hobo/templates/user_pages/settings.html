@@ -11,6 +11,17 @@
     border-radius:.25rem;
     outline:none;
   }
+
+
+  form i {
+            margin-left: -30px;
+            position: absolute;
+            right: 6%;
+            width: 20px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+        }
 </style>
 {% endblock %}
 
@@ -139,10 +150,13 @@
                         </div>
                         <div id="password-tab" class="row ml-2 collapse">
                             <div class="col-8 ml-4">
-                                <input class="inp-line pw" autocomplete="off" name="old_password" placeholder="Old Password" />
+                                <i class="bi bi-eye-slash" id="togglePassword1"></i>
+                                <input class="inp-line" type="password" id="old-pass" autocomplete="off" name="old_password" placeholder="Old Password" />
                                 <p class="old_password-error" style="margin-bottom:0; color:red;"></p>
-                                <input class="inp-line pw" autocomplete="off" name="new_password1" placeholder="New Password" />
+                                <i class="bi bi-eye-slash" id="togglePassword2"></i>
+                                <input class="inp-line" type="password" id="new-pass" autocomplete="off" name="new_password1" placeholder="New Password" />
                                 <p class="new_password1-error" style="margin-bottom:0; color:red;"></p>
+                                
                                 <input class="inp-line pw" autocomplete="off" name="new_password2" placeholder="Confirm New Password" />
                                 <p class="new_password2-error" style="margin-bottom:0; color:red;"></p>
                                 <div class="mt-2">
@@ -442,7 +456,8 @@
                                 <select
                                 class="form-control form-control-input block-placeholder border-cls"
                                 id="all_blocked_members">
-                                <option value=""></option>
+                                
+                                <option value="">Select User</option>
                                 </select>
                             </div>
                             <div class="col-2 mt-4">
@@ -535,7 +550,7 @@
                                         <div class="form-check">
                                             <label class="form-check-label w-100">
                                                 If someone sends me a friend request
-                                                <input type="checkbox"
+                                                &nbsp;&nbsp;&nbsp;<input type="checkbox"
                                                 name="friend_request"
                                                 class="form-check-input"
                                                 {% if user_settings.friend_request == True %}checked{% endif %}>
@@ -674,5 +689,30 @@
 {% block extrajs %}
 {{ form.media.js }}
 <script type="text/javascript" " src="{% static 'js/settings.js' %}"></script>
+<script>
+
+// Visibility Password hide and show eye
+    const togglePassword1 = document.querySelector('#togglePassword1');
+    const password1 = document.querySelector('#old-pass');
+    togglePassword1.addEventListener('click', function (e) {
+    // toggle the type attribute
+    const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+    password1.setAttribute('type', type);
+    // toggle the eye / eye slash icon
+    this.classList.toggle('bi-eye');
+});
+
+
+//Script Password hide and show eye
+const togglePassword2 = document.querySelector('#togglePassword2');
+    const password2 = document.querySelector('#new-pass');
+    togglePassword2.addEventListener('click', function (e) {
+    // toggle the type attribute
+    const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+    password2.setAttribute('type', type);
+    // toggle the eye / eye slash icon
+    this.classList.toggle('bi-eye');
+});
+</script>
 {% endblock %}
 
