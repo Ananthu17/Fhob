@@ -6,7 +6,6 @@ import requests
 from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
-
 from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
@@ -19,7 +18,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
@@ -27,7 +25,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
 from rest_framework import authentication
 from rest_framework import status
 from rest_framework import permissions
@@ -153,8 +150,8 @@ class CustomUserLogin(DjangoLogin):
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            return render(request, 'user_pages/user_home.html', 
+                                                        {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -165,13 +162,17 @@ class CustomUserLogin(DjangoLogin):
             email = input_json_data_dict['email']
             password = input_json_data_dict['password']
             user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'user_pages/user_home.html',
-                              {'user': user})
+            userobj = CustomUserSettings.objects.get(user=user)
+            if userobj.account_status == userobj.DISABLED:
+                return redirect('/hobo_user/enable-account')
             else:
-                return HttpResponse(
-                    'Unable to log in with provided credentials.')
+                if user is not None:
+                    login(request, user)
+                    return render(request, 'user_pages/user_home.html',
+                            {'user': user})
+                else:
+                    return HttpResponse(
+                        'Unable to log in with provided credentials.')
         else:
             return render(request, 'user_pages/login.html', {'form': form})
 
@@ -1249,6 +1250,9 @@ class DisableAccountAPI(APIView):
                 obj.user = user
                 obj.reason = reason
                 obj.save()
+                userobj = CustomUser.objects.get(id=user.id)
+                userobj.registration_complete = False
+                userobj.save()
                 user_settings = CustomUserSettings.objects.get(user=user)
                 user_settings.account_status = CustomUserSettings.DISABLED
                 user_settings.save()
@@ -1277,8 +1281,11 @@ class EnableAccountAPI(APIView):
                     user_settings = CustomUserSettings.objects.get(user=user)
                     user_settings.account_status = CustomUserSettings.ENABLED
                     try:
+                        userobj = CustomUser.objects.get(id=user.id)
+                        userobj.registration_complete = True
                         disabled_account = DisabledAccount.objects.get(user=user)
                         disabled_account.delete()
+                        userobj.save()
                         user_settings.save()
                         response = {'message': "Account Enabled",
                                     'status': status.HTTP_200_OK
