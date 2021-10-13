@@ -672,12 +672,304 @@ class AddDiscountDetailAPI(APIView):
     permission_classes = (IsSuperUser,)
 
     def post(self, request, format=None):
-        data = request.data
+        initial_data = request.data
         midnight = 'T00:00:00Z'
-        data['valid_from'] = data['valid_from'] + midnight
-        data['valid_to'] = data['valid_to'] + midnight
-        data['user_type'] = 'ADMIN'
-        serializer = DiscountsSerializer(data=data)
+        initial_data['valid_from'] = initial_data['valid_from'] + midnight
+        initial_data['valid_to'] = initial_data['valid_to'] + midnight
+        initial_data['user_type'] = 'ADMIN'
+        datetime_obj_valid_from = datetime.datetime.strptime(
+            initial_data['valid_from'], '%Y-%m-%dT%H:%M:%SZ')
+        datetime_obj_valid_to = datetime.datetime.strptime(
+            initial_data['valid_to'], '%Y-%m-%dT%H:%M:%SZ')
+        delta = datetime_obj_valid_to - datetime_obj_valid_from
+        discounted_days = delta.days
+
+        # function to get value of a key in json
+        def find_values(id, json_repr):
+            results = []
+
+            def _decode_dict(a_dict):
+                try:
+                    results.append(a_dict[id])
+                except KeyError:
+                    pass
+                return a_dict
+
+            json.loads(json_repr, object_hook=_decode_dict)
+            return results
+
+        # function to get final discounted value
+        def find_final_discounted_value(percentage, plan_value):
+            value_to_be_deducted = (float(percentage) *
+                                    float(plan_value) / 100.00)
+            final_discounted_value = plan_value - value_to_be_deducted
+            return round(final_discounted_value, 2)
+
+        # get paypal access_token
+        paypal_client_id = settings.PAYPAL_CLIENT_ID
+        paypal_secret = settings.PAYPAL_SECRET_ID
+        data = {'grant_type': 'client_credentials'}
+        token_user_response = requests.post(
+                            'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                            data=data,
+                            auth=(paypal_client_id, paypal_secret),
+                            headers={'Accept': 'application/json',
+                                     'Accept-Language': 'en_US'})
+        if token_user_response.status_code == 200:
+            access_token = json.loads(
+                token_user_response.content)['access_token']
+        else:
+            return Response(
+                {"status": "error in fetching paypal access token"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        access_token_strting = 'Bearer ' + access_token
+
+        # get the current plan details
+        paypal_get_plan_details_api = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
+
+        # 1
+        indie_monthly_plan_details_api = paypal_get_plan_details_api + \
+            settings.INDIE_PAYMENT_MONTHLY
+        indie_monthly_plan_details_api_response = requests.get(
+                            indie_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_monthly_plan_details_api_response.status_code == 200:
+            indie_monthly_plan_value = find_values(
+                'value', indie_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        # 2
+        indie_yearly_plan_details_api = paypal_get_plan_details_api + \
+            settings.INDIE_PAYMENT_YEARLY
+        indie_yearly_plan_details_api_response = requests.get(
+                            indie_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if indie_yearly_plan_details_api_response.status_code == 200:
+            indie_yearly_plan_value = find_values(
+                'value', indie_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        # 3
+        pro_monthly_plan_details_api = paypal_get_plan_details_api + \
+            settings.PRO_PAYMENT_MONTHLY
+        pro_monthly_plan_details_api_response = requests.get(
+                            pro_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_monthly_plan_details_api_response.status_code == 200:
+            pro_monthly_plan_value = find_values(
+                'value', pro_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        # 4
+        pro_yearly_plan_details_api = paypal_get_plan_details_api + \
+            settings.PRO_PAYMENT_YEARLY
+        pro_yearly_plan_details_api_response = requests.get(
+                            pro_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if pro_yearly_plan_details_api_response.status_code == 200:
+            pro_yearly_plan_value = find_values(
+                'value', pro_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        # 5
+        company_monthly_plan_details_api = paypal_get_plan_details_api + \
+            settings.COMPANY_PAYMENT_MONTHLY
+        company_monthly_plan_details_api_response = requests.get(
+                            company_monthly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_monthly_plan_details_api_response.status_code == 200:
+            company_monthly_plan_value = find_values(
+                'value', company_monthly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+        # 6
+        company_yearly_plan_details_api = paypal_get_plan_details_api + \
+            settings.COMPANY_PAYMENT_YEARLY
+        company_yearly_plan_details_api_response = requests.get(
+                            company_yearly_plan_details_api,
+                            headers={'Content-Type': 'application/json',
+                                     'Authorization': access_token_strting})
+        if company_yearly_plan_details_api_response.status_code == 200:
+            company_yearly_plan_value = find_values(
+                'value', company_yearly_plan_details_api_response.text)[0]
+        else:
+            return Response(
+                {"status": "error in fetching paypal plan"},
+                status=status.HTTP_404_NOT_FOUND)
+
+        # create plans based on the input
+
+        plan_types = ['Indie Payment Monthly', 'Indie Payment Yearly',
+                      'Pro Payment Monthly', 'Pro Payment Yearly',
+                      'Company Payment Monthly', 'Company Payment Yearly']
+        plan_ids = {'indie_monthly_plan_id': '',
+                    'indie_yearly_plan_id': '',
+                    'pro_monthly_plan_id': '',
+                    'pro_yearly_plan_id': '',
+                    'company_monthly_plan_id': '',
+                    'company_yearly_plan_id': ''}
+        for plan_type in plan_types:
+            plan_name = 'Discount Plan' + ' - ' + plan_type + ' - ' + \
+                request.data['promo_code']
+            if plan_type.find('Monthly'):
+                plan_interval_unit = 'MONTH'
+            else:
+                plan_interval_unit = 'YEAR'
+
+            if plan_type == 'Indie Payment Monthly':
+                plan_interval_count = indie_monthly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(indie_monthly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(indie_monthly_plan_value) -
+                        float(initial_data['amount']))
+            elif plan_type == 'Indie Payment Yearly':
+                plan_interval_count = indie_yearly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(indie_yearly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(indie_yearly_plan_value) -
+                        float(initial_data['amount']))
+            elif plan_type == 'Pro Payment Monthly':
+                plan_interval_count = pro_monthly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(pro_monthly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(pro_monthly_plan_value) -
+                        float(initial_data['amount']))
+            elif plan_type == 'Pro Payment Yearly':
+                plan_interval_count = pro_yearly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(pro_yearly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(pro_yearly_plan_value) -
+                        float(initial_data['amount']))
+            elif plan_type == 'Company Payment Monthly':
+                plan_interval_count = company_monthly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(company_monthly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(company_monthly_plan_value) -
+                        float(initial_data['amount']))
+            elif plan_type == 'Company Payment Yearly':
+                plan_interval_count = company_yearly_plan_value
+                if (initial_data['amount_type'] == 'percentage'):
+                    final_discounted_value = \
+                        find_final_discounted_value(
+                            float(initial_data['amount']),
+                            float(company_yearly_plan_value))
+                else:
+                    final_discounted_value = (
+                        float(company_yearly_plan_value) -
+                        float(initial_data['amount']))
+            else:
+                pass
+
+            create_plan_json = {
+                "name": plan_name,
+                "description": plan_name,
+                "product_id": settings.PRODUCT_ID,
+                "billing_cycles": [
+                    {
+                        "frequency": {
+                            "interval_unit": "DAY",
+                            "interval_count": discounted_days
+                        },
+                        "tenure_type": "TRIAL",
+                        "sequence": 1,
+                        "total_cycles": 1,
+                        "pricing_scheme": {
+                            "fixed_price": {
+                                "value": final_discounted_value,
+                                "currency_code": "USD"
+                            }
+                        }
+                    },
+                    {
+                        "frequency": {
+                            "interval_unit": plan_interval_unit,
+                            "interval_count": 1
+                        },
+                        "tenure_type": "REGULAR",
+                        "sequence": 2,
+                        "total_cycles": 0,
+                        "pricing_scheme": {
+                            "fixed_price": {
+                                "value": plan_interval_count,
+                                "currency_code": "USD"
+                            }
+                        }
+                    }
+                ],
+                "payment_preferences": {
+                    "auto_bill_outstanding": True,
+                    "payment_failure_threshold": 1
+                }
+            }
+
+            create_plan_user_response = requests.post(
+                        'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                        data=json.dumps(create_plan_json),
+                        headers={'Accept': 'application/json',
+                                 'Authorization': access_token_strting,
+                                 'Content-type': 'application/json'
+                                 })
+            if create_plan_user_response.status_code == 201:
+                plan_id = json.loads(create_plan_user_response.content)['id']
+                if plan_type == 'Indie Payment Monthly':
+                    plan_ids['indie_monthly_plan_id'] = plan_id
+                elif plan_type == 'Indie Payment Yearly':
+                    plan_ids['indie_yearly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Monthly':
+                    plan_ids['pro_monthly_plan_id'] = plan_id
+                elif plan_type == 'Pro Payment Yearly':
+                    plan_ids['pro_yearly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Monthly':
+                    plan_ids['company_monthly_plan_id'] = plan_id
+                elif plan_type == 'Company Payment Yearly':
+                    plan_ids['company_yearly_plan_id'] = plan_id
+                else:
+                    pass
+            else:
+                return HttpResponse('Could not save data')
+        initial_data.update(plan_ids)
+        serializer = DiscountsSerializer(data=initial_data)
         if serializer.is_valid():
             serializer.save()
             return Response({"status": "success",
@@ -966,7 +1258,8 @@ class CreateUserOrder(APIView):
                                     headers={'Accept': 'application/json',
                                              'Accept-Language': 'en_US'})
                 if token_user_response.status_code == 200:
-                    access_token = json.loads(token_user_response.content)['access_token']
+                    access_token = json.loads(
+                        token_user_response.content)['access_token']
                 else:
                     return HttpResponse('Could not save data')
 
@@ -976,7 +1269,8 @@ class CreateUserOrder(APIView):
                                 'https://api-m.sandbox.paypal.com/v1/billing/plans',
                                 data=json.dumps(data_dict),
                                 headers={'Content-type': 'application/json',
-                                         'Authorization': access_token_strting})
+                                         'Authorization': access_token_strting
+                                         })
                 if create_plan_user_response.status_code == 201:
                     plan_id = json.loads(create_plan_user_response.content)['id']
                 else:
@@ -1345,13 +1639,14 @@ class GetBraintreeDiscountDetailListAPI(APIView):
                 "amount": ''
             }
             if discount.never_expires:
-                promocode, created = BraintreePromoCode.objects.update_or_create(
-                    braintree_id=discount.id, promo_code=discount.name,
-                    description=discount.description,
-                    duration='full_subscription',
-                    billing_cycles=discount.number_of_billing_cycles,
-                    amount=discount.amount
-                )
+                promocode, created = \
+                    BraintreePromoCode.objects.update_or_create(
+                        braintree_id=discount.id, promo_code=discount.name,
+                        description=discount.description,
+                        duration='full_subscription',
+                        billing_cycles=discount.number_of_billing_cycles,
+                        amount=discount.amount
+                    )
                 data_dict['braintree_id'] = discount.id
                 data_dict['promo_code'] = discount.name
                 data_dict['description'] = discount.description
@@ -1360,13 +1655,14 @@ class GetBraintreeDiscountDetailListAPI(APIView):
                 data_dict['amount'] = discount.amount
                 final_list.append(data_dict)
             else:
-                promocode, created = BraintreePromoCode.objects.update_or_create(
-                    braintree_id=discount.id, promo_code=discount.name,
-                    description=discount.description,
-                    duration='billing_cycle_subscription',
-                    billing_cycles=discount.number_of_billing_cycles,
-                    amount=discount.amount
-                )
+                promocode, created = \
+                    BraintreePromoCode.objects.update_or_create(
+                        braintree_id=discount.id, promo_code=discount.name,
+                        description=discount.description,
+                        duration='billing_cycle_subscription',
+                        billing_cycles=discount.number_of_billing_cycles,
+                        amount=discount.amount
+                    )
                 data_dict['braintree_id'] = discount.id
                 data_dict['promo_code'] = discount.name
                 data_dict['description'] = discount.description
