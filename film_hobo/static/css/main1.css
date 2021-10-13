@@ -2208,6 +2208,7 @@ ul.cas-cast-menu li{
    font-size: 13px;
    font-weight: 600;
    height: 29px;
+   margin-top: 10px;
 }
 .cas-cast-save-or-edit-btn {
    font-size: 14px;
@@ -2220,14 +2221,14 @@ ul.cas-cast-menu li{
    padding-top: 4px;
    padding-bottom: 4px;
 }
-.cas-radio-label-1{
+.cas-radio-label{
    font-weight: 500;
    font-size: 14px;
 }
-.cas-radio-label-2{
-   font-weight: 500;
-   font-size: 14px;
-   margin-left: 15px;
+.cas-radio-grid{
+   display: flex;
+    column-gap: 8px;
+    flex-wrap: wrap;
 }
 .cas-select-style{
    max-width: 100px;
@@ -2299,6 +2300,10 @@ ul.cas-cast-menu li{
       height: 23px;
       width: 100%;
    }
+   .cas-cast-side-txt {
+      display: flex;
+      justify-content: flex-start;
+  }
 
 }
 @media(max-width:640px){
@@ -2317,13 +2322,9 @@ ul.cas-cast-menu li{
       grid-column-gap: 25px;
       grid-row-gap: 10px;
    }
-   .cas-cast-side-txt {
-      display: flex;
-      justify-content: flex-start;
-  }
-  .cas-cast-sub-txt {
-   padding-left: 0px;
-}
+   .cas-cast-sub-txt {
+      padding-left: 0px;
+   }
 }
 
 /* Cast and Sides End  */

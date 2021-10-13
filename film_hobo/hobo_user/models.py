@@ -1338,6 +1338,7 @@ class CompanyClient(models.Model):
 class UserInterest(models.Model):
     MALE = 'male'
     FEMALE = 'female'
+    OTHERS = 'others'
     SCENE = 'SCH'
     SHORT = 'SHO'
     PILOT = 'PIL'
@@ -1363,6 +1364,7 @@ class UserInterest(models.Model):
     GENDER_CHOICES = [
                     (MALE, 'Male'),
                     (FEMALE, 'Female'),
+                    (OTHERS, 'Others'),
                     ]
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
@@ -1423,65 +1425,6 @@ class UserInterest(models.Model):
                                  related_name='user_interest_location',
                                  verbose_name=_("Location"),
                                  null=True)
-
-
-# class UserRatingCombined(models.Model):
-#     user = models.ForeignKey("hobo_user.CustomUser",
-#                              on_delete=models.CASCADE,
-#                              related_name='user_rating_combined',
-#                              verbose_name=_("User"),
-#                              null=True)
-#     job_type = models.ForeignKey('hobo_user.JobType',
-#                                  on_delete=models.CASCADE,
-#                                  related_name="user_job_type_rating_combined",
-#                                  verbose_name=_("Job Types")
-#                                  )
-#     rating = models.FloatField(_("Rating"), null=True, blank=True)
-#     no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
-#     no_of_projects = models.IntegerField(
-#         _("No of Projects"), null=True, blank=True)
-
-#     def __str__(self):
-#         return str(self.user)
-
-#     class Meta:
-#         verbose_name = 'User Rating Combined'
-#         verbose_name_plural = 'User Rating Combined'
-
-
-class UserInterestJob(models.Model):
-    user = models.ForeignKey("hobo_user.CustomUser",
-                             on_delete=models.CASCADE,
-                             related_name='user_interest_job',
-                             verbose_name=_("User"))
-    user_interest = models.ForeignKey("hobo_user.UserInterest",
-                                      on_delete=models.CASCADE,
-                                      related_name='user_interest',
-                                      verbose_name=_("User"),
-                                      null=True)
-    crew = models.ForeignKey('project.ProjectCrew',
-                             verbose_name=_("Crew"),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True)
-    cast = models.ForeignKey('project.Character',
-                             verbose_name=_("Character"),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True)
-    crew_application = models.ForeignKey('project.CrewApplication',
-                                         verbose_name=_("Crew Application"),
-                                         on_delete=models.CASCADE,
-                                         null=True, blank=True)
-    cast_application = models.ForeignKey('project.Audition',
-                                         verbose_name=_("Cast Application"),
-                                         on_delete=models.CASCADE,
-                                         null=True, blank=True)
-
-    def __str__(self):
-        return str(self.user)
-
-    class Meta:
-        verbose_name = 'User Interest Job'
-        verbose_name_plural = 'User Interest Jobs'
 
 
 class UserRatingCombined(models.Model):

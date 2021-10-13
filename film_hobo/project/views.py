@@ -46,7 +46,7 @@ from rest_framework.generics import (UpdateAPIView,
 
 from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
      UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined, UserInterest, UserInterestJob
+     VideoRatingCombined, UserInterest
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
@@ -498,6 +498,16 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         context['crew_rating_dict'] = crew_rating_dict
         context['project'] = project
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
+        writer_obj = AttachedCrewMember.objects.filter(
+                Q(crew__job_type__slug='writer') &
+                Q(crew__project=project) &
+                Q(crew_status=AttachedCrewMember.ATTACHED)
+            ).first()
+        if writer_obj:
+            if writer_obj.user:
+                context['writer'] = writer_obj.user.get_full_name()
+            elif writer_obj.name:
+                context['writer'] = writer_obj.name
         return context
 
 
@@ -658,13 +668,6 @@ class CharacterCreateAPIView(APIView):
                                 )
                     for usin in interest:
                         user = usin.user
-                        # update user interest list table
-                        user_interest_job = UserInterestJob()
-                        user_interest_job.user = user
-                        user_interest_job.user_interest = usin
-                        user_interest_job.cast = character_obj
-                        user_interest_job.save()
-                        # update notification table
                         notification = UserNotification()
                         notification.user = user
                         notification.notification_type = UserNotification.USER_INTEREST
@@ -1122,17 +1125,6 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.save()
         # end
 
-        # update user interest job list table
-        try:
-            user_interest_job = UserInterestJob.objects.get(
-                                    Q(user=user) &
-                                    Q(cast=character)
-                                )
-            user_interest_job.cast_application = audition_obj
-            user_interest_job.save()
-        except UserInterestJob.DoesNotExist:
-            pass
-
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -1247,17 +1239,6 @@ class SubmitAuditionAPI(APIView):
             user_project_obj.character = character
             user_project_obj.save()
             # end
-
-            # update user interest job list table
-            try:
-                user_interest_job = UserInterestJob.objects.get(
-                                        Q(user=self.request.user) &
-                                        Q(cast=character)
-                                    )
-                user_interest_job.cast_application = audition_obj
-                user_interest_job.save()
-            except UserInterestJob.DoesNotExist:
-                pass
 
             response = {'message': "Audition Submitted",
                         'status': status.HTTP_200_OK}
@@ -3467,16 +3448,6 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.save()
         # end
 
-        # update user interest job list table
-        try:
-            user_interest_job = UserInterestJob.objects.get(
-                                    Q(user=user) &
-                                    Q(crew=project_crew)
-                                )
-            user_interest_job.crew_application = crew_apply_obj
-            user_interest_job.save()
-        except UserInterestJob.DoesNotExist:
-            pass
         messages.success(self.request, "Application submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -3529,16 +3500,7 @@ class CrewApplyAPI(APIView):
             user_project_obj.crew = project_crew
             user_project_obj.save()
             # end
-            # update user interest job list table
-            try:
-                user_interest_job = UserInterestJob.objects.get(
-                                        Q(user=self.request.user) &
-                                        Q(crew=project_crew)
-                                    )
-                user_interest_job.crew_application = crew_apply_obj
-                user_interest_job.save()
-            except UserInterestJob.DoesNotExist:
-                pass
+
             response = {'message': "Application submitted",
                         'status': status.HTTP_200_OK}
 
@@ -3975,13 +3937,6 @@ class AddProjectCrewAPI(APIView):
                             )
                 for usin in interest:
                     user = usin.user
-                    # update user interest list table
-                    user_interest_job = UserInterestJob()
-                    user_interest_job.user = user
-                    user_interest_job.user_interest = usin
-                    user_interest_job.crew = crew_obj
-                    user_interest_job.save()
-                    # update notification table
                     notification = UserNotification()
                     notification.user = user
                     notification.notification_type = UserNotification.USER_INTEREST

@@ -17,6 +17,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class Character(models.Model):
     MALE = 'male'
     FEMALE = 'female'
+    OTHERS = 'others'
     FIVE_TO_SEVEN = 'five_to_seven'
     EIGHT_TO_TEN = 'eight_to_ten'
     ELEVEN_TO_FIFTEEN = 'eleven_to_fifteen'
@@ -29,6 +30,7 @@ class Character(models.Model):
     GENDER_CHOICES = [
                     (MALE, 'Male'),
                     (FEMALE, 'Female'),
+                    (OTHERS, 'Others'),
                     ]
     AGE_CHOICES = [
                 (FIVE_TO_SEVEN, '5 to 7'),

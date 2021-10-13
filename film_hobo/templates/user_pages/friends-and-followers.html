@@ -2,6 +2,7 @@
 {% load static %}
 {% load friend_request_tag %}
 {% load project_rating_tag %}
+{% load user_account_tag %}
 
 {% block extracss %}
 <style>
@@ -456,23 +457,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#3</span></div>
-                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">Dallas</span>
-                                    </div>
-                                </div>
-                                <div class="col-6 mem-set-track-padding">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#178</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#1</span></div>
-                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
-                                            York</span></div>
-                                </div>
-                            </div>
                         </div>
 
                     </div>
@@ -482,10 +466,12 @@
                             <div class="card">
                                     <div class="row mb-1 mt-1" id="trackandtracking">
                                         <div class="col">
-                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu1');" >(11)Tracking </a>
+                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}"
+                                            onclick="toggleVisibility('Menu1');" >({{ tracking_list_count }})Tracking </a>
                                         </div>
                                         <div class="col">
-                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu2');">(7)Trackers</a>
+                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}"
+                                            onclick="toggleVisibility('Menu2');">({{ trackers_list_count }})Trackers</a>
                                         </div>
                                     </div>
                                 <!-- end dropdown bar     -->
@@ -616,7 +602,7 @@
                             <div class="row intrest-input ">
                                 <div class="sm-12">
                                     <label class="intrest-lab">Position:</label>
-                                    <select class="inp-interest" id="position_1"
+                                    <select class="inp-interest position" id="position_1"
                                     name="position" required>
                                         {% for position in my_interest_form.position %}
                                             {{position}}
@@ -650,7 +636,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="sm-12">
+                                <div class="sm-12 gender_age_section" id="gender_section_1">
                                     <label class="intrest-lab">Gender:</label>
                                     <select class="inp-interest format-space"
                                     name="gender" id ="gender"  >
@@ -659,7 +645,7 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="sm-12">
+                                <div class="sm-12 gender_age_section" id="age_section_1">
                                     <label class="intrest-lab">Age:</label>
                                     <select class="inp-interest format-space"
                                     name="age" id ="age"  >
@@ -698,65 +684,69 @@
                             <table class="table mem-table table-responsive-sm">
                                 <colgroup>
                                     <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 10%;">
-                                    <col span="1" style="width: 35%;">
-                                    <col span="1" style="width: 20%;">
-                                    <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 15%;">
+                                    <col span="1" style="width: 30%;">
+                                    <col span="1" style="width: 25%;">
+                                    <col span="1" style="width: 15%;">
                                     <!-- <col span="1" style="width: 5%;">
                                     <col span="1" style="width: 6%;"> -->
-                                    <col span="1" style="width: 10%;">
+                                    <col span="1" style="width: 20%;">
                                  </colgroup>
                             {% for obj in myinterests %}
                                 <tr class="interest-font my-interest-table-th" >
                                     <th>Position: <u>{{obj.position}}</u> </th>
-                                    <th>Format: <u>{% if obj.format == 'SCH' %}Scene {% elif obj.format == 'SHO'  %}Short Film {% elif obj.format == 'PIL'  %}Pilot{% elif obj.format == 'FTR'  %}Feature{% endif %}    </u> </th>
+                                    <th>Format: <u>{{obj.get_format_display}} </u> </th>
                                     <th>Location: <u>{{obj.location}}</u></th>
+                                    <th>{% if obj.position.slug == 'actoractress' %}Age:<u>{{obj.get_age_display}}{% endif %}</u></th>
+                                    <th>{% if obj.position.slug == 'actoractress' %}Gender:<u>{{obj.gender}}{% endif %}</u></th>
                                     <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
                                     <th></th>
                                     <th></th>
-                                    <th></th>
-                                    <th></th>
                                 </tr>
-                                {% get_dict_value_if_exists user_jobs_dict obj.id as job_list %}
-                                {% if job_list %}
-                                    {% for job in job_list  %}
-                                        {% if job.cast %}
+                                {% get_dict_value_if_exists cast_jobs_dict obj.id as cast_job_list %}
+                                {% if cast_job_list %}
+                                    {% for cast in cast_job_list  %}
                                             <tr>
-                                                    <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.cast.project.id %}">Project # {{ job.cast.project.id }}</a></td>
-                                                    <td>Title:  {{ job.cast.project.title }} </td>
-                                                    <td>Character:  {{ job.cast.name }} </td>
-                                                    <td>Posted on {{ job.cast.created_time }}</td>
-                                                    {% if job.cast_application %}
+                                                    <td><a class="tbl-tag" href="{% url 'project:single-film-project' cast.project.id %}">Project # {{ cast.project.id }}</a></td>
+                                                    <td>Title:  {{ cast.project.title }} </td>
+                                                    <td>Character:  {{ cast.name }} </td>
+                                                    <td>Posted on {{ cast.created_time }}</td>
+                                                    {% get_dict_value cast_application_dict cast.id as audition_obj %}
+                                                    {% if audition_obj is not None %}
                                                         <td
-                                                        {% if job.cast_application.audition_status == 'applied' %}class="int-applied"
-                                                        {% elif job.cast_application.audition_status == 'attached' %}class="int-green"
-                                                        {% elif job.cast_application.audition_status == 'passed' %}class="int-red"
-                                                        {% endif %}>{{job.cast_application.audition_status}}</td>
-                                                        <td class="int-red">(on {{job.cast_application.status_update_date}})</td>
+                                                        {% if audition_obj.audition_status == 'applied' %}class="int-applied"
+                                                        {% elif audition_obj.audition_status == 'attached' %}class="int-green"
+                                                        {% elif audition_obj.audition_status == 'passed' %}class="int-red"
+                                                        {% endif %}>{{audition_obj.audition_status}}</td>
+                                                        <td class="int-red">(on {{audition_obj.status_update_date}})</td>
                                                     {% else %}
                                                         <td></td>
                                                         <td></td>
                                                     {% endif %}
                                             </tr>
-                                        {% elif job.crew %}
+                                    {% endfor %}
+                                {% endif %}
+                                {% get_dict_value_if_exists crew_jobs_dict obj.id as crew_job_list %}
+                                {% if crew_job_list %}
+                                    {% for crew in crew_job_list  %}
                                             <tr>
-                                                <td><a class="tbl-tag" href="{% url 'project:single-film-project' job.crew.project.id %}">Project # {{ job.crew.project.id }}</a></td>
-                                                <td>Title:  {{ job.crew.project.title }} </td>
+                                                <td><a class="tbl-tag" href="{% url 'project:single-film-project' crew.project.id %}">Project # {{ crew.project.id }}</a></td>
+                                                <td>Title:  {{ crew.project.title }} </td>
                                                 <td></td>
-                                                <td>Posted on {{ job.crew.created_time }}</td>
-                                                {% if job.crew_application %}
+                                                <td>Posted on {{ crew.created_time }}</td>
+                                                {% get_dict_value crew_application_dict crew.id as application_obj %}
+                                                {% if application_obj %}
                                                     <td
-                                                    {% if job.crew_application.application_status == 'applied' %}class="int-applied"
-                                                    {% elif job.crew_application.application_status == 'attached' %}class="int-green"
-                                                    {% elif job.crew_application.application_status == 'passed' %}class="int-red"
-                                                    {% endif %}>{{job.crew_application.application_status}}</td>
-                                                    <td class="int-red">(on {{job.crew_application.status_update_date}})</td>
+                                                    {% if application_obj.application_status == 'applied' %}class="int-applied"
+                                                    {% elif application_obj.application_status == 'attached' %}class="int-green"
+                                                    {% elif application_obj.application_status == 'passed' %}class="int-red"
+                                                    {% endif %}>{{application_obj.application_status}}</td>
+                                                    <td class="int-red">(on {{application_obj.status_update_date}})</td>
                                                 {% else %}
                                                     <td></td>
                                                     <td></td>
                                                 {% endif %}
                                             </tr>
-                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
 
@@ -781,13 +771,10 @@
                                                                     <label class="intrest-lab">Position:</label>
                                                                 </div>
                                                                 <div class="col-6">
-                                                                    <select class="inp-interest-2" id="position_{{obj.id}}"
+                                                                    <select class="inp-interest-2 edit_position modal-position" id="position_{{obj.id}}"
                                                                     name="position" required>
                                                                         {% for position in positions %}
-                                                                             <option value="{{position.id}}"
-                                                                             {% if obj.position.id == position.id %} selected {% endif %}>
-                                                                             {{position}}
-                                                                            </option>
+                                                                             <option value="{{position.id}}"{% if obj.position.id == position.id %} selected {% endif %}>{{position}}</option>
                                                                         {% endfor %}
                                                                     </select>
                                                                 </div>
@@ -848,7 +835,8 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-12">
+                                                            <div class="col-12 {% if obj.position.slug != 'actoractress' %}edit_gender_Age_section{% endif %}"
+                                                            id="edit_gender_section_{{obj.id}}">
                                                                 <div class="row mb-2">
                                                                     <div class="offset-1 col-3">
                                                                         <label class="intrest-lab">Gender:</label>
@@ -868,7 +856,8 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-12">
+                                                            <div class="col-12 {% if obj.position.slug != 'actoractress' %}edit_gender_Age_section{% endif %}"
+                                                            id="edit_age_section_{{obj.id}}">
                                                                 <div class="row mb-2">
                                                                     <div class="offset-1 col-3">
                                                                         <label class="intrest-lab">Age:</label>
@@ -988,8 +977,10 @@
 <script>
 
     $(document).ready(function() {
-        // $('#location_1').select2();
-        // $('.modal-location').select2();
+        $('#location_1').select2();
+        $('#position_1').select2();
+        $('.modal-location').select2();
+        // $('.modal-position').select2();
 
         var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
@@ -1032,7 +1023,7 @@ $('body').on('click' , '#add-more-interests', function(){
         {
             $('.my-interests-section').append(data['add_my_interests_form_html']);
             $(location_id).select2();
-            // $(position_id).select2();
+            $(position_id).select2();
             // $(format_id).select2();
         }
     });
@@ -1311,6 +1302,36 @@ $('body').on('click' , '.close-add-togroup-modal', function(){
         jQuery("#trackandtracking .net-tracker-text").removeClass('net-tracker-text-color');
         jQuery(this).toggleClass('net-tracker-text-color'); 
         });
+</script>
+<script>
+    $('body').on('change' , '.position', function(){
+        var id = $(this).attr("id");
+        var position = $(this).find("option:selected").text();
+        var loop_count = id.split("_")[1];
+        var gender_section = "#gender_section_"+loop_count;
+        var age_section = "#age_section_"+loop_count;
+        if(position=='Actor/Actress'){
+            $(gender_section).css('visibility', 'visible');
+            $(age_section).css('visibility', 'visible');
+        }else{
+            $(gender_section).css('visibility', 'hidden');
+            $(age_section).css('visibility', 'hidden');
+        }
+    });
+    $('body').on('change' , '.edit_position', function(){
+        var id = $(this).attr("id");
+        var edit_position = $(this).find("option:selected").text();
+        var loop_count = id.split("_")[1];
+        var gender_section = "#edit_gender_section_"+loop_count;
+        var age_section = "#edit_age_section_"+loop_count;
+        if(edit_position=='Actor/Actress'){
+            $(gender_section).css('visibility', 'visible');
+            $(age_section).css('visibility', 'visible');
+        }else{
+            $(gender_section).css('visibility', 'hidden');
+            $(age_section).css('visibility', 'hidden');
+        }
+    });
 </script>
 {% endblock %}
 
