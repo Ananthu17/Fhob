@@ -428,6 +428,7 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
             }
 
             get_access_token_url = origin_url + '/payment/get_paypal_token'
+            send_plan_change_email_url = origin_url + '/payment/paypal/send_plan_change_email/'
             axios.post(get_access_token_url)
             .then((response) => {
                 var paypal_access_token = "Bearer " + response.data.access_token
@@ -435,6 +436,19 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
                 axios.post(indie_payment_monthly_patch_url, indie_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
                 .then((response) => {
                 if ((response.status == 204) || (response.status == 422)) {
+
+                        var send_plan_change_email_url_args = {
+                            "changed_plan_id": plan_id_indie_payment_monthly,
+                        }
+
+                        axios.post(send_plan_change_email_url, send_plan_change_email_url_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                        .then((response) => {
+                            console.log("response:::")
+                            console.log(plan_id_indie_payment_monthly)
+                        }, (error) => {
+                            console.log(error);
+                        });
+
                         console.log(response);
                     }
                 }, (error) => {

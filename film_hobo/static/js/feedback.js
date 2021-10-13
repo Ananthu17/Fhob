@@ -42,6 +42,10 @@ $(document).ready(function(){
       location.reload();
     });
 
+    $('#mem-close-btn').click(function(event){
+      location.reload();
+    });
+
     $('#feedback-submit').click(function(event){
       event.preventDefault();
 
