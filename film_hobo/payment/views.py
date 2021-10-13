@@ -47,24 +47,26 @@ class UpdateMembershipFeeDetailsAPI(APIView):
     permission_classes = (IsSuperUser,)
 
     def get(self, request, *args, **kwargs):
-        token_generation_url = \
-            'https://api.sandbox.paypal.com/v1/oauth2/token'
+        pass
+        # token_generation_url = \
+        #     'https://api.sandbox.paypal.com/v1/oauth2/token'
 
-        token_generation_url_username = settings.PAYPAL_CLIENT_ID
-        token_generation_url_password = settings.PAYPAL_SECRET_ID
-        full_user = token_generation_url_username + ':' +\
-            token_generation_url_password
+        # token_generation_url_username = settings.PAYPAL_CLIENT_ID
+        # token_generation_url_password = settings.PAYPAL_SECRET_ID
+        # full_user = token_generation_url_username + ':' +\
+        #     token_generation_url_password
 
-        token_generation_url_response = requests.get(
-            token_generation_url,
-            headers={'Accept': 'application/json',
-                     'Accept-Language': 'en_US'},
-            params={'grant_type': 'client_credentials'},
-            auth=(token_generation_url_username, token_generation_url_password))
-        if indie_monthly_user_response.status_code == 200:
-            passindie_monthly_user_response
-        else:
-            pass
+        # token_generation_url_response = requests.get(
+        #     token_generation_url,
+        #     headers={'Accept': 'application/json',
+        #              'Accept-Language': 'en_US'},
+        #     params={'grant_type': 'client_credentials'},
+        #     auth=(
+        # token_generation_url_username, token_generation_url_password))
+        # if indie_monthly_user_response.status_code == 200:
+        #     passindie_monthly_user_response
+        # else:
+        #     pass
 
         # details_url_origin = \
         #     'https://api-m.sandbox.paypal.com/v1/billing/plans/'
@@ -726,7 +728,8 @@ class AddDiscountDetailAPI(APIView):
         access_token_strting = 'Bearer ' + access_token
 
         # get the current plan details
-        paypal_get_plan_details_api = "https://api-m.sandbox.paypal.com/v1/billing/plans/"
+        paypal_get_plan_details_api = \
+            "https://api-m.sandbox.paypal.com/v1/billing/plans/"
 
         # 1
         indie_monthly_plan_details_api = paypal_get_plan_details_api + \
@@ -1251,12 +1254,13 @@ class CreateUserOrder(APIView):
                 paypal_client_id = settings.PAYPAL_CLIENT_ID
                 paypal_secret = settings.PAYPAL_SECRET_ID
                 data = {'grant_type': 'client_credentials'}
-                token_user_response = requests.post(
-                                    'https://api-m.sandbox.paypal.com/v1/oauth2/token',
-                                    data=data,
-                                    auth=(paypal_client_id, paypal_secret),
-                                    headers={'Accept': 'application/json',
-                                             'Accept-Language': 'en_US'})
+                token_user_response = \
+                    requests.post(
+                        'https://api-m.sandbox.paypal.com/v1/oauth2/token',
+                        data=data,
+                        auth=(paypal_client_id, paypal_secret),
+                        headers={'Accept': 'application/json',
+                                 'Accept-Language': 'en_US'})
                 if token_user_response.status_code == 200:
                     access_token = json.loads(
                         token_user_response.content)['access_token']
@@ -1272,7 +1276,8 @@ class CreateUserOrder(APIView):
                                          'Authorization': access_token_strting
                                          })
                 if create_plan_user_response.status_code == 201:
-                    plan_id = json.loads(create_plan_user_response.content)['id']
+                    plan_id = \
+                        json.loads(create_plan_user_response.content)['id']
                 else:
                     return HttpResponse('Could not save data')
             else:
@@ -2013,18 +2018,103 @@ class PayPalSendPlanChangeEmail(APIView):
                 elif plan_name == 'indie_yearly':
                     indie_yearly_users = CustomUser.objects.filter(
                         membership='IND', payment_plan='yearly')
+                    for user in indie_yearly_users:
+                        revised_rate = \
+                            IndiePaymentDetails.objects.first().annual_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 elif plan_name == 'pro_monthly':
                     pro_monthly_users = CustomUser.objects.filter(
                         membership='PRO', payment_plan='monthly')
+                    for user in pro_monthly_users:
+                        revised_rate = \
+                            ProPaymentDetails.objects.first().monthly_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 elif plan_name == 'pro_yearly':
                     pro_yearly_users = CustomUser.objects.filter(
                         membership='PRO', payment_plan='yearly')
+                    for user in pro_yearly_users:
+                        revised_rate = \
+                            ProPaymentDetails.objects.first().annual_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 elif plan_name == 'company_monthly':
                     company_monthly_users = CustomUser.objects.filter(
                         membership='COM', payment_plan='monthly')
+                    for user in company_monthly_users:
+                        revised_rate = \
+                            CompanyPaymentDetails.objects.first().monthly_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 elif plan_name == 'company_yearly':
                     company_yearly_users = CustomUser.objects.filter(
                         membership='COM', payment_plan='yearly')
+                    for user in company_yearly_users:
+                        revised_rate = \
+                            CompanyPaymentDetails.objects.first().annual_amount
+                        send_email_url = settings.ORIGIN_URL + \
+                            '/payment/paypal/change_notify_email/'
+                        data = {
+                            'user_id': user.id,
+                            'revised_rate': revised_rate
+                        }
+                        send_email_url_response = requests.post(
+                            send_email_url, data=data)
+                        if send_email_url_response.status_code == 200:
+                            email_status = True
+                        else:
+                            return Response(
+                                {"status": "failure"},
+                                status=status.HTTP_400_BAD_REQUEST)
                 else:
                     pass
         if email_status:
