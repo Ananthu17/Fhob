@@ -80,8 +80,11 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user.id
-        friend_obj = Friend.objects.get(user=user)
-        friends = friend_obj.friends.all()
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         rating_dict = {}
