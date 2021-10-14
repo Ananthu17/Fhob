@@ -9,18 +9,45 @@
 <div class="wrapper flex-grow-1">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
-                <div class="top-members-head text-center pt-2 txt-uppercase">{{job_type.title}}</div>
-                <div class="row">
-                    {% if members %}
-                    <ol class="mem-list-cont mb-0 ">
-                        {% for obj in members %}
-                        <li class="mt-1"><a href="{{obj.user.get_profile_url}}">{{obj.user.get_full_name}}</a></li>
-                        {% endfor %}
-                    </ol>
-                    {% endif %}
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg caa-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+
+                <!-- Top section -->
+
+                <div class="rsct-center-section-align">
+                    <div class="rsct-orange-head">
+                        Top {{job_type.title}}s
+                    </div>
+                    <div>
+                        {% if members %}
+                        <ol class="rsct-list-cont ">
+                            {% for obj in members %}
+                            <li class="mt-1"><a href="{{obj.user.get_profile_url}}" class="remove-decoration msg-txt-color">{{obj.user.get_full_name}}</a></li>
+                            {% endfor %}
+                        </ol>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+            </div>
+
         </div>
     </div>
 </div>

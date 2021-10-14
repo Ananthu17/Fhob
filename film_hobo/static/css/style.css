@@ -809,3 +809,7 @@ input.pw {
     font-family: Courier Bold;
     font-size: 13px;
   }
+.gender_age_section, .edit_gender_Age_section
+  {
+    visibility: hidden;
+  }

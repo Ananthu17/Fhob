@@ -415,7 +415,6 @@
     });
 
     $('body').on('change' , '.attached_user', function(){
-        console.log("here---")
         var id = $(this).attr("id");
         var user = $(this).find("option:selected").val();
         var crew_id = id.split("-")[1];

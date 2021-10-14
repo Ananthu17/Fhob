@@ -17,8 +17,7 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
                     Location, CompanyClient, NewJobType, Friend, FriendGroup, \
                     VideoRatingCombined, CompanyRatingCombined, \
                     UserProject, GroupUsers, Feedback, CompanyRating, \
-                    VideoRating, ProjectMemberRating, BetaTesterCodes, \
-                    UserInterestJob
+                    VideoRating, ProjectMemberRating, BetaTesterCodes
 
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
@@ -131,7 +130,6 @@ admin.site.register(FriendGroup)
 admin.site.register(CompanyRating)
 admin.site.register(CompanyRatingCombined)
 admin.site.register(UserProject)
-admin.site.register(UserInterestJob)
 
 
 @admin.register(EthnicAppearance)

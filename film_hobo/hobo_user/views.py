@@ -56,7 +56,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, UserInterestJob, Video, \
+                    GuildMembership, GroupUsers, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
@@ -100,7 +100,7 @@ from payment.views import IsSuperUser
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from project.models import Character, ProjectCrew
+from project.models import Audition, Character, CrewApplication, ProjectCrew
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -3533,16 +3533,58 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
 
-        user_jobs_dict = {}
-        job_list = UserInterestJob.objects.filter(user=user)
-        for item in job_list:
-            if item.user_interest.id in user_jobs_dict:
-                user_jobs_dict[item.user_interest.id].append(item)
-            else:
-                 user_jobs_dict[item.user_interest.id] = []
-                 user_jobs_dict[item.user_interest.id].append(item)
+        crew_jobs_dict = {}
+        cast_jobs_dict = {}
+        cast_application_dict = {}
+        crew_application_dict = {}
 
-        context['user_jobs_dict'] = user_jobs_dict
+        try:
+            actor_actress = JobType.objects.get(slug='actoractress')
+
+            # cast list
+            cast_list = myinterests.filter(position=actor_actress)
+            for user_interest in cast_list:
+                character_objs = Character.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(gender = user_interest.gender) &
+                                    Q(age = user_interest.age)
+                                    )
+                cast_jobs_dict[user_interest.id] = character_objs
+                # get applications list
+                for cast in character_objs:
+                    audition_obj = Audition.objects.filter(
+                                        Q(user=user) &
+                                        Q(character=cast)
+                                    ).first()
+                    cast_application_dict[cast.id] = audition_obj
+
+            context['cast_jobs_dict'] = cast_jobs_dict
+            context['cast_application_dict'] = cast_application_dict
+            # crew members list
+            crew_list = myinterests.exclude(position=actor_actress)
+            for user_interest in crew_list:
+                crew_objs = ProjectCrew.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(job_type=user_interest.position)
+                                    )
+                crew_jobs_dict[user_interest.id] = crew_objs
+                # get applications list
+                for crew in crew_objs:
+                    application_obj = CrewApplication.objects.filter(
+                                        Q(user=user) &
+                                        Q(crew=crew)
+                                    ).first()
+                    crew_application_dict[crew.id] = application_obj
+            context['crew_jobs_dict'] = crew_jobs_dict
+            context['crew_application_dict'] = crew_application_dict
+
+        except JobType.DoesNotExist:
+            pass
+
 
         applied_projects = UserProject.objects.filter(
                             Q(user=user) &

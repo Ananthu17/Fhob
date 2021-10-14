@@ -541,37 +541,22 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
 
-    PRO_AND_COMP_WITH_RATING_1_STAR = 'pro_and_comp_with_rating_1_star'
-    PRO_AND_COMP_WITH_RATING_2_STAR = 'pro_and_comp_with_rating_2_star'
-    PRO_AND_COMP_WITH_RATING_3_STAR = 'pro_and_comp_with_rating_3_star'
-    PRO_AND_COMP_WITH_RATING_4_STAR = 'pro_and_comp_with_rating_4_star'
-    PRO_AND_COMP_WITH_RATING_5_STAR = 'pro_and_comp_with_rating_5_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_1_STAR = 'indie_pro_and_comp_with_rating_1_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_2_STAR = 'indie_pro_and_comp_with_rating_2_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_3_STAR = 'indie_pro_and_comp_with_rating_3_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_4_STAR = 'indie_pro_and_comp_with_rating_4_star'
-    INDIE_PRO_AND_COMP_WITH_RATING_5_STAR = 'indie_pro_and_comp_with_rating_5_star'
-
-    CREW_SAMR_CHOICES =[
+    CREW_SAMR_CHOICES = [
         (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
         (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
         (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
         (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
         (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
-
-        (PRO_AND_COMP_WITH_RATING_1_STAR , 'pro and comp with rating 1 star'),
-        (PRO_AND_COMP_WITH_RATING_2_STAR , 'pro and comp with rating 2 star'),
-        (PRO_AND_COMP_WITH_RATING_3_STAR , 'pro and comp with rating 3 star'),
-        (PRO_AND_COMP_WITH_RATING_4_STAR , 'pro and comp with rating 4 star'),
-        (PRO_AND_COMP_WITH_RATING_5_STAR , 'pro and comp with rating 5 star'),
-
-        (INDIE_PRO_AND_COMP_WITH_RATING_1_STAR , 'indie pro and comp with rating 1 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_2_STAR , 'indie pro and comp with rating 2 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_3_STAR , 'indie pro and comp with rating 3 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_4_STAR , 'indie pro and comp with rating 4 star'),
-        (INDIE_PRO_AND_COMP_WITH_RATING_5_STAR , 'indie pro and comp with rating 5 star'),
-
-
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
 
     No_PAYMENT = 'no_payment'
@@ -720,7 +705,7 @@ class Project(models.Model):
     crew_samr = models.CharField(_("Crew SAMR"),
                                  choices=CREW_SAMR_CHOICES,
                                  max_length=150,
-                                 default=PRO_AND_COMP_WITH_RATING_1_STAR)
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,
@@ -1365,6 +1350,7 @@ class CompanyClient(models.Model):
 class UserInterest(models.Model):
     MALE = 'male'
     FEMALE = 'female'
+    OTHERS = 'others'
     SCENE = 'SCH'
     SHORT = 'SHO'
     PILOT = 'PIL'
@@ -1390,6 +1376,7 @@ class UserInterest(models.Model):
     GENDER_CHOICES = [
                     (MALE, 'Male'),
                     (FEMALE, 'Female'),
+                    (OTHERS, 'Others'),
                     ]
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
@@ -1450,65 +1437,6 @@ class UserInterest(models.Model):
                                  related_name='user_interest_location',
                                  verbose_name=_("Location"),
                                  null=True)
-
-
-# class UserRatingCombined(models.Model):
-#     user = models.ForeignKey("hobo_user.CustomUser",
-#                              on_delete=models.CASCADE,
-#                              related_name='user_rating_combined',
-#                              verbose_name=_("User"),
-#                              null=True)
-#     job_type = models.ForeignKey('hobo_user.JobType',
-#                                  on_delete=models.CASCADE,
-#                                  related_name="user_job_type_rating_combined",
-#                                  verbose_name=_("Job Types")
-#                                  )
-#     rating = models.FloatField(_("Rating"), null=True, blank=True)
-#     no_of_votes = models.IntegerField(_("No of Votes"), null=True, blank=True)
-#     no_of_projects = models.IntegerField(
-#         _("No of Projects"), null=True, blank=True)
-
-#     def __str__(self):
-#         return str(self.user)
-
-#     class Meta:
-#         verbose_name = 'User Rating Combined'
-#         verbose_name_plural = 'User Rating Combined'
-
-
-class UserInterestJob(models.Model):
-    user = models.ForeignKey("hobo_user.CustomUser",
-                             on_delete=models.CASCADE,
-                             related_name='user_interest_job',
-                             verbose_name=_("User"))
-    user_interest = models.ForeignKey("hobo_user.UserInterest",
-                                      on_delete=models.CASCADE,
-                                      related_name='user_interest',
-                                      verbose_name=_("User"),
-                                      null=True)
-    crew = models.ForeignKey('project.ProjectCrew',
-                             verbose_name=_("Crew"),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True)
-    cast = models.ForeignKey('project.Character',
-                             verbose_name=_("Character"),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True)
-    crew_application = models.ForeignKey('project.CrewApplication',
-                                         verbose_name=_("Crew Application"),
-                                         on_delete=models.CASCADE,
-                                         null=True, blank=True)
-    cast_application = models.ForeignKey('project.Audition',
-                                         verbose_name=_("Cast Application"),
-                                         on_delete=models.CASCADE,
-                                         null=True, blank=True)
-
-    def __str__(self):
-        return str(self.user)
-
-    class Meta:
-        verbose_name = 'User Interest Job'
-        verbose_name_plural = 'User Interest Jobs'
 
 
 class UserRatingCombined(models.Model):
