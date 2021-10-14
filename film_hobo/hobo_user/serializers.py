@@ -26,6 +26,7 @@ from .models import CustomUser, Country, GuildMembership, \
     UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
     Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
 
+
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 

@@ -6,7 +6,6 @@ import requests
 from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
-
 from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
@@ -19,7 +18,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
@@ -27,7 +25,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
 from rest_framework import authentication
 from rest_framework import status
 from rest_framework import permissions
@@ -91,10 +88,12 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
-    FeedbackSerializer, RateCompanySerializer, \
+    FeedbackSerializer,  RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
     VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+from general.serializers import ReportProblemSerializer
+
 from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
@@ -153,8 +152,8 @@ class CustomUserLogin(DjangoLogin):
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            return render(request, 'user_pages/user_home.html', 
+                                                        {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -165,13 +164,17 @@ class CustomUserLogin(DjangoLogin):
             email = input_json_data_dict['email']
             password = input_json_data_dict['password']
             user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'user_pages/user_home.html',
-                              {'user': user})
+            userobj = CustomUserSettings.objects.get(user=user)
+            if userobj.account_status == userobj.DISABLED:
+                return redirect('/hobo_user/enable-account')
             else:
-                return HttpResponse(
-                    'Unable to log in with provided credentials.')
+                if user is not None:
+                    login(request, user)
+                    return render(request, 'user_pages/user_home.html',
+                            {'user': user})
+                else:
+                    return HttpResponse(
+                        'Unable to log in with provided credentials.')
         else:
             return render(request, 'user_pages/login.html', {'form': form})
 
@@ -1249,6 +1252,9 @@ class DisableAccountAPI(APIView):
                 obj.user = user
                 obj.reason = reason
                 obj.save()
+                userobj = CustomUser.objects.get(id=user.id)
+                userobj.registration_complete = False
+                userobj.save()
                 user_settings = CustomUserSettings.objects.get(user=user)
                 user_settings.account_status = CustomUserSettings.DISABLED
                 user_settings.save()
@@ -1277,8 +1283,11 @@ class EnableAccountAPI(APIView):
                     user_settings = CustomUserSettings.objects.get(user=user)
                     user_settings.account_status = CustomUserSettings.ENABLED
                     try:
+                        userobj = CustomUser.objects.get(id=user.id)
+                        userobj.registration_complete = True
                         disabled_account = DisabledAccount.objects.get(user=user)
                         disabled_account.delete()
+                        userobj.save()
                         user_settings.save()
                         response = {'message': "Account Enabled",
                                     'status': status.HTTP_200_OK
@@ -4569,6 +4578,17 @@ class FeedbackAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ReportProblemAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class AddBetaTesterCode(APIView):
     """
     API endpoint to add a beta tester code
@@ -4960,6 +4980,14 @@ class ReportAProblemWebView(View):
         context = { }
         return render(request, self.template_name, context)
 
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=json.dumps(request.POST))
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Project CRUD
 class ProjectAPIView(ListAPIView, SegregatorMixin):
@@ -5239,8 +5267,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        mode_operation="create"
-        context['mode_operation']=mode_operation
+        mode_operation = "create"
+        context['mode_operation'] = mode_operation
         context['form'] = ProjectCreationForm
         context['writerform'] = WriterForm
         context['user'] = user
@@ -5252,13 +5280,12 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project = Project()
-
             cast_pay = request.POST.get('checkbx')
             # Passing cast_star rating
             cast_star1 = request.POST.get('cast-star1')
             cast_star2 = request.POST.get('cast-star2')
             cast_star3 = request.POST.get('cast-star3')
-            cast_star_smar=0
+            cast_star_smar = 0
 
             if (cast_star1 != ''):
                 if (cast_star1 == '1'):
@@ -5318,27 +5345,27 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 crew_star_smar = crew_star1
             if (crew_star2 != ''):
                 if (crew_star2 == '1'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_1_STAR
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
                 elif (crew_star2 == '2'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_2_STAR
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
                 elif (crew_star2 == '3'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_3_STAR
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
                 elif (crew_star2 == '4'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_4_STAR
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
                 elif (crew_star2 == '5'):
-                    crew_star2 = project.PRO_AND_COMP_WITH_RATING_5_STAR
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
                 crew_star_smar = crew_star2
             if (crew_star3 != ''):
                 if (crew_star3 == '1'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
                 if (crew_star3 == '2'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
                 if (crew_star3 == '3'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
                 if (crew_star3 == '4'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
                 if (crew_star3 == '5'):
-                    crew_star3 = project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
                 crew_star_smar = crew_star3
 
             print("valid ahno project:", projectform.is_valid())
@@ -5419,7 +5446,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
             cast_star_smar = 0
 
-            if (cast_star1 !=''):
+            if (cast_star1 != ''):
                 if (cast_star1 == '1'):
                     cast_star1 = project.INDIE_WITH_RATING_1_STAR
                 elif(cast_star1 == '2'):
@@ -5432,77 +5459,77 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                     cast_star1 = project.INDIE_WITH_RATING_5_STAR
                 cast_star_smar = cast_star1
             elif(cast_star2 != ''):
-                if (cast_star2=='1'):
-                    cast_star2=project.PRO_WITH_RATING_1_STAR
-                elif(cast_star2=='2'):
-                    cast_star2=project.PRO_WITH_RATING_2_STAR
-                elif(cast_star2=='3'):
-                    cast_star2=project.PRO_WITH_RATING_3_STAR
-                elif(cast_star2=='4'):
-                    cast_star2=project.PRO_WITH_RATING_4_STAR
-                elif(cast_star2=='5'):
-                    cast_star2=project.PRO_WITH_RATING_5_STAR
-                cast_star_smar=cast_star2
-            elif(cast_star3!=''):
-                if (cast_star3=='1'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_1_STAR
-                elif(cast_star3=='2'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_2_STAR
-                elif(cast_star3=='3'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_3_STAR
-                elif(cast_star3=='4'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_4_STAR
-                elif(cast_star3=='5'):
-                    cast_star3=project.INDIE_AND_PRO_WITH_RATING_5_STAR
-                cast_star_smar=cast_star3
+                if (cast_star2 == '1'):
+                    cast_star2 = project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2 == '2'):
+                    cast_star2 = project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2 == '3'):
+                    cast_star2 = project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2 == '4'):
+                    cast_star2 = project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2 == '5'):
+                    cast_star2 = project.PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star2
+            elif(cast_star3 != ''):
+                if (cast_star3 == '1'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3 == '2'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3 == '3'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3 == '4'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3 == '5'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star3
 
-            #Updating crew_star rating
-            crew_star1=request.POST.get('crew-star1')
-            crew_star2=request.POST.get('crew-star2')
-            crew_star3=request.POST.get('crew-star3')
+            # Updating crew_star rating
+            crew_star1 = request.POST.get('crew-star1')
+            crew_star2 = request.POST.get('crew-star2')
+            crew_star3 = request.POST.get('crew-star3')
 
-            crew_star_smar=0
+            crew_star_smar = 0
 
-            if (crew_star1!=''):
-                if (crew_star1=='1'):
-                    crew_star1=project.INDIE_WITH_RATING_1_STAR
-                elif (crew_star1=='2'):
-                    crew_star1=project.INDIE_WITH_RATING_2_STAR
-                elif (crew_star1=='3'):
-                    crew_star1=project.INDIE_WITH_RATING_3_STAR
-                elif (crew_star1=='4'):
-                    crew_star1=project.INDIE_WITH_RATING_4_STAR
-                elif (crew_star1=='5'):
-                    crew_star1=project.INDIE_WITH_RATING_5_STAR
-                crew_star_smar=crew_star1
-            if (crew_star2!=''):
-                if (crew_star2=='1'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_1_STAR
-                elif (crew_star2=='2'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_2_STAR
-                elif (crew_star2=='3'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_3_STAR
-                elif (crew_star2=='4'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_4_STAR
-                elif (crew_star2=='5'):
-                    crew_star2=project.PRO_AND_COMP_WITH_RATING_5_STAR
-                crew_star_smar=crew_star2
-            if (crew_star3!=''):
-                if (crew_star3=='1'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR
-                if (crew_star3=='2'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR
-                if (crew_star3=='3'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR
-                if (crew_star3=='4'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR
-                if (crew_star3=='5'):
-                    crew_star3=project.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR
-                crew_star_smar=crew_star3
+            if (crew_star1 != ''):
+                if (crew_star1 == '1'):
+                    crew_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1 == '2'):
+                    crew_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1 == '3'):
+                    crew_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1 == '4'):
+                    crew_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1 == '5'):
+                    crew_star1 = project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar = crew_star1
+            if (crew_star2 != ''):
+                if (crew_star2 == '1'):
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
+                elif (crew_star2 == '2'):
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
+                elif (crew_star2 == '3'):
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
+                elif (crew_star2 == '4'):
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
+                elif (crew_star2 == '5'):
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star2
+            if (crew_star3 != ''):
+                if (crew_star3 == '1'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                if (crew_star3 == '2'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                if (crew_star3 == '3'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                if (crew_star3 == '4'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                if (crew_star3 == '5'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star3
 
-            projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
-            writerform = WriterForm(request.POST or None,instance=writer)
-            new_writer=request.POST.get('new_writer')
+            projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
+            writerform = WriterForm(request.POST or None, instance=writer)
+            new_writer = request.POST.get('new_writer')
 
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
@@ -5512,11 +5539,11 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
                 writer = writerform.save()
                 project = projectform.save()
-                project.cast_samr=cast_star_smar
-                project.crew_samr=crew_star_smar
-                project.cast_pay_rate=cast_pay
+                project.cast_samr = cast_star_smar
+                project.crew_samr = crew_star_smar
+                project.cast_pay_rate = cast_pay
                 writer.project = project
-                writer.name=new_writer
+                writer.name = new_writer
                 project.save()
                 writer.save()
                 messages.success(request, "Project Updated Successfully.")
@@ -5542,7 +5569,7 @@ class ScreeningProjectDeatilInviteView(APIView):
             project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)
 
-            #update notification table
+            # update notification table
             notification = UserNotification()
             notification.user = to_user
             notification.notification_type = UserNotification.INVITE
@@ -5632,7 +5659,7 @@ class GetBetaTesterCodeId(APIView):
         else:
             return Response(
             {"status": "no content"},
-            status=status.HTTP_204_NO_CONTENT)
+            status = status.HTTP_204_NO_CONTENT)
 
 
 class SentPaymentMail(APIView):

@@ -1,7 +1,7 @@
 <select id="all_members"
     class="form-control block-membr-dropdown"
     style="width:100%;">
-    <option value="" selected disabled hidden>Type a name</option>
+    <option value="" selected disabled hidden>Choose a name</option>
     {% for item in block_member_list %}
         <option value="{{item.id}}">{{item.first_name}} {{item.last_name}}</option>
     {% endfor %}

@@ -37,7 +37,7 @@
             </div>
           </div>
          <div class="mt-4 landing-form-font">
-          <form method="post" class="col-lg-6 offset-lg-3">
+          <form method="post" class="col-lg-6 offset-lg-3" id="feedback-form" >
               <div class="form-group row">
                   <label for="" class="col-sm-3 col-form-label">Email:</label>
                   <div class="col-sm-9">
@@ -70,4 +70,11 @@
 {% endblock %}
 {% block extrajs %}
 <script src="{% static 'js/feedback.js' %}"></script>
+<script>
+$(function () {
+    $('#feedback-submit').on('click', function () {
+      $('#feedback-form').trigger("reset");
+    })
+  })
+</script>
 {% endblock %}

@@ -5,24 +5,27 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <form method="post" action="{% url 'hobo_user:enable-account' %}">
-            {% csrf_token %}
-            <p>Your account is disabled, Enable to continue</p>
-            <input type="hidden" name="account_status" value="enabled" />
-            <input type="submit" class="btn btn-primary" value="Enable" />
-            {% if enable_account_errors %}
-                    {{enable_account_errors}}
-            {% endif %}
-            {% if message %}
-                    {{message}}
-            {% endif %}
-        </form>
+
+<div class="wrapper flex-grow-1">
+    <div class="container">
+        <div class="row">
+            <form method="post" action="{% url 'hobo_user:enable-account' %}">
+                {% csrf_token %}
+               <p></p>
+                <p>Your account is disabled, Enable to continue</p>
+                <input type="hidden" name="account_status" value="enabled" />
+                <input type="submit" class="btn btn-primary" value="Enable" />
+                {% if enable_account_errors %}
+                        {{enable_account_errors}}
+                {% endif %}
+                {% if message %}
+                        {{message}}
+                {% endif %}
+            </form>
+        </div>
     </div>
+
 </div>
-
-
 {% endblock %}
 
 {% block extrajs %}

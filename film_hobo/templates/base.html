@@ -309,12 +309,25 @@
                                 {% endif %}
                             </div>
                         </li>
+                    {% elif user.i_agree == True %}
+                    <li class="nav-item">
+                        <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                    </li>
+                    <li class="nav-item" style="margin-left: 48em;">
+                        <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                        
+                    </li>
+                    <li class="nav-item">
+                        <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
+                        
+                    </li>
                     {% else %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                         </li>
                         <li class="nav-item">
                             <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                            
                         </li>
                     {% endif %}
                 </ul>
@@ -361,7 +374,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="notificationModalTitle">Notification</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" id="noti-modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -369,7 +382,7 @@
 
         </div>
         <div class="modal-footer">
-          <button id="mem-close-btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="mem-close-btn" type="button" class="btn btn-secondary"  data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
