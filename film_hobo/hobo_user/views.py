@@ -5207,8 +5207,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         try:
             print(request.POST)
-            # import pdb
-            # pdb.set_trace()
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project = Project()
@@ -5532,11 +5530,8 @@ class ScreeningProjectUrlSendView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             # send notification
-            # import pdb; pdb.set_trace()
             logged_in_user = request.user
             project_url = request.data['project_url']
-            
-            
 
             project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)

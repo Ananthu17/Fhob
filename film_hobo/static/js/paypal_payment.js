@@ -72,6 +72,7 @@ $('#close-payment-btn').click(function(){
 });
 
 var betacode = getUrlParameter('beta_code');
+var promocode = localStorage.getItem("promocode");
 if(betacode){
     beta_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
     time_period = $("#payment_plan").text();
@@ -85,6 +86,25 @@ if(betacode){
         var selected_plan_id = response.data.selected_plan_id
         $("#bill_start_date").text(bill_date);
         $("#days_free").text(days);
+        var plan_id = selected_plan_id
+        localStorage.setItem('plan_id', plan_id);
+    }, (error) => {
+        console.log(error);
+    })
+}
+else if(promocode.length > 0){
+    discount_details_api = origin_url + '/payment/get_discount_details'
+    time_period = $("#payment_plan").text();
+    extra_args = {"code": promocode,
+                  "membership": membership,
+                  "period": time_period}
+    axios.post(discount_details_api, extra_args)
+    .then((response) => {
+        // var bill_date = response.data.bill_date
+        // var days = response.data.days
+        var selected_plan_id = response.data.selected_plan_id
+        // $("#bill_start_date").text(bill_date);
+        // $("#days_free").text(days);
         var plan_id = selected_plan_id
         localStorage.setItem('plan_id', plan_id);
     }, (error) => {

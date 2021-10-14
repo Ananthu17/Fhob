@@ -9,7 +9,10 @@ class DiscountsSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoCode
         fields = ['id', 'promo_code', 'created_time', 'valid_from', 'valid_to',
-                  'life_span', 'amount_type', 'amount', 'user_type']
+                  'life_span', 'amount_type', 'amount', 'user_type',
+                  'indie_monthly_plan_id', 'indie_yearly_plan_id',
+                  'pro_monthly_plan_id', 'pro_yearly_plan_id',
+                  'company_monthly_plan_id', 'company_yearly_plan_id']
 
     def validate_amount(self, obj):
         if (self.__dict__['_kwargs']['data']['amount_type'] == 'percentage'):
