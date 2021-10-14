@@ -88,10 +88,12 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
-    FeedbackSerializer, RateCompanySerializer, \
+    FeedbackSerializer,  RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
     VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+from general.serializers import ReportProblemSerializer
+
 from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
@@ -4534,6 +4536,17 @@ class FeedbackAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ReportProblemAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class AddBetaTesterCode(APIView):
     """
     API endpoint to add a beta tester code
@@ -4924,6 +4937,14 @@ class ReportAProblemWebView(View):
     def get(self, request):
         context = { }
         return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=json.dumps(request.POST))
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Project CRUD

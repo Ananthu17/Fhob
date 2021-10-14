@@ -46,7 +46,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetFriendRequestNotificationAjaxView, \
                    CancelFriendRequestAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
-                   FeedbackAPIView, FeedbackWebView, \
+                   FeedbackAPIView, FeedbackWebView, ReportProblemAPIView, \
                    AddGroupAPI, RemoveFriendGroupAPI, \
                    AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
                    FilterFriendByGroupAjaxView, \
@@ -186,6 +186,10 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+
+    path('report-a-problem-api/', ReportProblemAPIView.as_view(),
+        name='report-problem-api'),
+
     path('get-all-users-api/', GetAllUsersAPI.as_view(),
          name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
