@@ -1,10 +1,24 @@
-$(document).ready(function() {
-    $('#payment-success-div').hide();
-});
 origin_url = window.location.origin
 create_url = origin_url + '/payment/paypal/create/'
 send_email_url = origin_url + '/payment/paypal/send_email_recepit/'
-var token = localStorage.getItem("token");
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+
+var token = getUrlParameter('user_token');
 token_str = "Token "
 token_val = String(token)
 var authorization_str = token_str.concat(token_val);
@@ -92,7 +106,7 @@ if(betacode){
         console.log(error);
     })
 }
-else if(promocode.length > 0){
+else if(promocode && promocode.length > 0){
     discount_details_api = origin_url + '/payment/get_discount_details'
     time_period = $("#payment_plan").text();
     extra_args = {"code": promocode,
@@ -128,7 +142,8 @@ else{
         console.log(error);
     });
 }
-var plan_id_final = localStorage.getItem("plan_id");
+
+var plan_id = localStorage.getItem("plan_id");
 
 const headers = {
     'Accept': 'application/json',
@@ -142,7 +157,7 @@ createSubscription: function(data, actions) {
 
     return actions.subscription.create({
 
-        'plan_id': plan_id_final
+        'plan_id': plan_id
 
     });
 },

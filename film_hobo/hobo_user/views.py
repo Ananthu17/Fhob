@@ -354,9 +354,35 @@ class HomePage(TemplateView):
 
 
 class ShowCase(TemplateView):
-    template_name = 'user_pages/showcase.html'
+    template_name = 'user_pages/showcasetwo.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(format="SCH").order_by('-likes')[:10]
+        context["toprated_scenes"] = Project.objects.filter(format="SHO").order_by('-likes')[:10]
+        context["filims"] = Project.objects.filter(format="SCH").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-id')
+        return context
+
+
+class ShowCaseAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+        context = self.showcase_segregator(queryset)
+        return Response(context)
 
 
 class StandardResultsSetPagination(PageNumberPagination):

@@ -1109,7 +1109,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'title', 'format', 'genre', 'rating',
                   'video_url', 'video_type', 'last_date', 'location',
                   'visibility_password', 'cast_attachment', 'cast_pay_rate',
-                  'cast_samr', 'timestamp', 'visibility']
+                  'cast_samr', 'timestamp', 'visibility', 'likes']
 
 
 class TeamSerializer(serializers.ModelSerializer):
