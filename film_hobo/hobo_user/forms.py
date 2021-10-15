@@ -188,9 +188,9 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
-        self.fields['beta_user'].required = False
-        self.fields['beta_user_code'].required = False
-        self.fields['beta_user_end'].required = False
+        self.fields['beta_user'].required = True
+        self.fields['beta_user_code'].required = True
+        self.fields['beta_user_end'].required = True
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True
