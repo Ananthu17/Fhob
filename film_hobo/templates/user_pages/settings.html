@@ -637,31 +637,37 @@
                                 <div class="col-9">
                                     <div class="form-check-inline">
                                         <label class="containerradio">Recurring
-                                            <input id="recurring_btn" type="radio" name="radio" checked>
+                                            <input id="recurring_btn" type="radio" name="radio1" checked>
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
-                                    <div class="form-check-inline">
-                                        <!-- <label class="containerradio">One Time
-                                            <input type="radio" name="radio">
+                                    <!-- <div class="form-check-inline">
+                                        <label class="containerradio">One Time
+                                            <input type="radio" name="radio1">
                                             <span class="checkmarkagree"></span>
-                                        </label> -->
-                                    </div>
+                                        </label>
+                                    </div> -->
                                 </div>
                             </div>
-                            <div class="row ml-2 mt-1 ">
-                                <div class="col-3">
-                                    <label class="billing-label">Change to Annual</label>
-                                </div>
+                            <!-- <div class="row ml-2 mt-1 ">
+                                {% if transaction.payment_plan == 'annually' %}
+                                    <div id="change_tenure" class="col-3">
+                                        <label class="billing-label">Change to Monthly</label>
+                                    </div>
+                                {% else %}
+                                    <div id="change_tenure" class="col-3">
+                                        <label class="billing-label">Change to Annual</label>
+                                    </div>
+                                {% endif %}
                                 <div class="col-9">
                                     <div class="form-check-inline">
-                                        <label class="containerradio">Yes
-                                            <input type="radio" name="radio">&nbsp;
+                                        <label id="change_tenure_btn" class="containerradio">Yes
+                                            <input name="radio2">&nbsp;
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         {% comment %}
                         </form>
                         {% endcomment %}
@@ -681,6 +687,24 @@
             </div>
         </div>
     </form>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="changeTenureModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                    <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                    <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p>Are you sure you want to change the payment interval</p>
+            </div>
+            <div class="modal-footer">
+                    <button id="change_tenure_yes" type="button" class="btn btn-default" id="modal-btn-si">Yes</button>
+                    <button id="change_tenure_no" type="button" class="btn btn-primary" id="modal-btn-no">No</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -713,6 +737,21 @@ const togglePassword2 = document.querySelector('#togglePassword2');
     // toggle the eye / eye slash icon
     this.classList.toggle('bi-eye');
 });
+</script>
+
+<script>
+$('#change_tenure_btn').click(function (event) {
+    $("#changeTenureModal").modal('show');
+});
+
+$('#modalClose').click(function (event) {
+    $("#changeTenureModal").modal('hide');
+});
+
+$('#change_tenure_no').click(function (event) {
+    $("#changeTenureModal").modal('hide');
+});
+
 </script>
 {% endblock %}
 

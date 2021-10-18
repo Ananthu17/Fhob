@@ -421,25 +421,16 @@
 <script src="{% static 'js/select2.min.js' %}"></script>
 <!-- Axios -->
 <script src="{% static 'js/axios.min.js' %}"></script>
-<script src="{% static 'js/axios.js' %}"></script>
-<!-- <script src="{% static 'js/axios.map' %}"></script>
-<script src="{% static 'js/axios.min.map' %}"></script> -->
-<!-- <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
-    <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
 <script src="{% static 'js/notification.js' %}"></script>
 <script src="{% static 'js/tracking.js' %}"></script>
 <script src="{% static 'js/friend_request.js' %}"></script>
 <script src="{% static 'js/top_rated_list.js' %}"></script>
 <script src="{% static 'js/cast-attach-request.js' %}"></script>
 <script src="{% static 'js/crew-attach-request.js' %}"></script>
-<!-- <script src="{% static 'js/a076d05399.js' %}"></script> -->
 
-<!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
-<!-- <script src="{% static 'js/a076d05399.js' %}" crossorigin='anonymous'></script> -->
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="https://kit.fontawesome.com/b4df75477f.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
@@ -482,9 +473,8 @@
         });
     }
     </script>
-{% block extrajs %}
 <script src="{% static 'js/base_nav.js' %}"></script>
-{% endblock %}
+
 <script>
 
 
@@ -510,24 +500,26 @@ $("a[class='nav-link-non-clickable']").click(function () {
 
 </script>
 <script>
-    $( document ).ready(function() {
-        var pathurl = window.location.pathname;
-        var search = window.location.search;
-        var desired_path = pathurl + search
-        if (desired_path == '/hobo_user/projectview/create/'){
-            $("#project-nav-item").addClass('active');
-        }
-        else if (desired_path == '/hobo_user/projectview/?format=SCH'){
-            $("#scene-nav-item").addClass('active');
-        }
-        else if (desired_path == '/hobo_user/projectview/?format=SHO'){
-            $("#shorts-nav-item").addClass('active');
-        }
-        else{
+$( document ).ready(function() {
+    var pathurl = window.location.pathname;
+    var search = window.location.search;
+    var desired_path = pathurl + search
+    if (desired_path == '/hobo_user/projectview/create/'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SCH'){
+        $("#scene-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+        $("#shorts-nav-item").addClass('active');
+    }
+    else{
 
-        }
-    });
+    }
+});
 </script>
+{% block extrajs %}
+{% endblock %}
 </body>
 </html>
 

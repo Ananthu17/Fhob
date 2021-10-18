@@ -99,7 +99,8 @@ from payment.views import IsSuperUser
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from project.models import Audition, Character, CrewApplication, ProjectCrew
+from project.models import Audition, Character, CrewApplication, ProjectCrew, \
+    ProjectTracking
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -3666,7 +3667,19 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                                 Q(relation_type = UserProject.APPLIED) |
                                 Q(relation_type = UserProject.ATTACHED)
                             )).order_by('-created_time')
-        
+
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        paginator = Paginator(tracking_projects, 21)
+        page = self.request.GET.get('page1')
+        try:
+            tracking_projects = paginator.page(page)
+        except PageNotAnInteger:
+            tracking_projects = paginator.page(1)
+        except EmptyPage:
+            tracking_projects = paginator.page(paginator.num_pages)
+        context['tracking_projects'] = tracking_projects
+
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
