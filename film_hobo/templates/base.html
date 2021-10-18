@@ -18,9 +18,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
         <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/select2.min.css' %}">
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
         <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}">
         {% block extracss %}
         {% endblock %}
@@ -297,10 +298,12 @@
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% elif user.registration_complete %}
@@ -318,6 +321,7 @@
                                         <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <!-- <a class="dropdown-item" href="#">Membership</a> -->
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% endif %}
@@ -329,11 +333,11 @@
                     </li>
                     <li class="nav-item" style="margin-left: 48em;">
                         <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
-                        
+
                     </li>
                     <li class="nav-item">
                         <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
-                        
+
                     </li>
                     {% else %}
                         <li class="nav-item">
@@ -341,7 +345,7 @@
                         </li>
                         <li class="nav-item">
                             <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
-                            
+
                         </li>
                     {% endif %}
                 </ul>
@@ -415,15 +419,15 @@
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'hobo_user:how_to' %}" class="link-color" style="color: white; ">About</a></li>
                         <li><a href="{% url 'hobo_user:choose-membership' %}" class="link-color" style="color: white;">Membership</a></li>
-                        <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
-                        <li><a href="#" class="link-color" style="color: white;">Contact</a></li>
+                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
+                        <!-- <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
+                        <li><a href="#" class="link-color" style="color: white;">Contact</a></li> -->
                     </ul>
                 </div>
                 <div class="col-sm-4 mt-4 mb-2">
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'general:terms_of_service' %}" class="link-color" style="color: white;">Terms of Service</a></li>
                         <li><a href="{% url 'general:privacy_policy' %}" class="link-color" style="color: white;">Privacy Policy</a></li>
-                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
                         <li><a href="{% url 'general:intellectual_property_rights' %}" class="link-color" style="color: white;">Intellectual Property Rights</a></li>
                     </ul>
                 </div>
@@ -432,28 +436,19 @@
 
     </footer>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
 <!-- Axios -->
 <script src="{% static 'js/axios.min.js' %}"></script>
-<script src="{% static 'js/axios.js' %}"></script>
-<!-- <script src="{% static 'js/axios.map' %}"></script>
-<script src="{% static 'js/axios.min.map' %}"></script> -->
-<!-- <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="{% static 'js/owl.carousel.min.js' %}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="{% static 'js/notification.js' %}"></script>
 <script src="{% static 'js/tracking.js' %}"></script>
 <script src="{% static 'js/friend_request.js' %}"></script>
 <script src="{% static 'js/top_rated_list.js' %}"></script>
 <script src="{% static 'js/cast-attach-request.js' %}"></script>
 <script src="{% static 'js/crew-attach-request.js' %}"></script>
-<!-- <script src="{% static 'js/a076d05399.js' %}"></script> -->
-<script src="{% static 'js/owl.carousel.min.js' %}"></script>
-<!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
-<!-- <script src="{% static 'js/a076d05399.js' %}" crossorigin='anonymous'></script> -->
+
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="https://kit.fontawesome.com/b4df75477f.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
@@ -496,9 +491,8 @@
         });
     }
     </script>
-{% block extrajs %}
 <script src="{% static 'js/base_nav.js' %}"></script>
-{% endblock %}
+
 <script>
 
 
@@ -524,24 +518,26 @@ $("a[class='nav-link-non-clickable']").click(function () {
 
 </script>
 <script>
-    $( document ).ready(function() {
-        var pathurl = window.location.pathname;
-        var search = window.location.search;
-        var desired_path = pathurl + search
-        if (desired_path == '/hobo_user/projectview/create/'){
-            $("#project-nav-item").addClass('active');
-        }
-        else if (desired_path == '/hobo_user/projectview/?format=SCH'){
-            $("#scene-nav-item").addClass('active');
-        }
-        else if (desired_path == '/hobo_user/projectview/?format=SHO'){
-            $("#shorts-nav-item").addClass('active');
-        }
-        else{
+$( document ).ready(function() {
+    var pathurl = window.location.pathname;
+    var search = window.location.search;
+    var desired_path = pathurl + search
+    if (desired_path == '/hobo_user/projectview/create/'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SCH'){
+        $("#scene-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+        $("#shorts-nav-item").addClass('active');
+    }
+    else{
 
-        }
-    });
+    }
+});
 </script>
+{% block extrajs %}
+{% endblock %}
 </body>
 </html>
 

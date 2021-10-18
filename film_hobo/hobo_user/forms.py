@@ -70,9 +70,9 @@ class SignUpIndieForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpIndieForm, self).__init__(*args, **kwargs)
         self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
-        self.fields['beta_user'].required = False
-        self.fields['beta_user_code'].required = False
-        self.fields['beta_user_end'].required = False
+        self.fields['beta_user'].required = True
+        self.fields['beta_user_code'].required = True
+        self.fields['beta_user_end'].required = True
         self.fields['i_agree'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -188,9 +188,9 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
-        self.fields['beta_user'].required = False
-        self.fields['beta_user_code'].required = False
-        self.fields['beta_user_end'].required = False
+        self.fields['beta_user'].required = True
+        self.fields['beta_user_code'].required = True
+        self.fields['beta_user_end'].required = True
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True

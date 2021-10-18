@@ -809,3 +809,15 @@ input.pw {
     font-family: Courier Bold;
     font-size: 13px;
   }
+.gender_age_section, .edit_gender_Age_section
+  {
+    visibility: hidden;
+  }
+  .project_tracking_hr{
+    border-top: 1px solid#a0a0a0;
+    margin: 0;
+   }
+.tracking_project_link:hover span
+   {
+    color:#0e62b5;
+   }

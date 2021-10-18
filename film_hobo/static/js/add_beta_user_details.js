@@ -9,6 +9,9 @@ $( document ).ready(function() {
     if (betacode){
         $("#id_beta_user").val("True");
     }
+    else{
+        $("#betaNotifyModal").modal('show');
+    }
 
     var get_args = {
         "code": betacode,
@@ -23,4 +26,16 @@ $( document ).ready(function() {
         console.log(error);
     });
 
+});
+
+success_redirect = origin_url + '/hobo_user/choose-membership/'
+
+$('#betaNotifyModalClose').click(function(event){
+    $("#betaNotifyModal").modal('hide');
+    window.location.href=success_redirect
+});
+
+$('#betaNotifyModalCross').click(function(event){
+    $("#betaNotifyModal").modal('hide');
+    window.location.href=success_redirect
 });

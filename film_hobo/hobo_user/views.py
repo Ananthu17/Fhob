@@ -53,7 +53,7 @@ from .forms import SignUpForm, LoginForm, SignUpIndieForm, \
     ProjectCreationForm, WriterForm
 
 from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
-                    GuildMembership, GroupUsers, UserInterestJob, Video, \
+                    GuildMembership, GroupUsers, Video, \
                     IndiePaymentDetails, Photo, ProPaymentDetails, \
                     VideoRating, PromoCode, DisabledAccount, \
                     CustomUserSettings, CompanyPaymentDetails, \
@@ -99,7 +99,8 @@ from payment.views import IsSuperUser
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from project.models import Character, ProjectCrew
+from project.models import Audition, Character, CrewApplication, ProjectCrew, \
+    ProjectTracking
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -354,9 +355,74 @@ class HomePage(TemplateView):
 
 
 class ShowCase(TemplateView):
-    template_name = 'user_pages/showcase.html'
+    template_name = 'user_pages/showcasetwo.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(format="SCH").order_by('-likes')[:10]
+        context["toprated_scenes"] = Project.objects.filter(format="SHO").order_by('-likes')[:10]
+        context["filims"] = Project.objects.filter(format="SCH").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-id')
+        print(context)
+        return context
+
+
+class ShowCaseAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+        context = self.showcase_segregator(queryset)
+        return Response(context)
+
+
+class ShowCaseSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.showcase_segregator(queryset)
+        return Response(context)
+
+
+class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.showcase_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.showcase_segregator(project)
+            return Response(context)
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -3542,16 +3608,58 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
 
-        user_jobs_dict = {}
-        job_list = UserInterestJob.objects.filter(user=user)
-        for item in job_list:
-            if item.user_interest.id in user_jobs_dict:
-                user_jobs_dict[item.user_interest.id].append(item)
-            else:
-                 user_jobs_dict[item.user_interest.id] = []
-                 user_jobs_dict[item.user_interest.id].append(item)
+        crew_jobs_dict = {}
+        cast_jobs_dict = {}
+        cast_application_dict = {}
+        crew_application_dict = {}
 
-        context['user_jobs_dict'] = user_jobs_dict
+        try:
+            actor_actress = JobType.objects.get(slug='actoractress')
+
+            # cast list
+            cast_list = myinterests.filter(position=actor_actress)
+            for user_interest in cast_list:
+                character_objs = Character.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(gender = user_interest.gender) &
+                                    Q(age = user_interest.age)
+                                    )
+                cast_jobs_dict[user_interest.id] = character_objs
+                # get applications list
+                for cast in character_objs:
+                    audition_obj = Audition.objects.filter(
+                                        Q(user=user) &
+                                        Q(character=cast)
+                                    ).first()
+                    cast_application_dict[cast.id] = audition_obj
+
+            context['cast_jobs_dict'] = cast_jobs_dict
+            context['cast_application_dict'] = cast_application_dict
+            # crew members list
+            crew_list = myinterests.exclude(position=actor_actress)
+            for user_interest in crew_list:
+                crew_objs = ProjectCrew.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(job_type=user_interest.position)
+                                    )
+                crew_jobs_dict[user_interest.id] = crew_objs
+                # get applications list
+                for crew in crew_objs:
+                    application_obj = CrewApplication.objects.filter(
+                                        Q(user=user) &
+                                        Q(crew=crew)
+                                    ).first()
+                    crew_application_dict[crew.id] = application_obj
+            context['crew_jobs_dict'] = crew_jobs_dict
+            context['crew_application_dict'] = crew_application_dict
+
+        except JobType.DoesNotExist:
+            pass
+
 
         applied_projects = UserProject.objects.filter(
                             Q(user=user) &
@@ -3559,7 +3667,19 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                                 Q(relation_type = UserProject.APPLIED) |
                                 Q(relation_type = UserProject.ATTACHED)
                             )).order_by('-created_time')
-        
+
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        paginator = Paginator(tracking_projects, 21)
+        page = self.request.GET.get('page1')
+        try:
+            tracking_projects = paginator.page(page)
+        except PageNotAnInteger:
+            tracking_projects = paginator.page(1)
+        except EmptyPage:
+            tracking_projects = paginator.page(paginator.num_pages)
+        context['tracking_projects'] = tracking_projects
+
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
@@ -3913,14 +4033,14 @@ class GetProfileRatingNotificationAjaxView(View, JSONResponseMixin):
 
     def get(self, *args, **kwargs):
         context = dict()
-        user = self.request.user
+        user = self.request.user.id
         id = self.request.GET.get('from_user')
         message = self.request.GET.get('message')
         from_user = CustomUser.objects.get(id=id)
         notification_id = UserNotification.objects.filter(
                             Q(user=self.request.user) &
                             Q(from_user=from_user) &
-                            Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first().id
+                            Q(notification_type=UserNotification.USER_RATING)).order_by('-created_time').first()
         notification_html = render_to_string(
                                 'user_pages/get-profile-rating-notification.html',
                                 {'from_user': from_user,
@@ -5235,8 +5355,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         try:
             print(request.POST)
-            # import pdb
-            # pdb.set_trace()
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
             writerform = WriterForm(request.POST or None)
             project = Project()
@@ -5549,6 +5667,46 @@ class ScreeningProjectDeatilInviteView(APIView):
             # end notification section
             if notification_msg:
                 return Response({"status": "invite success"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ScreeningProjectUrlSendView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # send notification
+            logged_in_user = request.user
+            project_url = request.data['project_url']
+
+            project_id = project_url.rsplit('/', 2)[1]
+            project_obj = Project.objects.get(id=project_id)
+            selectedUsers = request.data['selectedUsers']
+            for user in selectedUsers:
+                to_user = CustomUser.objects.get(id=user)
+                from_userid = request.user.id
+                #update notification table
+                notification = UserNotification()
+                notification.user = to_user
+                notification.notification_type = UserNotification.INVITE
+                notification.from_user = self.request.user
+                notification.message = self.request.user.get_full_name()+" shared you to check the project "+str(project_obj.title)+""
+                notification.invite_url = project_url
+                notification.save()
+                # send notification
+                room_name = "user_"+str(logged_in_user.id)
+                notification_msg = {
+                        'type': 'send_profile_rating_notification',
+                        'message': str(notification.message),
+                        'from': from_userid,
+                        "event": "INVITE"
+                    }
+                notify(room_name, notification_msg)
+                # end notification section
+                # if notification_msg:
+            return Response({"status": "url send successfully"}, status=status.HTTP_200_OK)
+
         except:
             return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)
 

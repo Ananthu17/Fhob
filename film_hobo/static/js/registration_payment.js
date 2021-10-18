@@ -19,9 +19,9 @@ var getUrlParameter = function getUrlParameter(sParam) {
 
 $( document ).ready(function() {
     $("#remove_promocode").hide();
-    localStorage.setItem('promocode', '');
-    localStorage.setItem('promotion_amount', '');
-    localStorage.setItem('final_amount', '');
+    // localStorage.setItem('promocode', '');
+    // localStorage.setItem('promotion_amount', '');
+    // localStorage.setItem('final_amount', '');
     var promotion_amount = localStorage.getItem("promotion_amount");
     var final_amount = localStorage.getItem("final_amount");
     if (promotion_amount){
