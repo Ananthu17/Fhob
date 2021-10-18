@@ -219,23 +219,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
-                            </div>
-                            <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#3</span></div>
-                            <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">Dallas</span>
-                            </div>
-                        </div>
-                        <div class="col-6 mem-set-track-padding">
-                            <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#178</span>
-                            </div>
-                            <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#1</span></div>
-                            <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
-                                    York</span></div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
@@ -445,78 +429,7 @@
                             </div>
                         </div>
                     </div>
-                    <hr class="mem-set-acc-hr">
-                    <div class="bold mt-3 mem-setup-blu-f "><a href="{% url 'hobo_user:friends-and-followers' %}"
-                        class="mem-blu-link">M<span
-                                class="mem-small-f">Y</span>
-                            I<span class="mem-small-f">NTERESTS</span></a></div>
-                    <form method="post" action="{% url 'hobo_user:add-user-interest' %}">
-                        {% csrf_token %}
-                    <div class="my-interests-section">
-                    <div class="row ">
-                        <div class="col-md-3 col-sm-3 form-group">Position
-                            <select name="position" id="position_1"
-                            class="form-control form-control-input mt-2" required>
-                                {% for position in my_interest_form.position %}
-                                    {{position}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-3 form-group">Format
-                            <select name="format" id = "format_1"
-                                class="form-control form-control-input mt-2 " required>
-                                {% for item in my_interest_form.format %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-3 form-group">Location
-                            <select name="location" id ="location_1"
-                                class="form-control form-control-input mt-2 " required>
-                                {% for item in my_interest_form.location %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-3 form-group">Budget
-                            <select name="budget" id ="budget_1"
-                                class="form-control form-control-input mt-2 " required>
-                                {% for item in my_interest_form.budget %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-3 form-group">
-                            <label class="intrest-lab">Gender:</label>
-                            <select class="form-control form-control-input"
-                            name="gender" id ="gender"  >
-                                {% for item in my_interest_form.gender %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-sm-3 form-group">
-                            <label class="intrest-lab">Age:</label>
-                            <select class="form-control form-control-input"
-                            name="age" id ="age"  >
-                                {% for item in my_interest_form.age %}
-                                    {{item}}
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    </div>
-                    <div class="row mt-0 mb-1">
-                        <div class="col-12 pr-5">
-                            <input type="submit"
-                            class="mem-setup-blu-f float-right ml-3 btn custom-save-btn"
-                            value="Save"/>
-                            <a class="mem-setup-blu-f float-right cursor-pointer"
-                            id="add-more-interests">Add More</a>
-                        </div>
-                    </div>
-
-                </form>
+                   
                     <hr class="mem-set-acc-hr">
                 </div>
                 <div class=" pl-2 pb-2">

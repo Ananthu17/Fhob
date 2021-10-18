@@ -26,6 +26,7 @@ from .models import CustomUser, Country, GuildMembership, \
     UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
     Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
 
+
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
 
@@ -1108,7 +1109,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'title', 'format', 'genre', 'rating',
                   'video_url', 'video_type', 'last_date', 'location',
                   'visibility_password', 'cast_attachment', 'cast_pay_rate',
-                  'cast_samr', 'timestamp', 'visibility']
+                  'cast_samr', 'timestamp', 'visibility', 'likes',
+                  'video_cover_image']
 
 
 class TeamSerializer(serializers.ModelSerializer):

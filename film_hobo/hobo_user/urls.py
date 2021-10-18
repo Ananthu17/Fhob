@@ -46,7 +46,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetFriendRequestNotificationAjaxView, \
                    CancelFriendRequestAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
-                   FeedbackAPIView, FeedbackWebView, \
+                   FeedbackAPIView, FeedbackWebView, ReportProblemAPIView, \
                    AddGroupAPI, RemoveFriendGroupAPI, \
                    AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
                    FilterFriendByGroupAjaxView, \
@@ -67,7 +67,9 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    CheckBetaTesterCode, ProjectDateFilterAPI, \
                    GetBetaTesterCodeId, HomeProjectAPIView, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
-                   ProjectSearchView, ShowCase, ReportAProblemWebView
+                   ProjectSearchView, ShowCase, ReportAProblemWebView, \
+                   ShowCaseAPIView, ScreeningProjectUrlSendView, \
+                   ShowCaseSearchView, ShowCaseDateFilterAPI
 
 
 app_name = "hobo_user"
@@ -186,6 +188,10 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+
+    path('report-a-problem-api/', ReportProblemAPIView.as_view(),
+         name='report-problem-api'),
+
     path('get-all-users-api/', GetAllUsersAPI.as_view(),
          name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
@@ -209,6 +215,11 @@ urlpatterns = [
     path('user_home/invite/',
          ScreeningProjectDeatilInviteView.as_view(),
          name='projects_detail_invite'),
+
+    path('user_home/send_url/',
+         ScreeningProjectUrlSendView.as_view(),
+         name='send_project_url'),
+
     path('user_home/project_invite/<int:id>/',
          UserHomeProjectInvite.as_view(),
          name='user_home_project_invite'),
@@ -347,4 +358,10 @@ urlpatterns = [
          name="user-project-search"),
     path('user_home-projects/', HomeProjectAPIView.as_view(),
          name='user-project-list'),
+    path('showcase/projects/', ShowCaseAPIView.as_view(),
+         name='showcase-project-list'),
+    path('showcase/search/', ShowCaseSearchView.as_view(),
+         name='showcase-search'),
+    path('showcase/date/', ShowCaseDateFilterAPI.as_view(),
+         name='showcase-date'),
 ]
