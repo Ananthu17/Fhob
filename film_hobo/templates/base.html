@@ -283,10 +283,12 @@
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% elif user.registration_complete %}
@@ -304,6 +306,7 @@
                                         <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <!-- <a class="dropdown-item" href="#">Membership</a> -->
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% endif %}
@@ -401,15 +404,15 @@
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'hobo_user:how_to' %}" class="link-color" style="color: white; ">About</a></li>
                         <li><a href="{% url 'hobo_user:choose-membership' %}" class="link-color" style="color: white;">Membership</a></li>
-                        <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
-                        <li><a href="#" class="link-color" style="color: white;">Contact</a></li>
+                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
+                        <!-- <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
+                        <li><a href="#" class="link-color" style="color: white;">Contact</a></li> -->
                     </ul>
                 </div>
                 <div class="col-sm-4 mt-4 mb-2">
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'general:terms_of_service' %}" class="link-color" style="color: white;">Terms of Service</a></li>
                         <li><a href="{% url 'general:privacy_policy' %}" class="link-color" style="color: white;">Privacy Policy</a></li>
-                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
                         <li><a href="{% url 'general:intellectual_property_rights' %}" class="link-color" style="color: white;">Intellectual Property Rights</a></li>
                     </ul>
                 </div>
