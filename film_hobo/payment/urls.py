@@ -56,7 +56,7 @@ urlpatterns = [
     path('get_discount_details', DiscountPlanDetails.as_view(),
          name='get_discount_details'),
     # web-view endpoints
-    path('payment_admin', PaymentAdmin.as_view(),
+    path('payment_admin/', PaymentAdmin.as_view(),
          name='payment_admin'),
     # paypal endpoints
     path('paypal/', include("paypal.standard.ipn.urls")),

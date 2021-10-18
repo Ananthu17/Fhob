@@ -5,9 +5,10 @@ import requests
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -719,7 +720,13 @@ class PaymentAdmin(View):
     Web URL View to load the admin payment page
     """
     def get(self, request, *args, **kwargs):
-        return render(request, 'payment/payment_admin.html')
+        user_obj = CustomUser.objects.get(id=request.user.id)
+        admin_token = Token.objects.get(user=user_obj).key
+        if not request.GET.get('token'):
+            return_url = "/payment/payment_admin/?token=" + admin_token + '/'
+            return HttpResponseRedirect(return_url)
+        else:
+            return render(request, 'payment/payment_admin.html')
 
 
 class AddDiscountDetailAPI(APIView):
