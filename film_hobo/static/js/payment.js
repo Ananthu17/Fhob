@@ -1,7 +1,28 @@
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
 /*
 get membership fee details and render to html
 */
-var token = localStorage.getItem("token");
+if (localStorage.getItem("token")){
+    var token = localStorage.getItem("token");
+}
+else{
+    var new_token = getUrlParameter('token');
+    var token = new_token.substring(0,new_token.length - 1)
+}
 token_str = "Token "
 token_val = String(token)
 var authorization_str = token_str.concat(token_val);
