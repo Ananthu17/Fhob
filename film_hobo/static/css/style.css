@@ -813,3 +813,11 @@ input.pw {
   {
     visibility: hidden;
   }
+  .project_tracking_hr{
+    border-top: 1px solid#a0a0a0;
+    margin: 0;
+   }
+.tracking_project_link:hover span
+   {
+    color:#0e62b5;
+   }

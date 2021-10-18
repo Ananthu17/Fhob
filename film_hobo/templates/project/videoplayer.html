@@ -344,16 +344,18 @@
 
 {% endblock %}
 {% block extrajs %}
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
 <script src="{% static 'js/user-rating.js' %}"></script>
 <script src="{% static 'js/project_tracking.js' %}"></script>
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script>
-var  availableTags = [];
-var token = $("#token").val();
-$(document).ready(function(){
 
+$(document).ready(function(){
+    var  availableTags = [];
+    var token = $("#token").val();
+    console.log(token)
+    console.log("{{ request.user }}")
     $.ajax
             ({
                 type: "GET",
