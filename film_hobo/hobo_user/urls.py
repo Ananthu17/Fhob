@@ -68,7 +68,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetBetaTesterCodeId, HomeProjectAPIView, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
                    ProjectSearchView, ShowCase, ReportAProblemWebView, \
-                   ShowCaseAPIView, ScreeningProjectUrlSendView
+                   ShowCaseAPIView, ScreeningProjectUrlSendView, \
+                   ShowCaseSearchView, ShowCaseDateFilterAPI
 
 
 app_name = "hobo_user"
@@ -358,5 +359,9 @@ urlpatterns = [
     path('user_home-projects/', HomeProjectAPIView.as_view(),
          name='user-project-list'),
     path('showcase/projects/', ShowCaseAPIView.as_view(),
-         name='showcase-project-list')
+         name='showcase-project-list'),
+    path('showcase/search/', ShowCaseSearchView.as_view(),
+         name='showcase-search'),
+    path('showcase/date/', ShowCaseDateFilterAPI.as_view(),
+         name='showcase-date'),
 ]
