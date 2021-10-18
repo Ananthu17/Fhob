@@ -112,22 +112,30 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                    <div class="row">
+                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{tracking_projects_count }})</div>
+                    {% for obj in tracking_projects %}
+                    {% if forloop.first or forloop.counter0|divisibleby:3 %}
+                    <div class="row ">
+                    {% endif %}
                         <div class="col-4 ">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Dynamo</span></div>
+                            <div class="track-blu-f-sec2">Project
+                                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                class="tracking_project_link" title="{{obj.project.id}}">
+                                    <span class="track-orng-f-sec2">#{{obj.project.id}}</span>
+                                </a>
+                            </div>
+                            <div class="track-blu-f-sec2">Title:
+                                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                    class="tracking_project_link" title="{{obj.project.title}}">
+                                    <span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
+                                </a>
+                            </div>
                         </div>
-                        <div class="col-4 mem-set-track-padding">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#56</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Jack</span></div>
-                        </div>
-                        <div class="col-4 mem-set-track-padding pl-0">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#457</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Hammer</span></div>
-                        </div>
+                    {% if forloop.last or forloop.counter|divisibleby:3 %}
                     </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                    {% endif %}
+                    {% endfor %}
+                    <!-- <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
                     <div class="row">
                         <div class="col-6">
                             <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
@@ -139,7 +147,7 @@
                             <div class="track-blu-f">Team:<span class="track-orng-f">#1</span></div>
                             <div class="track-blu-f">Location:<span class="track-orng-f">New York</span></div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">

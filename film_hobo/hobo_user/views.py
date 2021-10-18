@@ -2264,6 +2264,11 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             context['friends'] = friends[:8]
         except Friend.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2477,8 +2482,6 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         profile = get_object_or_404(CompanyProfile, user=user)
-        print(profile)
-        print(user)
         context['user'] = user
         context['profile'] = profile
         pos_list = [2, 3, 4]
@@ -2504,14 +2507,16 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['tracking_list'] = tracking_list[:6]
 
         try:
-            friend=Friend.objects.all()
-            if(friend):
-                friend_obj = Friend.objects.get(user=user)
-                friends = friend_obj.friends.all()
-                context['friends'] = friends[:8]
-                context['friends_list_count']=friends.count()
-        except FriendRequest.DoesNotExist:
-            context['friends'] = 0
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+            context['friends_list_count'] = friends.count()
+        except Friend.DoesNotExist:
+            pass
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2633,6 +2638,11 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             context['friends'] = friends[:8]
         except Friend.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -3058,6 +3068,11 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         except CustomUserSettings.DoesNotExist:
             pass
 
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
+
         user_projects = UserProject.objects.filter(user=user)
         my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
         favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
@@ -3121,6 +3136,11 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
 
@@ -3198,6 +3218,11 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
 
