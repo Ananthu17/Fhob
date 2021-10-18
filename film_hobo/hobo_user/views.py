@@ -361,6 +361,7 @@ class ShowCase(TemplateView):
         context["toprated_scenes"] = Project.objects.filter(format="SHO").order_by('-likes')[:10]
         context["filims"] = Project.objects.filter(format="SCH").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-id')
+        print(context)
         return context
 
 
@@ -380,6 +381,44 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
         print(queryset)
         context = self.showcase_segregator(queryset)
         return Response(context)
+
+
+class ShowCaseSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.showcase_segregator(queryset)
+        return Response(context)
+
+
+class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.showcase_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.showcase_segregator(project)
+            return Response(context)
 
 
 class StandardResultsSetPagination(PageNumberPagination):
