@@ -98,7 +98,7 @@ $('#url_send').click(function (event) {
 
 
 $('#cancel_url').click(function (event) {
-
+    alert("ggggggggggggggggggg")
     console.log(response);
     $("#shareModal").modal('hide');
 }, (error) => {
