@@ -95,7 +95,8 @@ class RegisterSerializer(serializers.Serializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
-                  'last_name', 'password1', 'password2']
+                  'last_name', 'password1', 'password2',
+                  'beta_user', 'beta_user_code', 'beta_user_end']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -121,6 +122,15 @@ class RegisterSerializer(serializers.Serializer):
     def custom_signup(self, request, user):
         pass
 
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterSerializer, self).to_internal_value(data)
+
     def get_cleaned_data(self):
         return {
             'username': self.validated_data.get('username', ''),
@@ -129,6 +139,9 @@ class RegisterSerializer(serializers.Serializer):
             'first_name': self.validated_data.get('first_name', ''),
             'middle_name': self.validated_data.get('middle_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
+            'beta_user': self.validated_data.get('beta_user', ''),
+            'beta_user_code': self.validated_data.get('beta_user_code', ''),
+            'beta_user_end': self.validated_data.get('beta_user_end', ''),
         }
 
     def save(self, request):

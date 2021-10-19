@@ -1748,8 +1748,9 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        context['transaction'] = \
-            Transaction.objects.get(user_id=user.id)
+        if user.membership != 'HOB':
+            context['transaction'] = \
+                Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
