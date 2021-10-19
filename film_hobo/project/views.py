@@ -436,6 +436,12 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         project_creator_rating = 0
+        user = self.request.user.id
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
 
         project_creator_job = JobType.objects.filter(
                                slug='project-creator'
@@ -517,6 +523,7 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
                 context['writer'] = writer_obj.user.get_full_name()
             elif writer_obj.name:
                 context['writer'] = writer_obj.name
+        context['friends'] = friends
         return context
 
 

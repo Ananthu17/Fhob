@@ -5702,10 +5702,8 @@ class ScreeningProjectUrlSendView(APIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            # send notification
             logged_in_user = request.user
             project_url = request.data['project_url']
-
             project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)
             selectedUsers = request.data['selectedUsers']
