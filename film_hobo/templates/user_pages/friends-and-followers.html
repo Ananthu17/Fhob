@@ -743,7 +743,8 @@
                                                         {% if audition_obj.audition_status == 'applied' %}class="int-applied"
                                                         {% elif audition_obj.audition_status == 'attached' %}class="int-green"
                                                         {% elif audition_obj.audition_status == 'passed' %}class="int-red"
-                                                        {% endif %}>{{audition_obj.audition_status}}</td>
+                                                        {% elif audition_obj.audition_status == 'callback' %}class="int-callback"
+                                                        {% endif %}>{{audition_obj.get_audition_status_display}}</td>
                                                         <td class="int-red">(on {{audition_obj.status_update_date}})</td>
                                                     {% else %}
                                                         <td></td>

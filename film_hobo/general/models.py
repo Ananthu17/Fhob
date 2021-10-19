@@ -25,3 +25,39 @@ class Help(models.Model):
     def __str__(self):
         title = str(self.user.get_full_name())+"-"+str(self.subject)
         return str(title)
+
+
+class EmailUs(models.Model):
+    General = 'general'
+    Technical = 'technical'
+    Sevices = 'services'
+    Abuse = 'abuse'
+    Business = 'business'
+    TOPIC_CHOICES = [
+                    (General, 'General'),
+                    (Technical, 'Technical'),
+                    (Abuse, 'Abuse'),
+                    (Sevices, 'Sevices'),
+                    (Business, 'Business'),
+                    ]
+    topic = models.CharField(_("Topic"),
+                             choices=TOPIC_CHOICES,
+                             max_length=150,
+                             null=True, blank=True)
+    user = models.ForeignKey("hobo_user.CustomUser",
+                             on_delete=models.CASCADE,
+                             related_name='email_from_user',
+                             verbose_name=_("User"),
+                             null=True)
+    subject = models.CharField(_('Subject'),
+                               max_length=150)
+    message = models.TextField(_("Message"))
+    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        verbose_name = 'Email'
+        verbose_name_plural = 'Emails'
+
+    def __str__(self):
+        return str(self.user)
