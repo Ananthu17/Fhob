@@ -125,40 +125,40 @@
                     <div class="d-flex justify-content-center left-mode-sec">
                         <ul class="list-group home-month swc-home">
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">January</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">January</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">February</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">February</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">March</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">March</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">April</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">April</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">May</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">May</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">June</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">June</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">July</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">July</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">August</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">August</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">September</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">September</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">October</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">October</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">November</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">November</li>
                             </a>
                             <a class="text-dark" href="javascript:void(0)">
-                                <li class="list-group-item border-0 month-algn" onclick="NewMonthFilter(this)">December</li>
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">December</li>
                             </a>
                         </ul>
                     </div>
@@ -259,7 +259,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="swc-img-project-txt ">
-                                        <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
@@ -274,7 +274,7 @@
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
-                                        <span class="hom-name-width-overflow">Name:<a href=""
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
                                         <span>Team<a href="">#{{project.team}}</a></span>
                                         <span class="swc-like-sec">
@@ -332,7 +332,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="swc-img-project-txt ">
-                                        <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
@@ -347,7 +347,7 @@
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
-                                        <span class="hom-name-width-overflow">Name:<a href=""
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
                                         <span>Team<a href="">#{{project.team}}</a></span>
                                         <span class="swc-like-sec">
@@ -408,7 +408,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="swc-img-project-txt ">
-                                        <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
@@ -423,7 +423,7 @@
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
-                                        <span class="hom-name-width-overflow">Name:<a href=""
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
                                         <span>Team<a href="">#{{project.team}}</a></span>
                                         <span class="swc-like-sec">
@@ -484,7 +484,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="swc-img-project-txt ">
-                                        <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
@@ -499,7 +499,7 @@
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
-                                        <span class="hom-name-width-overflow">Name:<a href=""
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
                                         <span>Team<a href="">#{{project.team}}</a></span>
                                         <span class="swc-like-sec">
@@ -731,7 +731,7 @@
                 }
 
                 let div2 = `<div class="swc-img-project-txt ">
-                                    <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="'${origin_url}/project/single-film-project/${this.id}/'"
                                         title="2245"> #${this.id}</a></span></span>
                                     <span class="">Scene</span><span class="hom-rate-star">`
                 let div3 = ""
@@ -744,7 +744,7 @@
                     }
                 let div5 =`</span></div>
                                 <div class="swc-img-project-name-txt">
-                                    <span class="hom-name-width-overflow">Name:<a href=""
+                                    <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="Cart Ride">${this.title}</a></span>
                                     <span>Team<a href="">#1</a></span>
                                         <span class="swc-like-sec">
@@ -810,7 +810,7 @@
                 }
 
                 let div2 = `<div class="swc-img-project-txt ">
-                                    <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                    <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="2245"> #${this.id}</a></span></span>
                                     <span class="">Scene</span><span class="hom-rate-star">`
                 let div3 = ""
@@ -823,7 +823,7 @@
                     }
                 let div5 =`</span></div>
                                 <div class="swc-img-project-name-txt">
-                                    <span class="hom-name-width-overflow">Name:<a href=""
+                                    <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="Cart Ride">${this.title}</a></span>
                                     <span>Team<a href="">#1</a></span>
                                         <span class="swc-like-sec">
@@ -889,7 +889,7 @@
                 }
 
                 let div2 = `<div class="swc-img-project-txt ">
-                                    <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                    <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="2245"> #${this.id}</a></span></span>
                                     <span class="">Scene</span><span class="hom-rate-star">`
                 let div3 = ""
@@ -902,7 +902,7 @@
                     }
                 let div5 =`</span></div>
                                 <div class="swc-img-project-name-txt">
-                                    <span class="hom-name-width-overflow">Name:<a href=""
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
                                     <span>Team<a href="">#1</a></span>
                                         <span class="swc-like-sec">
@@ -938,7 +938,7 @@
                 }
 
                 let div2 = `<div class="swc-img-project-txt ">
-                                    <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="2245"> #${this.id}</a></span></span>
                                     <span class="">Scene</span><span class="hom-rate-star">`
                 let div3 = ""
@@ -951,7 +951,7 @@
                     }
                 let div5 =`</span></div>
                                 <div class="swc-img-project-name-txt">
-                                    <span class="hom-name-width-overflow">Name:<a href=""
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
                                     <span>Team<a href="">#1</a></span>
                                         <span class="swc-like-sec">
@@ -987,7 +987,7 @@
                 }
 
                 let div2 = `<div class="swc-img-project-txt ">
-                                    <span>Project<span class="swc-pro-width-overflow"><a href=""
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="2245"> #${this.id}</a></span></span>
                                     <span class="">Scene</span><span class="hom-rate-star">`
                 let div3 = ""
@@ -1000,7 +1000,7 @@
                     }
                 let div5 =`</span></div>
                                 <div class="swc-img-project-name-txt">
-                                    <span class="hom-name-width-overflow">Name:<a href=""
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
                                     <span>Team<a href="">#1</a></span>
                                         <span class="swc-like-sec">
@@ -1167,7 +1167,7 @@
         }, (error) => {console.log(error);})
     }
 
-    function NewMonthFilter(data){
+    function newMonthFilter(data){
         $('.list-group a li').removeClass('text-primary selected');
         $('.list-group a li').removeAttr('id');
         data.setAttribute("class", "text-primary");
@@ -1233,11 +1233,16 @@
     $(".item").click(function(){
         var proj_card_ele = $(this)
         var project_obj = proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1)
-        console.log("MAN",proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1))
         var project_id = project_obj.split("#").pop();
         var origin_url = window.location.origin
         var redirect_url = origin_url + '/project/video/' + project_id + '/'
         window.location.replace(redirect_url);
+    });
+    $(".hom-name-width-overflow").click(function(){
+        console.log("%%%%%%%%%%%%%%%%%")
+        var proj_card_ele = $(this)
+        var project_obj = proj_card_ele[0].children[0]
+        console.log(proj_card_ele[0].children[0])
     });
 
 </script>
