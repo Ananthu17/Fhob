@@ -235,15 +235,23 @@
                             </div>
                            {% endfor %}
                         </div>
-                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{ my_projects.count }})</div>
-                        {% for obj in my_projects|slice:":6" %}
+                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{tracking_projects_count }})</div>
+                        {% for obj in tracking_projects %}
                         {% if forloop.first or forloop.counter0|divisibleby:3 %}
                         <div class="row ">
                         {% endif %}
                             <div class="col-4 ">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#{{obj.id}}</span>
+                                <div class="track-blu-f-sec2">Project
+                                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                    class="tracking_project_link" title="{{obj.project.id}}">
+                                        <span class="track-orng-f-sec2">#{{obj.project.id}}</span>
+                                    </a>
                                 </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
+                                <div class="track-blu-f-sec2">Title:
+                                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                        class="tracking_project_link" title="{{obj.project.title}}">
+                                        <span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
+                                    </a>
                                 </div>
                             </div>
                         {% if forloop.last or forloop.counter|divisibleby:3 %}
@@ -634,7 +642,7 @@
                     </div>
                     {% endif %}
                     <!-- end my projects -->
-                    {% if profile.user.id == request.user.id  %}{% endif %}
+                    {% if profile.user.id == request.user.id  %}
                     {% if favorites %}
                     <!-- Favorites -->
                     <div class="row mt-4">
@@ -779,6 +787,7 @@
                     {% endif %}
                     <!-- end applied -->
                     
+                    {% endif %}
                 </div>
                 <div class="left-mode-sec p-2 mt-3">
                     <div class="row mem-white-bg">
