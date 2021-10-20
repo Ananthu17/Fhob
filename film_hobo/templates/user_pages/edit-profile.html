@@ -28,8 +28,8 @@
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests (5)</a></li>
-                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
+                        <li><a href="{% url 'hobo_user:friends-and-followers' %}#myinterest_section" class="membr-setup-m">My Interests ({{my_interests_count}})</a></li>
+                        <li class="mt-4"><a href="{% url 'hobo_user:projects' %}" class="membr-setup-m">My Projects ({{my_projects_count}})</a></li>
                     </ul>
                 </div>
                 <!-- <div class="left-mode-sec mt-3 p-2 blank-left-mode">

@@ -2269,6 +2269,8 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
         context['tracking_projects_count'] = tracking_projects.count
         context['tracking_projects'] = tracking_projects[:6]
+        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
+        context['my_interests_count'] = UserInterest.objects.filter(user=user).count()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -3074,9 +3076,9 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         context['tracking_projects'] = tracking_projects[:6]
 
         user_projects = UserProject.objects.filter(user=user)
-        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
-        favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
-        applied = user_projects.filter(relation_type = UserProject.APPLIED).order_by('-created_time')
+        my_projects = user_projects.filter(relation_type=UserProject.ATTACHED).order_by('-created_time')
+        favorites = user_projects.filter(relation_type=UserProject.FAVORITE).order_by('-created_time')
+        applied = user_projects.filter(relation_type=UserProject.APPLIED).order_by('-created_time')
         context['my_projects'] = my_projects
         context['favorites'] = favorites
         context['applied'] = applied
@@ -3638,6 +3640,7 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         context['budget'] = UserInterest.BUDGET_CHOICES
         context['gender'] = UserInterest.GENDER_CHOICES
         context['age'] = UserInterest.AGE_CHOICES
+        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
         return context
 
 
