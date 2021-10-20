@@ -359,297 +359,299 @@
 <script src="{% static 'js/project_tracking.js' %}"></script>
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
 <link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
+<!-- COMMENT THIS 3 LINKS FOR THE COMMENTING TO WORK -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
+
+
+
 
 
 <script>
-var  availableTags = [];
-
-jQuery('#languageSelect').multiselect({
+    jQuery('#languageSelect').multiselect({
     columns: 1,
     placeholder: 'Select Users',
     search: true,
     selectAll: true
 });
-
-
-
-
-var token = $("#token").val();
-$(document).ready(function(){
-
-    $.ajax
-            ({
-                type: "GET",
-                url: "/hobo_user/get-all-users-api/",
-                dataType: 'json',
-                async: false,
-                data: {},
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    availableTags = response['serializer_list'];
-                    user_dict = response['name_dict'];
-                    name_list = response['name_list'];
-                }
-            });
-    function split(val)
-        {
-        return val.split(/@\s*/);
-        }
-
-    function extractLast(term)
-        {
-        return split(term).pop();
-        }
-$(".comment-textarea")
-    // don't navigate away from the field on tab when selecting an item
-    .bind("keydown", function(event) {
-        if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
-            event.preventDefault();
-        }
-        }).autocomplete({
-                minLength: 0,
-                source: function(request, response) {
-                    var term = request.term,
-                        results = [];
-                    if (term.indexOf("@") >= 0) {
-                        term = extractLast(request.term);
-                        if (term.length > 0) {
-                            results = $.ui.autocomplete.filter(
-                            availableTags, term);
-                        } else {
-                            results = ['Type a name..'];
-                        }
-                    }
-                    response(results);
-                },
-                focus: function() {
-                    // prevent value inserted on focus
-                    return false;
-                },
-                select: function(event, ui) {
-                    var terms = split(this.value);
-                    // remove the current input
-                    terms.pop();
-                    // add the selected item
-                    var hyperlink = ui.item.value
-                    terms.push(hyperlink);
-                    // add placeholder to get the comma-and-space at the end
-                    terms.push("");
-                    this.value = terms.join("");
-                    return false;
-                }
-            });
-
-
-    $('body').on('click' , '.post', function(){
-        var project_id = $(this).attr("id");
-        var token = $("#token").val();
-
-        var comment_txt_2 = $('#comment_txt').val();
-        var name_list_2 = name_list;
-        var name_str = name_list_2.join("|");
-        var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
-        // var found = $('.mention_user', comment_txt);
-        var found = $(comment_txt).filter('.mention_user');
-        var id_list = [];
-        $(found).each(function( link ) {
-            var id = $(this).attr("id");
-            id_list.push(id)
-        });
-        var data_dict = {};
-        data_dict['project'] = project_id
-        data_dict['comment_txt'] = comment_txt
-        data_dict['mentioned_users'] = JSON.stringify(id_list)
-
-        console.log(data_dict)
-        if(comment_txt){
-            $.ajax
-            ({
-                type: "POST",
-                url: "/project/post-comment-api/",
-                dataType: 'json',
-                async: false,
-                data: data_dict,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    window.location.reload()
-                    // var comment_id = response['id']
-                    // $('#comment_txt').val("");
-                    // $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
-
-                }
-            });
-        }
-    });
-    $('body').on('click' , '.post-reply', function(){
-        var comment_id = $(this).attr("id");
-        var project_id = $("#project_id").val();
-        var token = $("#token").val();
-        var comment_txt_id = '#comment_txt_'+comment_id
-
-        var comment_txt_2 = $(comment_txt_id).val();
-        var name_list_2 = name_list;
-        var name_str = name_list_2.join("|");
-        var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
-
-        var found = $(comment_txt).filter('.mention_user');
-        var id_list = [];
-        $(found).each(function( link ) {
-            var id = $(this).attr("id");
-            id_list.push(id)
-        });
-
-        var div_id = "#comment-"+comment_id;
-        var data_dict = {};
-        var reply_section = "#reply-section-"+comment_id;
-        data_dict['project'] = project_id
-        data_dict['comment_txt'] = comment_txt
-        data_dict['reply_to'] = comment_id
-        data_dict['mentioned_users'] = JSON.stringify(id_list)
-        // console.log(data_dict)
-        if(comment_txt){
-            $.ajax
-            ({
-                type: "POST",
-                url: "/project/post-comment-api/",
-                dataType: 'json',
-                async: false,
-                data: data_dict,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    window.location.reload();
-                    // var comm_id = response['id'];
-                    // $(".comment-reply-box").html("");
-                    // $(reply_section).append('<div class="col-12 "><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comm_id+'">Delete</a></span></div></div>');
-                }
-            });
-        }
-    });
-    $('body').on('click' , '.reply', function(){
-        var comment_id = $(this).attr("id");
-        var div_id = "#comment-"+comment_id;
-        var project_id = $("#project_id").val();
-        var txtbox = '<textarea class="comment-textarea " placeholder="Write a comment..." name="comment" id="comment_txt_'+comment_id+'"></textarea>'
-        var postbtn = '<div class="text-right"><a name="post-comment" id="'+comment_id+'" class="post-btn btn-primary cursor-pointer post-reply">Post</a></div>'
-        $(div_id).html("")
-        $(".comment-reply-box").html("");
-        $(div_id).append(txtbox)
-        $(div_id).append(postbtn)
-        $(".comment-textarea").focus()
-        $(".comment-textarea").select()
-        $.ajax
-            ({
-                type: "GET",
-                url: "/hobo_user/get-all-users-api/",
-                dataType: 'json',
-                async: false,
-                data: {},
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                    availableTags = response['serializer_list'];
-                    user_dict = response['name_dict'];
-                    name_list = response['name_list'];
-                }
-            });
-    function split(val)
-        {
-        return val.split(/@\s*/);
-        }
-
-    function extractLast(term)
-        {
-        return split(term).pop();
-        }
-$(".comment-textarea")
-    // don't navigate away from the field on tab when selecting an item
-    .bind("keydown", function(event) {
-        if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
-            event.preventDefault();
-        }
-        }).autocomplete({
-                minLength: 0,
-                source: function(request, response) {
-                    var term = request.term,
-                        results = [];
-                    if (term.indexOf("@") >= 0) {
-                        term = extractLast(request.term);
-                        if (term.length > 0) {
-                            results = $.ui.autocomplete.filter(
-                            availableTags, term);
-                        } else {
-                            results = ['Type a name..'];
-                        }
-                    }
-                    response(results);
-                },
-                focus: function() {
-                    // prevent value inserted on focus
-                    return false;
-                },
-                select: function(event, ui) {
-                    var terms = split(this.value);
-                    // remove the current input
-                    terms.pop();
-                    // add the selected item
-                    var hyperlink = ui.item.value
-                    terms.push(hyperlink);
-                    // add placeholder to get the comma-and-space at the end
-                    terms.push("");
-                    this.value = terms.join("");
-                    return false;
-                }
-            });
-    });
-
-});
-
 </script>
 <script>
-    $('body').on('click' , '.close-modal', function(){
-        $("#delete-comment-modal").modal('hide');
-    });
-    $('body').on('click' , '.delete', function(){
-        var comment_id = $(this).attr("id");
-        $(".delete-comment-btn-div").html('<button type="button" class="btn btn-outline-danger btn-sm delete-comment" id="'+comment_id+'">Delete</button>');
-        $("#delete-comment-modal").modal('show');
-    });
-      $('body').on('click' , '.delete-comment', function(){
-        var comment_id = $(this).attr("id");
+    $(document).ready(function(){
+        var  availableTags = [];
         var token = $("#token").val();
-
-        if(comment_id){
-            $.ajax
-            ({
-                type: "POST",
-                url: "/project/delete-comment-api/",
-                dataType: 'json',
-                async: false,
-                data: {"comment_id":comment_id},
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader ("Authorization", token);
-                },
-                success: function (response){
-                   window.location.reload();
-                }
+        console.log(token)
+        console.log("{{ request.user }}")
+        $.ajax
+                ({
+                    type: "GET",
+                    url: "/hobo_user/get-all-users-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (response){
+                        availableTags = response['serializer_list'];
+                        user_dict = response['name_dict'];
+                        name_list = response['name_list'];
+                    }
+                });
+        function split(val)
+            {
+            return val.split(/@\s*/);
+            }
+    
+        function extractLast(term)
+            {
+            return split(term).pop();
+            }
+    $(".comment-textarea")
+        // don't navigate away from the field on tab when selecting an item
+        .bind("keydown", function(event) {
+            if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
+                event.preventDefault();
+            }
+            }).autocomplete({
+                    minLength: 0,
+                    source: function(request, response) {
+                        var term = request.term,
+                            results = [];
+                        if (term.indexOf("@") >= 0) {
+                            term = extractLast(request.term);
+                            if (term.length > 0) {
+                                results = $.ui.autocomplete.filter(
+                                availableTags, term);
+                            } else {
+                                results = ['Type a name..'];
+                            }
+                        }
+                        response(results);
+                    },
+                    focus: function() {
+                        // prevent value inserted on focus
+                        return false;
+                    },
+                    select: function(event, ui) {
+                        var terms = split(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        var hyperlink = ui.item.value
+                        terms.push(hyperlink);
+                        // add placeholder to get the comma-and-space at the end
+                        terms.push("");
+                        this.value = terms.join("");
+                        return false;
+                    }
+                });
+    
+    
+        $('body').on('click' , '.post', function(){
+            var project_id = $(this).attr("id");
+            var token = $("#token").val();
+    
+            var comment_txt_2 = $('#comment_txt').val();
+            var name_list_2 = name_list;
+            var name_str = name_list_2.join("|");
+            var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
+            // var found = $('.mention_user', comment_txt);
+            var found = $(comment_txt).filter('.mention_user');
+            var id_list = [];
+            $(found).each(function( link ) {
+                var id = $(this).attr("id");
+                id_list.push(id)
             });
-        }
+            var data_dict = {};
+            data_dict['project'] = project_id
+            data_dict['comment_txt'] = comment_txt
+            data_dict['mentioned_users'] = JSON.stringify(id_list)
+    
+            console.log(data_dict)
+            if(comment_txt){
+                $.ajax
+                ({
+                    type: "POST",
+                    url: "/project/post-comment-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: data_dict,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (response){
+                        window.location.reload()
+                        // var comment_id = response['id']
+                        // $('#comment_txt').val("");
+                        // $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
+    
+                    }
+                });
+            }
+        });
+        $('body').on('click' , '.post-reply', function(){
+            var comment_id = $(this).attr("id");
+            var project_id = $("#project_id").val();
+            var token = $("#token").val();
+            var comment_txt_id = '#comment_txt_'+comment_id
+    
+            var comment_txt_2 = $(comment_txt_id).val();
+            var name_list_2 = name_list;
+            var name_str = name_list_2.join("|");
+            var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
+    
+            var found = $(comment_txt).filter('.mention_user');
+            var id_list = [];
+            $(found).each(function( link ) {
+                var id = $(this).attr("id");
+                id_list.push(id)
+            });
+    
+            var div_id = "#comment-"+comment_id;
+            var data_dict = {};
+            var reply_section = "#reply-section-"+comment_id;
+            data_dict['project'] = project_id
+            data_dict['comment_txt'] = comment_txt
+            data_dict['reply_to'] = comment_id
+            data_dict['mentioned_users'] = JSON.stringify(id_list)
+            // console.log(data_dict)
+            if(comment_txt){
+                $.ajax
+                ({
+                    type: "POST",
+                    url: "/project/post-comment-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: data_dict,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (response){
+                        window.location.reload();
+                        // var comm_id = response['id'];
+                        // $(".comment-reply-box").html("");
+                        // $(reply_section).append('<div class="col-12 "><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comm_id+'">Delete</a></span></div></div>');
+                    }
+                });
+            }
+        });
+        $('body').on('click' , '.reply', function(){
+            var comment_id = $(this).attr("id");
+            var div_id = "#comment-"+comment_id;
+            var project_id = $("#project_id").val();
+            var txtbox = '<textarea class="comment-textarea " placeholder="Write a comment..." name="comment" id="comment_txt_'+comment_id+'"></textarea>'
+            var postbtn = '<div class="text-right"><a name="post-comment" id="'+comment_id+'" class="post-btn btn-primary cursor-pointer post-reply">Post</a></div>'
+            $(div_id).html("")
+            $(".comment-reply-box").html("");
+            $(div_id).append(txtbox)
+            $(div_id).append(postbtn)
+            $(".comment-textarea").focus()
+            $(".comment-textarea").select()
+            $.ajax
+                ({
+                    type: "GET",
+                    url: "/hobo_user/get-all-users-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: {},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (response){
+                        availableTags = response['serializer_list'];
+                        user_dict = response['name_dict'];
+                        name_list = response['name_list'];
+                    }
+                });
+        function split(val)
+            {
+            return val.split(/@\s*/);
+            }
+    
+        function extractLast(term)
+            {
+            return split(term).pop();
+            }
+    $(".comment-textarea")
+        // don't navigate away from the field on tab when selecting an item
+        .bind("keydown", function(event) {
+            if (event.keyCode === $.ui.keyCode.TAB && $(this).data("autocomplete").menu.active) {
+                event.preventDefault();
+            }
+            }).autocomplete({
+                    minLength: 0,
+                    source: function(request, response) {
+                        var term = request.term,
+                            results = [];
+                        if (term.indexOf("@") >= 0) {
+                            term = extractLast(request.term);
+                            if (term.length > 0) {
+                                results = $.ui.autocomplete.filter(
+                                availableTags, term);
+                            } else {
+                                results = ['Type a name..'];
+                            }
+                        }
+                        response(results);
+                    },
+                    focus: function() {
+                        // prevent value inserted on focus
+                        return false;
+                    },
+                    select: function(event, ui) {
+                        var terms = split(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+                        var hyperlink = ui.item.value
+                        terms.push(hyperlink);
+                        // add placeholder to get the comma-and-space at the end
+                        terms.push("");
+                        this.value = terms.join("");
+                        return false;
+                    }
+                });
+        });
+    
     });
-</script>
-
-
-
-<script src="{% static 'js/videoplayer_invite.js' %}"></script>
-<script src="{% static 'js/email_invite.js' %}"></script>
-
-{% endblock %}
+    
+    </script>
+    <script>
+        $('body').on('click' , '.close-modal', function(){
+            $("#delete-comment-modal").modal('hide');
+        });
+        $('body').on('click' , '.delete', function(){
+            var comment_id = $(this).attr("id");
+            $(".delete-comment-btn-div").html('<button type="button" class="btn btn-outline-danger btn-sm delete-comment" id="'+comment_id+'">Delete</button>');
+            $("#delete-comment-modal").modal('show');
+        });
+          $('body').on('click' , '.delete-comment', function(){
+            var comment_id = $(this).attr("id");
+            var token = $("#token").val();
+    
+            if(comment_id){
+                $.ajax
+                ({
+                    type: "POST",
+                    url: "/project/delete-comment-api/",
+                    dataType: 'json',
+                    async: false,
+                    data: {"comment_id":comment_id},
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", token);
+                    },
+                    success: function (response){
+                       window.location.reload();
+                    }
+                });
+            }
+        });
+    </script>
+    
+    
+    
+    <script src="{% static 'js/videoplayer_invite.js' %}"></script>
+    <script src="{% static 'js/email_invite.js' %}"></script>
+    
+    {% endblock %}
