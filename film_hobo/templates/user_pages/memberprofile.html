@@ -381,13 +381,13 @@
                         <div class="col-3">
                             <label class="form-title mem-setup-blu-f">Personal Details:</label>
                         </div>
-                        <div class="col-9  mt-3">
+                        <div class="col-9 mt-3">
                             <span class="">
                                 {% if profile.user.feet %}{{profile.user.feet}}’{{profile.user.inch}} ({{profile.user.get_height_in_meters}} m){% endif%}
                                 {% if profile.user.start_age and profile.user.stop_age %}, Age-playing range {{profile.user.start_age}} - {{profile.user.stop_age}} {% endif %}
                             </span>
                             <a href="" data-toggle="modal" data-target="#more_tab"
-                                class="mem-setup-blu-f underline ml-2">more</a>
+                                class="mem-setup-blu-f underline ">more</a>
                         </div>
                     </div>
                     <!-- The Modal -->

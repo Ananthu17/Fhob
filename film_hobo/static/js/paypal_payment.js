@@ -1,10 +1,24 @@
-$(document).ready(function() {
-    $('#payment-success-div').hide();
-});
 origin_url = window.location.origin
 create_url = origin_url + '/payment/paypal/create/'
 send_email_url = origin_url + '/payment/paypal/send_email_recepit/'
-var token = localStorage.getItem("token");
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+
+var token = getUrlParameter('user_token');
 token_str = "Token "
 token_val = String(token)
 var authorization_str = token_str.concat(token_val);
@@ -72,6 +86,7 @@ $('#close-payment-btn').click(function(){
 });
 
 var betacode = getUrlParameter('beta_code');
+var promocode = localStorage.getItem("promocode");
 if(betacode){
     beta_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
     time_period = $("#payment_plan").text();
@@ -85,6 +100,25 @@ if(betacode){
         var selected_plan_id = response.data.selected_plan_id
         $("#bill_start_date").text(bill_date);
         $("#days_free").text(days);
+        var plan_id = selected_plan_id
+        localStorage.setItem('plan_id', plan_id);
+    }, (error) => {
+        console.log(error);
+    })
+}
+else if(promocode && promocode.length > 0){
+    discount_details_api = origin_url + '/payment/get_discount_details'
+    time_period = $("#payment_plan").text();
+    extra_args = {"code": promocode,
+                  "membership": membership,
+                  "period": time_period}
+    axios.post(discount_details_api, extra_args)
+    .then((response) => {
+        // var bill_date = response.data.bill_date
+        // var days = response.data.days
+        var selected_plan_id = response.data.selected_plan_id
+        // $("#bill_start_date").text(bill_date);
+        // $("#days_free").text(days);
         var plan_id = selected_plan_id
         localStorage.setItem('plan_id', plan_id);
     }, (error) => {
@@ -108,7 +142,8 @@ else{
         console.log(error);
     });
 }
-var plan_id_final = localStorage.getItem("plan_id");
+
+var plan_id = localStorage.getItem("plan_id");
 
 const headers = {
     'Accept': 'application/json',
@@ -122,7 +157,7 @@ createSubscription: function(data, actions) {
 
     return actions.subscription.create({
 
-        'plan_id': plan_id_final
+        'plan_id': plan_id
 
     });
 },

@@ -10,13 +10,22 @@ class CustomUserAccountAdapter(DefaultAccountAdapter):
         Saves a new `User` instance using information provided in the
         signup form.
         """
-
+        beta_user = request.data.get('beta_user', '')
+        beta_user_code_id = request.data.get('beta_user_code', '')
         user = super().save_user(request, user, form, False)
         user_field(user, 'first_name', request.data.get('first_name', ''))
         user_field(user, 'middle_name', request.data.get('middle_name', ''))
         user_field(user, 'last_name', request.data.get('last_name', ''))
         user_field(user, 'email', request.data.get('email', ''))
         user_field(user, 'password1', request.data.get('password1', ''))
+        user_field(user, 'beta_user_end', request.data.get('beta_user_end', ''))
+        if beta_user is not None:
+            user.beta_user = beta_user
+            user.save()
+        if beta_user_code_id is not None:
+            beta_user_code = BetaTesterCodes.objects.get(pk=beta_user_code_id)
+            user.beta_user_code = beta_user_code
+            user.save()
         user.save()
         return user
 

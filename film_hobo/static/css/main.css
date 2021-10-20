@@ -62,15 +62,15 @@
 }
 
 .search-placeholder:-moz-placeholder { /* Firefox 18- */
-  text-align: center;  
+  text-align: center;
 }
 
 .search-placeholder::-moz-placeholder {  /* Firefox 19+ */
-  text-align: center;  
+  text-align: center;
 }
 
-.search-placeholder:-ms-input-placeholder {  
-  text-align: center; 
+.search-placeholder:-ms-input-placeholder {
+  text-align: center;
 }
 
 .search-placeholder{
@@ -117,6 +117,8 @@
 .nav-link{
   font-family: Courier Bold;
   font-size:12px;
+  line-height: 13px;
+  margin-top: 1px;
 }
 .FH-dropdown-font{
   font-family: "Myraid Pro";
@@ -1374,6 +1376,42 @@ input#visa:focus {
  color: #C70039;
  font-size: 17px;
 }
+.memship-table-scroll{
+ width: 100%;
+ margin-bottom: 10px;
+}
+.memship-table-contnt{
+ width: 100%;
+ border-collapse: separate;
+ border-spacing:0 15px;
+ margin-top: -15px;
+}
+.memship-table-contnt tr {
+ background-color: #EDEEF0 !important;
+}
+.memship-table-contnt td {
+ padding: 4px 4px;
+ margin-bottom: 15px;
+}
+.memship-table-contnt td:first-child {
+ position: sticky;
+ left: 0;
+ background-color: #EDEEF0 !important;
+}
+
+/* Media query */
+
+@media(max-width:540px){
+ .memship-table-contnt {
+    width: 494px;
+}
+.memship-table-scroll{
+    width: 100%;
+    margin-bottom: 10px;
+    overflow-x: scroll;
+ }
+}
+
 /*membership page logistics end*/
 /*production company page*/
 .pro-pic-sec-tp{
@@ -1599,7 +1637,6 @@ input#visa:focus {
  padding: 2px 3px;
  background-color: #ffffff;
  margin-left: 15px;
- height: 24px;
 }
 .prjct-log-btn-wht:hover, .prjct-log-btn-wht:focus, .prjct-log-btn-wht:active{
  color: #0e62b5;
@@ -1624,6 +1661,7 @@ input#visa:focus {
  font-family: "Myraid Pro";
  font-size: 13px;
  padding: 0px 0px;
+ padding-right: 4px;
  box-shadow: none;
  outline: none;
  font-weight: 600;
@@ -1636,6 +1674,31 @@ input#visa:focus {
  box-shadow: none;
  outline: none;
  font-weight: 600;
+}
+.prjct-log-link-red{
+ color: red;
+ font-family: "Myraid Pro";
+ font-size: 13px;
+ padding: 0px 0px;
+ padding-right: 4px;
+ box-shadow: none;
+ outline: none;
+ font-weight: 600;
+}
+.prjct-log-link-red:active,.prjct-log-link-red:focus, .prjct-log-link-red:hover {
+ color: red;
+ font-family: "Myraid Pro";
+ font-size: 13px;
+ padding: 0px 0px;
+ box-shadow: none;
+ outline: none;
+ font-weight: 600;
+}
+.prjct-log-btm-btn-sec{
+ display: grid;
+ grid-template-columns: 1fr 1fr 1fr 2fr;
+ column-gap: 15px;
+ row-gap: 15px;
 }
 .red-f{
  color: #f32121;
@@ -1716,7 +1779,7 @@ input#visa:focus {
  padding: 2px 8px 2px 8px;
  font-weight: 500;
  font-size: 15px;
-
+ 
 }
 .help-profile-head{
  color: #0071bc;
@@ -1745,10 +1808,85 @@ input#visa:focus {
 .help-top-get-sec div:last-child{
  margin-left: auto;
 }
+.prjct-visiblity-margin{
+ margin-bottom: 2px;
+}
+.prjct-visiblity-inpt-sec{
+ margin-top: 8px;
+ display: grid;
+ grid-template-columns: 2fr 3fr 3fr;
+ align-items: center;
+ column-gap: 17px;
+ row-gap: 10px;
+}
+.prjct-scrnply-inp-row{
+ margin-top: 8px;
+ margin-left: 15px;
+ display: grid;
+ grid-template-columns: 1fr 2fr 1fr;
+ grid-column-gap: 20px;
+ grid-row-gap: 15px;
+ align-items: center;
+}
+
 
 /* media Query */
 
+@media(max-width:1080px){
+ .prjct-scrnply-inp-row{
+    margin-top: 8px;
+    margin-left: 15px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-column-gap: 20px;
+    align-items: center;
+ }
+}
+@media(max-width:1024px){
+ .prjct-visiblity-inpt-sec{
+    display: grid;
+    grid-template-columns: 3fr 3fr ;
+    align-items: center;
+    column-gap: 17px;
+ }
+}
+@media(max-width:991px){
+ .prjct-row-main{
+    margin-right: -5px;
+ }
+}
+@media(max-width:767px){
+ .prjct-log-btm-btn-sec{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+ }
+}
+@media(max-width:576px){
+ .prjct-visiblity-inpt-sec{
+    display: grid;
+    grid-template-columns: 3fr;
+
+ }
+}
+@media(max-width:540px){
+ .prjct-log-btm-btn-sec{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+ }
+ .prjct-scrnply-inp-row{
+    margin-top: 8px;
+    margin-left: 15px;
+    display: grid;
+    grid-template-columns: 2fr 2fr;
+    grid-column-gap: 20px;
+    align-items: center;
+ }
+}
 @media(max-width:380px){
+ .prjct-log-btm-btn-sec{
+    display: grid;
+    grid-template-columns: 1fr;
+ }
  .help-top-get-sec{
     margin-left: 25px;
     margin-right: 25px;
@@ -1759,6 +1897,14 @@ input#visa:focus {
  }
  .help-top-get-sec div:last-child{
     margin-left:0;
+ }
+ .prjct-scrnply-inp-row{
+    margin-top: 8px;
+    margin-left: 15px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-column-gap: 20px;
+    align-items: center;
  }
 }
 .help-arrow{

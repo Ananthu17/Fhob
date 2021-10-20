@@ -616,52 +616,52 @@
                                 </div>
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating2"> 
-                                        <label class="containerradio bold">Pro & Comp
+                                        <label class="containerradio bold">Pro 
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_1_STAR %}
+                                            {% if project_obj.crew_samr == project_obj.PRO_WITH_RATING_1_STAR %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" value="1">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_2_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_2_STAR %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" value="2">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_3_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_3_STAR %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" value="3">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_4_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_4_STAR %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" value="4">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_5_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_5_STAR %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" value="5">
                                             {% else %}
                                             <input type="hidden" name="crew-star2" class="cw-rating-value2" >
                                             {% endif %}
-                                            <input type="radio" name="radiorow8"  id="crew2" onclick="selectsamr(this)" value="6" {% if project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.PRO_AND_COMP_WITH_RATING_5_STAR %} checked{% endif %} >
+                                            <input type="radio" name="radiorow8"  id="crew2" onclick="selectsamr(this)" value="6" {% if project_obj.crew_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_5_STAR %} checked{% endif %} >
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
                                 </div>
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating3"> 
-                                        <label class="containerradio bold">Indie, Pro & Comp
+                                        <label class="containerradio bold">Indie & Pro 
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR %}
+                                            {% if project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" value="1" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" value="2" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" value="3" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" value="4" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR %}
+                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" value="5" >
                                             {% else %}
                                             <input type="hidden" name="crew-star3" class="cw-rating-value3" >
                                             {% endif %}
-                                            <input type="radio" name="radiorow8" id="crew3" onclick="selectsamr(this)" value="11"  {% if project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_PRO_AND_COMP_WITH_RATING_5_STAR  %} checked{% endif %}>
+                                            <input type="radio" name="radiorow8" id="crew3" onclick="selectsamr(this)" value="11"  {% if project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>   
@@ -777,59 +777,7 @@
 
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                    <div class="left-mode-sec h-100">
-                        <div class="mem-list-head">Top Actors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">John Smith</li>
-                            <li class="mt-1">John Dow</li>
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Aaron McCarty</li>
-                            <li class="mt-1">Toli Chew</li>
-                        </ol>
-                        <div class="mem-list-head">Top Writers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Tom Saint</li>
-                            <li class="mt-1">Lola Carola</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Jamal Smith</li>
-                            <li class="mt-1">Nikita Selivan</li>
-                        </ol>
-                        <div class="mem-list-head">Top Directors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Ivan Drago</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Kendra Shulman</li>
-                            <li class="mt-1">Sandra O’brian</li>
-                        </ol>
-                        <div class="mem-list-head">Top Producers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top DPs</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top Editors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head underline">TopTalent/Crew</div>
-                    </div>
-
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
                 </div>
             </div>
         </div>

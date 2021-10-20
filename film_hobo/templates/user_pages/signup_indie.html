@@ -269,12 +269,12 @@
                                           <button type="button" id="pdfmodal1Close" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
                                   </div>
                                   <div class="modal-body" style="text-align:center;">
-                                     
+
                                       <embed src="/media/terms_of_service.pdf" frameborder="0" width="100%" height="400px">
 
                                   </div>
                                   <div class="modal-footer">
-                                    <div class="row mt-1 mb-2 mr-3 float-right ">
+                                    <!-- <div class="row mt-1 mb-2 mr-3 float-right ">
                                       <label class="containerradio">I Agree
                                           <input type="radio"  name="{{ form.i_agree.name }}"
                                           id="{{ form.i_agree.id_for_label }}"
@@ -284,17 +284,34 @@
                                             <p style="color: red">{{form.errors.i_agree}}</p>
                                           {% endif %}
                                         </label>
-                                    </div>
-                                    
+                                    </div> -->
+
                                       <button type="button" class="btn btn-default" data-dismiss="modal"  id="pdfmodal1Close1">Close</button>
                                   </div>
                               </div>
                           </div>
                       </div>
-                      
-                      
+
+                        <!-- Warning Modal -->
+                         <div class="modal fade" id="betaNotifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                          <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                                          <button type="button" id="betaNotifyModalCross" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                  </div>
+                                  <div class="modal-body" style="text-align:center;">
+                                      <p>Please go back to membership page and provide your beta test code first!</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-default" data-dismiss="modal"  id="betaNotifyModalClose">Close</button>
+                                  </div>
+                              </div>
+                          </div>
+
+
                       <!-- The Modal -->
-                      <!-- <div class="row mt-1 mb-2 mr-3 float-right ">
+                      <div class="row mt-1 mb-2 mr-3 float-right ">
                           <label class="containerradio">I Agree
                             <input type="radio"  name="{{ form.i_agree.name }}"
                             id="{{ form.i_agree.id_for_label }}"
@@ -305,7 +322,7 @@
                             {% endif %}
                               <span class="checkmarkagree"></span>
                             </label>
-                      </div> -->
+                      </div>
 
                   </div>
               </div>
@@ -338,36 +355,22 @@
              });
 });
 
-
-
-
 $("a[class='link-clickable']").click(function () {
-  
   $('#myModalpdf1').modal('show');
- 
   return false;
-  
-
 });
-
 
 $(function () {
   $('#pdfmodal1Close').on('click', function () {
       $('#myModalpdf1').modal('hide');
-     
   })
 })
+
 $(function () {
   $('#pdfmodal1Close1').on('click', function () {
       $('#myModalpdf1').modal('hide');
-     
   })
 })
-
-
-
-
-
 
 </script>
 {% endblock %}

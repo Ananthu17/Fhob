@@ -11,6 +11,17 @@
     border-radius:.25rem;
     outline:none;
   }
+
+
+  form i {
+            margin-left: -30px;
+            position: absolute;
+            right: 6%;
+            width: 20px;
+            height: 20px;
+            border: none;
+            cursor: pointer;
+        }
 </style>
 {% endblock %}
 
@@ -139,10 +150,13 @@
                         </div>
                         <div id="password-tab" class="row ml-2 collapse">
                             <div class="col-8 ml-4">
-                                <input class="inp-line pw" autocomplete="off" name="old_password" placeholder="Old Password" />
+                                <i class="bi bi-eye-slash" id="togglePassword1"></i>
+                                <input class="inp-line" type="password" id="old-pass" autocomplete="off" name="old_password" placeholder="Old Password" />
                                 <p class="old_password-error" style="margin-bottom:0; color:red;"></p>
-                                <input class="inp-line pw" autocomplete="off" name="new_password1" placeholder="New Password" />
+                                <i class="bi bi-eye-slash" id="togglePassword2"></i>
+                                <input class="inp-line" type="password" id="new-pass" autocomplete="off" name="new_password1" placeholder="New Password" />
                                 <p class="new_password1-error" style="margin-bottom:0; color:red;"></p>
+                                
                                 <input class="inp-line pw" autocomplete="off" name="new_password2" placeholder="Confirm New Password" />
                                 <p class="new_password2-error" style="margin-bottom:0; color:red;"></p>
                                 <div class="mt-2">
@@ -442,7 +456,8 @@
                                 <select
                                 class="form-control form-control-input block-placeholder border-cls"
                                 id="all_blocked_members">
-                                <option value=""></option>
+                                
+                                <option value="">Select User</option>
                                 </select>
                             </div>
                             <div class="col-2 mt-4">
@@ -535,7 +550,7 @@
                                         <div class="form-check">
                                             <label class="form-check-label w-100">
                                                 If someone sends me a friend request
-                                                <input type="checkbox"
+                                                &nbsp;&nbsp;&nbsp;<input type="checkbox"
                                                 name="friend_request"
                                                 class="form-check-input"
                                                 {% if user_settings.friend_request == True %}checked{% endif %}>
@@ -563,7 +578,7 @@
                         {% comment %}
                         <form class="billing-form">
                         {% endcomment %}
-                            <div class="row ml-2 mt-3 ">
+                            <!-- <div class="row ml-2 mt-3 ">
                                 <div class="col-3">
                                     <label class="billing-label">Card on File:</label>
                                 </div>
@@ -581,7 +596,7 @@
                                 <div class="col-2">
                                     <a href="" class="billing-nw-card">Add New Card</a>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="row ml-2 mt-2 ">
                                 <div class="col-12">
                                     <label class="billing-label">Description</label>
@@ -612,7 +627,7 @@
                                     Taxes: $<span id="membership_tax_fee">0.00</span>
                                 </div>
                                 <div class="col-12">
-                                    Total Amount: $<span id="membership_total_fee">0.00</span>
+                                    Total Amount: $<span id="membership_total_fee">{{ transaction.final_amount }}</span>
                                 </div>
                             </div>
                             <div class="row ml-2 mt-1 ">
@@ -622,31 +637,37 @@
                                 <div class="col-9">
                                     <div class="form-check-inline">
                                         <label class="containerradio">Recurring
-                                            <input type="radio" name="radio">
+                                            <input id="recurring_btn" type="radio" name="radio1" checked>
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
-                                    <div class="form-check-inline">
+                                    <!-- <div class="form-check-inline">
                                         <label class="containerradio">One Time
-                                            <input type="radio" name="radio">
+                                            <input type="radio" name="radio1">
                                             <span class="checkmarkagree"></span>
                                         </label>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
-                            <div class="row ml-2 mt-1 ">
-                                <div class="col-3">
-                                    <label class="billing-label">Change to Annual</label>
-                                </div>
+                            <!-- <div class="row ml-2 mt-1 ">
+                                {% if transaction.payment_plan == 'annually' %}
+                                    <div id="change_tenure" class="col-3">
+                                        <label class="billing-label">Change to Monthly</label>
+                                    </div>
+                                {% else %}
+                                    <div id="change_tenure" class="col-3">
+                                        <label class="billing-label">Change to Annual</label>
+                                    </div>
+                                {% endif %}
                                 <div class="col-9">
                                     <div class="form-check-inline">
-                                        <label class="containerradio">
-                                            <input type="radio" name="radio">&nbsp;
+                                        <label id="change_tenure_btn" class="containerradio">Yes
+                                            <input name="radio2">&nbsp;
                                             <span class="checkmarkagree"></span>
                                         </label>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         {% comment %}
                         </form>
                         {% endcomment %}
@@ -668,11 +689,69 @@
     </form>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="changeTenureModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                    <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                    <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p>Are you sure you want to change the payment interval</p>
+            </div>
+            <div class="modal-footer">
+                    <button id="change_tenure_yes" type="button" class="btn btn-default" id="modal-btn-si">Yes</button>
+                    <button id="change_tenure_no" type="button" class="btn btn-primary" id="modal-btn-no">No</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extrajs %}
 {{ form.media.js }}
 <script type="text/javascript" " src="{% static 'js/settings.js' %}"></script>
+<script>
+
+// Visibility Password hide and show eye
+    const togglePassword1 = document.querySelector('#togglePassword1');
+    const password1 = document.querySelector('#old-pass');
+    togglePassword1.addEventListener('click', function (e) {
+    // toggle the type attribute
+    const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+    password1.setAttribute('type', type);
+    // toggle the eye / eye slash icon
+    this.classList.toggle('bi-eye');
+});
+
+
+//Script Password hide and show eye
+const togglePassword2 = document.querySelector('#togglePassword2');
+    const password2 = document.querySelector('#new-pass');
+    togglePassword2.addEventListener('click', function (e) {
+    // toggle the type attribute
+    const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+    password2.setAttribute('type', type);
+    // toggle the eye / eye slash icon
+    this.classList.toggle('bi-eye');
+});
+</script>
+
+<script>
+$('#change_tenure_btn').click(function (event) {
+    $("#changeTenureModal").modal('show');
+});
+
+$('#modalClose').click(function (event) {
+    $("#changeTenureModal").modal('hide');
+});
+
+$('#change_tenure_no').click(function (event) {
+    $("#changeTenureModal").modal('hide');
+});
+
+</script>
 {% endblock %}
 

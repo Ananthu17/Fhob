@@ -52,8 +52,6 @@ class EmailUs(models.Model):
     subject = models.CharField(_('Subject'),
                                max_length=150)
     message = models.TextField(_("Message"))
-    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
-                                     blank=False)
 
     class Meta:
         verbose_name = 'Email'
@@ -61,3 +59,21 @@ class EmailUs(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class ReportProblem(models.Model):
+    user_email = models.EmailField(_('Email'))
+    name = models.CharField(_('Name'),
+                            max_length=150, null=True, blank=True)
+    user_phone = models.CharField(_("Phone Number"),
+                                     max_length=16, null=True,
+                                     unique=True)
+    user_problem = models.TextField(_("User Problem"), blank=True, null=True)
+
+    timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
+                                     blank=False)
+
+    class Meta:
+        verbose_name = 'ReportProblem'
+        verbose_name_plural = 'ReportProblems'
+

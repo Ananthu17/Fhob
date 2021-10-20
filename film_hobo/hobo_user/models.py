@@ -725,6 +725,7 @@ class Project(models.Model):
                                               null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
@@ -796,6 +797,18 @@ class PromoCode(models.Model):
     user_type = models.CharField(_("User Type"),
                                  choices=USER_TYPE_CHOICES,
                                  max_length=150, default=HOBO)
+    indie_monthly_plan_id = models.CharField(
+        _("Indie Monthly Plan ID"), max_length=40, unique=True)
+    indie_yearly_plan_id = models.CharField(
+        _("Indie Yearly Plan ID"), max_length=40, unique=True)
+    pro_monthly_plan_id = models.CharField(
+        _("Pro Monthly Plan ID"), max_length=40, unique=True)
+    pro_yearly_plan_id = models.CharField(
+        _("Pro Yearly Plan ID"), max_length=40, unique=True)
+    company_monthly_plan_id = models.CharField(
+        _("Company Monthly Plan ID"), max_length=40, unique=True)
+    company_yearly_plan_id = models.CharField(
+        _("Company Yearly Plan ID"), max_length=40, unique=True)
 
     def __str__(self):
         return str(self.promo_code)

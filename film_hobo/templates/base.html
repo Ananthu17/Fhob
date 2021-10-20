@@ -38,9 +38,15 @@
             <header class="fh-header">
                 <div class="row no-wrap justify-content-between align-items-center">
                     <div class="col-md-3 col-xs-6">
-                        <a href="{% url 'hobo_user:user_home' %}">
-                            <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
-                        </a>
+                        {% if request.user.is_anonymous %}
+                            <a href="{% url 'hobo_user:how_to' %}">
+                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'hobo_user:user_home' %}">
+                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
+                            </a>
+                        {% endif %}
                     </div>
                     <div class="col-md-5 col-xs-6 text-center">
                         <div class="head-tp mt-20">Stardom starts with one scene</div>
@@ -58,6 +64,7 @@
                     <div class="col-md-4 col-xs-12 d-flex justify-content-end align-items-center">
                         <ul class="list-inline mb-0 mt-20">
                             <li class="list-inline-item">
+                                {% if user.is_authenticated and user.registration_complete %}
                                 <div class="dropdown">
                                     <button class="mm-icon-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="fa fa-envelope header-fnt-clr header-icon-pos " aria-hidden="true"></span>
@@ -75,8 +82,15 @@
                                       <a class="dropdown-item" href="{% url 'message:priority-messages'%}"><i class="fa fa-star mm-left-red-star" aria-hidden="true"></i>Priority</a>
                                     </div>
                                   </div>
-
                             </li>
+                            {% else %}
+                            <div class="dropdown">
+                                <button class="mm-icon-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="fa fa-envelope header-fnt-clr header-icon-pos " aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% if user.is_authenticated and user.registration_complete %}
                             <li class="list-inline-item notification_icon"  data-toggle="modal" data-target="#notificationModal">
                                 <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
                                     {% get_notifications_count request.user.id as count %}
@@ -85,6 +99,13 @@
                                     {% endif %}
                                 </i>
                             </li>
+                            {% else %}
+                            <li class="list-inline-item notification_icon"  >
+                                <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
+                                </i>
+                            </li>
+                            {% endif %}
+
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
                                 <img src="{% static 'images/man-user.png' %}"
@@ -118,7 +139,7 @@
                 <ul class="navbar-nav justify-content-between w-100">
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item">
-                            <a id="showcase" class="nav-link" href="">SHOWCASE</a>
+                            <a id="showcase" class="nav-link" href="{% url 'hobo_user:showcase' %}">SHOWCASE</a>
                         </li>
                     {% endif %}
                     {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
@@ -129,7 +150,7 @@
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="project-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 PROJECTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -141,7 +162,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="scene-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 SCENES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -155,7 +176,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="shorts-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 SHORTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -169,7 +190,7 @@
                         </li>
                         <!-- Dropdown -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 PILOTS/FEATURES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -186,28 +207,28 @@
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()"  >
                             PROJECTS
                         </a>
-                      
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             SCENES
                         </a>
-                       
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             SHORTS
                         </a>
-                      
+
                     </li>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" onclick="togglePopup()">
                             PILOTS/FEATURES
                         </a>
-                        
+
                     </li>
                     <li class="nav-item">
                         <a id="how_to" class="nav-link" href="#">HOW TO</a>
@@ -253,8 +274,8 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        
+
+
                         <!-- The Modal -->
                     {% else %}
                     {% endif %}
@@ -277,11 +298,12 @@
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
-                                        <a class="dropdown-item" href="#">Support</a>
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
-                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
                                     <a class="dropdown-item" href="#">Membership</a>
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a id="logout_link" class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% elif user.registration_complete %}
@@ -295,22 +317,35 @@
                                     {% endif %}
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
-                                        <a class="dropdown-item" href="#">Support</a>
                                         <a class="dropdown-item" href="{% url 'hobo_user:feedback-web' %}">Feedback</a>
-                                        <a class="dropdown-item" href="#">Report a Problem</a>
+                                        <a class="dropdown-item" href="{% url 'hobo_user:report-a-problem' %}">Report a Problem</a>
                                     </div>
-                                    <a class="dropdown-item" href="#">Membership</a>
+                                    <!-- <a class="dropdown-item" href="#">Membership</a> -->
+                                    <a class="dropdown-item" href="{% url 'general:help' %}">FAQ/Help</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:projects' %}">My Projects</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:user_logout' %}">Logout</a>
                                 {% endif %}
                             </div>
                         </li>
+                    {% elif user.i_agree == True %}
+                    <li class="nav-item">
+                        <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                    </li>
+                    <li class="nav-item" style="margin-left: 48em;">
+                        <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+
+                    </li>
+                    <li class="nav-item">
+                        <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
+
+                    </li>
                     {% else %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                         </li>
                         <li class="nav-item">
                             <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+
                         </li>
                     {% endif %}
                 </ul>
@@ -357,7 +392,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="notificationModalTitle">Notification</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" id="noti-modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -365,7 +400,7 @@
 
         </div>
         <div class="modal-footer">
-          <button id="mem-close-btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="mem-close-btn" type="button" class="btn btn-secondary"  data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -384,15 +419,20 @@
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'hobo_user:how_to' %}" class="link-color" style="color: white; ">About</a></li>
                         <li><a href="{% url 'hobo_user:choose-membership' %}" class="link-color" style="color: white;">Membership</a></li>
-                        <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
+
+                        <!-- <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li> -->
                         <li><a href="{% url 'general:email-us' %}" class="link-color" style="color: white;">Contact</a></li>
+
+                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
+                        <!-- <li><a href="{% url 'general:help' %}" class="link-color" style="color: white;">FAQ/Help</a></li>
+                        <li><a href="#" class="link-color" style="color: white;">Contact</a></li> -->
+
                     </ul>
                 </div>
                 <div class="col-sm-4 mt-4 mb-2">
                     <ul class="list-unstyled fw">
                         <li><a href="{% url 'general:terms_of_service' %}" class="link-color" style="color: white;">Terms of Service</a></li>
                         <li><a href="{% url 'general:privacy_policy' %}" class="link-color" style="color: white;">Privacy Policy</a></li>
-                        <li><a href="{% url 'general:refund_policy' %}" class="link-color" style="color: white;">Refund Policy</a></li>
                         <li><a href="{% url 'general:intellectual_property_rights' %}" class="link-color" style="color: white;">Intellectual Property Rights</a></li>
                     </ul>
                 </div>
@@ -463,27 +503,43 @@
 
 
 $("a[class='nav-link-non-clickable']").click(function () {
-  
         $('#myModal').modal('show');
         return false;
-        
-   
 });
 
 
     $(function () {
         $('#modalClose').on('click', function () {
             $('#myModal').modal('hide');
-           
+
         })
     })
     $(function () {
         $('#modalClose1').on('click', function () {
             $('#myModal').modal('hide');
-           
+
         })
     })
 
+</script>
+<script>
+$( document ).ready(function() {
+    var pathurl = window.location.pathname;
+    var search = window.location.search;
+    var desired_path = pathurl + search
+    if (desired_path == '/hobo_user/projectview/create/'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SCH'){
+        $("#scene-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+        $("#shorts-nav-item").addClass('active');
+    }
+    else{
+
+    }
+});
 </script>
 {% block extrajs %}
 {% endblock %}

@@ -588,7 +588,7 @@
                                 </div>
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating2"> 
-                                        <label class="containerradio bold">Pro & Comp
+                                        <label class="containerradio bold">Pro 
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
@@ -602,7 +602,7 @@
                                 </div>
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating3"> 
-                                        <label class="containerradio bold">Indie, Pro & Comp
+                                        <label class="containerradio bold">Indie & Pro
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
@@ -630,7 +630,7 @@
                                     </label>
 
                                     <label class="snf-file-upload d-flex flex-row align-items-left" style="margin-right: 2em; margin-left: 1em;">
-                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload">Upload</span>
+                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload" required>Upload</span>
                                         (PDF)
                                     </label>
                                     <div class="fileuploaddiv d-none" id="filenameblock">
@@ -687,7 +687,7 @@
                                     <div class="form-group">
                                         <label for="inputPassword5" class="bold mr-1">(Create a Password) </label>   
                                     </div>
-                                    
+
                                 </form>
                                 {{form.team_select_password}}
                                 <i class="bi bi-eye-slash" id="togglePassword4"></i>
@@ -712,59 +712,7 @@
 
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                    <div class="left-mode-sec h-100">
-                        <div class="mem-list-head">Top Actors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">John Smith</li>
-                            <li class="mt-1">John Dow</li>
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Aaron McCarty</li>
-                            <li class="mt-1">Toli Chew</li>
-                        </ol>
-                        <div class="mem-list-head">Top Writers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Tom Saint</li>
-                            <li class="mt-1">Lola Carola</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Jamal Smith</li>
-                            <li class="mt-1">Nikita Selivan</li>
-                        </ol>
-                        <div class="mem-list-head">Top Directors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Ivan Drago</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Kendra Shulman</li>
-                            <li class="mt-1">Sandra O’brian</li>
-                        </ol>
-                        <div class="mem-list-head">Top Producers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top DPs</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top Editors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head underline">TopTalent/Crew</div>
-                    </div>
-
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
                 </div>
             </div>
         </div>

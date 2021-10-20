@@ -44,19 +44,21 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (UpdateAPIView,
                                      get_object_or_404)
 
-from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined, UserInterest
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
+     UserProfile, UserProject, UserRating, JobType, UserRatingCombined, \
+     UserNotification, Project, UserInterest, Friend, VideoRatingCombined
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
-    ProjectRating, ProjectCrew, CrewApplication, AttachedCrewMember
+    Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, \
+    ProjectTracking, ProjectRating, \
+    AttachedCrewMember
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
-      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
+      RateAuditionSerializer, AuditionStatusSerializer, \
+      ProjectRatingSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
       SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
       CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
@@ -77,6 +79,12 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user.id
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         rating_dict = {}
@@ -110,6 +118,7 @@ class ProjectVideoPlayerView(LoginRequiredMixin, TemplateView):
         context["rating_dict"] = rating_dict
         context["job_types_dict"] = job_types_dict
         context["project"] = project
+        context['friends'] = friends
         return context
 
 
@@ -295,7 +304,7 @@ class RateUserSkillsAPI(APIView):
                 notify(room_name, notification_msg)
                 # end notification section
 
-                #update notification table - video rating
+                # update notification table - video rating
                 notification = UserNotification()
                 notification.user = project.creator
                 notification.project = project
@@ -427,6 +436,12 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         project_id = self.kwargs.get('id')
         project = Project.objects.get(id=project_id)
         project_creator_rating = 0
+        user = self.request.user.id
+        try:
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
 
         project_creator_job = JobType.objects.filter(
                                slug='project-creator'
@@ -508,6 +523,7 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
                 context['writer'] = writer_obj.user.get_full_name()
             elif writer_obj.name:
                 context['writer'] = writer_obj.name
+        context['friends'] = friends
         return context
 
 
@@ -756,11 +772,14 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
                 json_dict['password'] = passwords[i]
             else:
                 json_dict['password'] = ""
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/update/' + character_ids[i]+'/'
             user_response = requests.put(
-                                'http://127.0.0.1:8000/project/charater/update/'+character_ids[i]+'/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
-                                        'Authorization': token})
+                                         'Authorization': token})
             byte_str = user_response.content
             dict_str = byte_str.decode("UTF-8")
             response = ast.literal_eval(dict_str)
@@ -837,8 +856,11 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             else:
                 json_dict['password'] = None
             json_dict['project'] = project_id
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/create/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/project/charater/create/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                          'Authorization': token})
