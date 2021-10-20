@@ -419,7 +419,7 @@ class ProjectCreationForm(forms.ModelForm):
         widgets = {
 
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
-                'creator': forms.Select(attrs={'class': 'inp-line'}),
+                # 'creator': forms.Select(attrs={'class': 'inp-line'}),
                 'number_of_pages': forms.TextInput(attrs={"class": "inp-line",
                                                           'type': 'number'}),
                 'format': forms.Select(attrs={'class': 'd-none'}),
@@ -428,25 +428,25 @@ class ProjectCreationForm(forms.ModelForm):
                 'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
                 'visibility': forms.Select(attrs={'class': 'd-none'}),
                 'script_visibility': forms.Select(attrs={'class': 'd-none'}),
-                'visibility_password': forms.PasswordInput(attrs={
+                'visibility_password': forms.TextInput(attrs={
                                                            "class": "form-control\
                                                            form-control-input mem-b-placeholder",
-                                                           'placeholder': 'password' ,'data-toggle': 'password'
+                                                           'placeholder': 'password' ,'data-toggle': 'password' ,'type':'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
                 'script': forms.FileInput(attrs={'accept':'application/pdf'}),
-                    'script_password': forms.PasswordInput(attrs={
+                    'script_password': forms.TextInput(attrs={
                                                                 "class": "form-control form-control-input mem-b-placeholder",
-                                                                'placeholder': 'password'
+                                                                'placeholder': 'password','type':'password'
                                                                 }),
-                'cast_audition_password': forms.PasswordInput(attrs={
+                'cast_audition_password': forms.TextInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
-                                                            'placeholder': 'password'
+                                                            'placeholder': 'password','type':'password'
                                                             }),
-                'team_select_password': forms.PasswordInput(attrs={
+                'team_select_password': forms.TextInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
-                                                            'placeholder': 'password'
+                                                            'placeholder': 'password','type':'password'
                                                             })
 
                 }

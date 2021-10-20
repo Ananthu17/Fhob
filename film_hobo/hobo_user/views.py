@@ -5348,7 +5348,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
         mode_operation = "create"
         context['mode_operation'] = mode_operation
         context['form'] = ProjectCreationForm
-        context['writerform'] = WriterForm
+        # context['writerform'] = WriterForm
         context['user'] = user
         return context
 
@@ -5356,9 +5356,9 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
         try:
             print(request.POST)
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
-            writerform = WriterForm(request.POST or None)
+            # writerform = WriterForm(request.POST or None)
             project = Project()
-            cast_pay = request.POST.get('checkbx')
+            cast_pay = request.POST.get('radiorow4')
             # Passing cast_star rating
             cast_star1 = request.POST.get('cast-star1')
             cast_star2 = request.POST.get('cast-star2')
@@ -5448,17 +5448,20 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
-            print("valid ahno writer:", writerform.is_valid())
-            print('form error writer', writerform.errors)
-            if projectform.is_valid() and writerform.is_valid():
-                writer = writerform.save()
+            # print("valid ahno writer:", writerform.is_valid())
+            # print('form error writer', writerform.errors)
+            if projectform.is_valid():
+                # writer = writerform.save()
                 project = projectform.save()
                 project.cast_samr = cast_star_smar
                 project.crew_samr = crew_star_smar
                 project.cast_pay_rate = cast_pay
-                writer.project = project
+                print(project.creator)
+                # import pdb
+                # pdb.set_trace()
+                # writer.project = project
                 project.save()
-                writer.save()
+                # writer.save()
                 interest = UserInterest.objects.all()
                 for usin in interest:
                     if (project.format == usin.format and project.location == usin.location and project.sag_aftra == usin.budget):
@@ -5503,20 +5506,20 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
         project = get_object_or_404(Project, id=self.kwargs.get('id'))
         user = self.request.user
         mode_operation = "update"
-        writer = Writer.objects.get(project=project.id)
+        # writer = Writer.objects.get(project=project.id)
         context['mode_operation'] = mode_operation
         context['project_obj'] = project
         context['form'] = ProjectCreationForm(instance=project)
-        context['writerform'] = WriterForm(instance=writer)
+        # context['writerform'] = WriterForm(instance=writer)
         context['user'] = user
         return context
 
     def post(self, request, **kwargs):
         try:
             project = get_object_or_404(Project, id=self.kwargs.get('id'))
-            writer = Writer.objects.get(project=project.id)
+            # writer = Writer.objects.get(project=project.id)
             print(request.POST)
-            cast_pay = request.POST.get('checkbx')
+            cast_pay = request.POST.get('radiorow4')
             # Updating  cast_star rating
             cast_star1 = request.POST.get('cast-star1')
             cast_star2 = request.POST.get('cast-star2')
@@ -5606,24 +5609,24 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 crew_star_smar = crew_star3
 
             projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
-            writerform = WriterForm(request.POST or None, instance=writer)
-            new_writer = request.POST.get('new_writer')
+            # writerform = WriterForm(request.POST or None, instance=writer)
+            # new_writer = request.POST.get('new_writer')
 
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
-            print("valid ahno writer:", writerform.is_valid())
-            print('form error writer', writerform.errors)
-            if projectform.is_valid() and writerform.is_valid():
+            # print("valid ahno writer:", writerform.is_valid())
+            # print('form error writer', writerform.errors)
+            if projectform.is_valid():
 
-                writer = writerform.save()
+                # writer = writerform.save()
                 project = projectform.save()
                 project.cast_samr = cast_star_smar
                 project.crew_samr = crew_star_smar
                 project.cast_pay_rate = cast_pay
-                writer.project = project
-                writer.name = new_writer
+                # writer.project = project
+                # writer.name = new_writer
                 project.save()
-                writer.save()
+                # writer.save()
                 messages.success(request, "Project Updated Successfully.")
                 return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))

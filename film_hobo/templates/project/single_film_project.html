@@ -112,6 +112,14 @@
     </div>
 </div>
 <!-- Modal End -->
+
+                        {% if project.creator.id == request.user.id %}
+                         
+                        <span class="">
+                            <a class="mem-blu-link log-fnt-weight cursor-pointer " id="{{project.title}}" href="{% url 'hobo_user:update-project' id=project.id  %}" >E<span class="mem-small-f">DIT</span></a>
+                        </span>
+                        {% endif %}
+
                             </li>
                         </ul>
                     </div>
@@ -197,7 +205,7 @@
                                 </div>
                                 <div>
                                     <span class="sgl-black-txt">Cast Pay Rate: </span>
-                                    <span class="sgl-blue-txt">{{project.get_cast_pay_rate_display}}</span>
+                                    <span class="sgl-blue-txt">{{project.get_sag_aftra_display}}</span>
                                 </div>
                             </div>
                         </div>
