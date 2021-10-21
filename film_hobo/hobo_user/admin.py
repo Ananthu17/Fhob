@@ -22,7 +22,18 @@ from .models import CustomUser, Project, ProjectReaction, EthnicAppearance, \
 
 from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     CountryResource, GuildMembershipResource, \
-                    JobTypeResource, LocationResource
+                    JobTypeResource, LocationResource, CustomUserResource, \
+                    BetaTesterCodesResource, CompanyClientResource, \
+                    CompanyPaymentDetailsResource, \
+                    CompanyRatingCombinedResource, CompanyRatingResource, \
+                    CoWorkerResource, CustomUserSettingsResource, \
+                    DisabledAccountResource, FeedbackResource, \
+                    FriendGroupResource, FriendRequestResource, \
+                    HoboPaymentDetailsResource, IndiePaymentDetailsResource, \
+                    NewJobTypeResource, PhotoResource, \
+                    ProPaymentDetailsResource, ProjectReactionResource, \
+                    ProjectResource, PromoCodeResource, \
+                    UserAgentManagerResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -50,9 +61,10 @@ class CustomUserForm(forms.ModelForm):
         fields = '__all__'
 
 
-class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin, ImportExportModelAdmin):
     form = CustomUserForm
     model = CustomUser
+    resource_class = CustomUserResource
     list_display = ('email', 'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff', 'is_active',)
     fieldsets = (
@@ -104,30 +116,126 @@ class CustomUserAdmin(UserAdmin, admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+@admin.register(BetaTesterCodes)
+class BetaTesterCodesAdmin(ImportExportModelAdmin):
+    resource_class = BetaTesterCodesResource
+
+
+@admin.register(CompanyClient)
+class CompanyClientAdmin(ImportExportModelAdmin):
+    resource_class = CompanyClientResource
+
+
+@admin.register(CompanyPaymentDetails)
+class CompanyPaymentDetailsAdmin(ImportExportModelAdmin):
+    resource_class = CompanyPaymentDetailsResource
+
+
+@admin.register(CompanyRatingCombined)
+class CompanyRatingCombinedAdmin(ImportExportModelAdmin):
+    resource_class = CompanyRatingCombinedResource
+
+
+@admin.register(CompanyRating)
+class CompanyRatingAdmin(ImportExportModelAdmin):
+    resource_class = CompanyRatingResource
+
+
+@admin.register(CoWorker)
+class CoWorkerAdmin(ImportExportModelAdmin):
+    resource_class = CoWorkerResource
+
+
+@admin.register(DisabledAccount)
+class DisabledAccountAdmin(ImportExportModelAdmin):
+    resource_class = DisabledAccountResource
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(ImportExportModelAdmin):
+    resource_class = FeedbackResource
+
+
+@admin.register(FriendGroup)
+class FriendGroupAdmin(ImportExportModelAdmin):
+    resource_class = FriendGroupResource
+
+
+@admin.register(FriendRequest)
+class FriendRequestAdmin(ImportExportModelAdmin):
+    resource_class = FriendRequestResource
+
+
+@admin.register(HoboPaymentsDetails)
+class HoboPaymentsDetailsAdmin(ImportExportModelAdmin):
+    resource_class = HoboPaymentDetailsResource
+
+
+@admin.register(IndiePaymentDetails)
+class IndiePaymentDetailsAdmin(ImportExportModelAdmin):
+    resource_class = IndiePaymentDetailsResource
+
+
+@admin.register(NewJobType)
+class NewJobTypeAdmin(ImportExportModelAdmin):
+    resource_class = NewJobTypeResource
+
+
+@admin.register(Photo)
+class PhotoAdmin(ImportExportModelAdmin):
+    resource_class = PhotoResource
+
+
+@admin.register(ProPaymentDetails)
+class ProPaymentDetailsAdmin(ImportExportModelAdmin):
+    resource_class = ProPaymentDetailsResource
+
+
+@admin.register(ProjectReaction)
+class ProjectReactionAdmin(ImportExportModelAdmin):
+    resource_class = ProjectReactionResource
+
+
+@admin.register(Project)
+class ProjectAdmin(ImportExportModelAdmin):
+    resource_class = ProjectResource
+    list_display = ('id', 'title', 'creator', 'format', 'genre')
+
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(ImportExportModelAdmin):
+    resource_class = PromoCodeResource
+
+
+@admin.register(UserAgentManager)
+class UserAgentManagerAdmin(ImportExportModelAdmin):
+    resource_class = UserAgentManagerResource
+
+
 admin.site.site_header = "Filmhobo Admin"
 admin.site.site_title = "Filmhobo Admin Portal"
 admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(ProjectReaction)
-admin.site.register(PromoCode)
-admin.site.register(HoboPaymentsDetails)
-admin.site.register(IndiePaymentDetails)
-admin.site.register(ProPaymentDetails)
-admin.site.register(CompanyPaymentDetails)
-admin.site.register(DisabledAccount)
-admin.site.register(CoWorker)
+# admin.site.register(ProjectReaction)
+# admin.site.register(PromoCode)
+# admin.site.register(HoboPaymentsDetails)
+# admin.site.register(IndiePaymentDetails)
+# admin.site.register(ProPaymentDetails)
+# admin.site.register(CompanyPaymentDetails)
+# admin.site.register(DisabledAccount)
+# admin.site.register(CoWorker)
 admin.site.register(VideoRating)
 admin.site.register(VideoRatingCombined)
-admin.site.register(FriendRequest)
-admin.site.register(UserAgentManager)
-admin.site.register(Photo)
+# admin.site.register(FriendRequest)
+# admin.site.register(UserAgentManager)
+# admin.site.register(Photo)
 admin.site.register(UserInterest)
-admin.site.register(CompanyClient)
-admin.site.register(NewJobType)
-admin.site.register(FriendGroup)
-admin.site.register(CompanyRating)
-admin.site.register(CompanyRatingCombined)
+# admin.site.register(CompanyClient)
+# admin.site.register(NewJobType)
+# admin.site.register(FriendGroup)
+# admin.site.register(CompanyRating)
+# admin.site.register(CompanyRatingCombined)
 admin.site.register(UserProject)
 
 
@@ -161,7 +269,7 @@ class LocationAdmin(ImportExportModelAdmin):
     resource_class = LocationResource
 
 
-class CustomUserSettingsAdmin(admin.ModelAdmin):
+class CustomUserSettingsAdmin(ImportExportModelAdmin):
     model = CustomUserSettings
     fieldsets = (
         ('General', {'fields': ('user', 'profile_visibility',
@@ -177,6 +285,7 @@ class CustomUserSettingsAdmin(admin.ModelAdmin):
                                      'match_for_my_Interest',
                                      )}),
     )
+    resource_class = CustomUserSettingsResource
 
 
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
@@ -207,7 +316,7 @@ class GroupUsersAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GroupUsers, GroupUsersAdmin)
-admin.site.register(Feedback)
+# admin.site.register(Feedback)
 
 
 class UserProfileAdmin(admin.ModelAdmin):
@@ -263,11 +372,10 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Team, TeamAdmin)
-admin.site.register(BetaTesterCodes)
+# admin.site.register(BetaTesterCodes)
 
 
-class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'creator', 'format', 'genre')
 
 
-admin.site.register(Project, ProjectAdmin)
+# admin.site.register(Project, ProjectAdmin)
+
