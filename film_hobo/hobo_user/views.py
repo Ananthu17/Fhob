@@ -355,7 +355,7 @@ class HomePage(TemplateView):
 
 
 class VideoPlayer(TemplateView):
-    template_name = 'user_pages/Video_player_Logistics.html'
+    template_name = 'user_pages/video_player_logistics.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 

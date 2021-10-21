@@ -9,7 +9,7 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8041"
+      sh -c "python manage.py runserver 0.0.0.0:8041"
     environment:
       - DB_HOST=db
       - DB_NAME=film_hobo_db

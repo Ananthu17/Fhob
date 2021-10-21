@@ -1640,7 +1640,7 @@
         var project_id = project_obj.split("#").pop();
         var origin_url = window.location.origin
         var redirect_url = origin_url + '/project/video/' + project_id + '/'
-        window.location.replace(redirect_url);
+        window.location.assign(redirect_url);
     });
 </script>
 {% endblock %}
