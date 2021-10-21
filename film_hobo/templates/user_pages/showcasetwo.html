@@ -1235,7 +1235,7 @@
         var project_obj = proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1)
         var project_id = project_obj.split("#").pop();
         var origin_url = window.location.origin
-        var redirect_url = origin_url + '/project/video/' + project_id + '/'
+        var redirect_url = origin_url + '/hobo_user/video/' + project_id + '/'
         window.location.replace(redirect_url);
     });
     $(".hom-name-width-overflow").click(function(){
