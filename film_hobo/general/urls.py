@@ -2,7 +2,8 @@ from django.urls import path
 from .views import HelpAPI, HelpView, BetaUserAdmin, \
      HelpProject, HelpGettingStarted, HelpRating, TermsOfService, \
      PrivacyPolicy, RefundPolicy, IntellectualPropertyRights, Membership, \
-     HelpShowcase, HelpSAMR, HelpNetworking, HelpCommunityRules, HelpMembership
+     HelpShowcase, HelpSAMR, HelpNetworking, HelpCommunityRules, \
+     HelpMembership, EmailUsView, ContactUsAPI
 
 app_name = "general"
 
@@ -30,4 +31,8 @@ urlpatterns = [
          name='intellectual_property_rights'),
     path('membership/', Membership.as_view(),
          name='membership'),
+    path('email-us/', EmailUsView.as_view(),
+         name='email-us'),
+    path('contact-us-api/', ContactUsAPI.as_view(),
+         name='contact-us-api'),
     ]

@@ -28,12 +28,12 @@
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests (5)</a></li>
-                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
+                        <li><a href="{% url 'hobo_user:friends-and-followers' %}#myinterest_section" class="membr-setup-m">My Interests ({{my_interests_count}})</a></li>
+                        <li class="mt-4"><a href="{% url 'hobo_user:projects' %}" class="membr-setup-m">My Projects ({{my_projects_count}})</a></li>
                     </ul>
                 </div>
-                <div class="left-mode-sec mt-3 p-2 blank-left-mode">
-                </div>
+                <!-- <div class="left-mode-sec mt-3 p-2 blank-left-mode">
+                </div> -->
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
                 <div class="left-mode-sec mem-img-p">
@@ -68,7 +68,7 @@
                 </div>
                 <div class="mem-set-network-sec mt-3">
                     <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
-                    <div class="float-right"><a href="#" class="mem-setup-blck-f">Edit</a></div>
+                    <div class="float-right"><a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-setup-blck-f">Edit</a></div>
                     <hr class="mem-setup-network-hr">
                     {% for item in friends %}
                     {% if forloop.first or forloop.counter == 5 %}

@@ -6,14 +6,17 @@ from django.http import HttpResponseRedirect, FileResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic.base import View
+from django.conf import settings
+from django.template import loader
+from django.core.mail import send_mail
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Help
-from .serializers import HelpSerializer
+from .models import EmailUs, Help
+from .serializers import HelpSerializer, ContactUsSerializer
 
 # Create your views here.
 
@@ -197,3 +200,71 @@ class Membership(View):
         filepath = os.path.join('media', 'membership.pdf')
         return FileResponse(open(filepath, 'rb'),
                             content_type='application/pdf')
+
+
+class EmailUsView(LoginRequiredMixin, TemplateView):
+    template_name = 'general/email_us.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['user'] = user
+        return context
+
+
+class ContactUsAPI(APIView):
+    serializer_class = ContactUsSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            to_email = []
+            to_email_id = ""
+            data_dict = serializer.data
+            contact_obj = EmailUs()
+            contact_obj.user = self.request.user
+            contact_obj.subject = data_dict['subject']
+            contact_obj.message = data_dict['message']
+            contact_obj.topic = data_dict['topic']
+            contact_obj.save()
+            response = {'message': "Message send successfully.",
+                        'status': status.HTTP_200_OK}
+            messages.success(self.request, "Message send successfully.")
+
+            # send email
+            if contact_obj.topic == EmailUs.General:
+                to_email_id = settings.DEFAULT_GENERAL_MAIL
+            if contact_obj.topic == EmailUs.Technical:
+                to_email_id = settings.DEFAULT_TECHNICAL_MAIL
+            if contact_obj.topic == EmailUs.Sevices:
+                to_email_id = settings.DEFAULT_SERVICE_MAIL
+            if contact_obj.topic == EmailUs.Abuse:
+                to_email_id = settings.DEFAULT_ABUSE_MAIL
+            if contact_obj.topic == EmailUs.Business:
+                to_email_id = settings.DEFAULT_BUSINESS_MAIL
+
+            to_email.append(to_email_id)
+            subject = contact_obj.subject
+            message = contact_obj.message
+            html_message = loader.render_to_string(
+                                'general/contact_mail.html',
+                                {
+                                    'site_url': settings.ORIGIN_URL,
+                                    'from_user': self.request.user,
+                                    'message': message,
+                                    'topic': contact_obj.get_topic_display,
+                                }
+                            )
+            send_mail(subject, message,
+                      settings.EMAIL_FROM,
+                      to_email, fail_silently=True,
+                      html_message=html_message)
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
