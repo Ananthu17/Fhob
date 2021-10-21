@@ -354,6 +354,20 @@ class HomePage(TemplateView):
         return context
 
 
+class VideoPlayer(TemplateView):
+    template_name = 'user_pages/Video_player_Logistics.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = Project.objects.get(pk=self.kwargs.get('id'))
+        team = Team.objects.filter(project=self.kwargs.get('id'))
+        context['project'] = project
+        context['team'] = team
+        return context
+
+
 class ShowCase(TemplateView):
     template_name = 'user_pages/showcasetwo.html'
     login_url = '/hobo_user/user_login/'
@@ -361,11 +375,14 @@ class ShowCase(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scenes"] = Project.objects.filter(format="SCH").order_by('-likes')[:10]
-        context["toprated_scenes"] = Project.objects.filter(format="SHO").order_by('-likes')[:10]
-        context["filims"] = Project.objects.filter(format="SCH").order_by('-id')
-        context["toprated_filims"] = Project.objects.filter(format="SHO").order_by('-id')
-        print(context)
+        context["scenes"] = Project.objects.filter(
+                            format="SCH").order_by('-likes')[:10]
+        context["toprated_scenes"] = Project.objects.filter(
+                                     format="SHO").order_by('-likes')[:10]
+        context["filims"] = Project.objects.filter(
+                            format="SCH").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="SHO").order_by('-id')
         return context
 
 
