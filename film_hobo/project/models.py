@@ -443,3 +443,25 @@ class AttachedCrewMember(models.Model):
     class Meta:
         verbose_name = 'Attached Crew Member'
         verbose_name_plural = 'Attached Crew Members'
+
+
+class ReportVideo(models.Model):
+    reported_by_user = models.ForeignKey('hobo_user.CustomUser',
+                                         verbose_name=_("Reported by"),
+                                         on_delete=models.CASCADE,
+                                         related_name='video_reported_by_user',
+                                         null=True, blank=True)
+    video_url = models.CharField(_("Video URL"),
+                                 max_length=250, null=True, blank=True)
+    project_id = models.CharField(_("Project id"),
+                                  max_length=150, null=True, blank=True)
+    project_name = models.CharField(_("Project Name"),
+                                    max_length=250, null=True, blank=True)
+    reason = models.TextField(_("Reason"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.reported_by_user.get_full_name())
+
+    class Meta:
+        verbose_name = 'Report Video'
+        verbose_name_plural = 'Report Video'

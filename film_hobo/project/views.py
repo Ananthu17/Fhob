@@ -49,7 +49,7 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
      UserNotification, Project, UserInterest, Friend, VideoRatingCombined
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, \
+    Character, Comment, CrewApplication, ProjectCrew, ReportVideo, SceneImages, Sides, \
     ProjectTracking, ProjectRating, \
     AttachedCrewMember
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
@@ -65,7 +65,8 @@ from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       SidesPDFSerializer, CrewApplicationSerializer, JobTypeSerializer, \
       AttachProjectCrewSerializer, ProjectCrewSerializer, \
       CharacterPasswordSerializer, AttachCrewSerializer, \
-      CrewQualificationSerializer, ReplaceCrewSerializer
+      CrewQualificationSerializer, ReplaceCrewSerializer, \
+      ReportVideoSerializer
 
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify
@@ -4504,6 +4505,32 @@ class AcceptCrewAttachRequestAPI(APIView):
             except Character.DoesNotExist:
                 response = {'errors': 'Invalid ID', 'status':
                              status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ReportVideoAPI(APIView):
+    serializer_class = ReportVideoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            obj = ReportVideo()
+            obj.reported_by_user = self.request.user
+            obj.video_url = data_dict['video_url']
+            obj.project_id = data_dict['project_id']
+            obj.project_name = data_dict['project_name']
+            obj.reason = data_dict['reason']
+            obj.save()
+            response = {'mesage': "Video Reported", 'status':
+                        status.HTTP_200_OK}
+            messages.success(self.request, "Video Reported")
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':

@@ -1,7 +1,7 @@
 from hobo_user.models import UserProject, UserRating, Project, \
     UserRatingCombined, UserProject
 from project.models import Audition, AuditionRating, Character, Comment, CrewApplication, \
-    SceneImages, Sides, ProjectRating, Comment
+    SceneImages, Sides, ProjectRating, Comment, ReportVideo
 from rest_framework import serializers
 
 
@@ -440,3 +440,8 @@ class CrewQualificationSerializer(serializers.Serializer):
             )
 
 
+class ReportVideoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReportVideo
+        fields = ['video_url', 'project_id', 'project_name', 'reason']

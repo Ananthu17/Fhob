@@ -109,7 +109,6 @@ admin.site.site_title = "Filmhobo Admin Portal"
 admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Project)
 admin.site.register(ProjectReaction)
 admin.site.register(PromoCode)
 admin.site.register(HoboPaymentsDetails)
@@ -265,3 +264,10 @@ class TeamAdmin(admin.ModelAdmin):
 
 admin.site.register(Team, TeamAdmin)
 admin.site.register(BetaTesterCodes)
+
+
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'creator', 'format', 'genre')
+
+
+admin.site.register(Project, ProjectAdmin)
