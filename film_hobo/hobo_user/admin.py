@@ -33,7 +33,13 @@ from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     NewJobTypeResource, PhotoResource, \
                     ProPaymentDetailsResource, ProjectReactionResource, \
                     ProjectResource, PromoCodeResource, \
-                    UserAgentManagerResource
+                    UserAgentManagerResource, UserProjectResource, \
+                    UserInterestResource, VideoRatingResource, \
+                    VideoRatingCombinedResource, UserTrackingResource, \
+                    FriendResource, GroupUsersResource, UserProfileResource, \
+                    CompanyProfileResource, ProjectMemberRatingResource, \
+                    UserRatingResource, UserNotificationResource, TeamResource, \
+                    UserRatingCombinedResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -211,6 +217,26 @@ class UserAgentManagerAdmin(ImportExportModelAdmin):
     resource_class = UserAgentManagerResource
 
 
+@admin.register(UserProject)
+class UserProjectAdmin(ImportExportModelAdmin):
+    resource_class = UserProjectResource
+
+
+@admin.register(UserInterest)
+class UserInterestAdmin(ImportExportModelAdmin):
+    resource_class = UserInterestResource
+
+
+@admin.register(VideoRating)
+class VideoRatingAdmin(ImportExportModelAdmin):
+    resource_class = VideoRatingResource
+
+
+@admin.register(VideoRatingCombined)
+class VideoRatingCombinedAdmin(ImportExportModelAdmin):
+    resource_class = VideoRatingCombinedResource
+
+
 admin.site.site_header = "Filmhobo Admin"
 admin.site.site_title = "Filmhobo Admin Portal"
 admin.site.index_title = "Welcome to Filmhobo Admin Portal"
@@ -225,18 +251,18 @@ admin.site.register(CustomUser, CustomUserAdmin)
 # admin.site.register(CompanyPaymentDetails)
 # admin.site.register(DisabledAccount)
 # admin.site.register(CoWorker)
-admin.site.register(VideoRating)
-admin.site.register(VideoRatingCombined)
+# admin.site.register(VideoRating)
+# admin.site.register(VideoRatingCombined)
 # admin.site.register(FriendRequest)
 # admin.site.register(UserAgentManager)
 # admin.site.register(Photo)
-admin.site.register(UserInterest)
+# admin.site.register(UserInterest)
 # admin.site.register(CompanyClient)
 # admin.site.register(NewJobType)
 # admin.site.register(FriendGroup)
 # admin.site.register(CompanyRating)
 # admin.site.register(CompanyRatingCombined)
-admin.site.register(UserProject)
+# admin.site.register(UserProject)
 
 
 @admin.register(EthnicAppearance)
@@ -291,7 +317,8 @@ class CustomUserSettingsAdmin(ImportExportModelAdmin):
 admin.site.register(CustomUserSettings, CustomUserSettingsAdmin)
 
 
-class UserTrackingAdmin(admin.ModelAdmin):
+class UserTrackingAdmin(ImportExportModelAdmin):
+    resource_class = UserTrackingResource
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
@@ -300,7 +327,8 @@ class UserTrackingAdmin(admin.ModelAdmin):
 admin.site.register(UserTracking, UserTrackingAdmin)
 
 
-class FriendAdmin(admin.ModelAdmin):
+class FriendAdmin(ImportExportModelAdmin):
+    resource_class = FriendResource
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
@@ -309,7 +337,8 @@ class FriendAdmin(admin.ModelAdmin):
 admin.site.register(Friend, FriendAdmin)
 
 
-class GroupUsersAdmin(admin.ModelAdmin):
+class GroupUsersAdmin(ImportExportModelAdmin):
+    resource_class = GroupUsersResource
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
@@ -319,7 +348,8 @@ admin.site.register(GroupUsers, GroupUsersAdmin)
 # admin.site.register(Feedback)
 
 
-class UserProfileAdmin(admin.ModelAdmin):
+class UserProfileAdmin(ImportExportModelAdmin):
+    resource_class = UserProfileResource
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
@@ -328,7 +358,8 @@ class UserProfileAdmin(admin.ModelAdmin):
 admin.site.register(UserProfile, UserProfileAdmin)
 
 
-class CompanyProfileAdmin(admin.ModelAdmin):
+class CompanyProfileAdmin(ImportExportModelAdmin):
+    resource_class = CompanyProfileResource
     formfield_overrides = {
         models.ManyToManyField: {'widget': CheckboxSelectMultiple},
     }
@@ -337,21 +368,24 @@ class CompanyProfileAdmin(admin.ModelAdmin):
 admin.site.register(CompanyProfile, CompanyProfileAdmin)
 
 
-class ProjectMemberRatingAdmin(admin.ModelAdmin):
+class ProjectMemberRatingAdmin(ImportExportModelAdmin):
+    resource_class = ProjectMemberRatingResource
     list_display = ('user', 'job_type', 'project', 'rating')
 
 
 admin.site.register(ProjectMemberRating, ProjectMemberRatingAdmin)
 
 
-class UserRatingAdmin(admin.ModelAdmin):
+class UserRatingAdmin(ImportExportModelAdmin):
+    resource_class = UserRatingResource
     list_display = ('user', 'job_type', 'project', 'rating', 'rated_by')
 
 
 admin.site.register(UserRating, UserRatingAdmin)
 
 
-class UserNotificationAdmin(admin.ModelAdmin):
+class UserNotificationAdmin(ImportExportModelAdmin):
+    resource_class = UserNotificationResource
     list_display = (
         'user', 'notification_type', 'from_user',
         'status_type', 'message', 'created_time')
@@ -360,14 +394,16 @@ class UserNotificationAdmin(admin.ModelAdmin):
 admin.site.register(UserNotification, UserNotificationAdmin)
 
 
-class UserRatingCombinedAdmin(admin.ModelAdmin):
+class UserRatingCombinedAdmin(ImportExportModelAdmin):
+    resource_class = UserRatingCombinedResource
     list_display = ('user', 'job_type', 'rating')
 
 
 admin.site.register(UserRatingCombined, UserRatingCombinedAdmin)
 
 
-class TeamAdmin(admin.ModelAdmin):
+class TeamAdmin(ImportExportModelAdmin):
+    resource_class = TeamResource
     list_display = ('project', 'user', 'job_type')
 
 

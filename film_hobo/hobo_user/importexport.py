@@ -7,7 +7,10 @@ from .models import EthnicAppearance, AthleticSkill, Country, \
     CompanyRatingCombined, CompanyRating, CoWorker, CustomUserSettings, \
     DisabledAccount, Feedback, FriendGroup, FriendRequest, \
     HoboPaymentsDetails, IndiePaymentDetails, NewJobType, Photo, \
-    ProPaymentDetails, ProjectReaction, Project, PromoCode, UserAgentManager
+    ProPaymentDetails, ProjectReaction, Project, PromoCode, UserAgentManager, \
+    UserProject, UserInterest, VideoRating, VideoRatingCombined, \
+    UserTracking, Friend, GroupUsers, UserProfile, CompanyProfile, \
+    ProjectMemberRating, UserRating, UserNotification, Team, UserRatingCombined
 from payment.models import FilmHoboSenderEmail
 
 
@@ -141,6 +144,84 @@ class UserAgentManagerResource(ModelResource):
 
     class Meta:
         model = UserAgentManager
+
+
+class UserProjectResource(ModelResource):
+
+    class Meta:
+        model = UserProject
+
+
+class UserInterestResource(ModelResource):
+
+    class Meta:
+        model = UserInterest
+
+
+class VideoRatingResource(ModelResource):
+
+    class Meta:
+        model = VideoRating
+
+
+class VideoRatingCombinedResource(ModelResource):
+
+    class Meta:
+        model = VideoRatingCombined
+
+
+class UserTrackingResource(ModelResource):
+
+    class Meta:
+        model = UserTracking
+
+
+class FriendResource(ModelResource):
+
+    class Meta:
+        model = Friend
+
+
+class GroupUsersResource(ModelResource):
+
+    class Meta:
+        model = GroupUsers
+
+
+class UserProfileResource(ModelResource):
+
+    class Meta:
+        model = UserProfile
+
+
+class ProjectMemberRatingResource(ModelResource):
+
+    class Meta:
+        model = ProjectMemberRating
+
+
+class UserRatingResource(ModelResource):
+
+    class Meta:
+        model = UserRating
+
+
+class UserNotificationResource(ModelResource):
+
+    class Meta:
+        model = UserNotification
+
+
+class TeamResource(ModelResource):
+
+    class Meta:
+        model = Team
+
+
+class UserRatingCombinedResource(ModelResource):
+
+    class Meta:
+        model = UserRatingCombined
 
 
 class EthnicAppearanceResource(ModelResource):
