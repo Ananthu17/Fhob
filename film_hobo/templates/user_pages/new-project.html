@@ -101,11 +101,11 @@
                 <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
                     <div class="left-mode-sec mb-2 pl-3 pr-3 h-100">
 
-                        <div class="row pt-1">
+                        <!-- <div class="row pt-1">
                             <div class="col-12">
                                 <a href="" class="prjct-log-link  float-right">EDIT</a>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <div class="row">
                             <div class="col-2 ">
@@ -130,7 +130,7 @@
                             </div>
                         </div>
                        
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
                             </div>
@@ -138,9 +138,9 @@
                                 
                                 {{form.creator}}
                             </div>
-                        </div>
-
-                        <div class="row">
+                        </div> -->
+                        <input type="hidden" value="{{ user.id }}" name="creator">
+                        <!-- <div class="row">
                             <div class="col-2">
                                 <label class="form-title mem-setup-blu-f">WRITER:</label>
                             </div>
@@ -154,7 +154,7 @@
                                 <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER WRITER</a>
                             </div>
                             {% endif %}
-                        </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-md-2 col-sm-12">
@@ -365,9 +365,9 @@
 
                         <div class="row">
                             <div class="col-2 ">
-                                <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
+                                <label class="form-title mem-setup-blu-f"><br>CAST PAY RATE:</label>
                             </div>
-                            <div class=" containercheck"> 
+                            <!-- <div class=" containercheck"> 
                                 <div class="checkboxnew" style="margin-left: 1.2em; margin-top: 1em; ">
                                    <input type="checkbox" style="border: 1px solid #f32121 ;" id="checkbox1" name="checkbx" value="0">
                                         <label for="checkbox1" style="font-weight: bolder;font-size: 17px;">
@@ -379,15 +379,27 @@
                                             <span>NEGOTIABLE</span>
                                         </label>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- </div>
 
                             <div class="row"> -->
-                            <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
-                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
-                             <!-- </div>
-                            <div class="col-md-10 col-sm-6 mt-3"> -->
+                            <!-- <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
+                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
+                             <!-- </div> -->
+                            <div class="col-md-10 col-sm-6 mt-3"> 
                                 {{form.sag_aftra}}
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;">$ 0
+                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)" value="0" required>
+                                        <span class="checkmarkagree" style="margin-top: 0.3em;"  ></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Negotiable
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="1" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">Ultra Low
                                         <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="2" required>
@@ -1129,23 +1141,23 @@ Cw_SetRatingStar3();
 
 
 
-// the selector will match all input controls of type :checkbox
-// and attach a click event handler 
-$("input:checkbox").on('click', function() {
-  // in the handler, 'this' refers to the box clicked on
-  var $box = $(this);
-  if ($box.is(":checked")) {
-    // the name of the box is retrieved using the .attr() method
-    // as it is assumed and expected to be immutable
-    var group = "input:checkbox[name='checkbx']";
-    // the checked state of the group/box on the other hand will change
-    // and the current value is retrieved using .prop() method
-    $(group).prop("checked", false);
-    $box.prop("checked", true);
-  } else {
-    $box.prop("checked", false);
-  }
-});
+// // the selector will match all input controls of type :checkbox
+// // and attach a click event handler 
+// $("input:checkbox").on('click', function() {
+//   // in the handler, 'this' refers to the box clicked on
+//   var $box = $(this);
+//   if ($box.is(":checked")) {
+//     // the name of the box is retrieved using the .attr() method
+//     // as it is assumed and expected to be immutable
+//     var group = "input:checkbox[name='checkbx']";
+//     // the checked state of the group/box on the other hand will change
+//     // and the current value is retrieved using .prop() method
+//     $(group).prop("checked", false);
+//     $box.prop("checked", true);
+//   } else {
+//     $box.prop("checked", false);
+//   }
+// });
 
 // sHOWING MOdal
 $('input:radio[id="pilt"]').change(function() {

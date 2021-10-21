@@ -166,7 +166,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -187,10 +187,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Pages:<a>4</a>
+                                            Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -266,7 +266,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -287,10 +287,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -367,7 +367,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -386,10 +386,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -465,7 +465,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -484,10 +484,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -566,7 +566,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="" style="width: 100%;">{{project.sag_aftra}}</a>
@@ -587,10 +587,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Pages:<a>4</a>
+                                            Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -665,7 +665,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -686,10 +686,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -764,7 +764,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -783,10 +783,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -861,7 +861,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -880,10 +880,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
