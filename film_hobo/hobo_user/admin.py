@@ -205,6 +205,7 @@ class ProjectReactionAdmin(ImportExportModelAdmin):
 @admin.register(Project)
 class ProjectAdmin(ImportExportModelAdmin):
     resource_class = ProjectResource
+    list_display = ('id', 'title', 'creator', 'format', 'genre')
 
 
 @admin.register(PromoCode)
@@ -242,7 +243,6 @@ admin.site.site_title = "Filmhobo Admin Portal"
 admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
-# admin.site.register(Project)
 # admin.site.register(ProjectReaction)
 # admin.site.register(PromoCode)
 # admin.site.register(HoboPaymentsDetails)
@@ -409,3 +409,9 @@ class TeamAdmin(ImportExportModelAdmin):
 
 admin.site.register(Team, TeamAdmin)
 # admin.site.register(BetaTesterCodes)
+
+
+
+
+# admin.site.register(Project, ProjectAdmin)
+

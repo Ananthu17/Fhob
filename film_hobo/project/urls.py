@@ -27,7 +27,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
      AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
      GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI, \
-     GetUserInterestNotificationAjaxView
+     GetUserInterestNotificationAjaxView, ReportVideoAPI
 
 
 urlpatterns = [
@@ -197,6 +197,9 @@ urlpatterns = [
           name='decline-crew-attach-request-api'),
      path('accept-crew-attach-request-api/', AcceptCrewAttachRequestAPI.as_view(),
           name='accept-crew-attach-request-api'),
-     path('get-user-interest-notification-html/', GetUserInterestNotificationAjaxView.as_view(),
+     path('get-user-interest-notification-html/',
+          GetUserInterestNotificationAjaxView.as_view(),
           name='get-user-interest-notification-html'),
+     path('report-video-api/', ReportVideoAPI.as_view(),
+          name='report-video-api'),
     ]

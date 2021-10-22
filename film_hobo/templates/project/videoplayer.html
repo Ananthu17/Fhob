@@ -61,7 +61,8 @@
 
                             <li id="share-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                             </li>
-                            <li><a href="#" class="red-f log-fnt-weight">R<span class="mem-small-f">EPORT THIS</span> V<span
+                            <li><a class="cursor-pointer red-f log-fnt-weight"
+                                data-toggle="modal" data-target="#report_video">R<span class="mem-small-f">EPORT THIS</span> V<span
                                 class="mem-small-f">IDEO</span></a>
                             </li>
                         </ul>
@@ -308,6 +309,43 @@
             <!-- Modal footer -->
             <div class="modal-footer">
                 <span class="delete-comment-btn-div">
+                </span>
+                <button type="button" class="btn btn-outline-danger btn-sm close-modal"
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+ <!-- The Modal -->
+ <div class="modal fade" id="report_video">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Report video</h6>
+                <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-2 ">
+                        <p class="all-p ">Reason:</p>
+                    </div>
+                    <div class="col-8 ">
+                        <textarea id="reason" class="form-control" rows="5"></textarea>
+                        <p class="all-error-msg " id="report_video_err"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <span class="delete-comment-btn-div">
+                    <a class=" btn btn-outline-danger btn-sm" id="report_project_video">Report Video</a>
                 </span>
                 <button type="button" class="btn btn-outline-danger btn-sm close-modal"
                 data-dismiss="modal">Cancel</button>
@@ -645,7 +683,40 @@
         });
     </script>
 
+<script>
+    $('body').on('click' , '#report_project_video', function(){
+        console.log("----here")
+        var project_id = "{{ project.id }}";
+        var project_name = "{{ project.title }}";
+        var reason = $("#reason").val();
+        var video_url = window.location.href;
+        var token = $("#token").val();
+        var data_dict = {}
 
+        data_dict['project_id'] = project_id;
+        data_dict['video_url'] = video_url;
+        data_dict['project_name'] = project_name;
+        if(reason!=""){
+            data_dict['reason'] = reason;
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/report-video-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                }
+            });
+        }else{
+            $("#report_video_err").html("This field is required.")
+        }
+    });
+</script>
 
     <script src="{% static 'js/videoplayer_invite.js' %}"></script>
     <script src="{% static 'js/email_invite.js' %}"></script>
