@@ -56,3 +56,9 @@ def get_notifications_time(time_posted):
         else:
             return str(seconds) + " seconds"
 
+@register.simple_tag()
+def get_all_notifications(user):
+    notifications = UserNotification.objects.filter(
+                    user=user
+                    ).order_by('-created_time')
+    return notifications

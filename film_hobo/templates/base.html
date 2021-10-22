@@ -65,15 +65,15 @@
                         <ul class="list-inline mb-0 mt-20">
                             <li class="list-inline-item">
                                 {% if user.is_authenticated and user.registration_complete %}
-                                <div class="dropdown">
+                                <div class="dropdown" >
                                     <button class="mm-icon-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="fa fa-envelope header-fnt-clr header-icon-pos " aria-hidden="true"></span>
                                         <span class="message-notification">
-                                        {% get_msg_notifications_count request.user.id as msg_count %}
-                                        {% if msg_count %}
-                                        <span class="mm-icon-button__badge">{{msg_count}}</span>
-                                        {% endif %}
-                                    </span>
+                                            {% get_msg_notifications_count request.user.id as msg_count %}
+                                            {% if msg_count %}
+                                            <span class="mm-icon-button__badge">{{msg_count}}</span>
+                                            {% endif %}
+                                        </span>
                                     </button>
                                     <div class="dropdown-menu mm-dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                       <a class="dropdown-item" href="{% url 'message:compose-message' %}">Compose</a>
@@ -82,29 +82,53 @@
                                       <a class="dropdown-item" href="{% url 'message:priority-messages'%}"><i class="fa fa-star mm-left-red-star" aria-hidden="true"></i>Priority</a>
                                     </div>
                                   </div>
-                            </li>
                             {% else %}
                             <div class="dropdown">
-                                <button class="mm-icon-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button class="mm-icon-button" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="fa fa-envelope header-fnt-clr header-icon-pos " aria-hidden="true"></span>
                                 </button>
                             </div>
                             {% endif %}
+                           </li>
                             {% if user.is_authenticated and user.registration_complete %}
-                            <li class="list-inline-item notification_icon"  data-toggle="modal" data-target="#notificationModal">
+                            <!-- <li class="list-inline-item notification_icon" >
                                 <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
                                     {% get_notifications_count request.user.id as count %}
                                     {% if count %}
-                                    <span class="notification_count_span">{{count}}</span>
+                                    <span class="notification_count_span mm-icon-button__badge">{{count}}</span>
                                     {% endif %}
                                 </i>
+                            </li> -->
+                            <li class="list-inline-item">
+                                <div class="dropdown  dropdown-notification notification_icon">
+                                    <button class="mm-icon-button" type="button" id="dropdown-notify" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="fa fa-bell header-fnt-clr header-icon-pos" aria-hidden="true"></span>
+                                        <span class="notification-bell">
+                                        {% get_notifications_count request.user.id as count %}
+                                        {% if count %}<span class="mm-icon-button__badge">{{count}}</span>
+                                        {% endif %}
+                                    </span>
+                                    </button>
+                                    <ul class="dropdown-menu mm-dropdown-notify dropdown-menu-right" aria-labelledby="dropdown-notify">
+                                        <div class="mm-notify-titile">
+                                            Notification
+                                        </div>
+                                        <span class="notification-modal-content">
+                                            {% include 'user_pages/list_all_notifications.html' %}
+                                        </span>
+                                    </ul>
+                                </div>
                             </li>
                             {% else %}
-                            <li class="list-inline-item notification_icon"  >
+                            <!-- <li class="list-inline-item notification_icon"  >
                                 <i class="fa fa-bell header-fnt-clr header-icon-pos notification-bell"aria-hidden="true">
                                 </i>
-                            </li>
+                            </li> -->
+                            <button class="mm-icon-button" type="button" id="dropdown-notify"  aria-haspopup="true" aria-expanded="false">
+                                <span class="fa fa-bell header-fnt-clr header-icon-pos" aria-hidden="true"></span>
+                            </button>
                             {% endif %}
+
 
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
@@ -540,6 +564,14 @@ $( document ).ready(function() {
 
     }
 });
+</script>
+<script>
+    // $(document).on('click.bs.dropdown.data-api', '#dropdown-notification', function (e) {
+    // e.stopPropagation();
+    // });
+    $(document).on('click.bs.dropdown.data-api', '.dropdown.dropdown-notification', function (e) {
+        e.stopPropagation();
+        });
 </script>
 {% block extrajs %}
 {% endblock %}

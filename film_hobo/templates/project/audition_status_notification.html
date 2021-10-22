@@ -1,7 +1,83 @@
 
 {% load static %}
 
-<div class="row unread_notification">
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+
+                {% if notification.notification_type == 'audition_status'  %}
+                <a href="{% url 'project:single-film-project' notification.project.id %}"
+                 id ="{{notification.id}}" class="notification_link">
+                    {% if notification.project.video_cover_image %}
+                    <img src="{{ notification.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif notification.project.creator.get_profile_photo %}
+                    <img src="{{ notification.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}</a>
+                {% elif notification.notification_type == 'video_rating' %}
+                    <a href="{% url 'project:video' notification.project.id %}"
+                        id ="{{notification.id}}" class="notification_link">
+                        {% if notification.project.video_cover_image %}
+                        <img src="{{ notification.project.video_cover_image }}" class="mm-round-img"/>
+                        {% elif notification.project.creator.get_profile_photo %}
+                        <img src="{{ notification.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                        {% else %}
+                        <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                        {% endif %}
+                    </a>
+                {% elif notification.notification_type == 'project_rating' %}
+                    <a href="{{ notification.from_user.get_profile_url }}"
+                        id ="{{notification.id}}" class="notification_link">
+                        {% if notification.from_user.get_profile_photo %}
+                        <img src="{{ notification.from_user.get_profile_photo }}" class="mm-round-img"/>
+                        {% else %}
+                        <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                        {% endif %}
+                    </a>
+                {% endif %}
+
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ notification.from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                {% if notification.notification_type == 'project_rating' %}
+                <a href="{{ from_user.get_profile_url }}"
+                id ="{{notification.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{notification.from_user.get_full_name}} rated your project</a>
+                     <a href="{% url 'project:single-film-project' notification.project.id %}"
+                     class="notification_link mm-notf-tag" id ="{{notification.id}}">
+                         {{notification.project.title}}</a> as {{notification.rating|floatformat:0}} stars
+                {% else %}
+                <a href="{{ from_user.get_profile_url }}"
+                id ="{{notification.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{ notification.message|safe }}
+                </a>
+                {% endif %}
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+
+
+
+
+
+
+
+
+
+
+<!-- <div class="row unread_notification">
     <div  class="col-2">
         {% if notification.notification_type == 'audition_status'  %}
         <a href="{% url 'project:single-film-project' notification.project.id %}"
@@ -43,6 +119,6 @@
         {% endif %}<br>
         Now
     </div>
-</div>
+</div> -->
 
 

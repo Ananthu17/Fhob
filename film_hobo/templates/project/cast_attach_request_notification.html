@@ -1,7 +1,73 @@
 
 {% load static %}
 
-<div class="row unread_notification">
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+
+                <a href="{% url 'project:single-film-project' notification.project.id %}"
+                id ="{{notification_id}}" class="notification_link">
+                    {% if notification.project.video_cover_image %}
+                    <img src="{{ notification.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif notification.project.creator.get_profile_photo %}
+                    <img src="{{ notification.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ notification.project.creator.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                {% if notification.notification_type == 'cast_attach_request' %}
+                <span id="cast-attach-req-btns-{{notification.character.id}}">
+                    {{ notification.project.creator.get_full_name}} wants to attach you to character
+                    <b>{{notification.character.name}}</b> of his project
+                    <a href="{% url 'project:single-film-project' notification.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{notification.id}}">{{notification.project.title}}</a>
+
+                    <!-- <span class="btn-blue cursor-pointer accept_cast_attach_request" id="{{notification.character.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer decline_cast_request" id="{{notification.character.id}}">Decline</span> -->
+                    <div class="mm-notf-msg-btn-sec">
+                        <span class="btn mm-notf-msg-ad-btn accept_cast_attach_request" id="{{notification.character.id}}">Accept</span>
+                        <span class="btn mm-notf-msg-dlt-btn decline_cast_request" id="{{notification.character.id}}">Delete</span>
+                    </div>
+                </span>
+                {% elif notification.notification_type == 'crew_attach_request' %}
+                <span id="crew-attach-req-btns-{{notification.crew.id}}">
+                    {{ notification.project.creator.get_full_name}} wants to attach you as
+                    <b>{{notification.crew.job_type}}</b> to his project
+                    <a href="{% url 'project:single-film-project' notification.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{notification.id}}">{{notification.project.title}}</a>
+
+                    <!-- <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{notification.crew.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer decline_crew_request" id="{{notification.crew.id}}">Decline</span> -->
+                    <div class="mm-notf-msg-btn-sec">
+                        <span class="btn mm-notf-msg-ad-btn accept_crew_attach_request" id="{{notification.crew.id}}">Accept</span>
+                        <span class="btn mm-notf-msg-dlt-btn decline_crew_request" id="{{notification.crew.id}}">Delete</span>
+                    </div>
+                </span>
+                {% endif %}
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+
+
+
+
+
+
+<!-- <div class="row unread_notification">
     <div  class="col-2">
         <a href="{% url 'project:single-film-project' notification.project.id %}"
          target="_blank" id ="{{notification_id}}" class="notification_link">
@@ -34,4 +100,4 @@
     {% endif %}
 </div>
 
-
+ -->
