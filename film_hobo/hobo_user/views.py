@@ -5558,36 +5558,65 @@ class ScreeningProjectUrlSendView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # import pdb; pdb.set_trace()
         try:
             logged_in_user = request.user
             project_url = request.data['project_url']
-            
-            project_id = project_url.rsplit('/', 2)[1]
-            project_obj = Project.objects.get(id=project_id)
+            url_type = request.data['url_type']
+            users_id = request.user.id
             selectedUsers = request.data['selectedUsers']
-            for user in selectedUsers:
-                to_user = CustomUser.objects.get(id=user)
-                from_userid = request.user.id
-                #update notification table
-                notification = UserNotification()
-                notification.user = to_user
-                notification.notification_type = UserNotification.INVITE
-                notification.from_user = self.request.user
-                notification.message = self.request.user.get_full_name()+" shared you to check the project "+str(project_obj.title)+""
-                notification.invite_url = project_url
-                notification.save()
-                # send notification
-                room_name = "user_"+str(logged_in_user.id)
-                notification_msg = {
-                        'type': 'send_profile_rating_notification',
-                        'message': str(notification.message),
-                        'from': from_userid,
-                        "event": "INVITE"
-                    }
-                notify(room_name, notification_msg)
-                # end notification section
-                # if notification_msg:
-            return Response({"status": "url send successfully"}, status=status.HTTP_200_OK)
+            if url_type == "PROFILE" :
+                
+                project_obj = CustomUser.objects.get(id=users_id)
+                for user in selectedUsers:
+                    to_user = CustomUser.objects.get(id=user)
+                    from_userid = request.user.id
+                    #update notification table
+                    notification = UserNotification()
+                    notification.user = to_user
+                    notification.notification_type = UserNotification.INVITE
+                    notification.from_user = self.request.user
+                    notification.message = self.request.user.get_full_name()+" shared you to their profile."
+                    notification.invite_url = project_url
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(logged_in_user.id)
+                    notification_msg = {
+                            'type': 'send_profile_rating_notification',
+                            'message': str(notification.message),
+                            'from': from_userid,
+                            "event": "INVITE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+                    # if notification_msg:
+                return Response({"status": "url send successfully"}, status=status.HTTP_200_OK)
+            else:
+                project_id = project_url.rsplit('/', 2)[1]
+                project_obj = Project.objects.get(id=project_id)
+                for user in selectedUsers:
+                    to_user = CustomUser.objects.get(id=user)
+                    from_userid = request.user.id
+                    #update notification table
+                    notification = UserNotification()
+                    notification.user = to_user
+                    notification.notification_type = UserNotification.INVITE
+                    notification.from_user = self.request.user
+                    notification.message = self.request.user.get_full_name()+" shared you to check the project "+str(project_obj.title)+""
+                    notification.invite_url = project_url
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(logged_in_user.id)
+                    notification_msg = {
+                            'type': 'send_profile_rating_notification',
+                            'message': str(notification.message),
+                            'from': from_userid,
+                            "event": "INVITE"
+                        }
+                    notify(room_name, notification_msg)
+                    # end notification section
+                    # if notification_msg:
+                return Response({"status": "url send successfully"}, status=status.HTTP_200_OK)
 
         except:
             return Response({"status": "invite failure"}, status=status.HTTP_400_BAD_REQUEST)

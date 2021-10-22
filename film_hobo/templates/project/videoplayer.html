@@ -333,7 +333,7 @@
                        
                     
                      
-                        <select class="form-control" name="languageSelect" multiple id="languageSelect">
+                        <select class="form-control" name="userSelect" multiple id="userSelect">
                             {% for friend in friends %}
                             <option value="{{friend.id}}" >{{friend}} </option>
                                 {% endfor %}
@@ -360,8 +360,7 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
-<!-- COMMENT THIS 3 LINKS FOR THE COMMENTING TO WORK -->
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+
 <script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
 
 
@@ -369,7 +368,7 @@
 
 
 <script>
-    jQuery('#languageSelect').multiselect({
+    jQuery('#userSelect').multiselect({
     columns: 1,
     placeholder: 'Select Users',
     search: true,
