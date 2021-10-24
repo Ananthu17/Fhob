@@ -38,15 +38,9 @@
             <header class="fh-header">
                 <div class="row no-wrap justify-content-between align-items-center">
                     <div class="col-md-3 col-xs-6">
-                        {% if request.user.is_anonymous %}
-                            <a href="{% url 'hobo_user:how_to' %}">
-                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'hobo_user:user_home' %}">
-                                <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
-                            </a>
-                        {% endif %}
+                        <a href="{% url 'hobo_user:how_to' %}">
+                            <div><img src="{% static 'images/FH_Logo.png' %}" class="img-fluid" style="height: 120px;"></div>
+                        </a>
                     </div>
                     <div class="col-md-5 col-xs-6 text-center">
                         <div class="head-tp mt-20">Stardom starts with one scene</div>
@@ -240,7 +234,7 @@
                     {% if not user.is_authenticated %}
 
                         <li class="nav-item">
-                            <a id="showcase_non_clickable" class="nav-link" href="">SHOWCASE</a>
+                            <a id="showcase_non_clickable" class="nav-link-non-clickable" href="">SHOWCASE</a>
                         </li>
                         <li class="nav-item">
                             <a id="screeing_room_non_clickable" class="nav-link-non-clickable" href="">SCREENING ROOM</a>
@@ -274,9 +268,23 @@
                                 </div>
                             </div>
                         </div>
-
-
-                        <!-- The Modal -->
+                        <!-- The Login Modal -->
+                        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                                            <button type="button" id="modalClose2" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body" style="text-align:center;">
+                                        <p>Login to use this service !</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"  id="modalClose3">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                     {% endif %}
 
@@ -507,6 +515,10 @@ $("a[class='nav-link-non-clickable']").click(function () {
         return false;
 });
 
+$("#showcase_non_clickable").click(function () {
+        $('#loginModal').modal('show');
+        return false;
+});
 
     $(function () {
         $('#modalClose').on('click', function () {
@@ -520,6 +532,20 @@ $("a[class='nav-link-non-clickable']").click(function () {
 
         })
     })
+    $(function () {
+        $('#modalClose2').on('click', function () {
+            $('#loginModal').modal('hide');
+
+        })
+    })
+    $(function () {
+        $('#modalClose3').on('click', function () {
+            $('#loginModal').modal('hide');
+
+        })
+    })
+
+
 
 </script>
 <script>
