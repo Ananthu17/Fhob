@@ -23,11 +23,12 @@
             });
     });
     // decline crew attach request
-    $('body').on('click' , '.decline_crew_request', function(){
+    $('body').on('click' , '.decline_crew_request', function(e){
         var crew_id = $(this).attr('id');
         var token = $("#token").val();
         var notification_id = "#crew-attach-req-btns-"+crew_id
         var data_dict = {}
+        e.stopPropagation();
         if(crew_id){
             data_dict['id'] = crew_id;
         }
@@ -51,13 +52,14 @@
     });
 
     // accept crew attach request
-    $('body').on('click' , '.accept_crew_attach_request', function(){
+    $('body').on('click' , '.accept_crew_attach_request', function(e){
         var crew_id = $(this).attr("id");
         var token = $("#token").val();
         var data_dict = {};
         data_dict['id'] = crew_id;
         var notification_id = "#crew-attach-req-btns-"+crew_id
         console.log(data_dict)
+        e.stopPropagation();
         $.ajax
         ({
             type: "POST",

@@ -23,12 +23,13 @@
                 }
             });
     });
-    $('body').on('click' , '.decline_cast_request', function(){
+    $('body').on('click' , '.decline_cast_request', function(e){
         var character_id = $(this).attr('id');
         var token = $("#token").val();
         var notification_id = "#cast-attach-req-btns-"+character_id
         var data_dict = {}
         data_dict['type'] = 'decline';
+        e.stopPropagation();
         if(character_id){
             data_dict['character_id'] = character_id;
         }
@@ -51,12 +52,13 @@
             });
     });
 
-    $('body').on('click' , '.accept_cast_attach_request', function(){
+    $('body').on('click' , '.accept_cast_attach_request', function(e){
         var character_id = $(this).attr("id");
         var token = $("#token").val();
         var data_dict = {};
         data_dict['character_id'] = character_id;
         var notification_id = "#cast-attach-req-btns-"+character_id
+        e.stopPropagation();
         console.log(data_dict)
         $.ajax
         ({
