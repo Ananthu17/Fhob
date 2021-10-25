@@ -1,5 +1,39 @@
 
 {% load static %}
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+
+                <a href="{{ from_user.get_profile_url }}"
+                id ="{{notification_id}}" class="notification_link">
+                    {% if from_user.get_profile_photo %}
+                    <img src="{{ from_user.get_profile_photo }}" class="mm-round-img" />
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                <a href="{{ from_user.get_profile_url }}"
+                id ="{{notification_id}}" class="notification_link remove-decoration msg-txt-color">
+                {{ message }}
+                </a>
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+<!-- 
 
 <div class="row unread_notification">
     <div  class="col-2">
@@ -14,7 +48,7 @@
     <div class="col-10 ">
         {{ message }}<br>
         <b>{{ from_user.get_membership_display }}</b><br>
-
+ -->
     </div>
 </div>
 

@@ -1,7 +1,54 @@
 {% load static %}
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
 
+                <a href="{{ notification.from_user.get_profile_url }}"
+                id ="{{notification.id}}" class="notification_link">
+                    {% if notification.from_user.get_profile_photo %}
+                    <img src="{{ notification.from_user.get_profile_photo }}" class="mm-round-img" />
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ notification.from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                {% if notification.notification_type == 'comments_mention' %}
+                    <a href="{{ notification.from_user.get_profile_url }}"
+                   id ="{{notification.id}}" class="mm-notf-tag notification_link">
+                    {{notification.from_user.get_full_name}}
+                    </a> mentioned you in project <a href="{% url 'project:video' notification.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{notification.id}}">{{notification.project.title}}</a>'s video.
+                {% elif notification.notification_type == 'comments' %}
+                    <a href="{{ notification.from_user.get_profile_url }}"
+                    id ="{{notification.id}}" class="mm-notf-tag notification_link">
+                    {{notification.from_user.get_full_name}}
+                    </a> commented on your project <a href="{% url 'project:video' notification.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{notification.id}}">{{notification.project.title}}</a>'s video.
+                {% elif notification.notification_type == 'comments_reply' %}
+                    <a href="{{ notification.from_user.get_profile_url }}"
+                    id ="{{notification.id}}" class="mm-notf-tag notification_link">
+                    {{notification.from_user.get_full_name}}
+                    </a> replied to your comment on project <a href="{% url 'project:video' notification.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{notification.id}}">{{notification.project.title}}</a>'s video.
+                {% endif %}
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
 
-    <div class="row unread_notification">
+    <!-- <div class="row unread_notification">
         <div  class="col-2">
             <a href="{{ notification.from_user.get_profile_url }}"
             target="_blank" id ="{{notification.id}}" class="notification_link">
@@ -38,5 +85,5 @@
             <b>{{ notification.from_user.get_membership_display }}</b><br>
             Now
         </div>
-    </div>
+    </div> -->
 

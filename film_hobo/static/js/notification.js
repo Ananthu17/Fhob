@@ -24,10 +24,13 @@ notificationSocket.onmessage = function (e) {
         },
         error: function(data){},
         success: function(response){
-            $('.notification-bell').html(
-                '<span class="notification_count_span">'+response['unread_count']+'</span>'
-                )
-        }
+            console.log("response['unread_count']", response['unread_count'])
+            if(response['unread_count']!=0){
+                    $('.notification-bell').html(
+                        '<span class="mm-icon-button__badge">'+response['unread_count']+'</span>'
+                        )
+                }
+            }
     });
     $.ajax
     ({
@@ -41,11 +44,13 @@ notificationSocket.onmessage = function (e) {
         },
         error: function(data){},
         success: function(response){
-            console.log("count: ",response['unread_msg_count'])
-            $('.message-notification').html(
-                '<span class="mm-icon-button__badge">'+response['unread_msg_count']+'</span>'
-                );
-            $('.message_count').html("("+response['unread_msg_count']+")");
+            if(response['unread_msg_count']!=0){
+                console.log("count: ",response['unread_msg_count'])
+                    $('.message-notification').html(
+                        '<span class="mm-icon-button__badge">'+response['unread_msg_count']+'</span>'
+                        );
+                    $('.message_count').html("("+response['unread_msg_count']+")");
+                }
         }
     });
     let data = JSON.parse(e.data);
@@ -360,7 +365,7 @@ $('body').on('click' , '.notification_link', function(){
                     $('.notification-bell').html("");
                     if(response['unread_count']!=0){
                         $('.notification-bell').html(
-                            '<span class="notification_count_span">'+response['unread_count']+'</span>'
+                            '<span class="mm-icon-button__badge">'+response['unread_count']+'</span>'
                             )
                     }
                 }

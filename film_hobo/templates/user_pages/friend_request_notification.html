@@ -1,7 +1,45 @@
 
 {% load static %}
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
 
-<div class="row unread_notification">
+                <a href="{{ from_user.get_profile_url }}"
+                id ="{{notification_id}}" class="notification_link">
+                    {% if from_user.get_profile_photo %}
+                    <img src="{{ from_user.get_profile_photo }}" class="mm-round-img" />
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                <span id="friend-req-btns-{{from_user.id}}">
+                    {{ from_user.get_full_name }} send you friend request.<br>
+                    <!-- <span class="btn-blue cursor-pointer accept_friend_request" id="{{from_user.id}}">Accept</span>
+                    <span class="btn-grey  cursor-pointer delete_friend_request" id="{{from_user.id}}">Delete</span> -->
+                    <div class="mm-notf-msg-btn-sec">
+                        <span class="btn mm-notf-msg-ad-btn accept_friend_request" id="{{from_user.id}}">Accept</span>
+                        <span class="btn mm-notf-msg-dlt-btn delete_friend_request" id="{{from_user.id}}">Delete</span>
+                    </div>
+                </span>
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+
+<!-- <div class="row unread_notification">
     <div  class="col-2">
         <a href="{{ from_user.get_profile_url }}"
          target="_blank" id ="{{notification_id}}" class="notification_link">
@@ -18,6 +56,6 @@
         <span class="btn-grey  cursor-pointer delete_friend_request" id="{{from_user.id}}">Delete</span>
 
     </div>
-</div>
+</div> -->
 
 

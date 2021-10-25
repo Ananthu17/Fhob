@@ -1,5 +1,36 @@
 
 {% load static %}
+
+
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+
+                <a id ="{{notification_id}}" class="notification_link cursor-pointer">
+                    <img src="{% static 'images/FH_Logo.png' %}" class="mm-round-img"/>
+                </a>
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                <a id ="{{notification_id}}" class="cursor-pointer notification_link remove-decoration msg-txt-color">
+                {{message}}
+                </a>
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+
+
 <a class="notification_link">
 <div class="row unread_notification">
     <div  class="col-2">

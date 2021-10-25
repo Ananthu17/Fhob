@@ -446,8 +446,9 @@
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-red-post-align">
                                     <span class="sgl-post-red-tag">
+                                        {% if request.user == project.creator %}
                                         <a class=" cursor-pointer" title="Publish Video" data-toggle="modal" data-target="#post_video">POST VIDEO</a>
-
+                                        {% endif %}
 <!-- The Modal -->
 <div class="modal fade" id="video_player_modal">
     <div class="modal-dialog">
