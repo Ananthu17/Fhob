@@ -465,3 +465,31 @@ class ReportVideo(models.Model):
     class Meta:
         verbose_name = 'Report Video'
         verbose_name_plural = 'Report Video'
+
+
+class ProjectVideoLikeAndDislike(models.Model):
+    LIKE = 'like'
+    DISLIKE = 'dislike'
+    LIKE_OR_DISLIKE_CHOICES = [
+                                (LIKE, 'Like'),
+                                (DISLIKE, 'Dislike'),
+                                ]
+    user = models.ForeignKey('hobo_user.CustomUser',
+                             verbose_name=_("Submitted by"),
+                             on_delete=models.CASCADE,
+                             related_name='video_like_dislike_by_user',
+                             null=True, blank=True)
+    project = models.ForeignKey('hobo_user.Project',
+                                verbose_name=_("Project"),
+                                on_delete=models.CASCADE)
+    like_or_dislike = models.CharField(_("Like or Dislike"),
+                                       choices=LIKE_OR_DISLIKE_CHOICES,
+                                       max_length=150,
+                                       default=LIKE)
+
+    def __str__(self):
+        return str(self.user.get_full_name())
+
+    class Meta:
+        verbose_name = 'Project Video Like And Dislike'
+        verbose_name_plural = 'Project Video Likes And Dislikes'

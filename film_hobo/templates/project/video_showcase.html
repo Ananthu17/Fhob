@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load rest_framework %}
+{% load static %}
+{% load user_account_tag %}
+
+{% block extracss %}
+<style>
+    #player.vp-title
+    {
+        visibility:hidden!important;
+        display:none!important;
+    }
+    .vp-title-header
+    {
+    visibility:hidden!important;
+    display:none!important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrapper flex-grow-1">
+    <!-- Top nav End  -->
+
+    <div class="wrapper flex-grow-1">
+        <div class="container-fluid">
+            <div class="video-center-row ml-1 mr-1">
+                <div class="row ">
+
+                    <!-- Center column  -->
+
+                    <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3">
+                        <div class="vdo-menu-bg">
+                            <ul class="video-menu">
+                                <li><span class="video-menu-head">PROJECT </span><a href="">#{{project.id}}</a></li>
+                                <li><span class="fnt-weight">Title: </span><span class="vdo-details-blue txt-uppercase">{{project.title}}</span></li>
+                                <li><span class="fnt-weight">Format: </span><span class="vdo-details-blue txt-uppercase">{{project.get_format_display}}</span></li>
+                                <li><span class="fnt-weight">Genre: </span><span class="vdo-details-blue txt-uppercase">{{project.get_genre_display}}</span></li>
+                            </ul>
+
+                        </div>
+                        <div class="row align-row">
+                            <div class="col-md-9 ">
+                                <div class="video-frame">
+                                    {% if project.video_type == 'vimeo' %}
+                                        <iframe src="https://player.vimeo.com/video/{{ project.video_url }}?byline=false&dnt&portrait=false&title=false&loop=true" width="100%" height="100%"
+                                        data-show-text="false" frameborder="0"  allowfullscreen class=" video-img"></iframe>
+                                        <img src=""/>
+                                    {% elif project.video_type == 'youtube' %}
+                                        <iframe
+                                        src="http://www.youtube.com/embed/{{ project.video_url }}?rel=0&modestbranding=1&loop=1&playlist={{ project.video_url }}&color=white" width="100%" height="100%"
+                                        data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0" class=" video-img"></iframe>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3 left-mode-sec vdo-align">
+                            {% for job_type,team_members in job_types_dict.items %}
+                            <div class="log-vdo-details">
+                                <span class="vdo-detail-txt">
+                                    <span class="vdo-detail-txt-weight">{{job_type}}:</span>
+                                    {% for member in team_members %}
+                                    <br>
+                                    <a class="vdo-details-blue">{{member.user.get_full_name}}</a>
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            {% endfor %}
+                         </div>
+                        </div>
+
+                        <!-- video player End   -->
+
+                        <div class="share-sec">
+                            <div class="share-alg">
+                                <a href="#" class="mem-blu-link">S<span class="share-small-f">HARE</span></a>
+                            </div>
+                            <div class="like-dislike-btn">
+                                <span><a class="like_video cursor-pointer remove-decoration" id="{{project.id}}">
+                                    {% if like_obj.like_or_dislike == 'like' %}
+                                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                    {% else %}
+                                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                    {% endif %}
+                                </a> {{project.likes}}
+                                </span>
+                                <span><a class="dislike_video cursor-pointer remove-decoration" id="{{project.id}}">
+                                    {% if like_obj.like_or_dislike == 'dislike' %}
+                                    <i class="fa fa-thumbs-down" aria-hidden="true"></i>
+                                    {% else %}
+                                    <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                                    {% endif %}
+                                </a> {{project.dislikes}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Like Dislike section End   -->
+
+                        <!-- <div class="card dis-card mt-3">
+                            <div class="">
+                                <div class="dis-head">
+                                    Discussion Board
+                                </div>
+                            </div>
+                        </div> -->
+
+                    </div>
+
+                    <!-- Center column End -->
+
+                <!-- right coloumn  -->
+
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+                    </div>
+
+                    <!-- right column End -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer  -->
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $(".top_rated_members").click(function(){
+      return false;
+  });
+
+// like video
+  $('body').on('click' , '.like_video', function(){
+            var project_id = $(this).attr("id");
+            var token = $("#token").val();
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/like-project-video-api/",
+                dataType: 'json',
+                async: false,
+                data: {"id":project_id},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                }
+            });
+
+        });
+// dislike video
+  $('body').on('click' , '.dislike_video', function(){
+            var project_id = $(this).attr("id");
+            var token = $("#token").val();
+
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/dislike-project-video-api/",
+                dataType: 'json',
+                async: false,
+                data: {"id":project_id},
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                }
+            });
+
+        });
+</script>
+{% endblock %}

@@ -27,7 +27,8 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
      AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
      GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI, \
-     GetUserInterestNotificationAjaxView, ReportVideoAPI
+     GetUserInterestNotificationAjaxView, ReportVideoAPI, ShowcaseVideoView, \
+     LikeProjectVideoView, DislikeProjectVideoView
 
 
 urlpatterns = [
@@ -202,4 +203,10 @@ urlpatterns = [
           name='get-user-interest-notification-html'),
      path('report-video-api/', ReportVideoAPI.as_view(),
           name='report-video-api'),
+     path('showcase-video/<int:id>/', ShowcaseVideoView.as_view(),
+          name='showcase-video'),
+     path('like-project-video-api/', LikeProjectVideoView.as_view(),
+          name='like-project-video-api'),
+     path('dislike-project-video-api/', DislikeProjectVideoView.as_view(),
+          name='dislike-project-video-api'),
     ]

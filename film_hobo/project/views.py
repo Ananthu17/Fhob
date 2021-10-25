@@ -1,6 +1,7 @@
 import ast
 import io
 import json
+from django.db.models.deletion import PROTECT
 import requests
 # import boto3
 # import datetime
@@ -51,7 +52,7 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, ReportVideo, SceneImages, Sides, \
     ProjectTracking, ProjectRating, \
-    AttachedCrewMember
+    AttachedCrewMember, ProjectVideoLikeAndDislike
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
@@ -4531,6 +4532,152 @@ class ReportVideoAPI(APIView):
             response = {'mesage': "Video Reported", 'status':
                         status.HTTP_200_OK}
             messages.success(self.request, "Video Reported")
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ShowcaseVideoView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/video_showcase.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+
+        job_types_dict = {}
+        team_members = Team.objects.filter(project=project_id)
+        for team_member in team_members:
+            if team_member.job_type in job_types_dict:
+                job_types_dict[team_member.job_type].append(team_member)
+            else:
+                job_types_dict[team_member.job_type] = []
+                job_types_dict[team_member.job_type].append(team_member)
+        context["job_types_dict"] = job_types_dict
+
+        like_obj = ProjectVideoLikeAndDislike.objects.filter(
+                                Q(user=self.request.user) &
+                                Q(project=project)
+                            ).first()
+        context['like_obj'] = like_obj
+        return context
+
+
+class LikeProjectVideoView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['id']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    obj = ProjectVideoLikeAndDislike.objects.get(
+                        Q(project=project) &
+                        Q(user=user)
+                    )
+                    if obj.like_or_dislike == ProjectVideoLikeAndDislike.DISLIKE:
+                        obj.user = user
+                        obj.project = project
+                        obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
+                        obj.save()
+                        response = {'mesage': "Video liked", 'status':
+                                    status.HTTP_200_OK}
+                        messages.success(self.request, "You liked this video.")
+                    else:
+                        obj.delete()
+                        response = {'mesage': "Like Removed", 'status':
+                                    status.HTTP_200_OK}
+                except ProjectVideoLikeAndDislike.DoesNotExist:
+                    obj = ProjectVideoLikeAndDislike()
+                    obj.user = user
+                    obj.project = project
+                    obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
+                    obj.save()
+                    response = {'mesage': "Video liked", 'status':
+                                status.HTTP_200_OK}
+                    messages.success(self.request, "You liked this video.")
+                project.likes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
+                                ).count()
+                project.dislikes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE)
+                                ).count()
+                project.save()
+            except Project.DoesNotExist:
+                response = {'error': "Invalid ID", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DislikeProjectVideoView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['id']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    obj = ProjectVideoLikeAndDislike.objects.get(
+                        Q(project=project) &
+                        Q(user=user)
+                    )
+                    if obj.like_or_dislike == ProjectVideoLikeAndDislike.LIKE:
+                        obj.user = user
+                        obj.project = project
+                        obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
+                        obj.save()
+                        response = {'mesage': "Video disliked", 'status':
+                                    status.HTTP_200_OK}
+                        messages.success(self.request, "You disliked this video.")
+                    else:
+                        obj.delete()
+                        response = {'mesage': "Dislike Removed", 'status':
+                                    status.HTTP_200_OK}
+                except ProjectVideoLikeAndDislike.DoesNotExist:
+                    obj = ProjectVideoLikeAndDislike()
+                    obj.user = user
+                    obj.project = project
+                    obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
+                    obj.save()
+                    response = {'mesage': "Video disliked", 'status':
+                                status.HTTP_200_OK}
+                    messages.success(self.request, "You disliked this video.")
+                project.likes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
+                                ).count()
+                project.dislikes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE)
+                                ).count()
+                project.save()
+
+            except Project.DoesNotExist:
+                response = {'error': "Invalid ID", 'status':
+                            status.HTTP_200_OK}
         else:
             print(serializer.errors)
             response = {'errors': serializer.errors, 'status':

@@ -726,6 +726,7 @@ class Project(models.Model):
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
     likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
