@@ -207,7 +207,7 @@
             <!-- Center section  End-->
             <!-- Right section -->
 
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
+            <div id="showcase_top_memebers" class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
             </div>
             <!-- Right section  End-->
         </div>
@@ -218,8 +218,13 @@
 
 {% block extrajs %}
 <script>
+    $(".top_rated_members").click(function(){
+        return false;
+    });
+
     $("static dynamic-children a.menu-item").click(function(){
         return false;
     });
 </script>
+
 {% endblock %}
