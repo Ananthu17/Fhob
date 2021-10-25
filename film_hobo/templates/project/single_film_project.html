@@ -38,7 +38,7 @@
                                 {% endif %}
 
                             </li>
-                            <li class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
+                            <li id="share-link" data-toggle="modal" data-target="#sharing_modal" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                             </li>
                             <li class="mt-1"><a data-toggle="modal" data-target="#rating_modal" class="cursor-pointer red-f log-fnt-weight">R<span class="mem-small-f">ATE THIS</span> P<span
                                 class="mem-small-f">ROJECT</span></a>
@@ -47,6 +47,46 @@
                                         <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
                                     </div>
                                 </div>
+
+
+<!-- The Sharing Modal -->
+<!-- Modal End -->
+
+<!-- Share Modal Start -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content col-12">
+            <div class="modal-header">
+                <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 email-id-row">
+                    <span class="to-input">To</span>
+                        <div id="all_mail" class="all-mail">
+                        </div>
+                       
+                    
+                     
+                        <select class="form-control" name="languageSelect" multiple id="languageSelect">
+                            {% for friend in friends %}
+                            <option value="{{friend.id}}" >{{friend}} </option>
+                                {% endfor %}
+                        </select>
+                        <div class="modal-footer">
+                            <button id="url_send" type="submit" class="btn btn-primary">Send</button>
+                            <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                        </div>
+                   
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+
 <!-- The Modal -->
 <div class="modal fade" id="rating_modal">
     <div class="modal-dialog">
@@ -695,7 +735,30 @@
 {% endblock %}
 
 {% block extrajs %}
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
+<link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
+
+
+
+
 <script src="{% static 'js/project-rating.js' %}"></script>
+
+
+
+
+<script>
+    jQuery('#languageSelect').multiselect({
+    columns: 1,
+    placeholder: 'Select Users',
+    search: true,
+    selectAll: true
+});
+</script>
+
 <script type="text/javascript">
 
 $('body').on('change' , '#video_type', function(){

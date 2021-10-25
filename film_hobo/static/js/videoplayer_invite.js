@@ -2,7 +2,7 @@ origin_url = window.location.origin
 
 $('#share-link').click(function (event) {
     var modal = $("#shareModal")
-    var title = "Share with"
+    var title = "Share with Friends"
     modal.find('.modal-title').text(title)
     $("#shareModal").modal('show');
 });
@@ -98,7 +98,7 @@ $('#url_send').click(function (event) {
 
 
 $('#cancel_url').click(function (event) {
-
+    alert("ggggggggggggggggggg")
     console.log(response);
     $("#shareModal").modal('hide');
 }, (error) => {
