@@ -410,7 +410,7 @@ class GetProjectRatingNotificationAjaxView(View, JSONResponseMixin):
 
 
 class GetUserInterestNotificationAjaxView(View, JSONResponseMixin):
-    template_name = 'project/cast_attach_response_notification.html'
+    template_name = 'project/user_interest_notification.html'
 
     def get(self, *args, **kwargs):
         context = dict()
@@ -419,7 +419,7 @@ class GetUserInterestNotificationAjaxView(View, JSONResponseMixin):
                             Q(notification_type=UserNotification.USER_INTEREST)
                             ).order_by('-created_time').first()
         notification_html = render_to_string(
-                                'project/cast_attach_response_notification.html',
+                                'project/user_interest_notification.html',
                                 {'notification': notification
                                 })
         context['notification_html'] = notification_html
@@ -688,7 +688,7 @@ class CharacterCreateAPIView(APIView):
                         notification = UserNotification()
                         notification.user = user
                         notification.notification_type = UserNotification.USER_INTEREST
-                        notification.project =  project
+                        notification.project = project
                         notification.from_user = project.creator
                         notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
                         notification.save()

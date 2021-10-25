@@ -1,0 +1,38 @@
+{% load static %}
+<li class="mm-notf-grid-col-read">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+
+                <a href="{% url 'hobo_user:friends-and-followers' %}"
+                id ="{{notification.id}}" class="notification_link">
+                    {% if notification.project.video_cover_image %}
+                    <img src="{{ notification.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif notification.project.creator.get_profile_photo %}
+                    <img src="{{ notification.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ notification.from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                <a href="{% url 'hobo_user:friends-and-followers' %}"
+                id ="{{notification.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{notification.message|safe}}
+                </a>
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+               Now
+            </div>
+        </div>
+    </div>
+</li>
+
+

@@ -825,3 +825,8 @@ input.pw {
    {
      color:orangered;
    }
+
+.mm-notf-tag{
+    color : #1637f9!important;
+    text-decoration: underline;
+ }

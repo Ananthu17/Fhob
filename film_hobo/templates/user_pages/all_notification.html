@@ -51,7 +51,7 @@
                     {% endif %}
                 </a>
             {% elif obj.notification_type == 'comments_mention' %}
-                <a href="{{ notification.from_user.get_profile_url }}"
+                <a href="{{ obj.from_user.get_profile_url }}"
                 id ="{{obj.id}}" class="notification_link">
                     {% if obj.from_user.get_profile_photo %}
                     <img src="{{ obj.from_user.get_profile_photo }}" class="mm-round-img"/>
@@ -62,7 +62,9 @@
             {% elif obj.notification_type == 'user_interest' %}
                 <a href="{% url 'hobo_user:friends-and-followers' %}"
                 id ="{{obj.id}}" class="notification_link">
-                    {% if obj.from_user.get_profile_photo %}
+                    {% if obj.project.video_cover_image %}
+                    <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif obj.from_user.get_profile_photo %}
                     <img src="{{ obj.from_user.get_profile_photo }}" class="mm-round-img"/>
                     {% else %}
                     <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
@@ -91,7 +93,10 @@
             <div class="mm-notf-msg-sec">
                 <!-- Loura Petrosyan rated you as a director 4 stars, <a href="" class="mm-notf-tag">Project #244</a> -->
                 {% if obj.notification_type == 'tracking' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                     {{ obj.from_user.get_full_name }} started tracking you
+                    </a>
                 {% elif obj.notification_type == 'friend_request' %}
                     <span id="friend-req-btns-{{obj.from_user.id}}">
                         {{ obj.from_user.get_full_name }} send you friend request.
@@ -130,33 +135,57 @@
                             </div>
                         </span>
                 {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response'  %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                         {{obj.message|safe}}
+                        </a>
                 {% elif obj.notification_type == 'user_interest'  %}
+                    <a href="{% url 'hobo_user:friends-and-followers' %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                         {{obj.message|safe}}
+                    </a>
                 {% elif obj.notification_type == 'accepted_friend_request' %}
                     <a href="{{ obj.from_user.get_profile_url }}"
                     id ="{{obj.id}}"
-                    class="notification_link remove-decoration msg-txt-color" id ="{{obj.id}}">
+                    class="notification_link remove-decoration msg-txt-color">
                         {{ obj.from_user.get_full_name }} accepted your friend request.
                     </a>
                 {% elif obj.notification_type == 'user_rating' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                         {{obj.message}}
+                    </a>
                 {% elif obj.notification_type == 'invite' %}
                         {{obj.message}}<br><a href={{obj.invite_url}}
                         class="mm-notf-tag notification_link" id ="{{obj.id}}">Click here to view</a>
                         {{obj.inviteurl}}
                 {% elif obj.notification_type == 'membership_change' %}
-                    <b>{{obj.message}}</b><br>
-                    <b>FilmHobo</b>
+                    <a id ="{{obj.id}}" class="cursor-pointer notification_link remove-decoration msg-txt-color"></a>
+                        <b>{{obj.message}}</b><br>
+                        <b>FilmHobo</b>
+                    </a>
                 {% elif obj.notification_type == 'project_tracking' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                         {{obj.message}}
+                    </a>
                 {% elif obj.notification_type == 'audition_status' %}
+                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
                     {{obj.message|safe}}
+                    </a>
                 {% elif obj.notification_type == 'video_rating' %}
-                    {{obj.message}}
+                    <a href="{% url 'project:video' obj.project.id %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{obj.message|safe}}
+                    </a>
                 {% elif obj.notification_type == 'project_rating' %}
-                    {{obj.from_user.get_full_name}} rated your project <a href="{% url 'project:single-film-project' obj.project.id %}"
-                    class="mm-notf-tag notification_link" id ="{{obj.id}}">{{obj.project.title}}</a> as {{obj.rating|floatformat:0}} stars
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{obj.from_user.get_full_name}} rated your project
+                    </a>
+                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                    class="mm-notf-tag notification_link" id ="{{obj.id}}"> {{obj.project.title}}</a> as {{obj.rating|floatformat:0}} stars
                 {% elif obj.notification_type == 'comments_mention' %}
                     <a href="{{ obj.from_user.get_profile_url }}"
                     id ="{{obj.id}}" class="notification_link mm-notf-tag">
