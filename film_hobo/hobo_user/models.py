@@ -681,9 +681,6 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    # team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
-    #                               related_name='project_team',
-    #                               blank=True)
     script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
