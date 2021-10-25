@@ -39,8 +39,8 @@
             border-bottom:1px solid#9c9c9c!important;
         }
         .select2-container .select2-selection--single {
-            height:19px!important; 
-            
+            height:19px!important;
+
             }
         .select2-container--default .select2-selection--single .select2-selection__rendered
             {
@@ -49,10 +49,10 @@
         .select2-container--default .select2-selection--single .select2-selection__arrow
             {
             height:15px;
-          
+
         }
         .star-rating__ico{
-           
+
             padding-left: 2px;
             cursor: pointer;
             color: #FFB300;
@@ -85,13 +85,13 @@
         cursor: pointer;
         }
 
-        
+
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
-    
+
     </style>
-    
+
     </head>
     <div class="wrapper flex-grow-1">
         <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
@@ -101,12 +101,12 @@
                 <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
                     <div class="left-mode-sec mb-2 pl-3 pr-3 h-100">
 
-                        <div class="row pt-1">
+                        <!-- <div class="row pt-1">
                             <div class="col-12">
                                 <a href="" class="prjct-log-link  float-right">EDIT</a>
                             </div>
-                        </div>
-                        
+                        </div> -->
+
                         <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">PROJECT TITLE:</label>
@@ -129,23 +129,23 @@
                                 </div>
                             </div>
                         </div>
-                       
-                        <div class="row">
+
+                        <!-- <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
                             </div>
                             <div class="col-6">
-                                
+
                                 {{form.creator}}
                             </div>
-                        </div>
-
-                        <div class="row">
+                        </div> -->
+                        <input type="hidden" value="{{ user.id }}" name="creator">
+                        <!-- <div class="row">
                             <div class="col-2">
                                 <label class="form-title mem-setup-blu-f">WRITER:</label>
                             </div>
                             <div class="col-6">
-                               
+
                                 {{writerform.name}}
                             </div>
 
@@ -154,7 +154,7 @@
                                 <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER WRITER</a>
                             </div>
                             {% endif %}
-                        </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-md-2 col-sm-12">
@@ -222,11 +222,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                
+
+
                                 <!-- The Modal -->
-                  
-        
+
+
                                 {% endif  %}
                             </div>
                         </div>
@@ -237,7 +237,7 @@
                             </div>
                             <div class="col-6">
                                 {{form.number_of_pages}}
-                               
+
                             </div>
                         </div>
 
@@ -272,7 +272,7 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">SCI-FI&nbsp; 
+                                    <label class="containerradio bold">SCI-FI&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="21">
                                         <span class="checkmarkagree"></span>
                                     </label>
@@ -295,7 +295,7 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                
+
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="18">
@@ -303,12 +303,12 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold" >LGBTQ 
+                                    <label class="containerradio bold" >LGBTQ
                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="15">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline"> 
+                                <div class="form-check form-check-inline">
                                     <label class="containerradio bold " style="margin:left 7px;">MUSICAL &nbsp;&nbsp;
                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="17">
                                         <span class="checkmarkagree"></span>
@@ -326,16 +326,16 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                               
-                               
+
+
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">WAR / MILITARY
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="16">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                              
-                                
+
+
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="3">
@@ -365,29 +365,41 @@
 
                         <div class="row">
                             <div class="col-2 ">
-                                <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
+                                <label class="form-title mem-setup-blu-f"><br>CAST PAY RATE:</label>
                             </div>
-                            <div class=" containercheck"> 
+                            <!-- <div class=" containercheck">
                                 <div class="checkboxnew" style="margin-left: 1.2em; margin-top: 1em; ">
                                    <input type="checkbox" style="border: 1px solid #f32121 ;" id="checkbox1" name="checkbx" value="0">
                                         <label for="checkbox1" style="font-weight: bolder;font-size: 17px;">
                                             <span><b>$ 0</b></span>
                                         </label>
-                                
+
                                    <input type="checkbox" style="margin-left: 1.2em;" id="checkbox2" name="checkbx" value="1">
                                         <label for="checkbox2" style="font-weight: bolder; font-size: 13px;">
                                             <span>NEGOTIABLE</span>
                                         </label>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- </div>
 
                             <div class="row"> -->
-                            <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
-                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
-                             <!-- </div>
-                            <div class="col-md-10 col-sm-6 mt-3"> -->
+                            <!-- <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
+                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
+                             <!-- </div> -->
+                            <div class="col-md-10 col-sm-6 mt-3">
                                 {{form.sag_aftra}}
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;">$ 0
+                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)" value="0" required>
+                                        <span class="checkmarkagree" style="margin-top: 0.3em;"  ></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Negotiable
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="1" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">Ultra Low
                                         <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="2" required>
@@ -479,7 +491,7 @@
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.visibility_password  }}
                                         <i class="bi bi-eye-slash" id="togglePassword1"></i>
-                                        
+
                                     </div>
                                 </form>
                             </div>
@@ -495,7 +507,7 @@
                             <div class="col-6">
                                 <br><select class=" inp-line  modal-location" id ="location_1"
                                 name="location" required >
-                               
+
                                 {% for item in form.location %}
 
                                 {{item}}
@@ -522,7 +534,7 @@
                             <div class="col-md-9 mt-3">
                                 {{form.cast_samr}}
                                 <div class="form-check-inline">
-                                    <div class="cast-star-rating1"> 
+                                    <div class="cast-star-rating1">
                                         <label class="containerradio bold">Indie
                                                 <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                                 <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
@@ -536,7 +548,7 @@
                                     </div>
                                 </div>
                                 <div class="form-check-inline">
-                                        <div class="cast-star-rating2"> 
+                                        <div class="cast-star-rating2">
                                             <label class="containerradio bold">Pro
                                                     <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                                     <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
@@ -550,7 +562,7 @@
                                         </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <div class="cast-star-rating3"> 
+                                    <div class="cast-star-rating3">
                                         <label class="containerradio bold">Indie & Pro
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
@@ -561,7 +573,7 @@
                                             <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)" value="10">
                                             <span class="checkmarkagree"></span>
                                       </label>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -587,8 +599,8 @@
                                     </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <div class="crew-star-rating2"> 
-                                        <label class="containerradio bold">Pro 
+                                    <div class="crew-star-rating2">
+                                        <label class="containerradio bold">Pro
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
@@ -601,7 +613,7 @@
                                     </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <div class="crew-star-rating3"> 
+                                    <div class="crew-star-rating3">
                                         <label class="containerradio bold">Indie & Pro
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
                                             <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
@@ -612,7 +624,7 @@
                                             <input type="radio" name="radiorow8"   id="crew3" onclick="selectsamr(this)" value="11">
                                             <span class="checkmarkagree"></span>
                                         </label>
-                                    </div>    
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1129,23 +1141,23 @@ Cw_SetRatingStar3();
 
 
 
-// the selector will match all input controls of type :checkbox
-// and attach a click event handler 
-$("input:checkbox").on('click', function() {
-  // in the handler, 'this' refers to the box clicked on
-  var $box = $(this);
-  if ($box.is(":checked")) {
-    // the name of the box is retrieved using the .attr() method
-    // as it is assumed and expected to be immutable
-    var group = "input:checkbox[name='checkbx']";
-    // the checked state of the group/box on the other hand will change
-    // and the current value is retrieved using .prop() method
-    $(group).prop("checked", false);
-    $box.prop("checked", true);
-  } else {
-    $box.prop("checked", false);
-  }
-});
+// // the selector will match all input controls of type :checkbox
+// // and attach a click event handler 
+// $("input:checkbox").on('click', function() {
+//   // in the handler, 'this' refers to the box clicked on
+//   var $box = $(this);
+//   if ($box.is(":checked")) {
+//     // the name of the box is retrieved using the .attr() method
+//     // as it is assumed and expected to be immutable
+//     var group = "input:checkbox[name='checkbx']";
+//     // the checked state of the group/box on the other hand will change
+//     // and the current value is retrieved using .prop() method
+//     $(group).prop("checked", false);
+//     $box.prop("checked", true);
+//   } else {
+//     $box.prop("checked", false);
+//   }
+// });
 
 // sHOWING MOdal
 $('input:radio[id="pilt"]').change(function() {

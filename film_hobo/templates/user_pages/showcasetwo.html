@@ -276,7 +276,9 @@
                                     <div class="swc-img-project-name-txt">
                                         <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
-                                        <span>Team<a href="">#{{project.team}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
                                         <span class="swc-like-sec">
                                             <span class="swc-img-span">
                                                 <img src="{% static 'images/Like-sm.png' %}" alt=""
@@ -349,7 +351,9 @@
                                     <div class="swc-img-project-name-txt">
                                         <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
-                                        <span>Team<a href="">#{{project.team}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
                                         <span class="swc-like-sec">
                                             <span class="swc-img-span">
                                                 <img src="{% static 'images/Like-sm.png' %}" alt=""
@@ -425,7 +429,9 @@
                                     <div class="swc-img-project-name-txt">
                                         <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
-                                        <span>Team<a href="">#{{project.team}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
                                         <span class="swc-like-sec">
                                             <span class="swc-img-span">
                                                 <img src="{% static 'images/Like-sm.png' %}" alt=""
@@ -501,7 +507,9 @@
                                     <div class="swc-img-project-name-txt">
                                         <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
                                                 title="Cart Ride">{{project.title}}</a></span>
-                                        <span>Team<a href="">#{{project.team}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
                                         <span class="swc-like-sec">
                                             <span class="swc-img-span">
                                                 <img src="{% static 'images/Like-sm.png' %}" alt=""
@@ -1235,7 +1243,7 @@
         var project_obj = proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1)
         var project_id = project_obj.split("#").pop();
         var origin_url = window.location.origin
-        var redirect_url = origin_url + '/project/video/' + project_id + '/'
+        var redirect_url = origin_url + '/hobo_user/video/' + project_id + '/'
         window.location.replace(redirect_url);
     });
     $(".hom-name-width-overflow").click(function(){

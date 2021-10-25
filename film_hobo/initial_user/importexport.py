@@ -1,6 +1,6 @@
 from import_export import resources
 
-from .models import InitialIntrestedUsers
+from .models import InitialIntrestedUsers, Designation
 
 
 class InitialIntrestedUsersResource(resources.ModelResource):
@@ -17,3 +17,9 @@ class InitialIntrestedUsersResource(resources.ModelResource):
             destnations.append(designation['title'])
             final_string = ", ".join(destnations)
         return final_string
+
+
+class DesignationResource(resources.ModelResource):
+
+    class Meta:
+        model = Designation

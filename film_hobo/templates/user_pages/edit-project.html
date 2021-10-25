@@ -107,16 +107,16 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
                             </div>
                             <div class="col-6">
                                 {{form.creator}}
                             </div>
-                        </div>
-
-                        <div class="row">
+                        </div> -->
+                        <input type="hidden" value="{{ user.id }}" name="creator">
+                        <!-- <div class="row">
                             <div class="col-2">
                                 <label class="form-title mem-setup-blu-f">WRITER:</label>
                             </div>
@@ -132,7 +132,7 @@
                                 &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" class= "inp-line" id="writerForm" name="new_writer">
                             </div>
                             {% endif %}
-                        </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-md-2 col-sm-12">
@@ -201,15 +201,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                
+
+
                                 <!-- The Modal -->
-                  
-        
+
+
                                 {% endif  %}
                             </div>
                         </div>
-                          
+
 
                         <div class="row">
                             <div class="col-2 ">
@@ -322,7 +322,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-11 mt-2">
                                 <div class="form-check-inline">
                                     <label class="containerradio mem-setup-blu-f">SAG-AFTRA
@@ -338,13 +338,13 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-2 ">
-                                <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
+                                <label class="form-title mem-setup-blu-f" > <br> CAST PAY RATE:</label>
                             </div>
-                            <div class="containercheck"> 
+                            <!-- <div class="containercheck"> 
                                 <div class="checkboxnew" style="margin-left: 1.2em; margin-top: 1em; ">
                                    <input type="checkbox" style="border: 1px solid #f32121 ;" id="checkbox1" name="checkbx" {% if project_obj.cast_pay_rate == 0 %} checked {% endif%}  value="0">
                                         <label for="checkbox1" style="font-weight: bolder;font-size: 17px;">
@@ -356,15 +356,28 @@
                                             <span>NEGOTIABLE</span>
                                         </label>
                                 </div>
-                              </div>
+                              </div> -->
                         <!-- </div>
 
                         <div class="row"> -->
-                            <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; ">
-                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
-                            <!-- </div>
-                            <div class="col-md-10 col-sm-6 mt-3"> -->
+                            <!-- <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; ">
+                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
+                            <!-- </div> -->
+                            <div class="col-md-10 col-sm-6 mt-3">
                                 {{form.sag_aftra}}
+                                <div class="form-check form-check-inline">
+                                    
+                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;  ">$ 0
+                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="2" required>
+                                        <span class="checkmarkagree"  style="margin-top: 0.3em;"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Negotiable
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="2" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">Ultra Low
                                         <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ULB %}checked{% endif%} value="2" required>
@@ -699,29 +712,22 @@
                         <div class="row">
                             <div class="col-3">
                             </div>
-                            <div class="col-md-6 mt-3">
+                            <div class="col-md-8 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold" style="margin-right: 1em;">Private
-                                       
+                                    <label class="containerradio bold" style="margin-right: 2em;">Private
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" {% if project_obj.script_visibility == project_obj.PRIVATE %}checked{% endif%} required>
                                         <span class="checkmarkagree"></span>
                                     </label>
-                               
-                          
-                                    <form class="form-inline">
-                                        <div class="form-group d-none" id="script_password">
-                                            <label for="inputPassword2" class="bold mr-1"  >(Create a Password) </label>
+                                    <div class="flex-row align-items-center d-none" id="script_password" style="width: -webkit-fill-available;">
+                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit; ">(Create a Password) </label>
                                             {{form.script_password}}
-                                        
-                                            <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right: 14em; margin-bottom: 1em;"></i>        
-                                        </div>
-                                    </form>
+                                         <i class="bi bi-eye-slash  ml-0" id="togglePassword2" style="position: relative;left: 145px; bottom: 22px; "></i>        
+                                    </div> 
                                 </div>
                             </div>
-                            <div class="col-2 mt-2 cus-file-upload">
-
-                            </div>
+                        
                         </div>
+                        
                         <!-- {% if mode_operation == 'update' %}
                         <div class="row mt-3">
                             <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER SCRIPT</a> <span
@@ -900,13 +906,13 @@ const togglePassword4 = document.querySelector('#togglePassword4');
 });
 
 // Display Writer Form 
-$(document).ready(function() {
-  $("#formButton").click(function() {
-    $("#writerName").toggle();
-    $("#writerForm").toggle();
+// $(document).ready(function() {
+//   $("#formButton").click(function() {
+//     $("#writerName").toggle();
+//     $("#writerForm").toggle();
     
-  });
-});
+//   });
+// });
 
 $(document).ready(function() {
         $('#location_1').select2();

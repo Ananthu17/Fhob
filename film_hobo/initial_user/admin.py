@@ -4,9 +4,14 @@ from import_export.admin import ImportExportModelAdmin, \
     ImportExportActionModelAdmin
 
 from .models import Designation, InitialIntrestedUsers
-from .importexport import InitialIntrestedUsersResource
+from .importexport import InitialIntrestedUsersResource, DesignationResource
 
-admin.site.register(Designation)
+
+@admin.register(Designation)
+class DesignationAdmin(ImportExportModelAdmin):
+    resource_class = DesignationResource
+
+# admin.site.register(Designation)
 
 
 class InitialIntrestedUsersAdmin(ImportExportModelAdmin,

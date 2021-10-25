@@ -15,7 +15,7 @@
     <div class="container-fluid member-setup-sec">
         <div class="row mb-4">
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 text-center">
-               
+
                 {% if profile.user.id == request.user.id  %}
                 <div class="left-mode-sec p-2">View profile in:
                     <a href="{% url 'hobo_user:edit-profile' %}"
@@ -786,10 +786,10 @@
                     </div>
                     {% endif %}
                     <!-- end applied -->
-                    
+
                     {% endif %}
                 </div>
-                <div class="left-mode-sec p-2 mt-3">
+                <!-- <div class="left-mode-sec p-2 mt-3">
                     <div class="row mem-white-bg">
                                 <div class="col-5 form-group">
                                     <input type="password" class="form-control form-control-input mem-b-placeholder" placeholder="What’s on Your Mind">
@@ -801,7 +801,7 @@
                                     <input type="password" class="form-control form-control-input mem-b-placeholder" placeholder="Messenger">
                                 </div>
                     </div>
-                    </div>
+                </div> -->
                 {% else %}
                 <div class="left-mode-sec pl-2 pb-2 pt-3">
                     <p>Sorry!! You don't have the permission to view {{profile.user.get_full_name}}'s profile</p>

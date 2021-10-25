@@ -69,7 +69,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
                    ProjectSearchView, ShowCase, ReportAProblemWebView, \
                    ShowCaseAPIView, ScreeningProjectUrlSendView, \
-                   ShowCaseSearchView, ShowCaseDateFilterAPI
+                   ShowCaseSearchView, ShowCaseDateFilterAPI, \
+                   VideoPlayer
 
 
 app_name = "hobo_user"
@@ -364,4 +365,5 @@ urlpatterns = [
          name='showcase-search'),
     path('showcase/date/', ShowCaseDateFilterAPI.as_view(),
          name='showcase-date'),
+    path('video/<int:id>/', VideoPlayer.as_view(), name='user_video')
 ]

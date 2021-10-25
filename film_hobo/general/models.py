@@ -67,7 +67,7 @@ class ReportProblem(models.Model):
                             max_length=150, null=True, blank=True)
     user_phone = models.CharField(_("Phone Number"),
                                      max_length=16, null=True,
-                                     unique=True)
+                                      blank=False)
     user_problem = models.TextField(_("User Problem"), blank=True, null=True)
 
     timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,

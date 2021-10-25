@@ -120,7 +120,16 @@
                 </div>
                 <div class="proj-calender-sec  p-2  blank-left-alg-hgt-project ">
                     <div class="add-space d-flex justify-content-center add-space-align">
-                        Ad Space
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2568931363821177"
+                            crossorigin="anonymous"></script>
+                        <!-- 728x90, created 2/23/09 -->
+                        <ins class="adsbygoogle"
+                            style="display:inline-block;width:728px;height:90px"
+                            data-ad-client="ca-pub-2568931363821177"
+                            data-ad-slot="9556686269"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
                 </div>
             </div>
@@ -166,7 +175,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -187,10 +196,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Pages:<a>4</a>
+                                            Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -208,12 +217,12 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            Cast:<a>Female(27),Female(35)</a>
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -266,7 +275,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -287,10 +296,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -308,12 +317,12 @@
                                                     </div>
                                                     <div class="project-line-single-span">
                                                         <span class="proj-format">
-                                                            Team:<a href="">Actor,Director +</a>
+                                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
                                                         <span class="proj-format">
-                                                            Cast:<a>Female(27),Female(35)</a>
+                                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
@@ -367,7 +376,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -386,10 +395,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -407,12 +416,12 @@
                                                     </div>
                                                     <div class="project-line-single-span">
                                                         <span class="proj-format">
-                                                            Team:<a href="">Actor,Director +</a>
+                                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
                                                         <span class="proj-format">
-                                                            Cast:<a>Female(27),Female(35)</a>
+                                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
@@ -465,7 +474,7 @@
                                                 <div class="card proj-card pointer" >
                                                     <div class="project-line">
                                                         <span class="proj-no">
-                                                            Project<a href="">#{{project.id}}</a>
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                                         </span>
                                                         <span class="proj-pay">
                                                             $<a href="">{{project.sag_aftra}}</a>
@@ -484,10 +493,10 @@
                                                     </div>
                                                     <div class="project-line2">
                                                         <span class="proj-title">
-                                                            Title:<a href="">{{project.title}}</a>
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                                         </span>
                                                         <span class="proj-page-no">
-                                                            Page:<a>4</a>
+                                                            Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
                                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -505,12 +514,12 @@
                                                     </div>
                                                     <div class="project-line-single-span">
                                                         <span class="proj-format">
-                                                            Team:<a href="">Actor,Director +</a>
+                                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
                                                         <span class="proj-format">
-                                                            Cast:<a>Female(27),Female(35)</a>
+                                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                                         </span>
                                                     </div>
                                                     <div class="project-line">
@@ -566,7 +575,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="" style="width: 100%;">{{project.sag_aftra}}</a>
@@ -587,10 +596,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Pages:<a>4</a>
+                                            Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -608,12 +617,12 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            Cast:<a>Female(27),Female(35)</a>
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -665,7 +674,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -686,10 +695,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -707,12 +716,12 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            Cast:<a>Female(27),Female(35)</a>
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -764,7 +773,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -783,10 +792,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -804,12 +813,12 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            Cast:<a>Female(27),Female(35)</a>
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -861,7 +870,7 @@
                                 <div class="card proj-card pointer" >
                                     <div class="project-line">
                                         <span class="proj-no">
-                                            Project<a href="">#{{project.id}}</a>
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
                                         </span>
                                         <span class="proj-pay">
                                             $<a href="">{{project.sag_aftra}}</a>
@@ -880,10 +889,10 @@
                                     </div>
                                     <div class="project-line2">
                                         <span class="proj-title">
-                                            Title:<a href="">{{project.title}}</a>
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
                                         </span>
                                         <span class="proj-page-no">
-                                            Page:<a>4</a>
+                                            Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
                                             <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
@@ -901,12 +910,12 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            Team:<a href="">Actor,Director +</a>
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            Cast:<a>Female(27),Female(35)</a>
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -1165,12 +1174,10 @@
                             </div>\
                             <div class='project-line-single-span'>\
                                 <span class='proj-format'>\
-                                    Team:<a href=''>Actor,Director +</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
                                 <span class='proj-format'>\
-                                    Cast:<a href=''>Female(27),Female(35)</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
@@ -1239,12 +1246,10 @@
                             </div>\
                             <div class='project-line-single-span'>\
                                 <span class='proj-format'>\
-                                    Team:<a href=''>Actor,Director +</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
                                 <span class='proj-format'>\
-                                    Cast:<a href=''>Female(27),Female(35)</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
@@ -1307,12 +1312,10 @@
                             </div>\
                             <div class='project-line-single-span'>\
                                 <span class='proj-format'>\
-                                    Team:<a href=''>Actor,Director +</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
                                 <span class='proj-format'>\
-                                    Cast:<a href=''>Female(27),Female(35)</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
@@ -1375,12 +1378,10 @@
                             </div>\
                             <div class='project-line-single-span'>\
                                 <span class='proj-format'>\
-                                    Team:<a href=''>Actor,Director +</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
                                 <span class='proj-format'>\
-                                    Cast:<a href=''>Female(27),Female(35)</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
@@ -1443,12 +1444,10 @@
                             </div>\
                             <div class='project-line-single-span'>\
                                 <span class='proj-format'>\
-                                    Team:<a href=''>Actor,Director +</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
                                 <span class='proj-format'>\
-                                    Cast:<a href=''>Female(27),Female(35)</a>\
                                 </span>\
                             </div>\
                             <div class='project-line'>\
