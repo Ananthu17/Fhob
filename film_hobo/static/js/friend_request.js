@@ -85,10 +85,11 @@ $('body').on('click' , '#cancel_friend_request', function(){
 });
 
 // Delete friend request
-$('body').on('click' , '.delete_friend_request', function(){
+$('body').on('click' , '.delete_friend_request', function(e){
     var token = $("#token").val();
     var id = $(this).attr('id');
     var data_dict = {}
+    e.stopPropagation();
     if(id){
         data_dict['requested_by'] = id;
     }
@@ -116,13 +117,14 @@ $('body').on('click' , '.delete_friend_request', function(){
 });
 
 // Accept friend request
-$('body').on('click' , '.accept_friend_request', function(){
+$('body').on('click' , '.accept_friend_request', function(e){
     var token = $("#token").val();
     var id = $(this).attr('id');
     var data_dict = {}
     var notification_id = "#friend-req-btns-"+id
     var notification_id_2 = "#friend-request-"+id
     var req_btns = "#btns-"+id
+    e.stopPropagation();
     if(id){
         data_dict['requested_by'] = id;
     }

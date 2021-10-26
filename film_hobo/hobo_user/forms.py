@@ -70,9 +70,9 @@ class SignUpIndieForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpIndieForm, self).__init__(*args, **kwargs)
         self.fields['date_of_birth'].widget.attrs['id'] = 'date_of_birth'
-        self.fields['beta_user'].required = False
-        self.fields['beta_user_code'].required = False
-        self.fields['beta_user_end'].required = False
+        self.fields['beta_user'].required = True
+        self.fields['beta_user_code'].required = True
+        self.fields['beta_user_end'].required = True
         self.fields['i_agree'].required = True
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
@@ -188,9 +188,9 @@ class SignUpFormCompany(UserCreationForm):
         self.fields['phone_number'].required = True
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
-        self.fields['beta_user'].required = False
-        self.fields['beta_user_code'].required = False
-        self.fields['beta_user_end'].required = False
+        self.fields['beta_user'].required = True
+        self.fields['beta_user_code'].required = True
+        self.fields['beta_user_end'].required = True
         self.fields['country'].required = True
         self.fields['company_name'].required = True
         self.fields['company_address'].required = True
@@ -378,7 +378,7 @@ class EditAgencyManagementCompanyProfileForm(forms.ModelForm):
 class UserInterestForm(forms.ModelForm):
     class Meta:
         model = UserInterest
-        fields = ('position', 'format', 'location', 'budget')
+        fields = ('position', 'format', 'location', 'budget', 'age', 'gender')
 
 
 class FeedbackForm(forms.ModelForm):
@@ -408,45 +408,45 @@ class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
         model = Project
-        fields = ( 'title','creator', 'format', 'genre','cast_pay_rate', 'sag_aftra',
-                   'cast_attachment','visibility','script_visibility','visibility_password',
-                    'location','cast_samr', 'script','script_password','cast_audition_password',
-                    'team_select_password',
-                    'video_url','video_type','video_status', 'video_cover_image', 
-                    'logline','project_info', 
-                   
+        fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
+                  'sag_aftra', 'cast_attachment', 'visibility',
+                  'script_visibility', 'visibility_password', 'location',
+                  'cast_samr', 'script', 'script_password',
+                  'cast_audition_password', 'team_select_password',
+                  'video_url', 'video_type', 'video_status',
+                  'video_cover_image', 'logline', 'project_info',
                   )
         widgets = {
+
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
-                'creator': forms.Select(attrs={'class': 'inp-line'}),
+                # 'creator': forms.Select(attrs={'class': 'inp-line'}),
+                'number_of_pages': forms.TextInput(attrs={"class": "inp-line",
+                                                          'type': 'number'}),
                 'format': forms.Select(attrs={'class': 'd-none'}),
                 'genre': forms.Select(attrs={'class': 'd-none'}),
-                'cast_pay_rate': forms.NumberInput(attrs={"class": "inp-line",
-                                                   "placeholder": '$  0 or\
-                                                   Greater/Negotiable',"required":""}),
                 'sag_aftra': forms.Select(attrs={'class': 'd-none'}),
                 'cast_attachment': forms.Select(attrs={'class': 'd-none'}),
                 'visibility': forms.Select(attrs={'class': 'd-none'}),
                 'script_visibility': forms.Select(attrs={'class': 'd-none'}),
-                'visibility_password': forms.PasswordInput(attrs={
+                'visibility_password': forms.TextInput(attrs={
                                                            "class": "form-control\
                                                            form-control-input mem-b-placeholder",
-                                                           'placeholder': 'password' ,'data-toggle': 'password'
+                                                           'placeholder': 'password' ,'data-toggle': 'password' ,'type':'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
                 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
                 'script': forms.FileInput(attrs={'accept':'application/pdf'}),
-                'script_password': forms.PasswordInput(attrs={
+                    'script_password': forms.TextInput(attrs={
+                                                                "class": "form-control form-control-input mem-b-placeholder",
+                                                                'placeholder': 'password','type':'password'
+                                                                }),
+                'cast_audition_password': forms.TextInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
-                                                            'placeholder': 'password'
+                                                            'placeholder': 'password','type':'password'
                                                             }),
-                'cast_audition_password': forms.PasswordInput(attrs={
+                'team_select_password': forms.TextInput(attrs={
                                                             "class": "form-control form-control-input mem-b-placeholder",
-                                                            'placeholder': 'password'
-                                                            }),
-                'team_select_password': forms.PasswordInput(attrs={
-                                                            "class": "form-control form-control-input mem-b-placeholder",
-                                                            'placeholder': 'password'
+                                                            'placeholder': 'password','type':'password'
                                                             })
 
                 }

@@ -28,12 +28,12 @@
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests (5)</a></li>
-                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
+                        <li><a href="{% url 'hobo_user:friends-and-followers' %}#myinterest_section" class="membr-setup-m">My Interests ({{my_interests_count}})</a></li>
+                        <li class="mt-4"><a href="{% url 'hobo_user:projects' %}" class="membr-setup-m">My Projects ({{my_projects_count}})</a></li>
                     </ul>
                 </div>
-                <div class="left-mode-sec mt-3 p-2 blank-left-mode">
-                </div>
+                <!-- <div class="left-mode-sec mt-3 p-2 blank-left-mode">
+                </div> -->
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
                 <div class="left-mode-sec mem-img-p">
@@ -68,7 +68,7 @@
                 </div>
                 <div class="mem-set-network-sec mt-3">
                     <div class="mem-setup-blu-f mb-1 float-left">Network/Friends</div>
-                    <div class="float-right"><a href="#" class="mem-setup-blck-f">Edit</a></div>
+                    <div class="float-right"><a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-setup-blck-f">Edit</a></div>
                     <hr class="mem-setup-network-hr">
                     {% for item in friends %}
                     {% if forloop.first or forloop.counter == 5 %}
@@ -112,22 +112,30 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                    <div class="row">
+                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{tracking_projects_count }})</div>
+                    {% for obj in tracking_projects %}
+                    {% if forloop.first or forloop.counter0|divisibleby:3 %}
+                    <div class="row ">
+                    {% endif %}
                         <div class="col-4 ">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Dynamo</span></div>
+                            <div class="track-blu-f-sec2">Project
+                                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                class="tracking_project_link" title="{{obj.project.id}}">
+                                    <span class="track-orng-f-sec2">#{{obj.project.id}}</span>
+                                </a>
+                            </div>
+                            <div class="track-blu-f-sec2">Title:
+                                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                    class="tracking_project_link" title="{{obj.project.title}}">
+                                    <span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
+                                </a>
+                            </div>
                         </div>
-                        <div class="col-4 mem-set-track-padding">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#56</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Jack</span></div>
-                        </div>
-                        <div class="col-4 mem-set-track-padding pl-0">
-                            <div class="track-blu-f">Project<span class="track-orng-f">#457</span></div>
-                            <div class="track-blu-f">Title:<span class="track-orng-f">Hammer</span></div>
-                        </div>
+                    {% if forloop.last or forloop.counter|divisibleby:3 %}
                     </div>
-                    <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                    {% endif %}
+                    {% endfor %}
+                    <!-- <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
                     <div class="row">
                         <div class="col-6">
                             <div class="track-blu-f">Project<span class="track-orng-f">#224</span></div>
@@ -139,7 +147,7 @@
                             <div class="track-blu-f">Team:<span class="track-orng-f">#1</span></div>
                             <div class="track-blu-f">Location:<span class="track-orng-f">New York</span></div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3">
@@ -361,19 +369,19 @@
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input class="inp-line" name="agent_phone"
-                        id="agent_phone1" value="" placeholder="Phone"
+                        id="agent_phone1" value="" type="number" placeholder="Phone"
                         autocomplete="off"/>
                     </div>
                     <div class="col-md-2 col-sm-4">
                         <input name="agent_email" class="inp-line"
-                        id="agent_email1" value="" placeholder="Email"
+                        id="agent_email1" value="" type="email" placeholder="Email"
                         autocomplete="off"/>
                     </div>
                 </div>
                 </span>
                 <div class="row mt-1 mb-1">
                     <div class="col-11">
-                        <a class="mem-setup-blu-f float-right repeat-agent">Add Agent/Manager</a>
+                        <a class="mem-setup-blu-f float-right repeat-agent" ><i class="fa fa-plus-circle" aria-hidden="true">Add Another Agent/Manager</i>  </a>
                     </div>
                 </div>
                 <div class="row">

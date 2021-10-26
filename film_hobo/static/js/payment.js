@@ -1,7 +1,28 @@
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
 /*
 get membership fee details and render to html
 */
-var token = localStorage.getItem("token");
+if (localStorage.getItem("token")){
+    var token = localStorage.getItem("token");
+}
+else{
+    var new_token = getUrlParameter('token');
+    var token = new_token.substring(0,new_token.length - 1)
+}
 token_str = "Token "
 token_val = String(token)
 var authorization_str = token_str.concat(token_val);
@@ -203,30 +224,30 @@ $( document ).ready(function() {
     });
 
     // data to load if the promo-code from the braintree
-    get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'
+    // get_braintree_discounts = origin_url + '/payment/braintree/get_discount_details/'
 
-    axios.get(get_braintree_discounts, {headers: {'Authorization': authorization_str}})
-    .then((response) => {
-      discount_objs = response.data
+    // axios.get(get_braintree_discounts, {headers: {'Authorization': authorization_str}})
+    // .then((response) => {
+    //   discount_objs = response.data
 
-      let table = '<thead> <tr> <th>Braintree ID</th> <th>Promocode (Name)</th> <th>Description</th><th>Amount</th><th>Number of Billing Cycles</th></tr></thead><tbody></tbody>';
-        discount_objs.forEach(function(d){
-        obj_id = d.braintree_id
-        if (d.billing_cycles == null){
-            var billing_cycles_dur = 'For Duration of Subscription'
-        }
-        else{
-            var billing_cycles_dur = d.billing_cycles
-        }
-        table += '<tr><td contenteditable="false" class="edit'+d.braintree_id+'">'+d.braintree_id+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.promo_code+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.description+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.amount+'</td>';
-        table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+billing_cycles_dur+'</td>';
-    })
-      table += '</tbody>';
-      $('#braintree_discount_table').empty().html(table);
-    });
+    //   let table = '<thead> <tr> <th>Braintree ID</th> <th>Promocode (Name)</th> <th>Description</th><th>Amount</th><th>Number of Billing Cycles</th></tr></thead><tbody></tbody>';
+    //     discount_objs.forEach(function(d){
+    //     obj_id = d.braintree_id
+    //     if (d.billing_cycles == null){
+    //         var billing_cycles_dur = 'For Duration of Subscription'
+    //     }
+    //     else{
+    //         var billing_cycles_dur = d.billing_cycles
+    //     }
+    //     table += '<tr><td contenteditable="false" class="edit'+d.braintree_id+'">'+d.braintree_id+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.promo_code+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.description+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+d.amount+'</td>';
+    //     table += '<td contenteditable="false" class="edit'+d.braintree_id+'">'+billing_cycles_dur+'</td>';
+    // })
+    //   table += '</tbody>';
+    //   $('#braintree_discount_table').empty().html(table);
+    // });
 });
 /*
 make the table column field editable
@@ -428,6 +449,7 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
             }
 
             get_access_token_url = origin_url + '/payment/get_paypal_token'
+            send_plan_change_email_url = origin_url + '/payment/paypal/send_plan_change_email/'
             axios.post(get_access_token_url)
             .then((response) => {
                 var paypal_access_token = "Bearer " + response.data.access_token
@@ -435,6 +457,19 @@ document.getElementById("membership_fee_save").addEventListener("click", functio
                 axios.post(indie_payment_monthly_patch_url, indie_payment_monthly_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
                 .then((response) => {
                 if ((response.status == 204) || (response.status == 422)) {
+
+                        var send_plan_change_email_url_args = {
+                            "changed_plan_id": plan_id_indie_payment_monthly,
+                        }
+
+                        axios.post(send_plan_change_email_url, send_plan_change_email_url_args, {headers: {'Content-Type': 'application/json', 'Authorization': paypal_access_token}})
+                        .then((response) => {
+                            console.log("response:::")
+                            console.log(plan_id_indie_payment_monthly)
+                        }, (error) => {
+                            console.log(error);
+                        });
+
                         console.log(response);
                     }
                 }, (error) => {

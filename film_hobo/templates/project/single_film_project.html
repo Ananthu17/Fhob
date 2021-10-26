@@ -152,6 +152,14 @@
     </div>
 </div>
 <!-- Modal End -->
+
+                        {% if project.creator.id == request.user.id %}
+                         
+                        <span class="">
+                            <a class="mem-blu-link log-fnt-weight cursor-pointer " id="{{project.title}}" href="{% url 'hobo_user:update-project' id=project.id  %}" >E<span class="mem-small-f">DIT</span></a>
+                        </span>
+                        {% endif %}
+
                             </li>
                         </ul>
                     </div>
@@ -162,7 +170,7 @@
                         <div class="card sgl-left-box-lg">
                             <div class="sgl-left-box-sm-align">
                                 <div class="sgl-left-box-lg-align">
-                                    <span class="sgl-left-box-lg-txt"><a href="">{{project.title}}</a> Written by </span>
+                                    <span class="sgl-left-box-lg-txt"><a href="">{{project.title}}</a> Written by {{writer}}</span>
                                 </div>
                             </div>
                             <div class="sgl-info-open-txt-align">
@@ -237,7 +245,7 @@
                                 </div>
                                 <div>
                                     <span class="sgl-black-txt">Cast Pay Rate: </span>
-                                    <span class="sgl-blue-txt">{{project.get_cast_pay_rate_display}}</span>
+                                    <span class="sgl-blue-txt">{{project.get_sag_aftra_display}}</span>
                                 </div>
                             </div>
                         </div>
@@ -438,8 +446,9 @@
                                 <hr class="sgl-up-video-hr">
                                 <div class="sgl-red-post-align">
                                     <span class="sgl-post-red-tag">
+                                        {% if request.user == project.creator %}
                                         <a class=" cursor-pointer" title="Publish Video" data-toggle="modal" data-target="#post_video">POST VIDEO</a>
-
+                                        {% endif %}
 <!-- The Modal -->
 <div class="modal fade" id="video_player_modal">
     <div class="modal-dialog">
@@ -689,7 +698,7 @@
                                         <div >
                                             <span class="sgl-invite-txt"><a href=""><span class="sgl-fnt-lg">G</span>ROUPS</a></span>
                                             <span class="sgl-post-txt sgl-post-txt-align"><a href=""><span class="sgl-fnt-post-lg">P</span>OST <span class="sgl-fnt-post-lg">M</span>ESSAGE/<span class="sgl-fnt-post-lg">M</span>EDIA</a></span>
-                                            <span class="sgl-invite-txt sgl-video-txt-align"><a href=""><span class="sgl-fnt-lg">V</span>ideo <span class="sgl-fnt-lg">C</span>hat</a></span>
+                                            <!-- <span class="sgl-invite-txt sgl-video-txt-align"><a href=""><span class="sgl-fnt-lg">V</span>ideo <span class="sgl-fnt-lg">C</span>hat</a></span> -->
                                         </div>
                                         <div class="sgl-post-cont">
                                             <span class="sgl-post-cont-fnt"><span class="sgl-post-cont-fnt-lg">T</span>HIS <span class="sgl-post-cont-fnt-lg">B</span>OARD IS <span class="sgl-post-cont-fnt-lg">P</span>RIVATE BY <span class="sgl-post-cont-fnt-lg">D</span>EFAULT. <span class="sgl-post-cont-fnt-lg">ONLY </span><span class="sgl-post-cont-fnt-lg">M</span>EMBERS (ATTACHED CAST, FILMMAKERS AND CREW) CAN SEE THIS BOARD!</span>
@@ -941,7 +950,7 @@ $('body').on('click' , '.publish_video', function(){
                     }else{
                         $('.team-select-password-err').html("");
                         $('#team_select_password').val("");
-                        window.location.href = "/project/audition-list/"+project_id+"/";
+                        window.location.href = "/project/crew-application-listing/"+project_id+"/";
                     };
                 }
             });

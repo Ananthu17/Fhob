@@ -61,7 +61,8 @@
 
                             <li id="share-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                             </li>
-                            <li><a href="#" class="red-f log-fnt-weight">R<span class="mem-small-f">EPORT THIS</span> V<span
+                            <li><a class="cursor-pointer red-f log-fnt-weight"
+                                data-toggle="modal" data-target="#report_video">R<span class="mem-small-f">EPORT THIS</span> V<span
                                 class="mem-small-f">IDEO</span></a>
                             </li>
                         </ul>
@@ -69,7 +70,18 @@
                 </div>
                 <div class="left-mode-sec  p-2   mt-2">
                     <div class="add-space d-flex justify-content-center log-addspace">
-                        <span class="">Ad Banner</span>
+                        <span class="">
+                            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2568931363821177"
+                                crossorigin="anonymous"></script>
+                            <!-- 728x90, created 2/23/09 -->
+                            <ins class="adsbygoogle"
+                                style="display:inline-block;width:728px;height:90px"
+                                data-ad-client="ca-pub-2568931363821177"
+                                data-ad-slot="9556686269"></ins>
+                            <script>
+                                (adsbygoogle = window.adsbygoogle || []).push({});
+                            </script>
+                        </span>
                     </div>
                 </div>
 
@@ -89,7 +101,7 @@
                         </ul>
                     </div>
                     <div class="vdo-rate-head-visible">
-                        <a href="#" class="red-fnt bold log-rate-font">Rate this Team</a>
+                        <span class="red-fnt bold log-rate-font">Rate this Team</span>
                     </div>
                 </div>
                 <div class="row align-row">
@@ -317,6 +329,43 @@
     </div>
 </div>
 <!-- Modal End -->
+ <!-- The Modal -->
+ <div class="modal fade" id="report_video">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Report video</h6>
+                <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-2 ">
+                        <p class="all-p ">Reason:</p>
+                    </div>
+                    <div class="col-8 ">
+                        <textarea id="reason" class="form-control" rows="5"></textarea>
+                        <p class="all-error-msg " id="report_video_err"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <span class="delete-comment-btn-div">
+                    <a class=" btn btn-outline-danger btn-sm" id="report_project_video">Report Video</a>
+                </span>
+                <button type="button" class="btn btn-outline-danger btn-sm close-modal"
+                data-dismiss="modal">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
 
 <!-- Share Modal Start -->
 <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -341,12 +390,11 @@
                         <div class="modal-footer">
                             <button id="url_send" type="submit" class="btn btn-primary">Send</button>
                             <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                           
+
                         </div>
-                   
                 </div>
             </div>
-           
+
         </div>
     </div>
 </div>
@@ -354,7 +402,7 @@
 
 {% endblock %}
 {% block extrajs %}
-<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js" ></script>
 <script src="{% static 'js/user-rating.js' %}"></script>
 <script src="{% static 'js/project_tracking.js' %}"></script>
 
@@ -401,7 +449,7 @@
             {
             return val.split(/@\s*/);
             }
-    
+
         function extractLast(term)
             {
             return split(term).pop();
@@ -445,12 +493,12 @@
                         return false;
                     }
                 });
-    
-    
+
+
         $('body').on('click' , '.post', function(){
             var project_id = $(this).attr("id");
             var token = $("#token").val();
-    
+
             var comment_txt_2 = $('#comment_txt').val();
             var name_list_2 = name_list;
             var name_str = name_list_2.join("|");
@@ -466,7 +514,7 @@
             data_dict['project'] = project_id
             data_dict['comment_txt'] = comment_txt
             data_dict['mentioned_users'] = JSON.stringify(id_list)
-    
+
             console.log(data_dict)
             if(comment_txt){
                 $.ajax
@@ -484,7 +532,7 @@
                         // var comment_id = response['id']
                         // $('#comment_txt').val("");
                         // $(".comment_section").append(' <div class="col-12 "><div class="comment-div" ><span class="txt-capitalize comment-name-style"><a href="{{request.user.get_profile_url}}">'+"{{request.user.get_full_name}}"+'</a>:</span><span class="comment-style">'+comment_txt+'</span><div><span class="comment-style-time">now</span><span class="comment-style-time pl-2"><a class="cursor-pointer delete comment-style-time remove-decoration" id="'+comment_id+'">Delete</a></span></div></div>');
-    
+
                     }
                 });
             }
@@ -494,19 +542,19 @@
             var project_id = $("#project_id").val();
             var token = $("#token").val();
             var comment_txt_id = '#comment_txt_'+comment_id
-    
+
             var comment_txt_2 = $(comment_txt_id).val();
             var name_list_2 = name_list;
             var name_str = name_list_2.join("|");
             var comment_txt = comment_txt_2.replace(RegExp(name_str,'\g'), matched => user_dict[matched]);
-    
+
             var found = $(comment_txt).filter('.mention_user');
             var id_list = [];
             $(found).each(function( link ) {
                 var id = $(this).attr("id");
                 id_list.push(id)
             });
-    
+
             var div_id = "#comment-"+comment_id;
             var data_dict = {};
             var reply_section = "#reply-section-"+comment_id;
@@ -567,7 +615,7 @@
             {
             return val.split(/@\s*/);
             }
-    
+
         function extractLast(term)
             {
             return split(term).pop();
@@ -612,9 +660,9 @@
                     }
                 });
         });
-    
+
     });
-    
+
     </script>
     <script>
         $('body').on('click' , '.close-modal', function(){
@@ -628,7 +676,7 @@
           $('body').on('click' , '.delete-comment', function(){
             var comment_id = $(this).attr("id");
             var token = $("#token").val();
-    
+
             if(comment_id){
                 $.ajax
                 ({
@@ -647,10 +695,43 @@
             }
         });
     </script>
-    
-    
-    
+
+<script>
+    $('body').on('click' , '#report_project_video', function(){
+        console.log("----here")
+        var project_id = "{{ project.id }}";
+        var project_name = "{{ project.title }}";
+        var reason = $("#reason").val();
+        var video_url = window.location.href;
+        var token = $("#token").val();
+        var data_dict = {}
+
+        data_dict['project_id'] = project_id;
+        data_dict['video_url'] = video_url;
+        data_dict['project_name'] = project_name;
+        if(reason!=""){
+            data_dict['reason'] = reason;
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/report-video-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.reload();
+                }
+            });
+        }else{
+            $("#report_video_err").html("This field is required.")
+        }
+    });
+</script>
+
     <script src="{% static 'js/videoplayer_invite.js' %}"></script>
     <script src="{% static 'js/email_invite.js' %}"></script>
-    
+
     {% endblock %}

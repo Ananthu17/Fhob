@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block extracss %}
+{{ form.media.css }}
+{% endblock %}
 
 {% block content %}
+<head>
     <style>
         .fileuploaddiv{
             border: 1px solid;
@@ -28,12 +32,67 @@
             border: none;
             cursor: pointer;
         }
+        .select2-container--default .select2-selection--single
+        {
+            border-radius: 0!important;
+            border:none!important;
+            border-bottom:1px solid#9c9c9c!important;
+        }
+        .select2-container .select2-selection--single {
+            height:19px!important;
+
+            }
+        .select2-container--default .select2-selection--single .select2-selection__rendered
+            {
+                line-height:19px;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__arrow
+            {
+            height:15px;
+
+        }
+        .star-rating__ico{
+
+            padding-left: 2px;
+            cursor: pointer;
+            color: #FFB300;
+        }
+        .cast-star-rating1 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .cast-star-rating2 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .cast-star-rating3 {
+            font-size:1em;
+            cursor: pointer;
+        }
+        .crew-star-rating1{
+
+            font-size:1em;
+            cursor: pointer;
+        }
+        .crew-star-rating2{
+
+        font-size:1em;
+        cursor: pointer;
+        }
+        .crew-star-rating3{
+
+        font-size:1em;
+        cursor: pointer;
+        }
+
 
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
 
     </style>
+
+    </head>
     <div class="wrapper flex-grow-1">
         <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -42,12 +101,12 @@
                 <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 pr-1">
                     <div class="left-mode-sec mb-2 pl-3 pr-3 h-100">
 
-                        <div class="row pt-1">
+                        <!-- <div class="row pt-1">
                             <div class="col-12">
                                 <a href="" class="prjct-log-link  float-right">EDIT</a>
                             </div>
-                        </div>
-                        
+                        </div> -->
+
                         <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">PROJECT TITLE:</label>
@@ -71,20 +130,22 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">CREATOR OF THE PROJECT:</label>
                             </div>
                             <div class="col-6">
+
                                 {{form.creator}}
                             </div>
-                        </div>
-
-                        <div class="row">
+                        </div> -->
+                        <input type="hidden" value="{{ user.id }}" name="creator">
+                        <!-- <div class="row">
                             <div class="col-2">
                                 <label class="form-title mem-setup-blu-f">WRITER:</label>
                             </div>
                             <div class="col-6">
+
                                 {{writerform.name}}
                             </div>
 
@@ -93,7 +154,7 @@
                                 <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER WRITER</a>
                             </div>
                             {% endif %}
-                        </div>
+                        </div> -->
 
                         <div class="row">
                             <div class="col-md-2 col-sm-12">
@@ -113,6 +174,8 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+
+                                {% if user.membership == 'PRO'  or  user.membership == 'COM' %}
                                 <div class="form-check-inline">
                                     <label class="containerradio bold">PILOT (Pros & Companies)
                                         <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3">
@@ -125,6 +188,46 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
+                                {% elif user.membership != 'PRO'  or  user.membership != 'COM'  %}
+
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">PILOT (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="3" id=pilt>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class="containerradio bold">FEATURE (Pros & Companies)
+                                        <input type="radio" name="radiorow1" onclick="selectformat(this)" value="4" id=feat>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+
+
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                    <h4 class="modal-title warning-modal-title" id="myModalLabel"> Membership Warning!  </h4>
+                                                    <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                            </div>
+                                            <div class="modal-body" style="text-align:center;">
+                                                <p>Only Pro and Company Members Can Use This Format</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal"  id="modalClose1">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- The Modal -->
+
+
+                                {% endif  %}
                             </div>
                         </div>
 
@@ -133,7 +236,8 @@
                                 <label class="form-title mem-setup-blu-f">NUMBER OF PAGES:</label>
                             </div>
                             <div class="col-6">
-                                <input class="inp-line" placeholder="" type="number" required />
+                                {{form.number_of_pages}}
+
                             </div>
                         </div>
 
@@ -168,7 +272,7 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">SCI-FI&nbsp; 
+                                    <label class="containerradio bold">SCI-FI&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="21">
                                         <span class="checkmarkagree"></span>
                                     </label>
@@ -186,18 +290,25 @@
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
+                                    <label class="containerradio bold"  >FAMILY
+                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="18">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold" >LGBTQ 
+                                    <label class="containerradio bold" >LGBTQ
                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="15">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline"> 
+                                <div class="form-check form-check-inline">
                                     <label class="containerradio bold " style="margin:left 7px;">MUSICAL &nbsp;&nbsp;
                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="17">
                                         <span class="checkmarkagree"></span>
@@ -215,22 +326,16 @@
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                               
-                               
+
+
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">WAR / MILITARY
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="16">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold"  >FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="9">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                
-                                
+
+
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
                                         <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="3">
@@ -260,19 +365,41 @@
 
                         <div class="row">
                             <div class="col-2 ">
-                                <label class="form-title mem-setup-blu-f">CAST PAY RATE:</label>
+                                <label class="form-title mem-setup-blu-f"><br>CAST PAY RATE:</label>
                             </div>
-                            <div class="col-6">
-                                {{form.cast_pay_rate}}
-                            </div>
-                        </div>
+                            <!-- <div class=" containercheck">
+                                <div class="checkboxnew" style="margin-left: 1.2em; margin-top: 1em; ">
+                                   <input type="checkbox" style="border: 1px solid #f32121 ;" id="checkbox1" name="checkbx" value="0">
+                                        <label for="checkbox1" style="font-weight: bolder;font-size: 17px;">
+                                            <span><b>$ 0</b></span>
+                                        </label>
 
-                        <div class="row">
-                            <div class="col-md-2 col-sm-6 ">
-                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label>
-                            </div>
+                                   <input type="checkbox" style="margin-left: 1.2em;" id="checkbox2" name="checkbx" value="1">
+                                        <label for="checkbox2" style="font-weight: bolder; font-size: 13px;">
+                                            <span>NEGOTIABLE</span>
+                                        </label>
+                                </div>
+                            </div> -->
+                            <!-- </div>
+
+                            <div class="row"> -->
+                            <!-- <div class="col-md-8 col-sm-9 " style="margin-top: 0.5em; " >
+                                <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
+                             <!-- </div> -->
                             <div class="col-md-10 col-sm-6 mt-3">
                                 {{form.sag_aftra}}
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;">$ 0
+                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)" value="0" required>
+                                        <span class="checkmarkagree" style="margin-top: 0.3em;"  ></span>
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="containerradio bold">Negotiable
+                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="1" required>
+                                        <span class="checkmarkagree"></span>
+                                    </label>
+                                </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">Ultra Low
                                         <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" value="2" required>
@@ -364,7 +491,7 @@
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.visibility_password  }}
                                         <i class="bi bi-eye-slash" id="togglePassword1"></i>
-                                        
+
                                     </div>
                                 </form>
                             </div>
@@ -373,14 +500,19 @@
                                 the Project Page.
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-2 ">
                                 <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
                             <div class="col-6">
-                                <!-- <input class="inp-line" placeholder="Separate by Commas" /> -->
-                                {{form.location}}
+                                <br><select class=" inp-line  modal-location" id ="location_1"
+                                name="location" required >
+
+                                {% for item in form.location %}
+
+                                {{item}}
+                                {% endfor %}
+                                </select>
                             </div>
                         </div>
                         {% if mode_operation != 'create' %}
@@ -402,43 +534,46 @@
                             <div class="col-md-9 mt-3">
                                 {{form.cast_samr}}
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="0" required>
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="cast-star-rating1">
+                                        <label class="containerradio bold">Indie
+                                                <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                                <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                                <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                                <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                                <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                                <input type="hidden" name="cast-star1" class="rating-value1" >
+                                                <input type="radio" name="radiorow7" id="star1" onclick="selectsamr(this)" value="0" required>
+                                                <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Pro
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="5">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                        <div class="cast-star-rating2">
+                                            <label class="containerradio bold">Pro
+                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                                    <input type="hidden" name="cast-star2" class="rating-value2">
+                                                   <input type="radio" name="radiorow7" id="star2" onclick="selectsamr(this)" value="5">
+                                                 <span class="checkmarkagree"></span>
+                                            </label>
+                                        </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie & Pro
-                                        <span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star checked "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow7" onclick="selectsamr(this)" value="10">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="cast-star-rating3">
+                                        <label class="containerradio bold">Indie & Pro
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            <input type="hidden" name="cast-star3" class="rating-value3" >
+                                            <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)" value="10">
+                                            <span class="checkmarkagree"></span>
+                                      </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -450,43 +585,46 @@
                             </div>
                             <div class="col-md-9 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)" value="1">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating1"> 
+                                        <label class="containerradio bold">Indie
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" >
+                                            <input type="radio" name="radiorow8" id="crew1" onclick="selectsamr(this)" value="1">
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Pro & Comp
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)" value="6">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating2">
+                                        <label class="containerradio bold">Pro
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" >
+                                            <input type="radio" name="radiorow8" id="crew2" onclick="selectsamr(this)" value="6">
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold">Indie, Pro & Comp
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
-                                        <input type="radio" name="radiorow8" onclick="selectsamr(this)" value="11">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
+                                    <div class="crew-star-rating3">
+                                        <label class="containerradio bold">Indie & Pro
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
+                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" >
+                                            <input type="radio" name="radiorow8"   id="crew3" onclick="selectsamr(this)" value="11">
+                                            <span class="checkmarkagree"></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -495,66 +633,42 @@
                             <div class="col-3">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
-                            <div class="col-md-2 mt-3">
-                                <div class="form-check-inline">
+                            <div class="col-md-3 mt-3">
+                                <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
                                         <input type="radio" name="radiorow9" id="public_script" onclick="selectscript(this)" value="0">
                                         <span class="checkmarkagree"></span>
                                     </label>
-                                </div>
-                            </div>
-                            <div class="col-2 mt-3 cus-file-upload">
-                                <label class="snf-file-upload d-flex flex-row align-items-center">
-                                    {{form.script}}<span class="mem-setup-blu-f underline ml-1">Upload</span>
-                                    (PDF)
-                                </label>
-                                <div class="fileuploaddiv d-none" id="filenameblock">
-                                    <span id="filename" class="mr-1"></span>
-                                    <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+
+                                    <label class="snf-file-upload d-flex flex-row align-items-left" style="margin-right: 2em; margin-left: 1em;">
+                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload" required>Upload</span>
+                                        (PDF)
+                                    </label>
+                                    <div class="fileuploaddiv d-none" id="filenameblock">
+                                        <span id="filename" class="mr-1"></span>
+                                        <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-3">
                             </div>
-                            <div class="col-md-2 mt-3">
+                            <div class="col-md-8 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold" style="font: size em;">Privte
-                                        <span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o "></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                            <span class="fa fa-star-o"></span>
-                                        </span>
+                                    <label class="containerradio bold" style="margin-right: 2em;">Private
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" required>
                                         <span class="checkmarkagree"></span>
                                     </label>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-sm-3 mt-2">
-                                <form class="form-inline">
-                                    <div class="form-group d-none" id="script_password">
-                                        <label for="inputPassword3" style="margin-right:3em" class="bold mr-1">(Create a Password) </label>
+                                    <div class="flex-row align-items-center d-none" id="script_pass" style="width: -webkit-fill-available;">
+                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit;">(Create a Password) </label>
                                         {{form.script_password}}
-                                        <i class="bi bi-eye-slash" id="togglePassword2" style="margin-right:2em;"></i>
-
+                                        <i class="bi bi-eye-slash ml-0" id="togglePassword2" style="position: relative;left: -22px;"></i>
                                     </div>
-                                </form>
+                              </div>
                             </div>
-                           
                         </div>
-
-                       
                         {% if mode_operation != 'create' %}
                         <div class="row mt-3">
                             <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER SCRIPT</a> <span
@@ -569,9 +683,7 @@
                                 <form class="form-inline">
                                     <div class="form-group ">
                                         <label for="inputPassword4" class="bold mr-1">(Create a Password) </label>
-                                       
                                     </div>
-                                    
                                 </form>
                                 {{form.cast_audition_password}}
                                 <i class="bi bi-eye-slash" id="togglePassword3"></i>
@@ -587,7 +699,7 @@
                                     <div class="form-group">
                                         <label for="inputPassword5" class="bold mr-1">(Create a Password) </label>   
                                     </div>
-                                    
+
                                 </form>
                                 {{form.team_select_password}}
                                 <i class="bi bi-eye-slash" id="togglePassword4"></i>
@@ -612,59 +724,7 @@
 
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3">
-                    <div class="left-mode-sec h-100">
-                        <div class="mem-list-head">Top Actors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">John Smith</li>
-                            <li class="mt-1">John Dow</li>
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Aaron McCarty</li>
-                            <li class="mt-1">Toli Chew</li>
-                        </ol>
-                        <div class="mem-list-head">Top Writers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Tom Saint</li>
-                            <li class="mt-1">Lola Carola</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Jamal Smith</li>
-                            <li class="mt-1">Nikita Selivan</li>
-                        </ol>
-                        <div class="mem-list-head">Top Directors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Karen Do</li>
-                            <li class="mt-1">Ivan Drago</li>
-                            <li class="mt-1">Ken Track</li>
-                            <li class="mt-1">Kendra Shulman</li>
-                            <li class="mt-1">Sandra O’brian</li>
-                        </ol>
-                        <div class="mem-list-head">Top Producers</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top DPs</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head">Top Editors</div>
-                        <ol class="mem-list-cont mb-0">
-                            <li class="mt-1">Sarah Lee</li>
-                            <li class="mt-1">Colle Ace</li>
-                            <li class="mt-1">Duran Duran</li>
-                            <li class="mt-1">Char Hendrix</li>
-                            <li class="mt-1">Oleg Smirnov</li>
-                        </ol>
-                        <div class="mem-list-head underline">TopTalent/Crew</div>
-                    </div>
-
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
                 </div>
             </div>
         </div>
@@ -710,11 +770,16 @@
         $('option:selected','#id_script_visibility').attr('selected', false);
         $(`#id_script_visibility>option:eq(${data.value})`).attr('selected', true);
     }
+    $('#id_script_password').on('change',()=>{
+        console.log("ANANTHU", $('#id_script_password').val())
+    })
     $('#private_script').on(('click'),()=>{
-        $('#script_password').removeClass('d-none')
+        $('#script_pass').removeClass('d-none')
+        $('#script_pass').addClass('d-flex')
     })
     $('#public_script').on(('click'),()=>{
-        $('#script_password').addClass('d-none')
+        $('#script_pass').addClass('d-none')
+        $('#script_pass').removeClass('d-flex')
     })
     $('#private').on(('click'),()=>{
         $('#visibility_password').removeClass('d-none')
@@ -732,14 +797,13 @@
         document.getElementById("id_script").value = "";
         $('#filenameblock').addClass('d-none')
     })
-    $('input:checkbox').change(function(){
-    if($(this).is(":checked")) {
-        $('.containerradio .checkmarkagree').addClass("act");
-    } else {
-        $('.containerradio .checkmarkagree').removeClass("act");
-    }
-    });
-
+    // $('input:checkbox').change(function(){
+    // if($(this).is(":checked")) {
+    //     $('.containerradio .checkmarkagree').addClass("act");
+    // } else {
+    //     $('.containerradio .checkmarkagree').removeClass("act");
+    // }
+    // });
 
 
 // Visibility Password hide and show eye
@@ -801,7 +865,328 @@ jQuery($ => {
   });
 });
 
+// Location  jquery (search & track) for New project
+
+$(document).ready(function() {
+        $('#location_1').select2();
+        $('.modal-location').select2();
 
 
+        var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+            return false;
+        };
+        var trackers = getUrlParameter('trackers');
+        var tracking = getUrlParameter('tracking');
+        if(tracking == 'true'){
+            toggleVisibility("Menu1");
+        }
+        if(trackers == 'true'){
+            toggleVisibility("Menu2");
+        }
+    });
+
+
+// Star rating for Indi  Cast Smar
+var $radio_star1=$('#star1')
+var $star_rating1 = $('.cast-star-rating1 .fa');
+
+var SetRatingStar1 = function() {
+  return $star_rating1.each(function() {
+    if (parseInt($star_rating1.siblings('input.rating-value1').val()) >= parseInt($(this).data('rating'))) {
+        console.log(parseInt($star_rating1.siblings('input.rating-value1').val()));
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star1.on('click', function(){
+    if($radio_star1.prop('checked')){
+        $star_rating1.on('click', function() {
+        console.log($radio_star1)
+        $star_rating1.siblings('input.rating-value1').val($(this).data('rating'));
+    return SetRatingStar1();
+        });
+    }
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    console.log($radio_star1.prop('checked'))
+    $star_rating1.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar1();
+
+
+
+// Star rating for Pro Cast Smar
+
+var $radio_star2=$('#star2')
+var $star_rating2 = $('.cast-star-rating2 .fa');
+
+var SetRatingStar2 = function() {
+  return $star_rating2.each(function() {
+    if (parseInt($star_rating2.siblings('input.rating-value2').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star2.on('click', function(){
+    if($radio_star2.prop('checked')){
+        $star_rating2.on('click', function() {
+
+        $star_rating2.siblings('input.rating-value2').val($(this).data('rating'));
+    return SetRatingStar2();
+        });
+    }
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    
+    $star_rating2.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar2();
+
+
+// Star rating for Indi & Pro Cast Smar
+
+var $radio_star3=$('#star3')
+var $star_rating3 = $('.cast-star-rating3 .fa');
+
+var SetRatingStar3 = function() {
+  return $star_rating3.each(function() {
+    if (parseInt($star_rating3.siblings('input.rating-value3').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$radio_star3.on('click', function(){
+    if($radio_star3.prop('checked')){
+        $star_rating3.on('click', function() {
+
+        $star_rating3.siblings('input.rating-value3').val($(this).data('rating'));
+    return SetRatingStar3();
+        });
+    }
+});
+
+$('input:radio[name=radiorow7]').change(function(){
+    
+    $star_rating3.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+SetRatingStar3();
+
+
+
+
+// Star rating for Indi  Crew Smar
+
+var $cw_radio_star1=$('#crew1')
+var $cw_star_rating1 = $('.crew-star-rating1 .fa');
+
+var Cw_SetRatingStar1 = function() {
+  return $cw_star_rating1.each(function() {
+    if (parseInt($cw_star_rating1.siblings('input.cw-rating-value1').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star1.on('click', function(){
+    if($cw_radio_star1.prop('checked')){
+        $cw_star_rating1.on('click', function() {
+        $cw_star_rating1.siblings('input.cw-rating-value1').val($(this).data('rating'));
+  return Cw_SetRatingStar1();
+        });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating1.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar1();
+
+
+// Star rating for Pro & Comp Crew Smar
+
+var $cw_radio_star2=$('#crew2')
+var $cw_star_rating2 = $('.crew-star-rating2 .fa');
+
+var Cw_SetRatingStar2 = function() {
+  return $cw_star_rating2.each(function() {
+    if (parseInt($cw_star_rating2.siblings('input.cw-rating-value2').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star2.on('click', function(){
+    if($cw_radio_star2.prop('checked')){
+        $cw_star_rating2.on('click', function() {
+
+        $cw_star_rating2.siblings('input.cw-rating-value2').val($(this).data('rating'));
+    return Cw_SetRatingStar2();
+     });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating2.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar2();
+
+
+
+
+// Star rating for Indi, Pro & Comp Crew Smar
+
+var $cw_radio_star3=$('#crew3')
+var $cw_star_rating3 = $('.crew-star-rating3 .fa');
+
+var Cw_SetRatingStar3 = function() {
+  return $cw_star_rating3.each(function() {
+    if (parseInt($cw_star_rating3.siblings('input.cw-rating-value3').val()) >= parseInt($(this).data('rating'))) {
+       
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$cw_radio_star3.on('click', function(){
+    if($cw_radio_star3.prop('checked')){
+        $cw_star_rating3.on('click', function() {
+        $cw_star_rating3.siblings('input.cw-rating-value3').val($(this).data('rating'));
+    return Cw_SetRatingStar3();
+        });
+    }
+});
+
+$('input:radio[name=radiorow8]').change(function(){
+    
+    $cw_star_rating3.each(function(index,value) {
+        console.log(value);
+        
+        return $(value).removeClass('fa-star').addClass('fa-star-o');
+    
+  }); 
+
+});
+
+Cw_SetRatingStar3();
+
+
+
+// // the selector will match all input controls of type :checkbox
+// // and attach a click event handler 
+// $("input:checkbox").on('click', function() {
+//   // in the handler, 'this' refers to the box clicked on
+//   var $box = $(this);
+//   if ($box.is(":checked")) {
+//     // the name of the box is retrieved using the .attr() method
+//     // as it is assumed and expected to be immutable
+//     var group = "input:checkbox[name='checkbx']";
+//     // the checked state of the group/box on the other hand will change
+//     // and the current value is retrieved using .prop() method
+//     $(group).prop("checked", false);
+//     $box.prop("checked", true);
+//   } else {
+//     $box.prop("checked", false);
+//   }
+// });
+
+// sHOWING MOdal
+$('input:radio[id="pilt"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='pilt']").prop("checked", false);
+   }
+});
+
+$('input:radio[id="feat"]').change(function() {
+   if($(this).is(':checked') ) {
+        $('#myModal').modal('show');
+        $("input:radio[id='feat']").prop("checked", false);
+        
+   }
+});
+
+
+    $(function () {
+        $('#modalClose').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#modalClose1').on('click', function () {
+            $('#myModal').modal('hide');
+           
+        })
+    })
 </script>
 {% endblock %}

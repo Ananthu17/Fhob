@@ -1,7 +1,7 @@
-<div class="row intrest-input ">
+<div class="row intrest-input mt-3">
     <div class="sm-12">
         <label class="intrest-lab">Position:</label>
-        <select class="inp-interest" id="position_{{count}}"
+        <select class="inp-interest position" id="position_{{count}}"
         name="position" required>
             {% for position in my_interest_form.position %}
                 {{position}}
@@ -33,6 +33,31 @@
             {% for item in my_interest_form.budget %}
             {{item}}
             {% endfor %}
+        </select>
+    </div>
+    <div class="sm-12 gender_age_section" id="gender_section_{{count}}">
+        <label class="intrest-lab">Gender:</label>
+        <select class="inp-interest format-space"
+        name="gender" id ="gender_{{count}}" required >
+            <option value="">---------</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="others">Others</option>
+        </select>
+    </div>
+    <div class="sm-12 gender_age_section" id="age_section_{{count}}">
+        <label class="intrest-lab">Age:</label>
+        <select class="inp-interest format-space"
+        name="age" id ="age_{{count}}" required >
+            <option value="five_to_seven">5 to 7</option>
+            <option value="eight_to_ten">8 to 10</option>
+            <option value="eleven_to_fifteen">11 to 15</option>
+            <option value="sixteen_to_twenty">16 to 20</option>
+            <option value="twentyone_to_thirty">21 to 30</option>
+            <option value="thirtyone_to_fourty">31 to 40</option>
+            <option value="fourtyone_to_fifty">41 to 50</option>
+            <option value="fiftyone_to_sixty">51 to 60</option>
+            <option value="sixtyone_to_seventy">61 to 70</option>
         </select>
     </div>
 </div>

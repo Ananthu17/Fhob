@@ -233,28 +233,30 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                        <div class="row">
+                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> ({{tracking_projects_count}})</div>
+                        {% for obj in tracking_projects %}
+                        {% if forloop.first or forloop.counter0|divisibleby:3 %}
+                        <div class="row ">
+                        {% endif %}
                             <div class="col-4 ">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
+                                <div class="track-blu-f-sec2">Project
+                                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                    class="tracking_project_link" title="{{obj.project.id}}">
+                                        <span class="track-orng-f-sec2">#{{obj.project.id}}</span>
+                                    </a>
                                 </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Dynamo</span>
-                                </div>
-                            </div>
-                            <div class="col-4 mem-set-track-padding-sec2">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#56</span>
-                                </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Jack</span>
-                                </div>
-                            </div>
-                            <div class="col-4 mem-set-track-padding-sec2 pl-0">
-                                <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#457</span>
-                                </div>
-                                <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Hammer</span>
+                                <div class="track-blu-f-sec2">Title:
+                                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                                        class="tracking_project_link" title="{{obj.project.title}}">
+                                        <span class="track-orng-f-sec2">{{obj.project.title|truncatechars:"5"}}</span>
+                                    </a>
                                 </div>
                             </div>
+                        {% if forloop.last or forloop.counter|divisibleby:3 %}
                         </div>
-                        <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
+                        {% endif %}
+                        {% endfor %}
+                        <!-- <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
@@ -270,7 +272,7 @@
                                 <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
                                         York</span></div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     {% endif %}
                 </div>
@@ -297,7 +299,7 @@
                                         {% if profile.imdb %}
                                         {% get_url profile.imdb as imdb %}
                                         <label class="form-title">
-                                            <a href="{{imdb}}" class="mem-setup-blu-f">IMDB</a>
+                                            <a href="{{imdb}}" target="_blank" class="mem-setup-blu-f">IMDB</a>
                                         </label>
                                         {% endif %}
                                     </div>
@@ -414,7 +416,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="row mt-3">
+                        <!-- <div class="row mt-3">
                             <div class="col">
                                 <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
                                 <div class="pc-img-title">Project......</div>
@@ -435,7 +437,7 @@
                                 <img src="{% static 'images/pc-img1.PNG' %}" class="img-fluid pc-img">
                                 <div class="pc-img-title">Project......</div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="left-mode-sec p-2 mt-3">
                         <div class="row pc-mem-white-bg">

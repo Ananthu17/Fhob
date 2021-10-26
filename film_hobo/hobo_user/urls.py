@@ -46,7 +46,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    GetFriendRequestNotificationAjaxView, \
                    CancelFriendRequestAPI, \
                    GetFriendRequestAcceptNotificationAjaxView, \
-                   FeedbackAPIView, FeedbackWebView, \
+                   FeedbackAPIView, FeedbackWebView, ReportProblemAPIView, \
                    AddGroupAPI, RemoveFriendGroupAPI, \
                    AddFriendToGroupAPI, UpdateFriendGroupAjaxView, \
                    FilterFriendByGroupAjaxView, \
@@ -63,11 +63,14 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    UserHomeProjectInvite, ScreeningProjectDeatilInviteView, \
                    GetScreeningProjectInviteNotificationAjaxView, \
                    AddBetaTesterCode, ListBetaTesterCode, \
-                   DeleteBetaTesterCode, EditBetaTesterCode, \
+                   DeleteBetaTesterCode, \
                    CheckBetaTesterCode, ProjectDateFilterAPI, \
                    GetBetaTesterCodeId, HomeProjectAPIView, \
                    HomeProjectDateFilterAPI, HomeProjectSearchView, \
-                   ProjectSearchView, ScreeningProjectUrlSendView
+                   ProjectSearchView, ShowCase, ReportAProblemWebView, \
+                   ShowCaseAPIView, ScreeningProjectUrlSendView, \
+                   ShowCaseSearchView, ShowCaseDateFilterAPI, \
+                   VideoPlayer
 
 
 app_name = "hobo_user"
@@ -186,6 +189,10 @@ urlpatterns = [
     path('remove-friend-group-api/', RemoveFriendGroupAPI.as_view(),
          name='remove-friend-group-api'),
     path('feedback-api/', FeedbackAPIView.as_view(), name='feedback-api'),
+
+    path('report-a-problem-api/', ReportProblemAPIView.as_view(),
+         name='report-problem-api'),
+
     path('get-all-users-api/', GetAllUsersAPI.as_view(),
          name='get-all-users-api'),
     path('add-beta-tester-code/', AddBetaTesterCode.as_view(),
@@ -194,8 +201,6 @@ urlpatterns = [
          name='list-beta-tester-code'),
     path('delete-beta-tester-code/<id>/', DeleteBetaTesterCode.as_view(),
          name='delete-beta-tester-code'),
-    path('edit-beta-tester-code/', EditBetaTesterCode.as_view(),
-         name='edit-beta-tester-code'),
     path('check-beta-tester-code/', CheckBetaTesterCode.as_view(),
          name='check-beta-tester-code'),
     path('get-beta-tester-code-id/', GetBetaTesterCodeId.as_view(),
@@ -204,6 +209,7 @@ urlpatterns = [
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
     path('user_home/', HomePage.as_view(), name='user_home'),
+    path('showcase/', ShowCase.as_view(), name='showcase'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),
          name='projects_detail'),
@@ -304,6 +310,10 @@ urlpatterns = [
     path('feedback/',
          FeedbackWebView.as_view(),
          name='feedback-web'),
+    path('report-a-problem/',
+         ReportAProblemWebView.as_view(),
+         name='report-a-problem'),
+
 
     path('projects/', ProjectAPIView.as_view(),
          name='project-list'),
@@ -349,4 +359,11 @@ urlpatterns = [
          name="user-project-search"),
     path('user_home-projects/', HomeProjectAPIView.as_view(),
          name='user-project-list'),
+    path('showcase/projects/', ShowCaseAPIView.as_view(),
+         name='showcase-project-list'),
+    path('showcase/search/', ShowCaseSearchView.as_view(),
+         name='showcase-search'),
+    path('showcase/date/', ShowCaseDateFilterAPI.as_view(),
+         name='showcase-date'),
+    path('video/<int:id>/', VideoPlayer.as_view(), name='user_video')
 ]

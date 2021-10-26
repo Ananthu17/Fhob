@@ -26,7 +26,10 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      CrewAttachReplaceView, RemoveAttachedCrewAPI, AttachCrewAPI, \
      GetCrewAtachRequestNotificationAjaxView, CancelCrewAttachRequestAPI, \
      AddCrewQualificationAPI, DeclineCrewAttachRequestAPI, \
-     GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI
+     GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI, \
+     GetUserInterestNotificationAjaxView, ReportVideoAPI, ShowcaseVideoView, \
+     LikeProjectVideoView, DislikeProjectVideoView, \
+     ProjectVideoLikeDislikeAjaxView
 
 
 urlpatterns = [
@@ -196,4 +199,17 @@ urlpatterns = [
           name='decline-crew-attach-request-api'),
      path('accept-crew-attach-request-api/', AcceptCrewAttachRequestAPI.as_view(),
           name='accept-crew-attach-request-api'),
+     path('get-user-interest-notification-html/',
+          GetUserInterestNotificationAjaxView.as_view(),
+          name='get-user-interest-notification-html'),
+     path('report-video-api/', ReportVideoAPI.as_view(),
+          name='report-video-api'),
+     path('showcase-video/<int:id>/', ShowcaseVideoView.as_view(),
+          name='showcase-video'),
+     path('like-project-video-api/', LikeProjectVideoView.as_view(),
+          name='like-project-video-api'),
+     path('dislike-project-video-api/', DislikeProjectVideoView.as_view(),
+          name='dislike-project-video-api'),
+     path('like-dislike-replace-html/', ProjectVideoLikeDislikeAjaxView.as_view(),
+          name='like-dislike-replace-html'),
     ]

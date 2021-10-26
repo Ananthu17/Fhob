@@ -3,7 +3,8 @@ import datetime
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, \
+    RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save
@@ -11,7 +12,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from phonenumber_field.modelfields import PhoneNumberField
+# from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
 
@@ -207,8 +208,16 @@ class CustomUser(AbstractUser):
                                        max_length=250,
                                        null=True,
                                        blank=True,)
-    company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="Invalid Phone Number",
+                                        code="invalid_phone_number"
+                                        )
+    company_phone = models.CharField(_("Phone Number"),
+                                     validators=[phone_number_regex],
+                                     max_length=16, null=True,
                                      unique=True)
+    # company_phone = PhoneNumberField(_("Phone Number"), null=True,
+    #                                  unique=True)
     title = models.CharField(_('Title'),
                              max_length=150, null=True, blank=True)
     acting_skill = models.FloatField(_("Acting Skill"), null=True, blank=True)
@@ -245,8 +254,16 @@ class CustomUser(AbstractUser):
     eyes = models.CharField(_("Eyes"),
                             choices=EYES_CHOICES, max_length=150,
                             null=True, blank=True)
-    phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="Invalid Phone Number",
+                                        code="invalid_phone_number"
+                                        )
+    phone_number = models.CharField(_("Phone Number"),
+                                    validators=[phone_number_regex],
+                                    max_length=16, null=True,
                                     unique=True)
+    # phone_number = PhoneNumberField(_("Phone Number"), null=True,
+    #                                 unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
                                      null=True)
     date_of_joining = models.DateField(_("Date of Joining"),
@@ -298,8 +315,10 @@ class CustomUser(AbstractUser):
             name = self.first_name+" "+self.middle_name+" "+self.last_name
         elif self.first_name == None and self.last_name ==None:
             name = ""
-        else:
+        elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
+        else:
+            name = self.email
         return name
 
     def get_height_in_meters(self):
@@ -523,6 +542,25 @@ class Project(models.Model):
         (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
         (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
     ]
+
+    CREW_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
+    ]
+
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
     ULB = 'SAG_ultra _low_budget'
@@ -623,6 +661,9 @@ class Project(models.Model):
     format = models.CharField(_("Format Type"),
                               choices=FORMAT_CHOICES,
                               max_length=150, null=True, blank=True)
+
+    number_of_pages = models.IntegerField(_("Number of Pages"),
+                                          null=True, blank=True)
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
@@ -642,9 +683,6 @@ class Project(models.Model):
                                  related_name='project_location',
                                  verbose_name=_("Location"),
                                  null=True, blank=True)
-    # team = models.ManyToManyField('hobo_user.Team', verbose_name=_("Team"),
-    #                               related_name='project_team',
-    #                               blank=True)
     script = models.FileField(upload_to='script/', null=True, blank=True)
     visibility = models.CharField(_("Visibility"),
                                   choices=VISIBILITY_CHOICES,
@@ -664,7 +702,7 @@ class Project(models.Model):
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     crew_samr = models.CharField(_("Crew SAMR"),
-                                 choices=CAST_SAMR_CHOICES,
+                                 choices=CREW_SAMR_CHOICES,
                                  max_length=150,
                                  default=INDIE_AND_PRO_WITH_RATING_1_STAR)
     video_status = models.CharField(_("Video Status"),
@@ -678,13 +716,16 @@ class Project(models.Model):
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
                                          max_length=150, default=PUBLIC)
-    script_password = models.CharField(max_length=12, null=True, blank=True)
+    script_password = models.CharField(max_length=12, null=True,
+                                       blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
                                             blank=True)
     cast_audition_password = models.CharField(max_length=12,
                                               null=True, blank=True)
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
@@ -756,6 +797,18 @@ class PromoCode(models.Model):
     user_type = models.CharField(_("User Type"),
                                  choices=USER_TYPE_CHOICES,
                                  max_length=150, default=HOBO)
+    indie_monthly_plan_id = models.CharField(
+        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+    indie_yearly_plan_id = models.CharField(
+        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+    pro_monthly_plan_id = models.CharField(
+        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+    pro_yearly_plan_id = models.CharField(
+        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+    company_monthly_plan_id = models.CharField(
+        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+    company_yearly_plan_id = models.CharField(
+        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.promo_code)
@@ -1296,10 +1349,13 @@ class CompanyClient(models.Model):
 
 
 class UserInterest(models.Model):
-    SCENE = 'scene'
-    SHORT = 'short'
-    PILOT = 'pilot'
-    FEATURE = 'feature'
+    MALE = 'male'
+    FEMALE = 'female'
+    OTHERS = 'others'
+    SCENE = 'SCH'
+    SHORT = 'SHO'
+    PILOT = 'PIL'
+    FEATURE = 'FTR'
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
     ULB = 'SAG_ultra _low_budget'
@@ -1309,11 +1365,36 @@ class UserInterest(models.Model):
     ShB = 'SAG_short_film_budget'
     MiB = 'SAG_micro_budget'
     StB = 'SAG_studet_budget'
+    FIVE_TO_SEVEN = 'five_to_seven'
+    EIGHT_TO_TEN = 'eight_to_ten'
+    ELEVEN_TO_FIFTEEN = 'eleven_to_fifteen'
+    SIXTEEN_TO_TWENTY = 'sixteen_to_twenty'
+    TWENTYONE_TO_THIRTY = 'twentyone_to_thirty'
+    THIRTYONE_TO_FOURTY = 'thirtyone_to_fourty'
+    FOURTYONE_TO_FIFTY = 'fourtyone_to_fifty'
+    FIFTYONE_TO_SIXTY = 'fiftyone_to_sixty'
+    SIXTYONE_TO_SEVENTY = 'sixtyone_to_seventy'
+    GENDER_CHOICES = [
+                    (MALE, 'Male'),
+                    (FEMALE, 'Female'),
+                    (OTHERS, 'Others'),
+                    ]
     FORMAT_CHOICES = [
                     (SCENE, 'Scene'),
                     (SHORT, 'Short Film'),
                     (PILOT, 'Pilot'),
                     (FEATURE, 'Feature'),
+                    ]
+    AGE_CHOICES = [
+                    (FIVE_TO_SEVEN, '5 to 7'),
+                    (EIGHT_TO_TEN, '8 to 10'),
+                    (ELEVEN_TO_FIFTEEN, '11 to 15'),
+                    (SIXTEEN_TO_TWENTY, '16 to 20'),
+                    (TWENTYONE_TO_THIRTY, '21 to 30'),
+                    (THIRTYONE_TO_FOURTY, '31 to 40'),
+                    (FOURTYONE_TO_FIFTY, '41 to 50'),
+                    (FIFTYONE_TO_SIXTY, '51 to 60'),
+                    (SIXTYONE_TO_SEVENTY, '61 to 70'),
                     ]
     BUDGET_CHOICES = [
                     (No_PAYMENT, 'No Payment'),
@@ -1344,6 +1425,14 @@ class UserInterest(models.Model):
                               choices=BUDGET_CHOICES,
                               max_length=150,
                               default=No_PAYMENT, null=True)
+    gender = models.CharField(_("Gender"),
+                              choices=GENDER_CHOICES,
+                              max_length=150,
+                              null=True, blank=True)
+    age = models.CharField(_("Age"),
+                           choices=AGE_CHOICES,
+                           max_length=150,
+                           null=True, blank=True)
     location = models.ForeignKey("hobo_user.Location",
                                  on_delete=models.SET_NULL,
                                  related_name='user_interest_location',
@@ -1613,10 +1702,18 @@ class UserAgentManager(models.Model):
                                   null=True,
                                   blank=True
                                   )
-    agent_phone = PhoneNumberField(_("Agent's phone number"),
-                                   null=True,
-                                   blank=True
-                                   )
+    phone_number_regex = RegexValidator(regex=r'^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$',
+                                        message="Invalid Phone Number",
+                                        code="invalid_phone_number"
+                                        )
+    agent_phone = models.CharField(_("Agent's phone number"),
+                                   validators=[phone_number_regex],
+                                   max_length=16, null=True,
+                                   blank=True, unique=True)
+    # agent_phone = PhoneNumberField(_("Agent's phone number"),
+    #                                null=True,
+    #                                blank=True
+    #                                )
     agent_email = models.EmailField(_("Agent's email address"),
                                     null=True,
                                     blank=True)
@@ -1673,6 +1770,7 @@ class UserNotification(models.Model):
     CAST_ATTACH_RESPONSE = 'cast_attach_response'
     CREW_ATTACH_REQUEST = 'crew_attach_request'
     CREW_ATTACH_RESPONSE = 'crew_attach_response'
+    USER_INTEREST = 'user_interest'
     NOTIFICATION_TYPE_CHOICES = [
                                 (TRACKING, 'Tracking'),
                                 (USER_RATING, 'Rating'),
@@ -1696,6 +1794,7 @@ class UserNotification(models.Model):
                                 (CAST_ATTACH_RESPONSE, 'Cast Attach Response'),
                                 (CREW_ATTACH_REQUEST, 'Crew Attach Request'),
                                 (CREW_ATTACH_RESPONSE, 'Crew Attach Response'),
+                                (USER_INTEREST, 'User Interest'),
                                ]
     STATUS_CHOICES = [
                     (READ, 'Read'),
@@ -1857,17 +1956,17 @@ class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=40, unique=True)
+        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=40, unique=True)
+        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=40, unique=True)
+        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=40, unique=True)
+        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=40, unique=True)
+        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=40, unique=True)
+        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.code)

@@ -1,6 +1,7 @@
 import ast
 import io
 import json
+from django.db.models.deletion import PROTECT
 import requests
 # import boto3
 # import datetime
@@ -44,26 +45,29 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (UpdateAPIView,
                                      get_object_or_404)
 
-from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, UserProfile, UserProject, \
-     UserRating, JobType, UserRatingCombined, UserNotification, Project, \
-     VideoRatingCombined, Friend
+from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
+     UserProfile, UserProject, UserRating, JobType, UserRatingCombined, \
+     UserNotification, Project, UserInterest, Friend, VideoRatingCombined
 
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
-    Character, Comment, CrewApplication, ProjectCrew, SceneImages, Sides, ProjectTracking, \
-    ProjectRating, ProjectCrew, CrewApplication, AttachedCrewMember
+    Character, Comment, CrewApplication, ProjectCrew, ReportVideo, SceneImages, Sides, \
+    ProjectTracking, ProjectRating, \
+    AttachedCrewMember, ProjectVideoLikeAndDislike
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
       SidesSerializer, AuditionSerializer, PostProjectVideoSerializer, \
       PasswordSerializer, ProjectLoglineSerializer, TrackProjectSerializer, \
-      RateAuditionSerializer, AuditionStatusSerializer, ProjectRatingSerializer, \
+      RateAuditionSerializer, AuditionStatusSerializer, \
+      ProjectRatingSerializer, \
       CommentSerializer, DeleteCommentSerializer, PdfToImageSerializer, \
       SceneImagesSerializer, SceneImageSerializer, CastRequestSerializer, \
       CancelCastRequestSerializer, UserProjectSerializer, IdSerializer, \
       SidesPDFSerializer, CrewApplicationSerializer, JobTypeSerializer, \
       AttachProjectCrewSerializer, ProjectCrewSerializer, \
       CharacterPasswordSerializer, AttachCrewSerializer, \
-      CrewQualificationSerializer, ReplaceCrewSerializer
+      CrewQualificationSerializer, ReplaceCrewSerializer, \
+      ReportVideoSerializer
 
 from hobo_user.serializers import UserSerializer
 from hobo_user.utils import notify
@@ -302,7 +306,7 @@ class RateUserSkillsAPI(APIView):
                 notify(room_name, notification_msg)
                 # end notification section
 
-                #update notification table - video rating
+                # update notification table - video rating
                 notification = UserNotification()
                 notification.user = project.creator
                 notification.project = project
@@ -406,6 +410,23 @@ class GetProjectRatingNotificationAjaxView(View, JSONResponseMixin):
         return self.render_json_response(context)
 
 
+class GetUserInterestNotificationAjaxView(View, JSONResponseMixin):
+    template_name = 'project/user_interest_notification.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        notification = UserNotification.objects.filter(
+                            Q(user=self.request.user) &
+                            Q(notification_type=UserNotification.USER_INTEREST)
+                            ).order_by('-created_time').first()
+        notification_html = render_to_string(
+                                'project/user_interest_notification.html',
+                                {'notification': notification
+                                })
+        context['notification_html'] = notification_html
+        return self.render_json_response(context)
+
+
 class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
     template_name = 'project/single_film_project.html'
     login_url = '/hobo_user/user_login/'
@@ -494,6 +515,16 @@ class SingleFilmProjectView(LoginRequiredMixin, TemplateView):
         context['crew_rating_dict'] = crew_rating_dict
         context['project'] = project
         context['video_types'] = Project.VIDEO_TYPE_CHOICES
+        writer_obj = AttachedCrewMember.objects.filter(
+                Q(crew__job_type__slug='writer') &
+                Q(crew__project=project) &
+                Q(crew_status=AttachedCrewMember.ATTACHED)
+            ).first()
+        if writer_obj:
+            if writer_obj.user:
+                context['writer'] = writer_obj.user.get_full_name()
+            elif writer_obj.name:
+                context['writer'] = writer_obj.name
         context['friends'] = friends
         return context
 
@@ -639,8 +670,41 @@ class CharacterCreateAPIView(APIView):
                 character_obj.description = data_dict['description']
                 character_obj.project = project
                 character_obj.password = data_dict['password']
-                # character_obj.sort_order = data_dict['sort_order']
+                character_obj.age = data_dict['age']
+                character_obj.gender = data_dict['gender']
                 character_obj.save()
+
+                try:
+                    actoractress = JobType.objects.get(slug='actoractress')
+                    interest = UserInterest.objects.filter(
+                                Q(position=actoractress) &
+                                Q(age=character_obj.age) &
+                                Q(gender=character_obj.gender) &
+                                Q(format=character_obj.project.format) &
+                                Q(location=character_obj.project.location) &
+                                Q(budget=character_obj.project.sag_aftra)
+                                )
+                    for usin in interest:
+                        user = usin.user
+                        notification = UserNotification()
+                        notification.user = user
+                        notification.notification_type = UserNotification.USER_INTEREST
+                        notification.project = project
+                        notification.from_user = project.creator
+                        notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(user.id)
+                        notification_msg = {
+                                'type': 'send_user_interest_notification',
+                                'message': str(notification.message),
+                                'from': str(project.creator.id),
+                                "event": "USER_INTEREST"
+                            }
+                        notify(room_name, notification_msg)
+                except JobType.DoesNotExist:
+                    actoractress = ""
+
                 response = {'message': "Character added",
                             'status': status.HTTP_200_OK}
             except Project.DoesNotExist:
@@ -672,6 +736,7 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         context['project'] = project
         characters = Character.objects.filter(project=project.id)
         context['characters'] = characters
+        context['age'] = UserInterest.AGE_CHOICES
         return context
 
     def post(self, request, *args, **kwargs):
@@ -682,6 +747,8 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
+        age = self.request.POST.getlist('age')
+        # gender = self.request.POST.getlist('gender')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -690,15 +757,31 @@ class EditCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
+
+            gender_id = 'gender_'+str(i+1)
+            gender = self.request.POST.get(gender_id)
+            if gender != "":
+                json_dict['gender'] = gender
+            else:
+                json_dict['gender'] = None
+
+            if age[i] != "":
+                json_dict['age'] = age[i]
+            else:
+                json_dict['age'] = ""
+
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
                 json_dict['password'] = ""
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/update/' + character_ids[i]+'/'
             user_response = requests.put(
-                                'http://127.0.0.1:8000/project/charater/update/'+character_ids[i]+'/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
-                                        'Authorization': token})
+                                         'Authorization': token})
             byte_str = user_response.content
             dict_str = byte_str.decode("UTF-8")
             response = ast.literal_eval(dict_str)
@@ -738,16 +821,19 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
             context['sites_dict'] = sites_dict
         except Project.DoesNotExist:
             context["message"] = "Project not found !!"
+        context['age'] = UserInterest.AGE_CHOICES
         return context
 
     def post(self, request, *args, **kwargs):
         json_dict = {}
+        print(self.request.POST)
         project_id = self.kwargs.get('id')
         user = self.request.user
         names = self.request.POST.getlist('name')
         descriptions = self.request.POST.getlist('description')
         passwords = self.request.POST.getlist('password')
-        # sort_order = self.request.POST.getlist('sort_order')
+        age = self.request.POST.getlist('age')
+        # gender = self.request.POST.getlist('gender')
         count = len(names)
         key = Token.objects.get(user=user).key
         token = 'Token '+key
@@ -755,17 +841,28 @@ class AddCharactersView(LoginRequiredMixin, TemplateView):
         for i in range(count):
             json_dict['name'] = names[i]
             json_dict['description'] = descriptions[i]
-            # if sort_order[i] != "":
-            #     json_dict['sort_order'] = sort_order[i]
-            # else:
-            #     json_dict['sort_order'] = 0
+            if age[i] != "":
+                json_dict['age'] = age[i]
+            else:
+                json_dict['age'] = None
+
+            gender_id = 'gender_'+str(i+1)
+            gender = self.request.POST.get(gender_id)
+            if gender != "":
+                json_dict['gender'] = gender
+            else:
+                json_dict['gender'] = None
+
             if passwords[i] != "":
                 json_dict['password'] = passwords[i]
             else:
                 json_dict['password'] = None
             json_dict['project'] = project_id
+            origin_url = settings.ORIGIN_URL
+            complete_url = origin_url + \
+                '/project/charater/create/'
             user_response = requests.post(
-                                'http://127.0.0.1:8000/project/charater/create/',
+                                complete_url,
                                 data=json.dumps(json_dict),
                                 headers={'Content-type': 'application/json',
                                          'Authorization': token})
@@ -794,7 +891,10 @@ class AddSidesAjaxView(View, JSONResponseMixin):
         count = self.request.GET.get('count')
         form_html = render_to_string(
                                 'project/add-sides-form.html',
-                                {'count': count})
+                                {
+                                 'count': count,
+                                 'age': UserInterest.AGE_CHOICES
+                                 })
         context['form_html'] = form_html
         return self.render_json_response(context)
 
@@ -1037,6 +1137,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
             if url.startswith('vimeo.com/'):
                 video_url = url.split('vimeo.com/')[1]
                 audition_obj.video_url = video_url
+        audition_obj.status_update_date = timezone.now()
         audition_obj.save()
         # update user-project-table
         user_project_obj = UserProject()
@@ -1047,6 +1148,7 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.character = character
         user_project_obj.save()
         # end
+
         messages.success(self.request, "Audition submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -1149,6 +1251,7 @@ class SubmitAuditionAPI(APIView):
                     audition_obj.video_url = video_url
             if video_type == 'facebook':
                 audition_obj.video_url = url
+            audition_obj.status_update_date = timezone.now()
             audition_obj.save()
 
             # update user-project-table
@@ -1920,7 +2023,7 @@ class UpdateAuditionStatusAPI(APIView):
                 else:
                     msg = "Audition status updated to "+audition.get_audition_status_display()
 
-                #update notification table
+                # update notification table
                 notification = UserNotification()
                 notification.user = audition.user
                 notification.project = audition.project
@@ -1959,7 +2062,6 @@ class ChemistryRoomView(LoginRequiredMixin, TemplateView):
     template_name = 'project/chemistry-room.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2859,7 +2961,7 @@ class TopRatedMembersAjaxView(View, JSONResponseMixin):
         context = dict()
         user_list = []
         user_rating_objs = UserRatingCombined.objects.all()
-        
+
         try:
             actoractress = JobType.objects.get(slug='actoractress')
             actoractress_list = user_rating_objs.filter(job_type=actoractress).order_by('-rating', '-no_of_votes', '-no_of_projects')[:5]
@@ -3357,6 +3459,7 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
             crew_apply_obj.agent = agent_user
         except CustomUser.DoesNotExist:
             pass
+        crew_apply_obj.status_update_date = timezone.now()
         crew_apply_obj.save()
 
         # update user-project-table
@@ -3368,6 +3471,7 @@ class CrewApplyAuditionView(LoginRequiredMixin, TemplateView):
         user_project_obj.crew = project_crew
         user_project_obj.save()
         # end
+
         messages.success(self.request, "Application submitted successfully")
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -3409,6 +3513,7 @@ class CrewApplyAPI(APIView):
                 crew_apply_obj.cover_letter = cover_letter
             except KeyError:
                 raise ParseError('Request has no cover image attached')
+            crew_apply_obj.status_update_date = timezone.now()
             crew_apply_obj.save()
             # update user-project-table
             user_project_obj = UserProject()
@@ -3419,6 +3524,7 @@ class CrewApplyAPI(APIView):
             user_project_obj.crew = project_crew
             user_project_obj.save()
             # end
+
             response = {'message': "Application submitted",
                         'status': status.HTTP_200_OK}
 
@@ -3847,6 +3953,30 @@ class AddProjectCrewAPI(APIView):
                 crew_obj.job_type = job_type
                 crew_obj.count = data_dict['count']
                 crew_obj.save()
+                interest = UserInterest.objects.filter(
+                                Q(position=job_type) &
+                                Q(format=project.format) &
+                                Q(location=project.location) &
+                                Q(budget=project.sag_aftra)
+                            )
+                for usin in interest:
+                    user = usin.user
+                    notification = UserNotification()
+                    notification.user = user
+                    notification.notification_type = UserNotification.USER_INTEREST
+                    notification.project =  project
+                    notification.from_user = project.creator
+                    notification.message = str(project.creator)+" posted a role in project "+str(project.title)+" that matches your interest."
+                    notification.save()
+                    # send notification
+                    room_name = "user_"+str(user.id)
+                    notification_msg = {
+                            'type': 'send_user_interest_notification',
+                            'message': str(notification.message),
+                            'from': str(project.creator.id),
+                            "event": "USER_INTEREST"
+                        }
+                    notify(room_name, notification_msg)
             response = {'message': 'Project Crew Added', 'status':
                         status.HTTP_200_OK}
         else:
@@ -4381,3 +4511,197 @@ class AcceptCrewAttachRequestAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class ReportVideoAPI(APIView):
+    serializer_class = ReportVideoSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            obj = ReportVideo()
+            obj.reported_by_user = self.request.user
+            obj.video_url = data_dict['video_url']
+            obj.project_id = data_dict['project_id']
+            obj.project_name = data_dict['project_name']
+            obj.reason = data_dict['reason']
+            obj.save()
+            response = {'mesage': "Video Reported", 'status':
+                        status.HTTP_200_OK}
+            messages.success(self.request, "Video Reported")
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ShowcaseVideoView(LoginRequiredMixin, TemplateView):
+    template_name = 'project/video_showcase.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_id = self.kwargs.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        context['project'] = project
+
+        job_types_dict = {}
+        team_members = Team.objects.filter(project=project_id)
+        for team_member in team_members:
+            if team_member.job_type in job_types_dict:
+                job_types_dict[team_member.job_type].append(team_member)
+            else:
+                job_types_dict[team_member.job_type] = []
+                job_types_dict[team_member.job_type].append(team_member)
+        context["job_types_dict"] = job_types_dict
+
+        like_obj = ProjectVideoLikeAndDislike.objects.filter(
+                                Q(user=self.request.user) &
+                                Q(project=project)
+                            ).first()
+        context['like_obj'] = like_obj
+
+        try:
+            friend_obj = Friend.objects.get(user=self.request.user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
+        context['friends'] = friends
+        return context
+
+
+class LikeProjectVideoView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['id']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    obj = ProjectVideoLikeAndDislike.objects.get(
+                                Q(project=project) &
+                                Q(user=user)
+                            )
+                    if obj.like_or_dislike == ProjectVideoLikeAndDislike.DISLIKE:
+                        obj.user = user
+                        obj.project = project
+                        obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
+                        obj.save()
+                        response = {'message': "You liked this video.", 'status':
+                                    status.HTTP_200_OK}
+                    else:
+                        obj.delete()
+                        response = {'message': "Like Removed", 'status':
+                                    status.HTTP_200_OK}
+                except ProjectVideoLikeAndDislike.DoesNotExist:
+                    obj = ProjectVideoLikeAndDislike()
+                    obj.user = user
+                    obj.project = project
+                    obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
+                    obj.save()
+                    response = {'message': "You liked this video.", 'status':
+                                status.HTTP_200_OK}
+                project.likes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
+                                ).count()
+                project.dislikes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE)
+                                ).count()
+                project.save()
+            except Project.DoesNotExist:
+                response = {'error': "Invalid ID", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class DislikeProjectVideoView(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            project_id = data_dict['id']
+            user = self.request.user
+            try:
+                project = Project.objects.get(pk=project_id)
+                try:
+                    obj = ProjectVideoLikeAndDislike.objects.get(
+                                Q(project=project) &
+                                Q(user=user)
+                            )
+                    if obj.like_or_dislike == ProjectVideoLikeAndDislike.LIKE:
+                        obj.user = user
+                        obj.project = project
+                        obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
+                        obj.save()
+                        response = {'message': "You disliked this video.", 'status':
+                                    status.HTTP_200_OK}
+                    else:
+                        obj.delete()
+                        response = {'message': "Dislike Removed", 'status':
+                                    status.HTTP_200_OK}
+                except ProjectVideoLikeAndDislike.DoesNotExist:
+                    obj = ProjectVideoLikeAndDislike()
+                    obj.user = user
+                    obj.project = project
+                    obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
+                    obj.save()
+                    response = {'message': "You disliked this video.", 'status':
+                                status.HTTP_200_OK}
+                project.likes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
+                                ).count()
+                project.dislikes = ProjectVideoLikeAndDislike.objects.filter(
+                                    Q(project=project) &
+                                    Q(like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE)
+                                ).count()
+                project.save()
+
+            except Project.DoesNotExist:
+                response = {'error': "Invalid ID", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
+
+class ProjectVideoLikeDislikeAjaxView(View, JSONResponseMixin):
+    template_name = 'project/like_dislike.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        project_id = self.request.GET.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        like_obj = ProjectVideoLikeAndDislike.objects.filter(
+                        Q(user=self.request.user) &
+                        Q(project=project)
+                    ).first()
+        like_dislike_html = render_to_string(
+                                'project/like_dislike.html',
+                                {'like_obj': like_obj,
+                                 'project':project})
+        context['like_dislike_html'] = like_dislike_html
+        return self.render_json_response(context)

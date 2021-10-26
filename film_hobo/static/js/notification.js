@@ -24,9 +24,33 @@ notificationSocket.onmessage = function (e) {
         },
         error: function(data){},
         success: function(response){
-            $('.notification-bell').html(
-                '<span class="notification_count_span">'+response['unread_count']+'</span>'
-                )
+            console.log("response['unread_count']", response['unread_count'])
+            if(response['unread_count']!=0){
+                    $('.notification-bell').html(
+                        '<span class="mm-icon-button__badge">'+response['unread_count']+'</span>'
+                        )
+                }
+            }
+    });
+    $.ajax
+    ({
+        type: "GET",
+        url: "/message/get-message-notification-api/",
+        dataType: 'json',
+        async: false,
+        data: {},
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader ("Authorization", token);
+        },
+        error: function(data){},
+        success: function(response){
+            if(response['unread_msg_count']!=0){
+                console.log("count: ",response['unread_msg_count'])
+                    $('.message-notification').html(
+                        '<span class="mm-icon-button__badge">'+response['unread_msg_count']+'</span>'
+                        );
+                    $('.message_count').html("("+response['unread_msg_count']+")");
+                }
         }
     });
     let data = JSON.parse(e.data);
@@ -254,6 +278,35 @@ notificationSocket.onmessage = function (e) {
                      }
              });
             break;
+        case "USER_INTEREST":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             console.log(data_dict)
+             $.get('/project/get-user-interest-notification-html/', data_dict)
+             .done(function(data) {
+                 if(data.results!='')
+                     {
+                         $('.notification-modal-content').prepend(data['notification_html'])
+                     }
+             });
+            break;
+        case "USER_MESSAGES":
+             // get membership change notification html
+             data_dict = {}
+             data_dict['message'] = message
+             data_dict['msg_thread'] = data['msg_thread']
+             var chat_box_id = "#new_message_"+data['msg_thread']
+             console.log(data_dict)
+             $.get('/message/get-new-message-html/', data_dict)
+             .done(function(data) {
+                 console.log(chat_box_id)
+                 if(data.results!='')
+                     {
+                         $(chat_box_id).prepend(data['new_message_html'])
+                     }
+             });
+            break;
         default:
             console.log("No event")
     }
@@ -312,7 +365,7 @@ $('body').on('click' , '.notification_link', function(){
                     $('.notification-bell').html("");
                     if(response['unread_count']!=0){
                         $('.notification-bell').html(
-                            '<span class="notification_count_span">'+response['unread_count']+'</span>'
+                            '<span class="mm-icon-button__badge">'+response['unread_count']+'</span>'
                             )
                     }
                 }

@@ -1,7 +1,7 @@
 # from urllib.parse import urlparse
 
 from rest_framework import serializers
-from phonenumber_field.serializerfields import PhoneNumberField
+# from phonenumber_field.serializerfields import PhoneNumberField
 from django.utils.translation import ugettext_lazy as _
 
 try:
@@ -25,6 +25,7 @@ from .models import CustomUser, Country, GuildMembership, \
     UserAgentManager, UserNotification, UserProfile, CoWorker, UserInterest, \
     UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
     Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
+
 
 from authemail.models import SignupCode
 from rest_framework.authtoken.models import Token
@@ -94,7 +95,8 @@ class RegisterSerializer(serializers.Serializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'middle_name',
-                  'last_name', 'password1', 'password2']
+                  'last_name', 'password1', 'password2',
+                  'beta_user', 'beta_user_code', 'beta_user_end']
 
     def validate_username(self, username):
         username = get_adapter().clean_username(username)
@@ -120,6 +122,15 @@ class RegisterSerializer(serializers.Serializer):
     def custom_signup(self, request, user):
         pass
 
+    def to_internal_value(self, data):
+        if data.get('beta_user') == '':
+            data['beta_user'] = None
+        if data.get('beta_user_code') == '':
+            data['beta_user_code'] = None
+        if data.get('beta_user_end') == '':
+            data['beta_user_end'] = None
+        return super(RegisterSerializer, self).to_internal_value(data)
+
     def get_cleaned_data(self):
         return {
             'username': self.validated_data.get('username', ''),
@@ -128,6 +139,9 @@ class RegisterSerializer(serializers.Serializer):
             'first_name': self.validated_data.get('first_name', ''),
             'middle_name': self.validated_data.get('middle_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
+            'beta_user': self.validated_data.get('beta_user', ''),
+            'beta_user_code': self.validated_data.get('beta_user_code', ''),
+            'beta_user_end': self.validated_data.get('beta_user_end', ''),
         }
 
     def save(self, request):
@@ -164,9 +178,9 @@ class RegisterIndieSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
-    phone_number = serializers.CharField(
-        max_length=15, required=True
-    )
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
+                                          max_length=16,
+                                          allow_blank=True)
     date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
     membership = serializers.StringRelatedField()
     address = serializers.CharField(required=True)
@@ -372,10 +386,9 @@ class RegisterProSerializer(serializers.Serializer):
         max_length=150,
         required=True,
     )
-    phone_number = serializers.CharField(
-        max_length=15, required=True
-    )
-
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
+                                          max_length=16,
+                                          required=True)
     date_of_birth = serializers.DateField(format="%Y-%m-%d", required=True)
     membership = serializers.StringRelatedField()
     address = serializers.CharField(required=True)
@@ -499,7 +512,8 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
-    phone_number = PhoneNumberField()
+    phone_number = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
+                                          max_length=16)
     date_of_birth = serializers.DateField()
     address = serializers.CharField()
     country = serializers.CharField()
@@ -509,7 +523,8 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     company_name = serializers.CharField()
     company_address = serializers.CharField()
     company_website = serializers.CharField(allow_blank=True)
-    company_phone = PhoneNumberField()
+    company_phone = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
+                                           max_length=16)
     title = serializers.CharField()
     membership = serializers.ChoiceField(choices=CustomUser.MEMBERSHIP_CHOICES)
     beta_user_end = serializers.DateField(allow_null=True)
@@ -879,9 +894,8 @@ class AgentManagerSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
-    agent_phone = PhoneNumberField(
-        required=True,
-    )
+    agent_phone = serializers.RegexField("^\s*(?:\+?(\d{1,3}))?([-. (]*(\d{3})[-. )]*)?((\d{3})[-. ]*(\d{2,4})(?:[-.x ]*(\d+))?)\s*$",
+                                         max_length=16, required=False)
     agent_job_type = serializers.CharField(
         max_length=150,
         required=True,
@@ -963,7 +977,7 @@ class UserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['position', 'format', 'location', 'budget']
+        fields = ['position', 'format', 'location', 'budget', 'age', 'gender']
 
 
 class EditUserInterestSerializer(serializers.ModelSerializer):
@@ -987,10 +1001,18 @@ class EditUserInterestSerializer(serializers.ModelSerializer):
         max_length=150,
         required=True,
     )
+    age = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
+    gender = serializers.CharField(
+        max_length=150,
+        required=False,
+    )
 
     class Meta:
         model = UserInterest
-        fields = ['id', 'position', 'format', 'location', 'budget']
+        fields = ['id', 'position', 'format', 'location', 'budget', 'age', 'gender']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):
@@ -1100,7 +1122,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator', 'title', 'format', 'genre', 'rating',
                   'video_url', 'video_type', 'last_date', 'location',
                   'visibility_password', 'cast_attachment', 'cast_pay_rate',
-                  'cast_samr', 'timestamp', 'visibility']
+                  'cast_samr', 'timestamp', 'visibility', 'likes',
+                  'video_cover_image']
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -1131,10 +1154,3 @@ class AddBetaTesterCodeSerializer(serializers.ModelSerializer):
                   'indie_monthly_plan_id', 'indie_yearly_plan_id',
                   'pro_monthly_plan_id', 'pro_yearly_plan_id',
                   'company_monthly_plan_id', 'company_yearly_plan_id']
-
-
-class EditBetaTesterCodeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = BetaTesterCodes
-        fields = ['code', 'days']

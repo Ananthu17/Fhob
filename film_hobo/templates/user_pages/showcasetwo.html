@@ -1,0 +1,1258 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load range %}
+
+{% block content %}
+<style>
+    .list-group a li{
+        list-style: none;
+    }
+    .clicked{
+        color: orange !important;
+    }
+    .proj-cnt-menu-li li a {
+        font-size: 10px;
+        padding-right: 26px;
+        font-weight: normal;
+    }
+    @media only screen and (max-width: 1300px){
+        .proj-cnt-menu-li li a{
+            padding-right: 16px;
+        }
+    }
+    /* font-size: 10px;
+    padding-right: 26px; */
+</style>
+<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left section  -->
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
+                <div class=" proj-calender-sec mt-2">
+                    <div class="mt-2 search-txt">
+                        <label class="swc-top-ten-top">
+                            Top Ten
+                        </label>
+                    </div>
+                    <div>
+                        <label class="d-flex justify-content-center txt-orange">Year</label>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div>
+                            <a href="javascript:void(0)"><i class="fa fa-play prv-button nxt-btn" aria-hidden="true" id="topdecrease"></i></a>
+                        </div>
+                        <div class="ml-2">
+                            <label class="d-flex justify-content-center year" id="topyear">2021</label>
+                        </div>
+                        <div class="ml-2">
+                            <a href="javascript:void(0)"><i class="fa fa-play nxt-btn" aria-hidden="true" id="topincrease"></i></a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="d-flex justify-content-center txt-orange">Month</label>
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        <ul class="list-group home-month swc-home">
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">January</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">February</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">March</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">April</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">May</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">June</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">July</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">August</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">September</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">October</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">November</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">December</li>
+                            </a>
+                        </ul>
+                    </div>
+                    <div class="swc-top-ten-btm">
+                        Top Ten
+                    </div>
+                </div>
+                <div class=" proj-calender-sec mt-3">
+                    <div class="mt-2 search-txt mb-3">
+                        <label class="swc-left-scenes-sec ">Scenes</label>
+                        <label class="swc-left-scenes-sec ">&</label>
+                        <label class="swc-left-scenes-sec ">Shorts</label>
+                    </div>
+                    <!-- <div>
+                            <label class="d-flex justify-content-center txt-orange">Year</label>
+                        </div> -->
+                    <div class="row justify-content-center">
+                        <div>
+                            <a href="javascript:void(0)"><i class="fa fa-play prv-button nxt-btn" aria-hidden="true" id="decrease"></i></a>
+                        </div>
+                        <div class="ml-2">
+                            <label class="d-flex justify-content-center year" id="year">2021</label>
+                        </div>
+                        <div class="ml-2">
+                            <a href="javascript:void(0)"><i class="fa fa-play nxt-btn" aria-hidden="true" id="increase"></i></a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="d-flex justify-content-center txt-orange">Month</label>
+                    </div>
+
+                    <div class="d-flex justify-content-center left-mode-sec">
+                        <ul class="list-group home-month swc-home">
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">January</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">February</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">March</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">April</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">May</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">June</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">July</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">August</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">September</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">October</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">November</li>
+                            </a>
+                            <a class="text-dark" href="javascript:void(0)">
+                                <li class="list-group-item border-0 month-algn" onclick="newMonthFilter(this)">December</li>
+                            </a>
+                        </ul>
+                    </div>
+                    <div>
+                        <label class="d-flex justify-content-center txt-orange">Day</label>
+                    </div>
+                    <!-- <div > -->
+                    <table class="table borderless d-flex justify-content-center home-date proj-table-font">
+
+                        <tbody>
+                            <tr>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">1</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">2</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">3</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">4</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">5</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">6</a></td>
+                                <td><a class="text-dark" href="javascript:void(0)" onclick="date_filter(this)">7</a></td>
+                            </tr>
+                            <tr>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">8</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">9</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">10</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">11</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">12</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">13</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">14</a></td>
+                            </tr>
+
+                            <tr>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">15</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">16</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">17</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">18</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">19</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">20</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">21</a></td>
+                            </tr>
+
+                            <tr>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">22</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">23</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">24</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">25</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">26</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">27</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">28</a></td>
+                            </tr>
+
+                            <tr>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">29</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">30</a></td>
+                                <td><a class="text-dark " href="javascript:void(0)" onclick="date_filter(this)">31</a></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- left section end  -->
+            <!-- center section  -->
+
+            <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
+                <!-- Row 1  -->
+                <div class="proj-input-sec-bg">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display mb-1">
+                        </div>
+                       <div class="proj-owl-right-margin">
+                            <!-- owl-carousel  -->
+                        <div id="demo1">
+                        <div class="owl-carousel owl-theme " id="project-owl1">
+                            {% if scenes != None  %}
+                            {% for project in scenes %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    {% if scenes.0 == project %}
+                                    <div class="swc-owl-img-number flex-row justify-content-between">
+                                        <div class="swc-owl-list-head">Scenes</div>
+                                        <span class="swc-owl-img-trophy-sec mr-3">
+                                            <img src="{% static 'images/trophy.png' %}" alt=""
+                                                class="swc-owl-img-trophy">
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                    {% else %}
+                                    <div class="swc-owl-img-number">
+                                        {{forloop.counter}}
+                                    </div>
+                                    {% endif %}
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            {% if project.rating != None %}
+                                            {% for item in project.rating|times %}
+                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
+                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+                <!-- Row 2  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display mb-1">
+
+                        </div>
+                       <div class="proj-owl-right-margin">
+                            <!-- owl-carousel  -->
+                        <div id="demo2">
+                        <div class="owl-carousel owl-theme " id="project-owl2">
+                            {% if toprated_scenes != None  %}
+                            {% for project in toprated_scenes %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    {% if toprated_scenes.0 == project %}
+                                    <div class="swc-owl-img-number flex-row justify-content-between">
+                                        <div class="swc-owl-list-head">Shorts</div>
+                                        <span class="swc-owl-img-trophy-sec mr-3">
+                                            <img src="{% static 'images/trophy.png' %}" alt=""
+                                                class="swc-owl-img-trophy">
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                    {% else %}
+                                    <div class="swc-owl-img-number">
+                                        {{forloop.counter}}
+                                    </div>
+                                    {% endif %}
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            {% if project.rating != None %}
+                                            {% for item in project.rating|times %}
+                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
+                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+                <!-- Row 3  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display align-items-center">
+                            <div class="swc-owl-list-head mt-0 mr-3">Scenes</div>
+                            <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo3">
+                        <div class="owl-carousel owl-theme " id="project-owl3">
+                            {% if filims != None  %}
+                            {% for project in filims %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            {% if project.rating != None %}
+                                            {% for item in project.rating|times %}
+                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
+                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+                <!-- Row 4  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display align-items-center">
+                            <div class="swc-owl-list-head mt-0 mr-3">Shorts</div>
+                            <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo4">
+                        <div class="owl-carousel owl-theme " id="project-owl4">
+                            {% if toprated_filims != None  %}
+                            {% for project in toprated_filims %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            {% if project.rating != None %}
+                                            {% for item in project.rating|times %}
+                                            <span class="fa fa-star checked "></span>
+                                            {% endfor %}
+                                            {% for item in project.rating|blank %}
+                                            <span class="fa fa-star-o"></span>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center section End  -->
+            <!-- Right section  -->
+
+            <!-- Right section End  -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    // OwlCarousel Script
+    $('#project-owl1').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:5,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#project-owl2').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:5,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#project-owl3').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:5,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#project-owl4').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:5,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+
+
+    const origin_url = window.location.origin
+
+    const owlSettings = (owl)=>{
+        return owl.owlCarousel({
+                    loop:true,
+                    margin:10,
+                    responsiveClass:true,
+                    nav: true,
+                    navText: [
+                    "<i class='fa fa-caret-left'></i>",
+                    "<i class='fa fa-caret-right'></i>"
+                    ],
+                    responsive:{
+                        0:{
+                            items:1,
+                            nav:true
+                        },
+                        641:{
+                            items:2,
+                            nav:true
+                        },
+                        885:{
+                            items:3,
+                            nav:true
+                        },
+                        992:{
+                            items:4,
+                            nav:true
+                        },
+                        1200:{
+                            items:5,
+                            nav:true,
+                            loop:false
+                        },
+                    }
+                });
+    }
+
+    const dataInsertion = (data, id=5)=>{
+        console.log("DATA =",data)
+        console.log("ID=",id)
+        if (id!=5){
+            console.log(`#demo${id}`)
+            let rows = {'1':data.top_scenes,'2':data.top_shorts,'3':data.new_scenes, '4':data.new_shorts}
+            $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
+            let counter = 0
+            jQuery.each(rows[id], function() {
+
+                let div1 = `<div class="item">
+                                <div class="swc-img-div-width">`
+                let divimg = ""
+                if(this.video_cover_image !== null){
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="${this.video_cover_image}" class="swc-video-img ">
+                                 </div>`
+                }
+                else{
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                </div>`
+                }
+
+                let div2 = `<div class="swc-img-project-txt ">
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="'${origin_url}/project/single-film-project/${this.id}/'"
+                                        title="2245"> #${this.id}</a></span></span>
+                                    <span class="">Scene</span><span class="hom-rate-star">`
+                let div3 = ""
+                    for (let i = 0; i < this.rating; i++) {
+                        div3 += "<span class='fa fa-star checked'></span>"
+                    }
+                let div4 = ""
+                    for (let i = 0; i < 5-this.rating; i++) {
+                        div4 += "<span class='fa fa-star-o'></span>"
+                    }
+                let div5 =`</span></div>
+                                <div class="swc-img-project-name-txt">
+                                    <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
+                                        title="Cart Ride">${this.title}</a></span>
+                                    <span>Team<a href="">#1</a></span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                            <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                            class="swc-like-image">
+                                            </span>
+                                            <span>${this.likes}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>`
+                let div = div1+divimg+div2+div3+div4+div5
+                // appending div to results
+                $(`#project-owl${id}`).append(div);
+            })
+            var owl = $(`#project-owl${id}`);
+            owlSettings(owl);
+        }
+        else{
+            $('#demo1').html("<div class='owl-carousel owl-theme ' id='project-owl1'>");
+            $('#demo2').html("<div class='owl-carousel owl-theme ' id='project-owl2'>");
+            $('#demo3').html("<div class='owl-carousel owl-theme ' id='project-owl3'>");
+            $('#demo4').html("<div class='owl-carousel owl-theme ' id='project-owl4'>");
+            // Scenes
+            let counter = 0
+            jQuery.each(data.top_scenes, function() {
+                counter += 1
+                let div0 = ``
+
+                let div1 = `<div class="item">
+                                <div class="swc-img-div-width">`
+                if(data.top_scenes[0] == this){
+                    div0 = `<div class="swc-owl-img-number flex-row justify-content-between">
+                                <div class="swc-owl-list-head">Scenes</div>
+                                    <span class="swc-owl-img-trophy-sec mr-3">
+                                        <img src="{% static 'images/trophy.png' %}" alt=""
+                                            class="swc-owl-img-trophy">
+                                    </span>
+                                <span></span>
+                            </div>`
+                }
+                else{
+                    div0 = `<div class="swc-owl-img-number flex-row justify-content-between">
+                                <div class="swc-owl-list-head">Scenes</div>
+                                    <span class="swc-owl-img-trophy-sec mr-3">
+                                        ${counter}
+                                    </span>
+                                <span></span>
+                            </div>`
+                }
+
+                let divimg = ""
+                if(this.video_cover_image !== null){
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="${this.video_cover_image}" class="swc-video-img ">
+                                 </div>`
+                }
+                else{
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                </div>`
+                }
+
+                let div2 = `<div class="swc-img-project-txt ">
+                                    <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
+                                        title="2245"> #${this.id}</a></span></span>
+                                    <span class="">Scene</span><span class="hom-rate-star">`
+                let div3 = ""
+                    for (let i = 0; i < this.rating; i++) {
+                        div3 += "<span class='fa fa-star checked'></span>"
+                    }
+                let div4 = ""
+                    for (let i = 0; i < 5-this.rating; i++) {
+                        div4 += "<span class='fa fa-star-o'></span>"
+                    }
+                let div5 =`</span></div>
+                                <div class="swc-img-project-name-txt">
+                                    <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
+                                        title="Cart Ride">${this.title}</a></span>
+                                    <span>Team<a href="">#1</a></span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                            <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                            class="swc-like-image">
+                                            </span>
+                                            <span>${this.likes}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>`
+                let div = div1+div0+divimg+div2+div3+div4+div5
+                // appending div to results
+                $('#project-owl1').append(div);
+            })
+            var owl = $("#project-owl1");
+            owlSettings(owl);
+            // Top scenes
+            jQuery.each(data.top_shorts, function() {
+                counter += 1
+                let div0 = `<div class="swc-owl-img-number flex-row justify-content-between">
+                                <div class="swc-owl-list-head">Scenes</div>
+                                    <span class="swc-owl-img-trophy-sec mr-3">
+                                        <img src="{% static 'images/trophy.png' %}" alt=""
+                                            class="swc-owl-img-trophy">
+                                    </span>
+                                <span></span>
+                            </div>`
+
+                let div1 = `<div class="item">
+                                <div class="swc-img-div-width">`
+                if(data.top_shorts[0] == this){
+                    div0 = `<div class="swc-owl-img-number flex-row justify-content-between">
+                                <div class="swc-owl-list-head">Scenes</div>
+                                    <span class="swc-owl-img-trophy-sec mr-3">
+                                        <img src="{% static 'images/trophy.png' %}" alt=""
+                                            class="swc-owl-img-trophy">
+                                    </span>
+                                <span></span>
+                            </div>`
+                }
+                else{
+                    div0 = `<div class="swc-owl-img-number flex-row justify-content-between">
+                                <div class="swc-owl-list-head">Scenes</div>
+                                    <span class="swc-owl-img-trophy-sec mr-3">
+                                        ${counter}
+                                    </span>
+                                <span></span>
+                            </div>`
+                }
+
+                let divimg = ""
+                if(this.video_cover_image !== null){
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="${this.video_cover_image}" class="swc-video-img ">
+                                 </div>`
+                }
+                else{
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                </div>`
+                }
+
+                let div2 = `<div class="swc-img-project-txt ">
+                                    <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
+                                        title="2245"> #${this.id}</a></span></span>
+                                    <span class="">Scene</span><span class="hom-rate-star">`
+                let div3 = ""
+                    for (let i = 0; i < this.rating; i++) {
+                        div3 += "<span class='fa fa-star checked'></span>"
+                    }
+                let div4 = ""
+                    for (let i = 0; i < 5-this.rating; i++) {
+                        div4 += "<span class='fa fa-star-o'></span>"
+                    }
+                let div5 =`</span></div>
+                                <div class="swc-img-project-name-txt">
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
+                                        title="Cart Ride">${this.title}</a></span>
+                                    <span>Team<a href="">#1</a></span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                            <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                            class="swc-like-image">
+                                            </span>
+                                            <span>${this.likes}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>`
+                let div = div1+div0+divimg+div2+div3+div4+div5
+                // appending div to results
+                $('#project-owl2').append(div);
+            })
+            var owl = $("#project-owl2");
+            owlSettings(owl);
+            // Filims
+            jQuery.each(data.new_scenes, function() {
+                let div1 = `<div class="item">
+                                <div class="swc-img-div-width">`
+                let divimg = ""
+                if(this.video_cover_image !== null){
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="${this.video_cover_image}" class="swc-video-img ">
+                                 </div>`
+                }
+                else{
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                </div>`
+                }
+
+                let div2 = `<div class="swc-img-project-txt ">
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
+                                        title="2245"> #${this.id}</a></span></span>
+                                    <span class="">Scene</span><span class="hom-rate-star">`
+                let div3 = ""
+                    for (let i = 0; i < this.rating; i++) {
+                        div3 += "<span class='fa fa-star checked'></span>"
+                    }
+                let div4 = ""
+                    for (let i = 0; i < 5-this.rating; i++) {
+                        div4 += "<span class='fa fa-star-o'></span>"
+                    }
+                let div5 =`</span></div>
+                                <div class="swc-img-project-name-txt">
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
+                                        title="Cart Ride">${this.title}</a></span>
+                                    <span>Team<a href="">#1</a></span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                            <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                            class="swc-like-image">
+                                            </span>
+                                            <span>${this.likes}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>`
+                let div = div1+divimg+div2+div3+div4+div5
+                // appending div to results
+                $('#project-owl3').append(div);
+            })
+            var owl = $("#project-owl3");
+            owlSettings(owl);
+            // Top filims
+            jQuery.each(data.new_shorts, function() {
+                let div1 = `<div class="item">
+                                <div class="swc-img-div-width">`
+                let divimg = ""
+                if(this.video_cover_image !== null){
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="${this.video_cover_image}" class="swc-video-img ">
+                                 </div>`
+                }
+                else{
+                    divimg = `<div class="swc-image-frame">
+                                    <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                </div>`
+                }
+
+                let div2 = `<div class="swc-img-project-txt ">
+                                    <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
+                                        title="2245"> #${this.id}</a></span></span>
+                                    <span class="">Scene</span><span class="hom-rate-star">`
+                let div3 = ""
+                    for (let i = 0; i < this.rating; i++) {
+                        div3 += "<span class='fa fa-star checked'></span>"
+                    }
+                let div4 = ""
+                    for (let i = 0; i < 5-this.rating; i++) {
+                        div4 += "<span class='fa fa-star-o'></span>"
+                    }
+                let div5 =`</span></div>
+                                <div class="swc-img-project-name-txt">
+                                    <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
+                                        title="Cart Ride">${this.title}</a></span>
+                                    <span>Team<a href="">#1</a></span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                            <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                            class="swc-like-image">
+                                            </span>
+                                            <span>${this.likes}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>`
+                let div = div1+divimg+div2+div3+div4+div5
+                // appending div to results
+                $('#project-owl4').append(div);
+            })
+            var owl = $("#project-owl4");
+            owlSettings(owl);
+            }
+    }
+
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
+    }
+
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
+    }
+
+    // Script for search functionality
+    $('#search').on('change',()=>{
+        post_url = origin_url + `/hobo_user/showcase/search/?search=${$('#search').val()}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Decreases (Date Filter)
+    $('#topdecrease').on('click',()=>{
+        document.getElementById('topyear').innerHTML = parseInt(document.getElementById('topyear').innerHTML)-1
+
+        post_url = origin_url + `/hobo_user/projects/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('topyear').innerHTML,
+                method : "topten"
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Increases (Date Filter)
+    $('#topincrease').on('click',()=>{
+        document.getElementById('topyear').innerHTML = parseInt(document.getElementById('topyear').innerHTML)+1
+        post_url = origin_url + `/hobo_user/showcase/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('topyear').innerHTML,
+                method : "topten"
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Decreases (Date Filter)
+    $('#decrease').on('click',()=>{
+        document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)-1
+
+        post_url = origin_url + `/hobo_user/projects/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('year').innerHTML,
+                method : "newscene"
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    // Runs when year Increases (Date Filter)
+    $('#increase').on('click',()=>{
+        document.getElementById('year').innerHTML = parseInt(document.getElementById('year').innerHTML)+1
+        post_url = origin_url + `/hobo_user/showcase/date/`
+        console.log('post url :',post_url)
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('year').innerHTML,
+                method : "newscene"
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    })
+
+    let date = ''
+
+    let months = {'January':'01','February':'02','March':'03','April':'04','May':'05','June':'06',
+                  'July':'07','August':'08','September':'09','October':'10','November':'11','December':'12'}
+
+    let genre = { 'ACTION':'ACT', 'ADVENTURE':'ADV', 'ANIMATION':'ANI', 'BIOGRAPHY':'BIO', 'COMEDY':'COM',
+                 'CRIME':'CRI', 'DOCUMENTARY':'DOC', 'DRAMA':'DRA', 'FAMILY':'FAM', 'FANTASY':'FAN', 'FILM_NOIR':'FIL',
+                 'GAME_SHOW':'GAM', 'HISTORY':'HIS', 'HORROR':'HOR', 'LGBTQ':'LGB', 'MILITARY':'MIL', 'MUSICAL':'MUS','MYSTERY':'MYS',
+                 'REALITY_TV':'REA','ROMANCE':'ROM', 'SCIENCE_FICTION':'SCI', 'SPORT':'SPO', 'TALK_SHOW':'TAL','THRILLER':'THR',
+                 'WESTERN':'WES'}
+
+    let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
+
+    // Month and Year filter (Date Filter)
+    function monthFilter(data){
+        $('.list-group a li').removeClass('text-primary selected');
+        $('.list-group a li').removeAttr('id');
+        data.setAttribute("class", "text-primary");
+        data.setAttribute("id", "selected");
+
+        post_url = origin_url + `/hobo_user/showcase/date/`
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('topyear').innerHTML,
+                month : months[document.getElementById('selected').innerHTML]
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+    function newMonthFilter(data){
+        $('.list-group a li').removeClass('text-primary selected');
+        $('.list-group a li').removeAttr('id');
+        data.setAttribute("class", "text-primary");
+        data.setAttribute("id", "selected");
+
+        post_url = origin_url + `/hobo_user/showcase/date/`
+        axios({
+            method: 'post',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()},
+            data: {
+                year : document.getElementById('year').innerHTML,
+                month : months[document.getElementById('selected').innerHTML]
+            }
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+    // Filter Projects according to full date (Date Filter)
+    function date_filter(data){
+        $('table a').addClass('text-dark');
+        $('table a').removeClass('font-weight-bold');
+        data.setAttribute("class", "text-primary font-weight-bold");
+
+        date = `${document.getElementById('topyear').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
+        console.log(date)
+        post_url = origin_url + `/hobo_user/showcase/projects/?timestamp=${date}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+    // Filter Projects based on genere selected (Category Filter)
+    function genereFilter(data){
+        console.log(data)
+        $('.proj-cnt-menu-li a').removeClass('clicked')
+        let keyword = data.innerHTML.toUpperCase()
+        data.setAttribute("class", "clicked");
+        parent = data.parentNode.parentNode.getAttribute("id");
+        console.log("PARENT", parent)
+
+        post_url = origin_url + `/hobo_user/showcase/projects/?genre=${genre[keyword]}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response:",response.data)
+                dataInsertion(response.data, parent)
+        }, (error) => {console.log(error);})
+    }
+
+    $(".item").click(function(){
+        var proj_card_ele = $(this)
+        var project_obj = proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1)
+        var project_id = project_obj.split("#").pop();
+        var origin_url = window.location.origin
+        // var redirect_url = origin_url + '/hobo_user/video/' + project_id + '/'
+        var redirect_url = origin_url + '/project/showcase-video/' + project_id + '/'
+        window.location.replace(redirect_url);
+    });
+    $(".hom-name-width-overflow").click(function(){
+        console.log("%%%%%%%%%%%%%%%%%")
+        var proj_card_ele = $(this)
+        var project_obj = proj_card_ele[0].children[0]
+        console.log(proj_card_ele[0].children[0])
+    });
+
+</script>
+{% endblock %}

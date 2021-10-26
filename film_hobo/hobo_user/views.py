@@ -6,7 +6,6 @@ import requests
 from authemail.models import SignupCode
 from braces.views import JSONResponseMixin
 from datetime import timedelta, date
-
 from django.db.models import Sum, Q
 from django.template import loader
 from django.core.mail import send_mail
@@ -19,7 +18,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.views import LoginView as DjangoLogin
 from django.contrib.auth.views import LogoutView as DjangoLogout
-
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View, FormView
@@ -27,7 +25,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
 from rest_framework import authentication
 from rest_framework import status
 from rest_framework import permissions
@@ -70,6 +67,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
+from messaging.models import MessageStatus
 
 from .serializers import CustomUserSerializer, RegisterSerializer, \
     RegisterIndieSerializer, TokenSerializer, RegisterProSerializer, \
@@ -90,16 +88,19 @@ from .serializers import CustomUserSerializer, RegisterSerializer, \
     RemoveClientSerializer, FriendRequestSerializer, \
     AcceptFriendRequestSerializer, AddGroupSerializer, \
     AddFriendToGroupSerializer, RemoveFriendGroupSerializer, \
-    FeedbackSerializer, RateCompanySerializer, \
+    FeedbackSerializer,  RateCompanySerializer, \
     ProjectSerializer, TeamSerializer, \
     EditUserInterestSerializer, \
-    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer, \
-    EditBetaTesterCodeSerializer
+    VideoRatingSerializer, VideoSerializer, AddBetaTesterCodeSerializer
+from general.serializers import ReportProblemSerializer
+
 from payment.views import IsSuperUser
 
 from .mixins import SegregatorMixin, SearchFilter
 from .utils import notify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from project.models import Audition, Character, CrewApplication, ProjectCrew, \
+    ProjectTracking
 
 CHECKBOX_MAPPING = {'on': True,
                     'off': False}
@@ -152,8 +153,8 @@ class CustomUserLogin(DjangoLogin):
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            return render(request, 'user_pages/user_home.html', 
+                                                        {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -164,13 +165,17 @@ class CustomUserLogin(DjangoLogin):
             email = input_json_data_dict['email']
             password = input_json_data_dict['password']
             user = authenticate(request, email=email, password=password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'user_pages/user_home.html',
-                              {'user': user})
+            userobj = CustomUserSettings.objects.get(user=user)
+            if userobj.account_status == userobj.DISABLED:
+                return redirect('/hobo_user/enable-account')
             else:
-                return HttpResponse(
-                    'Unable to log in with provided credentials.')
+                if user is not None:
+                    login(request, user)
+                    return render(request, 'user_pages/user_home.html',
+                            {'user': user})
+                else:
+                    return HttpResponse(
+                        'Unable to log in with provided credentials.')
         else:
             return render(request, 'user_pages/login.html', {'form': form})
 
@@ -326,7 +331,6 @@ class CustomUserSignupHobo(APIView):
 class HowTo(View):
 
     def get(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         return render(request, 'user_pages/how_to.html')
 
 
@@ -348,6 +352,94 @@ class HomePage(TemplateView):
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-rating')
         return context
+
+
+class VideoPlayer(TemplateView):
+    template_name = 'user_pages/video_player_logistics.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = Project.objects.get(pk=self.kwargs.get('id'))
+        team = Team.objects.filter(project=self.kwargs.get('id'))
+        context['project'] = project
+        context['team'] = team
+        return context
+
+
+class ShowCase(TemplateView):
+    template_name = 'user_pages/showcasetwo.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(
+                            format="SCH").order_by('-likes')[:10]
+        context["toprated_scenes"] = Project.objects.filter(
+                                     format="SHO").order_by('-likes')[:10]
+        context["filims"] = Project.objects.filter(
+                            format="SCH").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="SHO").order_by('-id')
+        return context
+
+
+class ShowCaseAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+        context = self.showcase_segregator(queryset)
+        return Response(context)
+
+
+class ShowCaseSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.showcase_segregator(queryset)
+        return Response(context)
+
+
+class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.showcase_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.showcase_segregator(project)
+            return Response(context)
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -1243,6 +1335,9 @@ class DisableAccountAPI(APIView):
                 obj.user = user
                 obj.reason = reason
                 obj.save()
+                userobj = CustomUser.objects.get(id=user.id)
+                userobj.registration_complete = False
+                userobj.save()
                 user_settings = CustomUserSettings.objects.get(user=user)
                 user_settings.account_status = CustomUserSettings.DISABLED
                 user_settings.save()
@@ -1271,8 +1366,11 @@ class EnableAccountAPI(APIView):
                     user_settings = CustomUserSettings.objects.get(user=user)
                     user_settings.account_status = CustomUserSettings.ENABLED
                     try:
+                        userobj = CustomUser.objects.get(id=user.id)
+                        userobj.registration_complete = True
                         disabled_account = DisabledAccount.objects.get(user=user)
                         disabled_account.delete()
+                        userobj.save()
                         user_settings.save()
                         response = {'message': "Account Enabled",
                                     'status': status.HTTP_200_OK
@@ -1343,7 +1441,7 @@ class BlockMembersAPI(APIView):
         user_settings = CustomUserSettings.objects.get(user=user)
         if user_settings.blocked_members:
             for obj in user_settings.blocked_members.all():
-                blocked_members[obj.id] = obj.first_name + " " + obj.last_name
+                blocked_members[obj.id] = obj.get_full_name()
             response['blocked_members'] = blocked_members
         return Response(response)
 
@@ -1365,6 +1463,22 @@ class BlockMembersAPI(APIView):
                     blocked_members.append(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = True
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Blocked %s" % (
                                 block_user.email),
@@ -1401,6 +1515,22 @@ class UnBlockMembersAPI(APIView):
                     blocked_members.remove(block_user)
                     user_settings.blocked_members.set(blocked_members)
                     user_settings.save()
+
+                    # change message status
+                    thread_id = ""
+                    if block_user.id < user.id:
+                        thread_id = "chat_"+str(block_user.id)+"_"+str(user.id)
+                    else:
+                        thread_id = "chat_"+str(user.id)+"_"+str(block_user.id)
+                    try:
+                        message_status_obj = MessageStatus.objects.get(
+                            Q(user=user) &
+                            Q(msg_thread=thread_id)
+                        )
+                        message_status_obj.is_spam = False
+                        message_status_obj.save()
+                    except MessageStatus.DoesNotExist:
+                        pass
 
                     response = {'message': "Un Blocked %s" % (
                                 block_user.email),
@@ -1635,8 +1765,9 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        context['transaction'] = \
-            Transaction.objects.get(user_id=user.id)
+        if user.membership != 'HOB':
+            context['transaction'] = \
+                Transaction.objects.get(user_id=user.id)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2231,6 +2362,13 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             context['friends'] = friends[:8]
         except Friend.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
+        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
+        context['my_interests_count'] = UserInterest.objects.filter(user=user).count()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2444,8 +2582,6 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         profile = get_object_or_404(CompanyProfile, user=user)
-        print(profile)
-        print(user)
         context['user'] = user
         context['profile'] = profile
         pos_list = [2, 3, 4]
@@ -2471,14 +2607,16 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         context['tracking_list'] = tracking_list[:6]
 
         try:
-            friend=Friend.objects.all()
-            if(friend):
-                friend_obj = Friend.objects.get(user=user)
-                friends = friend_obj.friends.all()
-                context['friends'] = friends[:8]
-                context['friends_list_count']=friends.count()
-        except FriendRequest.DoesNotExist:
-            context['friends'] = 0
+            friend_obj = Friend.objects.get(user=user)
+            friends = friend_obj.friends.all()
+            context['friends'] = friends[:8]
+            context['friends_list_count'] = friends.count()
+        except Friend.DoesNotExist:
+            pass
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -2598,8 +2736,13 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
             friend_obj = Friend.objects.get(user=user)
             friends = friend_obj.friends.all()
             context['friends'] = friends[:8]
-        except FriendRequest.DoesNotExist:
+        except Friend.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
     def post(self, request, *args, **kwargs):
@@ -3025,10 +3168,15 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         except CustomUserSettings.DoesNotExist:
             pass
 
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
+
         user_projects = UserProject.objects.filter(user=user)
-        my_projects = user_projects.filter(relation_type = UserProject.ATTACHED).order_by('-created_time')
-        favorites = user_projects.filter(relation_type = UserProject.FAVORITE).order_by('-created_time')
-        applied = user_projects.filter(relation_type = UserProject.APPLIED).order_by('-created_time')
+        my_projects = user_projects.filter(relation_type=UserProject.ATTACHED).order_by('-created_time')
+        favorites = user_projects.filter(relation_type=UserProject.FAVORITE).order_by('-created_time')
+        applied = user_projects.filter(relation_type=UserProject.APPLIED).order_by('-created_time')
         context['my_projects'] = my_projects
         context['favorites'] = favorites
         context['applied'] = applied
@@ -3088,6 +3236,11 @@ class ProductionCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
 
@@ -3165,6 +3318,11 @@ class AgencyManagementCompanyProfileView(LoginRequiredMixin, TemplateView):
             context['settings'] = settings
         except CustomUserSettings.DoesNotExist:
             pass
+
+        # tracking Projects
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        context['tracking_projects'] = tracking_projects[:6]
         return context
 
 
@@ -3494,6 +3652,79 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
                          Q(user=user) &
                          Q(status=FriendRequest.REQUEST_SEND)
                         )
+
+        crew_jobs_dict = {}
+        cast_jobs_dict = {}
+        cast_application_dict = {}
+        crew_application_dict = {}
+
+        try:
+            actor_actress = JobType.objects.get(slug='actoractress')
+
+            # cast list
+            cast_list = myinterests.filter(position=actor_actress)
+            for user_interest in cast_list:
+                character_objs = Character.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(gender = user_interest.gender) &
+                                    Q(age = user_interest.age)
+                                    )
+                cast_jobs_dict[user_interest.id] = character_objs
+                # get applications list
+                for cast in character_objs:
+                    audition_obj = Audition.objects.filter(
+                                        Q(user=user) &
+                                        Q(character=cast)
+                                    ).first()
+                    cast_application_dict[cast.id] = audition_obj
+
+            context['cast_jobs_dict'] = cast_jobs_dict
+            context['cast_application_dict'] = cast_application_dict
+            # crew members list
+            crew_list = myinterests.exclude(position=actor_actress)
+            for user_interest in crew_list:
+                crew_objs = ProjectCrew.objects.filter(
+                                    Q(project__format = user_interest.format) &
+                                    Q(project__location = user_interest.location) &
+                                    Q(project__sag_aftra= user_interest.budget) &
+                                    Q(job_type=user_interest.position)
+                                    )
+                crew_jobs_dict[user_interest.id] = crew_objs
+                # get applications list
+                for crew in crew_objs:
+                    application_obj = CrewApplication.objects.filter(
+                                        Q(user=user) &
+                                        Q(crew=crew)
+                                    ).first()
+                    crew_application_dict[crew.id] = application_obj
+            context['crew_jobs_dict'] = crew_jobs_dict
+            context['crew_application_dict'] = crew_application_dict
+
+        except JobType.DoesNotExist:
+            pass
+
+
+        applied_projects = UserProject.objects.filter(
+                            Q(user=user) &
+                            (
+                                Q(relation_type = UserProject.APPLIED) |
+                                Q(relation_type = UserProject.ATTACHED)
+                            )).order_by('-created_time')
+
+        tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
+        context['tracking_projects_count'] = tracking_projects.count
+        paginator = Paginator(tracking_projects, 21)
+        page = self.request.GET.get('page1')
+        try:
+            tracking_projects = paginator.page(page)
+        except PageNotAnInteger:
+            tracking_projects = paginator.page(1)
+        except EmptyPage:
+            tracking_projects = paginator.page(paginator.num_pages)
+        context['tracking_projects'] = tracking_projects
+
         context['friend_request'] = friend_request
         context['friend_request_count'] = friend_request.count()
         context['myinterests'] = myinterests
@@ -3505,6 +3736,9 @@ class FriendsAndFollowersView(LoginRequiredMixin, TemplateView):
         context['locations'] = Location.objects.all()
         context['format'] = UserInterest.FORMAT_CHOICES
         context['budget'] = UserInterest.BUDGET_CHOICES
+        context['gender'] = UserInterest.GENDER_CHOICES
+        context['age'] = UserInterest.AGE_CHOICES
+        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
         return context
 
 
@@ -3635,7 +3869,10 @@ class AddUserInterestAPI(APIView):
             obj.location = Location.objects.get(pk=data_dict['location'])
             obj.format = data_dict['format']
             obj.budget = data_dict['budget']
+            obj.age = data_dict['age']
+            obj.gender = data_dict['gender']
             obj.save()
+
             response = {'message': "User interest added.",
                         'status': status.HTTP_200_OK}
         else:
@@ -3656,12 +3893,15 @@ class EditUserInterestAPI(APIView):
         if serializer.is_valid():
             data_dict = serializer.data
             id = data_dict['id']
+            print("--------------", data_dict)
             try:
                 obj = UserInterest.objects.get(Q(pk=id) & Q(user=self.request.user))
                 obj.position = JobType.objects.get(pk=data_dict['position'])
                 obj.location = Location.objects.get(pk=data_dict['location'])
                 obj.format = data_dict['format']
                 obj.budget = data_dict['budget']
+                obj.age = data_dict['age']
+                obj.gender = data_dict['gender']
                 obj.save()
                 response = {'message': "User interest updated.",
                            'status': status.HTTP_200_OK}
@@ -3682,11 +3922,14 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
+        print(self.request.POST)
         user = self.request.user
         positions = self.request.POST.getlist('position')
         formats = self.request.POST.getlist('format')
         locations = self.request.POST.getlist('location')
         budget = self.request.POST.getlist('budget')
+        age = self.request.POST.getlist('age')
+        gender = self.request.POST.getlist('gender')
         count = len(locations)
         json_dict = {}
         key = Token.objects.get(user=user).key
@@ -3697,6 +3940,8 @@ class AddUserInterestView(LoginRequiredMixin, TemplateView):
             json_dict['format'] = formats[i]
             json_dict['location'] = locations[i]
             json_dict['budget'] = budget[i]
+            json_dict['age'] = age[i]
+            json_dict['gender'] = gender[i]
             origin_url = settings.ORIGIN_URL
             complete_url = origin_url + '/hobo_user/add-user-interest-api/'
             user_response = requests.post(
@@ -4399,7 +4644,7 @@ class RemoveFriendGroupAPI(APIView):
 
 
 class UpdateFriendGroupAjaxView(View, JSONResponseMixin):
-    template_name = 'user_pages/add-my-interest-form.html'
+    template_name = 'user_pages/friend-group.html'
 
     def get(self, *args, **kwargs):
         context = dict()
@@ -4450,6 +4695,17 @@ class FeedbackAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = FeedbackSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReportProblemAPIView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -4798,322 +5054,6 @@ class DeleteBetaTesterCode(APIView):
                 {'status': 'code with this id does not exist'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class EditBetaTesterCode(APIView):
-    """
-    API endpoint to edit a beta tester code
-    """
-    permission_classes = (IsSuperUser,)
-
-    def put(self, request, *args, **kwargs):
-
-        def get_paypal_access_token():
-            # get paypal access_token
-            paypal_client_id = settings.PAYPAL_CLIENT_ID
-            paypal_secret = settings.PAYPAL_SECRET_ID
-            data = {'grant_type': 'client_credentials'}
-            token_user_response = requests.post(
-                                'https://api-m.sandbox.paypal.com/v1/oauth2/token',
-                                data=data,
-                                auth=(paypal_client_id, paypal_secret),
-                                headers={'Accept': 'application/json',
-                                         'Accept-Language': 'en_US'})
-            if token_user_response.status_code == 200:
-                access_token = json.loads(token_user_response.content)['access_token']
-            else:
-                return Response(
-                    {"status": "error in fetching paypal access token"},
-                    status=status.HTTP_404_NOT_FOUND)
-
-            access_token_string = 'Bearer ' + access_token
-            return access_token_string
-
-        try:
-            data = request.data
-            beta_tester_code_id = request.data['id']
-            beta_tester_code = request.data['code']
-            beta_tester_code_days = request.data['days']
-            testercode_instance = BetaTesterCodes.objects.get(id=beta_tester_code_id)
-            serializer = EditBetaTesterCodeSerializer(testercode_instance,
-                                             data=request.data, partial=True)
-            if serializer.is_valid():
-                plans_updated = ""
-                plans_failed = ""
-                plans_updated_list = ""
-                if ((testercode_instance.code == beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
-                    serializer.update(BetaTesterCodes.objects.get(code=beta_tester_code),
-                                    request.data)
-                    return Response(serializer.data)
-                elif ((testercode_instance.code != beta_tester_code) and (testercode_instance.days == beta_tester_code_days)):
-                    access_token_string = get_paypal_access_token()
-                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
-
-                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
-                      'Pro Payment Monthly','Pro Payment Yearly',
-                      'Company Payment Monthly','Company Payment Yearly']
-
-                    for plan_type in plan_types:
-                        plan_name = 'Beta User Plan' + ' - ' + plan_type + ' - ' + beta_tester_code
-                        edit_json_1 = [
-                            {
-                                "op": "replace",
-                                "path": "/name",
-                                "value": plan_name
-                            }
-                        ]
-                        edit_json_2 = [
-                            {
-                                "op": "replace",
-                                "path": "/description",
-                                "value": plan_name
-                            }
-                        ]
-                        if plan_type == 'Indie Payment Monthly':
-                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
-                            indie_monthly_update_plan_full_url_response_1 = requests.patch(
-                                                indie_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if indie_monthly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_monthly_plan_id + ' name,'
-                            indie_monthly_update_plan_full_url_response_2 = requests.patch(
-                                                indie_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if indie_monthly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_monthly_plan_id + ' description,'
-
-                        elif plan_type == 'Indie Payment Yearly':
-                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
-                            indie_yearly_update_plan_full_url_response_1 = requests.patch(
-                                                indie_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if indie_yearly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_yearly_plan_id + ' name,'
-                            indie_yearly_update_plan_full_url_response_2 = requests.patch(
-                                                indie_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if indie_yearly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_yearly_plan_id + ' description,'
-
-                        elif plan_type == 'Pro Payment Monthly':
-                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
-                            pro_monthly_update_plan_full_url_response_1 = requests.patch(
-                                                pro_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if pro_monthly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_monthly_plan_id + ' name,'
-                            pro_monthly_update_plan_full_url_response_2 = requests.patch(
-                                                pro_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if pro_monthly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_monthly_plan_id + ' description,'
-
-                        elif plan_type == 'Pro Payment Yearly':
-                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
-                            pro_yearly_update_plan_full_url_response_1 = requests.patch(
-                                                pro_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if pro_yearly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_yearly_plan_id + ' name,'
-
-                            pro_yearly_update_plan_full_url_response_2 = requests.patch(
-                                                pro_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if pro_yearly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_yearly_plan_id + ' description,'
-                        elif plan_type == 'Company Payment Monthly':
-                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
-                            company_monthly_update_plan_full_url_response_1 = requests.patch(
-                                                company_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if company_monthly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.company_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_monthly_plan_id + ' name,'
-                            company_monthly_update_plan_full_url_response_2 = requests.patch(
-                                                company_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if company_monthly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.company_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_monthly_plan_id + ' description,'
-                        elif plan_type == 'Company Payment Yearly':
-                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
-                            company_yearly_update_plan_full_url_response_1 = requests.patch(
-                                                company_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_1),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if company_yearly_update_plan_full_url_response_1.status_code == 204:
-                                plans_updated_list += testercode_instance.company_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_yearly_plan_id + ' name,'
-                            company_yearly_update_plan_full_url_response_2 = requests.patch(
-                                                company_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json_2),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string})
-                            if company_yearly_update_plan_full_url_response_2.status_code == 204:
-                                plans_updated_list += testercode_instance.company_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_yearly_plan_id + ' description,'
-                        else:
-                            pass
-                    word_list = plans_updated_list.split()
-                    number_of_words = len(word_list)
-                    if number_of_words == 12:
-                        serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
-                                request.data)
-                        return Response(serializer.data)
-                    else:
-                        return Response({"status": plans_failed},
-                                        status=status.HTTP_404_NOT_FOUND)
-                elif ((testercode_instance.code == beta_tester_code) and (testercode_instance.days != beta_tester_code_days)):
-                    access_token_string = get_paypal_access_token()
-                    update_plan_base_url = 'https://api-m.sandbox.paypal.com/v1/billing/plans/'
-
-                    plan_types = ['Indie Payment Monthly','Indie Payment Yearly',
-                      'Pro Payment Monthly','Pro Payment Yearly',
-                      'Company Payment Monthly','Company Payment Yearly']
-                    for plan_type in plan_types:
-                        edit_json = [
-                            {
-                                "op": "replace",
-                                "path": "/billing_cycles/frequency/interval_count",
-                                "value": int(request.data['days'])
-                            }
-                        ]
-                        if plan_type == 'Indie Payment Monthly':
-                            indie_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_monthly_plan_id
-                            indie_monthly_update_plan_full_url_response = requests.patch(
-                                                indie_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if indie_monthly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_monthly_plan_id + ' days,'
-                        elif plan_type == 'Indie Payment Yearly':
-                            indie_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.indie_yearly_plan_id
-                            indie_yearly_update_plan_full_url_response = requests.patch(
-                                                indie_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if indie_yearly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.indie_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.indie_yearly_plan_id + ' days,'
-                        elif plan_type == 'Pro Payment Monthly':
-                            pro_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_monthly_plan_id
-                            pro_monthly_update_plan_full_url_response = requests.patch(
-                                                pro_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if pro_monthly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_monthly_plan_id + ' days,'
-                        elif plan_type == 'Pro Payment Yearly':
-                            pro_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.pro_yearly_plan_id
-                            pro_yearly_update_plan_full_url_response = requests.patch(
-                                                pro_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if pro_yearly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.pro_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.pro_yearly_plan_id + ' days,'
-                        elif plan_type == 'Company Payment Monthly':
-                            company_monthly_update_plan_full_url = update_plan_base_url + testercode_instance.company_monthly_plan_id
-                            company_monthly_update_plan_full_url_response = requests.patch(
-                                                company_monthly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if company_monthly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.company_monthly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_monthly_plan_id + ' days,'
-                        elif plan_type == 'Company Payment Yearly':
-                            company_yearly_update_plan_full_url = update_plan_base_url + testercode_instance.company_yearly_plan_id
-                            company_yearly_update_plan_full_url_response = requests.patch(
-                                                company_yearly_update_plan_full_url,
-                                                data=json.dumps(edit_json),
-                                                headers={'Content-Type': 'application/json',
-                                                        'Authorization': access_token_string},
-                                                )
-                            if company_yearly_update_plan_full_url_response.status_code == 204:
-                                plans_updated_list += testercode_instance.company_yearly_plan_id + " "
-                            else:
-                                plans_failed += testercode_instance.company_yearly_plan_id + ' days,'
-                    word_list = plans_updated_list.split()
-                    number_of_words = len(word_list)
-                    if number_of_words == 12:
-                        serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
-                                request.data)
-                        return Response(serializer.data)
-                else:
-                    # update the local db
-                    serializer.update(BetaTesterCodes.objects.get(id=beta_tester_code_id),
-                                    request.data)
-                    return Response(serializer.data)
-            else:
-                return Response(serializer.errors)
-        except ObjectDoesNotExist:
-            return Response(
-                {"status": "beta tester code record not found"},
-                status=status.HTTP_404_NOT_FOUND)
-
-
 class CheckBetaTesterCode(APIView):
     """
     API endpoint to check a beta tester code
@@ -5136,18 +5076,36 @@ class CheckBetaTesterCode(APIView):
 
 
 class FeedbackWebView(View):
-    # renderer_classes = [TemplateHTMLRenderer]
-    # template_name = 'user_pages/feedback.html'
+    template_name = 'user_pages/feedback.html'
     """
     Web View to load the feedback page
     """
 
-    def get(self, request, *args, **kwargs):
-        template = loader.get_template("user_pages/feedback.html")
-        return HttpResponse(template.render())
+    def get(self, request):
+        context = { }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         serializer = FeedbackSerializer(data=json.dumps(request.POST))
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReportAProblemWebView(View):
+    template_name = 'general/report_page.html'
+    """
+    Web View to load the report page
+    """
+
+    def get(self, request):
+        context = { }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        serializer = ReportProblemSerializer(data=json.dumps(request.POST))
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -5200,6 +5158,7 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
             context = self.project_segregator(project)
             return Response(context)
 
+
 class ProjectSearchView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -5210,15 +5169,15 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset()).filter(
-                                        creator=request.user)
+                   creator=request.user)
         context = self.project_segregator(queryset)
         return Response(context)
 
 
 class ProjectCreateAPIView(CreateAPIView):
-  permission_classes = (IsAuthenticated,)
-  queryset = Project.objects.all()
-  serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
 
 class ProjectUpdateAPIView(UpdateAPIView):
@@ -5260,23 +5219,8 @@ class TeamDeleteAPIView(DestroyAPIView):
     serializer_class = TeamSerializer
 
 
-class ProjectSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title", "format", "genre",
-                     "rating", "timestamp"]
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.filter_queryset(self.get_queryset())
-#         context = self.project_segregator(queryset)
-#         return Response(context)
-
-
 #Search API for Pages
-
 #API for Searching things in a page
-
 class PageSearchView(ListAPIView):
     template_name = 'search_results.html'
     serializer_class = ProjectSerializer
@@ -5378,7 +5322,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'login_url'
 
     def get_context_data(self,user,**kwargs):
-        
+
         context = super().get_context_data(**kwargs)
         project_format = self.request.GET.get('format')
         context["format"] = project_format
@@ -5446,26 +5390,147 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        mode_operation="create"
-        context['mode_operation']=mode_operation
+        user = self.request.user
+        mode_operation = "create"
+        context['mode_operation'] = mode_operation
         context['form'] = ProjectCreationForm
-        context['writerform'] = WriterForm
+        # context['writerform'] = WriterForm
+        context['user'] = user
         return context
 
     def post(self, request):
         try:
+            print(request.POST)
             projectform = ProjectCreationForm(request.POST or None, request.FILES)
-            writerform = WriterForm(request.POST or None)
+            # writerform = WriterForm(request.POST or None)
+            project = Project()
+            cast_pay = request.POST.get('radiorow4')
+            # Passing cast_star rating
+            cast_star1 = request.POST.get('cast-star1')
+            cast_star2 = request.POST.get('cast-star2')
+            cast_star3 = request.POST.get('cast-star3')
+            cast_star_smar = 0
+
+            if (cast_star1 != ''):
+                if (cast_star1 == '1'):
+                    cast_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif(cast_star1 == '2'):
+                    cast_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif(cast_star1 == '3'):
+                    cast_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif(cast_star1 == '4'):
+                    cast_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif(cast_star1 == '5'):
+                    cast_star1 = project.INDIE_WITH_RATING_5_STAR
+                cast_star_smar = cast_star1
+            elif(cast_star2 != ''):
+                if (cast_star2 == '1'):
+                    cast_star2 = project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2 == '2'):
+                    cast_star2 = project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2 == '3'):
+                    cast_star2 = project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2 == '4'):
+                    cast_star2 = project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2 == '5'):
+                    cast_star2 = project.PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star2
+            elif(cast_star3 != ''):
+                if (cast_star3 == '1'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3 == '2'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3 == '3'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3 == '4'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3 == '5'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star3
+
+            # Passing crew_star rating
+            crew_star1 = request.POST.get('crew-star1')
+            crew_star2 = request.POST.get('crew-star2')
+            crew_star3 = request.POST.get('crew-star3')
+
+            crew_star_smar = 0
+
+            if (crew_star1 != ''):
+                if (crew_star1 == '1'):
+                    crew_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1 == '2'):
+                    crew_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1 == '3'):
+                    crew_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1 == '4'):
+                    crew_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1 == '5'):
+                    crew_star1 = project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar = crew_star1
+            if (crew_star2 != ''):
+                if (crew_star2 == '1'):
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
+                elif (crew_star2 == '2'):
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
+                elif (crew_star2 == '3'):
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
+                elif (crew_star2 == '4'):
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
+                elif (crew_star2 == '5'):
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star2
+            if (crew_star3 != ''):
+                if (crew_star3 == '1'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                if (crew_star3 == '2'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                if (crew_star3 == '3'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                if (crew_star3 == '4'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                if (crew_star3 == '5'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star3
+
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
-            print("valid ahno writer:", writerform.is_valid())
-            print('form error writer', writerform.errors)
-            if projectform.is_valid() and writerform.is_valid():
-                writer = writerform.save()
+            # print("valid ahno writer:", writerform.is_valid())
+            # print('form error writer', writerform.errors)
+            if projectform.is_valid():
+                # writer = writerform.save()
                 project = projectform.save()
-                writer.project = project
-                writer.save()
-                messages.success(request, "New project added.")
+                project.cast_samr = cast_star_smar
+                project.crew_samr = crew_star_smar
+                project.cast_pay_rate = cast_pay
+                print(project.creator)
+                # import pdb
+                # pdb.set_trace()
+                # writer.project = project
+                project.save()
+                # writer.save()
+                interest = UserInterest.objects.all()
+                for usin in interest:
+                    if (project.format == usin.format and project.location == usin.location and project.sag_aftra == usin.budget):
+                        user = usin.user
+                        # update notification table
+                        notification = UserNotification()
+                        notification.user = user
+                        notification.notification_type = UserNotification.PROJECT_TRACKING
+                        notification.from_user = project.creator
+                        notification.message = str(project.creator)+" added a new  project "+str(project.title)+" at location "+str(project.location)
+                        print(notification.message)
+                        notification.save()
+                        # send notification
+                        room_name = "user_"+str(user.id)
+                        notification_msg = {
+                                'type': 'send_project_tracking_notification',
+                                'message': str(notification.message),
+                                'from': str(project.creator.id),
+                                "event": "PROJECT_TRACKING"
+                            }
+                        notify(room_name, notification_msg)
+
+                messages.success(request, "New project"+"  "+str(project.title)+"  "+"added")
                 return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))
             messages.error(request, "Form not valid")
@@ -5477,36 +5542,137 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                                     reverse('hobo_user:projects'))
 
 class EditProjectView(LoginRequiredMixin, TemplateView):
+
     template_name = 'user_pages/edit-project.html'
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        project=get_object_or_404(Project, id=self.kwargs.get('id'))
-        mode_operation="update"
-        writer=Writer.objects.get(project=project.id)
-        context['mode_operation']=mode_operation
-        context['project_obj']=project
+        project = get_object_or_404(Project, id=self.kwargs.get('id'))
+        user = self.request.user
+        mode_operation = "update"
+        # writer = Writer.objects.get(project=project.id)
+        context['mode_operation'] = mode_operation
+        context['project_obj'] = project
         context['form'] = ProjectCreationForm(instance=project)
-        context['writerform'] = WriterForm(instance=writer)
+        # context['writerform'] = WriterForm(instance=writer)
+        context['user'] = user
         return context
 
-    def post(self, request,**kwargs):
+    def post(self, request, **kwargs):
         try:
-            project=get_object_or_404(Project, id=self.kwargs.get('id'))
-            writer=Writer.objects.get(project=project.id)
-            projectform = ProjectCreationForm(request.POST or None, request.FILES,instance=project)
-            writerform = WriterForm(request.POST or None,instance=writer)
+            project = get_object_or_404(Project, id=self.kwargs.get('id'))
+            # writer = Writer.objects.get(project=project.id)
+            print(request.POST)
+            cast_pay = request.POST.get('radiorow4')
+            # Updating  cast_star rating
+            cast_star1 = request.POST.get('cast-star1')
+            cast_star2 = request.POST.get('cast-star2')
+            cast_star3 = request.POST.get('cast-star3')
+
+            cast_star_smar = 0
+
+            if (cast_star1 != ''):
+                if (cast_star1 == '1'):
+                    cast_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif(cast_star1 == '2'):
+                    cast_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif(cast_star1 == '3'):
+                    cast_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif(cast_star1 == '4'):
+                    cast_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif(cast_star1 == '5'):
+                    cast_star1 = project.INDIE_WITH_RATING_5_STAR
+                cast_star_smar = cast_star1
+            elif(cast_star2 != ''):
+                if (cast_star2 == '1'):
+                    cast_star2 = project.PRO_WITH_RATING_1_STAR
+                elif(cast_star2 == '2'):
+                    cast_star2 = project.PRO_WITH_RATING_2_STAR
+                elif(cast_star2 == '3'):
+                    cast_star2 = project.PRO_WITH_RATING_3_STAR
+                elif(cast_star2 == '4'):
+                    cast_star2 = project.PRO_WITH_RATING_4_STAR
+                elif(cast_star2 == '5'):
+                    cast_star2 = project.PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star2
+            elif(cast_star3 != ''):
+                if (cast_star3 == '1'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                elif(cast_star3 == '2'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                elif(cast_star3 == '3'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                elif(cast_star3 == '4'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                elif(cast_star3 == '5'):
+                    cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                cast_star_smar = cast_star3
+
+            # Updating crew_star rating
+            crew_star1 = request.POST.get('crew-star1')
+            crew_star2 = request.POST.get('crew-star2')
+            crew_star3 = request.POST.get('crew-star3')
+
+            crew_star_smar = 0
+
+            if (crew_star1 != ''):
+                if (crew_star1 == '1'):
+                    crew_star1 = project.INDIE_WITH_RATING_1_STAR
+                elif (crew_star1 == '2'):
+                    crew_star1 = project.INDIE_WITH_RATING_2_STAR
+                elif (crew_star1 == '3'):
+                    crew_star1 = project.INDIE_WITH_RATING_3_STAR
+                elif (crew_star1 == '4'):
+                    crew_star1 = project.INDIE_WITH_RATING_4_STAR
+                elif (crew_star1 == '5'):
+                    crew_star1 = project.INDIE_WITH_RATING_5_STAR
+                crew_star_smar = crew_star1
+            if (crew_star2 != ''):
+                if (crew_star2 == '1'):
+                    crew_star2 = project.PRO_WITH_RATING_1_STAR
+                elif (crew_star2 == '2'):
+                    crew_star2 = project.PRO_WITH_RATING_2_STAR
+                elif (crew_star2 == '3'):
+                    crew_star2 = project.PRO_WITH_RATING_3_STAR
+                elif (crew_star2 == '4'):
+                    crew_star2 = project.PRO_WITH_RATING_4_STAR
+                elif (crew_star2 == '5'):
+                    crew_star2 = project.PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star2
+            if (crew_star3 != ''):
+                if (crew_star3 == '1'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
+                if (crew_star3 == '2'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
+                if (crew_star3 == '3'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
+                if (crew_star3 == '4'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
+                if (crew_star3 == '5'):
+                    crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
+                crew_star_smar = crew_star3
+
+            projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
+            # writerform = WriterForm(request.POST or None, instance=writer)
+            # new_writer = request.POST.get('new_writer')
+
             print("valid ahno project:", projectform.is_valid())
             print('form error project', projectform.errors)
-            print("valid ahno writer:", writerform.is_valid())
-            print('form error writer', writerform.errors)
-            if projectform.is_valid() and writerform.is_valid():
-                writer = writerform.save()
+            # print("valid ahno writer:", writerform.is_valid())
+            # print('form error writer', writerform.errors)
+            if projectform.is_valid():
+
+                # writer = writerform.save()
                 project = projectform.save()
-                writer.project = project
-                writer.save()
+                project.cast_samr = cast_star_smar
+                project.crew_samr = crew_star_smar
+                project.cast_pay_rate = cast_pay
+                # writer.project = project
+                # writer.name = new_writer
+                project.save()
+                # writer.save()
                 messages.success(request, "Project Updated Successfully.")
                 return HttpResponseRedirect(
                                     reverse('hobo_user:projects'))
@@ -5530,7 +5696,7 @@ class ScreeningProjectDeatilInviteView(APIView):
             project_id = project_url.rsplit('/', 2)[1]
             project_obj = Project.objects.get(id=project_id)
 
-            #update notification table
+            # update notification table
             notification = UserNotification()
             notification.user = to_user
             notification.notification_type = UserNotification.INVITE
@@ -5648,7 +5814,7 @@ class GetBetaTesterCodeId(APIView):
         else:
             return Response(
             {"status": "no content"},
-            status=status.HTTP_204_NO_CONTENT)
+            status = status.HTTP_204_NO_CONTENT)
 
 
 class SentPaymentMail(APIView):
@@ -5670,3 +5836,4 @@ class SentPaymentMail(APIView):
         else:
             response = {'message': 'Invalid data'}
         return Response(response)
+

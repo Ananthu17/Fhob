@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-import os
+from celery.schedules import crontab
 import environ
+import os
 from pathlib import Path
 from corsheaders.defaults import default_headers
+import film_hobo.tasks
 
 env = environ.Env()
 environ.Env.read_env()
@@ -35,16 +37,59 @@ SECRET_KEY = env("SECRET_KEY")
 # 2 - DEMO_SERVER
 # 3 - AWS_PRODUCTION
 
-PROJECT_ENVIRONMENT = "DEMO_SERVER"
+# PROJECT_ENVIRONMENT = "DEMO_SERVER"
+PROJECT_ENVIRONMENT = "LOCAL"
+
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
+    DEBUG = False
     # ORIGIN_URL = "http://202.88.246.92:8041"
-    ORIGIN_URL = "http://172.19.0.3:8041"
+    # ORIGIN_URL = "http://172.19.0.3:8041"
+    ORIGIN_URL = "http://app:8041"
+    # demo server database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
+            'NAME': env("DEMO_SERVER_DATABASE_NAME"),
+            'USER': env("DEMO_SERVER_DATABASE_USER"),
+            'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
+            'HOST': env("DEMO_SERVER_DATABASE_HOST"),
+            'PORT': env("DEMO_SERVER_DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://redis:6379'
+    CELERY_RESULT_BACKEND = "redis://redis:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
 
 elif PROJECT_ENVIRONMENT == "AWS_PRODUCTION":
     ORIGIN_URL = "http://www.filmhobo.com"
 else:
+    DEBUG = True
     ORIGIN_URL = "http://127.0.0.1:8000"
+    # local database credentials
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DATABASE_ENGINE"),
+            'NAME': env("DATABASE_NAME"),
+            'USER': env("DATABASE_USER"),
+            'PASSWORD': env("DATABASE_PASSWORD"),
+            'HOST': env("DATABASE_HOST"),
+            'PORT': env("DATABASE_PORT"),
+        }
+    }
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
+    CELERY_BEAT_SCHEDULE = {
+        "send_email_report": {
+            "task": "film_hobo.tasks.send_email_report",
+            "schedule": crontab(minute="*/1"),
+        }
+    }
 
 # # for development
 DEBUG = True
@@ -92,6 +137,7 @@ INSTALLED_APPS = [
     'payment',
     'general',
     'project',
+    'messaging',
 
     'bootstrap_datepicker_plus',
     'django_select2',
@@ -162,29 +208,6 @@ ASGI_APPLICATION = "film_hobo.asgi.application"
 #     }
 # }
 
-# local database credentials
-# DATABASES = {
-#     'default': {
-#         'ENGINE': env("DATABASE_ENGINE"),
-#         'NAME': env("DATABASE_NAME"),
-#         'USER': env("DATABASE_USER"),
-#         'PASSWORD': env("DATABASE_PASSWORD"),
-#         'HOST': env("DATABASE_HOST"),
-#         'PORT': env("DATABASE_PORT"),
-#     }
-# }
-
-# demo server database credentials
-DATABASES = {
-    'default': {
-        'ENGINE': env("DEMO_SERVER_DATABASE_ENGINE"),
-        'NAME': env("DEMO_SERVER_DATABASE_NAME"),
-        'USER': env("DEMO_SERVER_DATABASE_USER"),
-        'PASSWORD': env("DEMO_SERVER_DATABASE_PASSWORD"),
-        'HOST': env("DEMO_SERVER_DATABASE_HOST"),
-        'PORT': env("DEMO_SERVER_DATABASE_PORT"),
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -395,3 +418,9 @@ CKEDITOR_CONFIGS = {
 # SUBSCRIPTION_PAYPAL_FORM = 'paypal.standard.forms.PayPalPaymentsForm'
 
 # SUBSCRIPTION_GRACE_PERIOD = 0
+
+DEFAULT_GENERAL_MAIL = env("DEFAULT_GENERAL_MAIL")
+DEFAULT_TECHNICAL_MAIL = env("DEFAULT_TECHNICAL_MAIL")
+DEFAULT_SERVICE_MAIL = env("DEFAULT_SERVICE_MAIL")
+DEFAULT_ABUSE_MAIL = env("DEFAULT_ABUSE_MAIL")
+DEFAULT_BUSINESS_MAIL = env("DEFAULT_BUSINESS_MAIL")

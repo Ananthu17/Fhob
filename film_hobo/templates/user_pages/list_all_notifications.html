@@ -1,0 +1,220 @@
+{% load static %}
+{% load notification_tag %}
+
+
+{% get_all_notifications request.user as notifications %}
+{% for obj in notifications %}
+
+<li class="{% if obj.status_type == 'unread' %} mm-notf-grid-col-read {% endif %}">
+    <div class="mm-notf-grid-col">
+        <div class="mm-msg-img">
+            <div class="mm-notf-img-pro-sec">
+                {% if obj.notification_type == 'audition_status' %}
+                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.project.video_cover_image %}
+                    <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif obj.project.creator.get_profile_photo %}
+                    <img src="{{ obj.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+                {% elif obj.notification_type == 'cast_attach_request' %}
+                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                    id ="{{obj.id}}" class="notification_link">
+                        {% if obj.project.video_cover_image %}
+                        <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                        {% elif obj.project.creator.get_profile_photo %}
+                        <img src="{{ obj.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                        {% else %}
+                        <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                        {% endif %}
+                    </a>
+            {% elif obj.notification_type == 'crew_attach_request' %}
+                <a href="{% url 'project:single-film-project' obj.project.id %}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.project.video_cover_image %}
+                    <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif obj.project.creator.get_profile_photo %}
+                    <img src="{{ obj.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+            {% elif obj.notification_type == 'video_rating' %}
+                <a href="{% url 'project:video' obj.project.id %}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.project.video_cover_image %}
+                    <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif obj.project.creator.get_profile_photo %}
+                    <img src="{{ obj.project.creator.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/FH_Logo.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+            {% elif obj.notification_type == 'comments_mention' %}
+                <a href="{{ obj.from_user.get_profile_url }}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.from_user.get_profile_photo %}
+                    <img src="{{ obj.from_user.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+            {% elif obj.notification_type == 'user_interest' %}
+                <a href="{% url 'hobo_user:friends-and-followers' %}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.project.video_cover_image %}
+                    <img src="{{ obj.project.video_cover_image.url }}" class="mm-round-img"/>
+                    {% elif obj.from_user.get_profile_photo %}
+                    <img src="{{ obj.from_user.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+            {% elif obj.from_user %}
+                <a href="{{ obj.from_user.get_profile_url }}"
+                id ="{{obj.id}}" class="notification_link">
+                    {% if obj.from_user.get_profile_photo %}
+                    <img src="{{ obj.from_user.get_profile_photo }}" class="mm-round-img"/>
+                    {% else %}
+                    <img src="{% static 'images/default_profile_pic.png' %}" class="mm-round-img"/>
+                    {% endif %}
+                </a>
+            {% else %}
+                 <img src="{% static 'images/FH_Logo.png' %}" class="mm-round-img"/>
+            {% endif %}
+                 <div class="mm-msg-pro">
+                     <div class="mm-msg-pro-lgth" title="Indie">
+                        {{ obj.from_user.get_membership_display }}
+                     </div>
+                 </div>
+            </div>
+        </div>
+        <div class="mm-notf-msg-display">
+            <div class="mm-notf-msg-sec">
+                <!-- Loura Petrosyan rated you as a director 4 stars, <a href="" class="mm-notf-tag">Project #244</a> -->
+                {% if obj.notification_type == 'tracking' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{ obj.from_user.get_full_name }} started tracking you
+                    </a>
+                {% elif obj.notification_type == 'friend_request' %}
+                    <span id="friend-req-btns-{{obj.from_user.id}}">
+                        {{ obj.from_user.get_full_name }} send you friend request.
+                        <!-- <div>
+                            <span class="btn-blue cursor-pointer accept_friend_request" id="{{obj.from_user.id}}">Accept</span>
+                            <span class="btn-grey  cursor-pointer delete_friend_request" id="{{obj.from_user.id}}">Delete</span>
+                        </div> -->
+                        <div class="mm-notf-msg-btn-sec">
+                            <span class="btn mm-notf-msg-ad-btn accept_friend_request" id="{{obj.from_user.id}}">Accept</span>
+                            <span class="btn mm-notf-msg-dlt-btn delete_friend_request" id="{{obj.from_user.id}}">Delete</span>
+                        </div>
+                    </span>
+                {% elif obj.notification_type == 'cast_attach_request' %}
+                    <span id="cast-attach-req-btns-{{obj.character.id}}">
+                        {{ obj.project.creator.get_full_name}} wants to attach you to character
+                        <b>{{obj.character.name}}</b> of his project
+                        <a href="{% url 'project:single-film-project' obj.project.id %}"
+                            class="mm-notf-tag notification_link" id ="{{obj.id}}">{{obj.project.title}}</a><br>
+                        <!-- <span class="btn-blue cursor-pointer accept_cast_attach_request" id="{{obj.character.id}}">Accept</span>
+                        <span class="btn-grey  cursor-pointer decline_cast_request" id="{{obj.character.id}}">Decline</span> -->
+                        <div class="mm-notf-msg-btn-sec">
+                            <span class="btn mm-notf-msg-ad-btn accept_cast_attach_request" id="{{obj.character.id}}">Accept</span>
+                            <span class="btn mm-notf-msg-dlt-btn decline_cast_request" id="{{obj.character.id}}">Delete</span>
+                        </div>
+                    </span>
+                {% elif obj.notification_type == 'crew_attach_request' %}
+                        <span  id="crew-attach-req-btns-{{obj.crew.id}}">{{ obj.project.creator.get_full_name}} wants to attach you as
+                            <b>{{obj.crew.job_type}}</b> to his project
+                            <b><a href="{% url 'project:single-film-project' obj.project.id %}"
+                                class="mm-notf-tag notification_link" id ="{{obj.id}}">{{obj.project.title}}</a></b><br>
+                            <!-- <span class="btn-blue cursor-pointer accept_crew_attach_request" id="{{obj.crew.id}}">Accept</span>
+                            <span class="btn-grey  cursor-pointer decline_crew_request" id="{{obj.crew.id}}">Decline</span> -->
+                            <div class="mm-notf-msg-btn-sec">
+                                <span class="btn mm-notf-msg-ad-btn accept_crew_attach_request" id="{{obj.crew.id}}">Accept</span>
+                                <span class="btn mm-notf-msg-dlt-btn decline_crew_request" id="{{obj.crew.id}}">Delete</span>
+                            </div>
+                        </span>
+                {% elif obj.notification_type == 'cast_attach_response' or obj.notification_type == 'crew_attach_response'  %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                        {{obj.message|safe}}
+                        </a>
+                {% elif obj.notification_type == 'user_interest'  %}
+                    <a href="{% url 'hobo_user:friends-and-followers' %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                        {{obj.message|safe}}
+                    </a>
+                {% elif obj.notification_type == 'accepted_friend_request' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}"
+                    class="notification_link remove-decoration msg-txt-color">
+                        {{ obj.from_user.get_full_name }} accepted your friend request.
+                    </a>
+                {% elif obj.notification_type == 'user_rating' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                        {{obj.message}}
+                    </a>
+                {% elif obj.notification_type == 'invite' %}
+                        {{obj.message}}<br><a href={{obj.invite_url}}
+                        class="mm-notf-tag notification_link" id ="{{obj.id}}">Click here to view</a>
+                        {{obj.inviteurl}}
+                {% elif obj.notification_type == 'membership_change' %}
+                    <a id ="{{obj.id}}" class="cursor-pointer notification_link remove-decoration msg-txt-color"></a>
+                        <b>{{obj.message}}</b><br>
+                        <b>FilmHobo</b>
+                    </a>
+                {% elif obj.notification_type == 'project_tracking' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                        {{obj.message}}
+                    </a>
+                {% elif obj.notification_type == 'audition_status' %}
+                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{obj.message|safe}}
+                    </a>
+                {% elif obj.notification_type == 'video_rating' %}
+                    <a href="{% url 'project:video' obj.project.id %}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{obj.message|safe}}
+                    </a>
+                {% elif obj.notification_type == 'project_rating' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link remove-decoration msg-txt-color">
+                    {{obj.from_user.get_full_name}} rated your project
+                    </a>
+                    <a href="{% url 'project:single-film-project' obj.project.id %}"
+                    class="mm-notf-tag notification_link" id ="{{obj.id}}"> {{obj.project.title}}</a> as {{obj.rating|floatformat:0}} stars
+                {% elif obj.notification_type == 'comments_mention' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="notification_link mm-notf-tag">
+                    {{obj.from_user.get_full_name}}
+                    </a> mentioned you in <a href="{% url 'project:video' obj.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{obj.id}}">{{obj.project.title}}</a>'s post.
+
+                {% elif obj.notification_type == 'comments' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="mm-notf-tag notification_link">
+                    {{obj.from_user.get_full_name}}
+                    </a> commented on your project <a href="{% url 'project:video' obj.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{obj.id}}">{{obj.project.title}}</a>'s video.
+                {% elif obj.notification_type == 'comments_reply' %}
+                    <a href="{{ obj.from_user.get_profile_url }}"
+                    id ="{{obj.id}}" class="mm-notf-tag notification_link">
+                    {{obj.from_user.get_full_name}}
+                    </a> replied to your comment on project <a href="{% url 'project:video' obj.project.id %}"
+                    class="notification_link mm-notf-tag" id ="{{obj.id}}">{{obj.project.title}}</a>'s video.
+                {% endif %}
+            </div>
+            <div class="mm-notf-msg--hour-sec">
+                {% get_notifications_time obj.created_time as time %}
+                {{time}} ago.
+            </div>
+        </div>
+    </div>
+</li>
+{% endfor %}

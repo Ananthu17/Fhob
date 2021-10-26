@@ -251,26 +251,76 @@
                   </div>
                       <div class="row mt-2">
                           <div class="col-12 tos">
-                              By creating this account, you agree to the<span class="tos-t"> TERMS OF
-                                  SERVICE</span> of Filmhobo
+                              By creating this account, you need agree to the<span class="tos-t"> <a  class="link-clickable" href="">TERMS OF
+                                  SERVICE</a></span> of Filmhobo
                               Corporation and acknowledge that your credit card will be charged for the
                               selected subscription amount plus any applicable taxes, at the time of purchase
                               or at the end of any promotional discount period. Your subscription will renew
                               automatically unless you adjust your subscription settings at any time before
-                              the next billing date. </div>
+                              the next billing date, Please read it before Submitting. </div>
+                      </div>
+                         <!-- Modal -->
+                         <div class="modal fade" id="myModalpdf1" tabindex="-1" width="100%" role="dialog" aria-labelledby="myModalLabel">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                          <h6 class="modal-title" id="myModalLabel" style="text-align: center;">TERMS OF
+                                            SERVICE</h5>
+                                          <button type="button" id="pdfmodal1Close" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                  </div>
+                                  <div class="modal-body" style="text-align:center;">
+
+                                      <embed src="/media/terms_of_service.pdf" frameborder="0" width="100%" height="400px">
+
+                                  </div>
+                                  <div class="modal-footer">
+                                    <!-- <div class="row mt-1 mb-2 mr-3 float-right ">
+                                      <label class="containerradio">I Agree
+                                          <input type="radio"  name="{{ form.i_agree.name }}"
+                                          id="{{ form.i_agree.id_for_label }}"
+                                          {% if form.i_agree.field.required %}required{% endif %}>
+                                          <span class="checkmarkagree"></span>
+                                          {% if form.errors.i_agree %}
+                                            <p style="color: red">{{form.errors.i_agree}}</p>
+                                          {% endif %}
+                                        </label>
+                                    </div> -->
+                                      <button type="button" class="btn btn-default" data-dismiss="modal"  id="pdfmodal1Close1">Close</button>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
                       <div class="row mt-1 mb-2 mr-3 float-right ">
-                          <label class="containerradio">I Agree
-                            <input type="radio"  name="{{ form.i_agree.name }}"
-                            id="{{ form.i_agree.id_for_label }}"
-                            {% if form.i_agree.field.required %}required{% endif %}>
+                        <label class="containerradio">I Agree
+                          <input type="radio"  name="{{ form.i_agree.name }}"
+                          id="{{ form.i_agree.id_for_label }}"
+                          {% if form.i_agree.field.required %}required{% endif %}>
+                          <span class="checkmarkagree"></span>
+                          {% if form.errors.i_agree %}
+                            <p style="color: red">{{form.errors.i_agree}}</p>
+                          {% endif %}
                             <span class="checkmarkagree"></span>
-                            {% if form.errors.i_agree %}
-                              <p style="color: red">{{form.errors.i_agree}}</p>
-                            {% endif %}
-                              <span class="checkmarkagree"></span>
-                            </label>
-                      </div>
+                          </label>
+                    </div>
+                        <!-- Warning Modal -->
+                         <div class="modal fade" id="betaNotifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                          <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                                          <button type="button" id="betaNotifyModalCross" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                  </div>
+                                  <div class="modal-body" style="text-align:center;">
+                                      <p>Please go back to membership page and provide your beta test code first!</p>
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-default" data-dismiss="modal"  id="betaNotifyModalClose">Close</button>
+                                  </div>
+                              </div>
+                          </div>
+
+
+                      <!-- The Modal -->
 
                   </div>
               </div>
@@ -302,6 +352,23 @@
                 });
              });
 });
+
+$("a[class='link-clickable']").click(function () {
+  $('#myModalpdf1').modal('show');
+  return false;
+});
+
+$(function () {
+  $('#pdfmodal1Close').on('click', function () {
+      $('#myModalpdf1').modal('hide');
+  })
+})
+
+$(function () {
+  $('#pdfmodal1Close1').on('click', function () {
+      $('#myModalpdf1').modal('hide');
+  })
+})
 
 </script>
 {% endblock %}

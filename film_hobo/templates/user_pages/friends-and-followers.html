@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load friend_request_tag %}
+{% load project_rating_tag %}
+{% load user_account_tag %}
 
 {% block extracss %}
 <style>
@@ -39,8 +41,8 @@
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">
-                        <li><a href="#" class="membr-setup-m">My Interests ({{myinterests.count}})</a></li>
-                        <li class="mt-4"><a href="#" class="membr-setup-m">My Projects (2)</a></li>
+                        <li><a href="#myinterest_section" class="membr-setup-m">My Interests ({{myinterests.count}})</a></li>
+                        <li class="mt-4"><a href="{% url 'hobo_user:projects' %}" class="membr-setup-m">My Projects ({{my_projects_count}})</a></li>
                     </ul>
                 </div>
                 <div class="left-mode-sec mt-3 p-2 blank-add-scene">
@@ -414,11 +416,25 @@
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="net-set-tracker-sec mt-5 mb-4">
-                            <div class="mb-1 float-left"><a href="#" class="mem-setup-orng-f">({{tracking_list_count}})Tracking</a></div>
-                            <div class="float-right"><a href="#" class="mem-setup-blu-f">({{trackers_list_count}})Trackers</a></div>
-                            <hr class="mem-setup-network-hr">
-                            <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list_count}})</div>
-                            <div class="row pl-3 pr-3">
+                            <div class="mb-1 float-left"><a href="#" class="mem-setup-orng-f">({{tracking_projects_count}})Tracking Projects</a></div>
+                            <div class="text-right ">
+                                {% if tracking_projects.has_previous %}
+                                    <a href="?page1={{ tracking_projects.previous_page_number }}" class="page-nav">
+                                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                                <span class="current current-page mb-2">
+                                    {{ tracking_projects.number }}/{{ tracking_projects.paginator.num_pages }}
+                                </span>
+                                {% if tracking_projects.has_next %}
+                                    <a href="?page1={{ tracking_projects.next_page_number }}" class="page-nav">
+                                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <hr class="project_tracking_hr">
+                            <!-- <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list_count}})</div> -->
+                            <!-- <div class="row pl-3 pr-3">
                                 {% for obj in tracking_list|slice:"5" %}
                                 <div class="col-2 mem-set-img">
                                     <a href="{{obj.user.get_profile_url}}">
@@ -433,45 +449,32 @@
                                     <div class="mem-set-img-track-nam">{{obj.user.get_full_name|truncatechars:"5" }}</div>
                                 </div>
                                 {% endfor %}
+                            </div> -->
+                            <!-- <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div> -->
+
+                            {% for project_obj in tracking_projects %}
+                            {% if forloop.first or forloop.counter|divisibleby:4 %}
+                            <div class="row mt-2">
+                            {% endif %}
+                                <div class="col-4 {% if forloop.first or forloop.counter|divisibleby:4 %} {% else %}mem-set-track-padding-sec2 {% endif %} {% if  forloop.counter|divisibleby:3 %}pl-0{% endif %}">
+                                    <div class="track-blu-f-sec2">
+                                        Project
+                                        <a href="{% url 'project:single-film-project' project_obj.project.id %}"
+                                        class="tracking_project_link" title="{{project_obj.project.id}}">
+                                            <span class="track-orng-f-sec2">#{{project_obj.project.id}}</span>
+                                        </a>
+                                    </div>
+                                    <div class="track-blu-f-sec2">Title:
+                                        <a href="{% url 'project:single-film-project' project_obj.project.id %}"
+                                        class="tracking_project_link" title="{{project_obj.project.title}}">
+                                        <span class="track-orng-f-sec2">{{project_obj.project.title|truncatechars:"5"}}</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% if forloop.last or forloop.counter|divisibleby:3 %}
                             </div>
-                            <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Projects</span> (3)</div>
-                            <div class="row">
-                                <div class="col-4 ">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Dynamo</span>
-                                    </div>
-                                </div>
-                                <div class="col-4 mem-set-track-padding-sec2">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#56</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Jack</span>
-                                    </div>
-                                </div>
-                                <div class="col-4 mem-set-track-padding-sec2 pl-0">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#457</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Title:<span class="track-orng-f-sec2">Hammer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mem-set-track-txt mt-1 mb-1"><span class="underline">Teams</span> (2)</div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#224</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#3</span></div>
-                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">Dallas</span>
-                                    </div>
-                                </div>
-                                <div class="col-6 mem-set-track-padding">
-                                    <div class="track-blu-f-sec2">Project<span class="track-orng-f-sec2">#178</span>
-                                    </div>
-                                    <div class="track-blu-f-sec2">Team:<span class="track-orng-f-sec2">#1</span></div>
-                                    <div class="track-blu-f-sec2">Location:<span class="track-orng-f-sec2">New
-                                            York</span></div>
-                                </div>
-                            </div>
+                            {% endif %}
+                            {% endfor %}
                         </div>
 
                     </div>
@@ -481,10 +484,12 @@
                             <div class="card">
                                     <div class="row mb-1 mt-1" id="trackandtracking">
                                         <div class="col">
-                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu1');" >(11)Tracking </a>
+                                            <a href="#?" class=" net-tracker-text float-left ml-2 {% if request.GET.tracking %}net-tracker-text-color{% endif %}"
+                                            onclick="toggleVisibility('Menu1');" >({{ tracking_list_count }})Tracking </a>
                                         </div>
                                         <div class="col">
-                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}" onclick="toggleVisibility('Menu2');">(7)Trackers</a>
+                                            <a href="#?" class="net-tracker-text float-right mr-2 tracker-color {% if request.GET.trackers %}net-tracker-text-color{% endif %}"
+                                            onclick="toggleVisibility('Menu2');">({{ trackers_list_count }})Trackers</a>
                                         </div>
                                     </div>
                                 <!-- end dropdown bar     -->
@@ -502,10 +507,14 @@
                                                 <div class="s-12 m-3 l-3 ">
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
-                                                            {% if obj.get_profile_photo %}
-                                                            <img src="{{obj.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            {% if obj.user.get_profile_photo %}
+                                                            <a href="{{obj.user.get_profile_url}}">
+                                                            <img src="{{obj.user.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            </a>
                                                             {% else %}
+                                                            <a href="{{obj.user.get_profile_url}}">
                                                             <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                                                            </a>
                                                             {% endif %}
 
                                                         </div>
@@ -539,16 +548,20 @@
                                                     <div class="row">
                                                         <div class="col-md-6 col-sm-12">
                                                             {% if obj.get_profile_photo %}
-                                                            <img src="{{obj.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            <a href="{{obj.get_profile_url}}">
+                                                                <img src="{{obj.get_profile_photo}}" class=" mem-set-img-networkorfriends">
+                                                            </a>
                                                             {% else %}
+                                                            <a href="{{obj.get_profile_url}}">
                                                             <img src="{% static 'images/default_profile_pic.png' %}" class=" mem-set-img-networkorfriends">
+                                                            </a>
                                                             {% endif %}
                                                         </div>
                                                     </div>
                                                     <div class="row">
                                                         <div class="col">
                                                                 <span>
-                                                                    <lable class="name-alg">{{obj.get_full_name|truncatechars:"18"}}</lable>
+                                                                    <label class="name-alg">{{obj.get_full_name|truncatechars:"18"}}</label>
                                                                 </span>
                                                         </div>
                                                     </div>
@@ -598,7 +611,7 @@
                 </div>
                 <!-- End Tracking and trackers -->
                     <hr class="mem-set-acc-hr-1">
-                    <div class="row">
+                    <div class="row" id="myinterest_section">
                         
                         <!-- My Interest Row -->
                         <div class="col mt-3 ">
@@ -615,7 +628,7 @@
                             <div class="row intrest-input ">
                                 <div class="sm-12">
                                     <label class="intrest-lab">Position:</label>
-                                    <select class="inp-interest" id="position_1"
+                                    <select class="inp-interest position" id="position_1"
                                     name="position" required>
                                         {% for position in my_interest_form.position %}
                                             {{position}}
@@ -649,6 +662,24 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+                                <div class="sm-12 gender_age_section" id="gender_section_1">
+                                    <label class="intrest-lab">Gender:</label>
+                                    <select class="inp-interest format-space"
+                                    name="gender" id ="gender"  >
+                                        {% for item in my_interest_form.gender %}
+                                            {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="sm-12 gender_age_section" id="age_section_1">
+                                    <label class="intrest-lab">Age:</label>
+                                    <select class="inp-interest format-space"
+                                    name="age" id ="age"  >
+                                        {% for item in my_interest_form.age %}
+                                            {{item}}
+                                        {% endfor %}
+                                    </select>
+                                </div>
                            </div>
                            </span>
                             <div class="row mt-2">
@@ -676,45 +707,76 @@
                         <!-- Table -->
                         <div class="card ml-3 mr-3">
                             <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
-                            <hr class="mem-set-acc-hr-interest">
                             <table class="table mem-table table-responsive-sm">
                                 <colgroup>
                                     <col span="1" style="width: 15%;">
                                     <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 40%;">
-                                    <col span="1" style="width: 5%;">
-                                    <col span="1" style="width: 5%;">
-                                    <col span="1" style="width: 6%;">
-                                    <col span="1" style="width: 8%;">
+                                    <col span="1" style="width: 30%;">
+                                    <col span="1" style="width: 25%;">
+                                    <col span="1" style="width: 15%;">
+                                    <!-- <col span="1" style="width: 5%;">
+                                    <col span="1" style="width: 6%;"> -->
+                                    <col span="1" style="width: 20%;">
                                  </colgroup>
                             {% for obj in myinterests %}
                                 <tr class="interest-font my-interest-table-th" >
                                     <th>Position: <u>{{obj.position}}</u> </th>
-                                    <th>Format: <u>{{obj.format}}</u> </th>
+                                    <th>Format: <u>{{obj.get_format_display}} </u> </th>
                                     <th>Location: <u>{{obj.location}}</u></th>
+                                    <th>{% if obj.position.slug == 'actoractress' %}Age:<u>{{obj.get_age_display}}{% endif %}</u></th>
+                                    <th>{% if obj.position.slug == 'actoractress' %}Gender:<u>{{obj.gender}}{% endif %}</u></th>
                                     <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
                                     <th></th>
                                     <th></th>
-                                    <th></th>
                                 </tr>
-                                <tr>
-                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
-                                    <td>Title: Ripples of Moonlight</td>
-                                    <td>Posted on 07/23/21</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr>
-                                <tr>
-                                    <td><a class="tbl-tag" href="">Project # 233</a></td>
-                                    <td>Title: Ripples of Moonlight</td>
-                                    <td>Posted on 07/23/21</td>
-                                    <td class="int-applied">Applied</td>
-                                    <td class="int-red">Passed</td>
-                                    <td class="int-grey">Attached</td>
-                                    <td class="int-red">(on 08/05/21)</td>
-                                </tr>
+                                {% get_dict_value_if_exists cast_jobs_dict obj.id as cast_job_list %}
+                                {% if cast_job_list %}
+                                    {% for cast in cast_job_list  %}
+                                            <tr>
+                                                    <td><a class="tbl-tag" href="{% url 'project:single-film-project' cast.project.id %}">Project # {{ cast.project.id }}</a></td>
+                                                    <td>Title:  {{ cast.project.title }} </td>
+                                                    <td>Character:  {{ cast.name }} </td>
+                                                    <td>Posted on {{ cast.created_time }}</td>
+                                                    {% get_dict_value cast_application_dict cast.id as audition_obj %}
+                                                    {% if audition_obj is not None %}
+                                                        <td
+                                                        {% if audition_obj.audition_status == 'applied' %}class="int-applied"
+                                                        {% elif audition_obj.audition_status == 'attached' %}class="int-green"
+                                                        {% elif audition_obj.audition_status == 'passed' %}class="int-red"
+                                                        {% elif audition_obj.audition_status == 'callback' %}class="int-callback"
+                                                        {% endif %}>{{audition_obj.get_audition_status_display}}</td>
+                                                        <td class="int-red">(on {{audition_obj.status_update_date}})</td>
+                                                    {% else %}
+                                                        <td></td>
+                                                        <td></td>
+                                                    {% endif %}
+                                            </tr>
+                                    {% endfor %}
+                                {% endif %}
+                                {% get_dict_value_if_exists crew_jobs_dict obj.id as crew_job_list %}
+                                {% if crew_job_list %}
+                                    {% for crew in crew_job_list  %}
+                                            <tr>
+                                                <td><a class="tbl-tag" href="{% url 'project:single-film-project' crew.project.id %}">Project # {{ crew.project.id }}</a></td>
+                                                <td>Title:  {{ crew.project.title }} </td>
+                                                <td></td>
+                                                <td>Posted on {{ crew.created_time }}</td>
+                                                {% get_dict_value crew_application_dict crew.id as application_obj %}
+                                                {% if application_obj %}
+                                                    <td
+                                                    {% if application_obj.application_status == 'applied' %}class="int-applied"
+                                                    {% elif application_obj.application_status == 'attached' %}class="int-green"
+                                                    {% elif application_obj.application_status == 'passed' %}class="int-red"
+                                                    {% endif %}>{{application_obj.application_status}}</td>
+                                                    <td class="int-red">(on {{application_obj.status_update_date}})</td>
+                                                {% else %}
+                                                    <td></td>
+                                                    <td></td>
+                                                {% endif %}
+                                            </tr>
+                                    {% endfor %}
+                                {% endif %}
+
                                 <!-- The Modal -->
                                 <div class="modal fade" id="edit-{{obj.id}}">
                                     <div class="modal-dialog">
@@ -736,13 +798,10 @@
                                                                     <label class="intrest-lab">Position:</label>
                                                                 </div>
                                                                 <div class="col-6">
-                                                                    <select class="inp-interest-2" id="position_{{obj.id}}"
+                                                                    <select class="inp-interest-2 edit_position modal-position" id="position_{{obj.id}}"
                                                                     name="position" required>
                                                                         {% for position in positions %}
-                                                                             <option value="{{position.id}}"
-                                                                             {% if obj.position.id == position.id %} selected {% endif %}>
-                                                                             {{position}}
-                                                                            </option>
+                                                                             <option value="{{position.id}}"{% if obj.position.id == position.id %} selected {% endif %}>{{position}}</option>
                                                                         {% endfor %}
                                                                     </select>
                                                                 </div>
@@ -790,13 +849,55 @@
                                                                         <label class="intrest-lab">Location:</label>
                                                                     </div>
                                                                     <div class="col-6">
-                                                                        <select class="inp-interest-2 modal-location form-control"
+                                                                        <select class="inp-interest-2 modal-location "
                                                                         id ="location_{{obj.id}}"
                                                                         name="location" required >
                                                                         {% for location in locations %}
                                                                                 <option value="{{location.id}}"
                                                                                 {% if obj.location.id == location.id %} selected {% endif %}>
                                                                                 {{location}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 {% if obj.position.slug != 'actoractress' %}edit_gender_Age_section{% endif %}"
+                                                            id="edit_gender_section_{{obj.id}}">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Gender:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2"
+                                                                        id ="gender_{{obj.id}}"
+                                                                        name="gender" required >
+                                                                        <option value="">---</option>
+                                                                        {% for item in gender %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.gender == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
+                                                                            </option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 {% if obj.position.slug != 'actoractress' %}edit_gender_Age_section{% endif %}"
+                                                            id="edit_age_section_{{obj.id}}">
+                                                                <div class="row mb-2">
+                                                                    <div class="offset-1 col-3">
+                                                                        <label class="intrest-lab">Age:</label>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <select class="inp-interest-2 "
+                                                                        id ="age_{{obj.id}}"
+                                                                        name="age" required >
+                                                                        <option value="">---</option>
+                                                                        {% for item in age %}
+                                                                            <option value="{{item.0}}"
+                                                                                {% if obj.age == item.0 %} selected {% endif %}>
+                                                                                {{item.1}}
                                                                             </option>
                                                                         {% endfor %}
                                                                         </select>
@@ -904,8 +1005,9 @@
 
     $(document).ready(function() {
         $('#location_1').select2();
+        $('#position_1').select2();
         $('.modal-location').select2();
-
+        // $('.modal-position').select2();
 
         var getUrlParameter = function getUrlParameter(sParam) {
         var sPageURL = window.location.search.substring(1),
@@ -948,7 +1050,7 @@ $('body').on('click' , '#add-more-interests', function(){
         {
             $('.my-interests-section').append(data['add_my_interests_form_html']);
             $(location_id).select2();
-            // $(position_id).select2();
+            $(position_id).select2();
             // $(format_id).select2();
         }
     });
@@ -1019,10 +1121,14 @@ $('body').on('click' , '#add-more-interests', function(){
         var format_id = "#format_"+id
         var budget_id = "#budget_"+id
         var location_id = "#location_"+id
+        var gender_id = "#gender_"+id
+        var age_id = "#age_"+id
         var position = $(position_id).val();
         var format = $(format_id).val();
         var budget = $(budget_id).val();
         var location = $(location_id).val();
+        var gender = $(gender_id).val();
+        var age = $(age_id).val();
 
         data_dict['id'] = id
         if(position){
@@ -1037,6 +1143,13 @@ $('body').on('click' , '#add-more-interests', function(){
         if(location){
             data_dict['location'] = location
         }
+        if(gender){
+            data_dict['gender'] = gender
+        }
+        if(age){
+            data_dict['age'] = age
+        }
+        console.log(data_dict)
         $.ajax
         ({
             type: "POST",
@@ -1216,6 +1329,36 @@ $('body').on('click' , '.close-add-togroup-modal', function(){
         jQuery("#trackandtracking .net-tracker-text").removeClass('net-tracker-text-color');
         jQuery(this).toggleClass('net-tracker-text-color'); 
         });
+</script>
+<script>
+    $('body').on('change' , '.position', function(){
+        var id = $(this).attr("id");
+        var position = $(this).find("option:selected").text();
+        var loop_count = id.split("_")[1];
+        var gender_section = "#gender_section_"+loop_count;
+        var age_section = "#age_section_"+loop_count;
+        if(position=='Actor/Actress'){
+            $(gender_section).css('visibility', 'visible');
+            $(age_section).css('visibility', 'visible');
+        }else{
+            $(gender_section).css('visibility', 'hidden');
+            $(age_section).css('visibility', 'hidden');
+        }
+    });
+    $('body').on('change' , '.edit_position', function(){
+        var id = $(this).attr("id");
+        var edit_position = $(this).find("option:selected").text();
+        var loop_count = id.split("_")[1];
+        var gender_section = "#edit_gender_section_"+loop_count;
+        var age_section = "#edit_age_section_"+loop_count;
+        if(edit_position=='Actor/Actress'){
+            $(gender_section).css('visibility', 'visible');
+            $(age_section).css('visibility', 'visible');
+        }else{
+            $(gender_section).css('visibility', 'hidden');
+            $(age_section).css('visibility', 'hidden');
+        }
+    });
 </script>
 {% endblock %}
 

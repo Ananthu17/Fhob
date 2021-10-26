@@ -9,7 +9,9 @@
     <div class="row help-sec-outer mt-3 mb-4">
         <div class="col-11 mt-4 mb-4">
             <a class="help-blu-link float-left ml-3">Surfing Film Hobo</a>
-            <button class="btn help-top-btn float-right mb-3">Report a Problem</button>
+            <a href="{% url 'hobo_user:report-a-problem' %}">
+                <button  class="btn help-top-btn float-right mb-3">Report a Problem</button>
+            </a>
         </div>
         <div class="bg-light-help">
             <div class="col-12 mt-1">
