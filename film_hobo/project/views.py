@@ -4565,6 +4565,13 @@ class ShowcaseVideoView(LoginRequiredMixin, TemplateView):
                                 Q(project=project)
                             ).first()
         context['like_obj'] = like_obj
+
+        try:
+            friend_obj = Friend.objects.get(user=self.request.user)
+            friends = friend_obj.friends.all()
+        except Friend.DoesNotExist:
+            friends = None
+        context['friends'] = friends
         return context
 
 
@@ -4583,20 +4590,19 @@ class LikeProjectVideoView(APIView):
                 project = Project.objects.get(pk=project_id)
                 try:
                     obj = ProjectVideoLikeAndDislike.objects.get(
-                        Q(project=project) &
-                        Q(user=user)
-                    )
+                                Q(project=project) &
+                                Q(user=user)
+                            )
                     if obj.like_or_dislike == ProjectVideoLikeAndDislike.DISLIKE:
                         obj.user = user
                         obj.project = project
                         obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
                         obj.save()
-                        response = {'mesage': "Video liked", 'status':
+                        response = {'message': "You liked this video.", 'status':
                                     status.HTTP_200_OK}
-                        messages.success(self.request, "You liked this video.")
                     else:
                         obj.delete()
-                        response = {'mesage': "Like Removed", 'status':
+                        response = {'message': "Like Removed", 'status':
                                     status.HTTP_200_OK}
                 except ProjectVideoLikeAndDislike.DoesNotExist:
                     obj = ProjectVideoLikeAndDislike()
@@ -4604,9 +4610,8 @@ class LikeProjectVideoView(APIView):
                     obj.project = project
                     obj.like_or_dislike = ProjectVideoLikeAndDislike.LIKE
                     obj.save()
-                    response = {'mesage': "Video liked", 'status':
+                    response = {'message': "You liked this video.", 'status':
                                 status.HTTP_200_OK}
-                    messages.success(self.request, "You liked this video.")
                 project.likes = ProjectVideoLikeAndDislike.objects.filter(
                                     Q(project=project) &
                                     Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
@@ -4641,20 +4646,19 @@ class DislikeProjectVideoView(APIView):
                 project = Project.objects.get(pk=project_id)
                 try:
                     obj = ProjectVideoLikeAndDislike.objects.get(
-                        Q(project=project) &
-                        Q(user=user)
-                    )
+                                Q(project=project) &
+                                Q(user=user)
+                            )
                     if obj.like_or_dislike == ProjectVideoLikeAndDislike.LIKE:
                         obj.user = user
                         obj.project = project
                         obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
                         obj.save()
-                        response = {'mesage': "Video disliked", 'status':
+                        response = {'message': "You disliked this video.", 'status':
                                     status.HTTP_200_OK}
-                        messages.success(self.request, "You disliked this video.")
                     else:
                         obj.delete()
-                        response = {'mesage': "Dislike Removed", 'status':
+                        response = {'message': "Dislike Removed", 'status':
                                     status.HTTP_200_OK}
                 except ProjectVideoLikeAndDislike.DoesNotExist:
                     obj = ProjectVideoLikeAndDislike()
@@ -4662,9 +4666,8 @@ class DislikeProjectVideoView(APIView):
                     obj.project = project
                     obj.like_or_dislike = ProjectVideoLikeAndDislike.DISLIKE
                     obj.save()
-                    response = {'mesage': "Video disliked", 'status':
+                    response = {'message': "You disliked this video.", 'status':
                                 status.HTTP_200_OK}
-                    messages.success(self.request, "You disliked this video.")
                 project.likes = ProjectVideoLikeAndDislike.objects.filter(
                                     Q(project=project) &
                                     Q(like_or_dislike = ProjectVideoLikeAndDislike.LIKE)
@@ -4683,3 +4686,22 @@ class DislikeProjectVideoView(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class ProjectVideoLikeDislikeAjaxView(View, JSONResponseMixin):
+    template_name = 'project/like_dislike.html'
+
+    def get(self, *args, **kwargs):
+        context = dict()
+        project_id = self.request.GET.get('id')
+        project = get_object_or_404(Project, pk=project_id)
+        like_obj = ProjectVideoLikeAndDislike.objects.filter(
+                        Q(user=self.request.user) &
+                        Q(project=project)
+                    ).first()
+        like_dislike_html = render_to_string(
+                                'project/like_dislike.html',
+                                {'like_obj': like_obj,
+                                 'project':project})
+        context['like_dislike_html'] = like_dislike_html
+        return self.render_json_response(context)

@@ -52,6 +52,31 @@
                                         data-show-text="false" allowFullScreen="allowFullScreen" frameBorder="0" class=" video-img"></iframe>
                                     {% endif %}
                                 </div>
+                                <div class="share-sec">
+                                    <div class="share-alg">
+                                        {% if request.user.membership != 'HOB' %}
+                                        <a class="cursor-pointer mem-blu-link">S<span class="share-small-f">HARE</span></a>
+                                        {% endif %}
+                                    </div>
+                                    <div class="like-dislike-btn like_dislike">
+                                        <span><a class="like_video cursor-pointer remove-decoration" id="{{project.id}}">
+                                            {% if like_obj.like_or_dislike == 'like' %}
+                                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                            {% else %}
+                                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </a> {{project.likes}}
+                                        </span>
+                                        <span><a class="dislike_video cursor-pointer remove-decoration" id="{{project.id}}">
+                                            {% if like_obj.like_or_dislike == 'dislike' %}
+                                            <i class="fa fa-thumbs-down" aria-hidden="true"></i>
+                                            {% else %}
+                                            <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                                            {% endif %}
+                                        </a> {{project.dislikes}}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3 left-mode-sec vdo-align">
                             {% for job_type,team_members in job_types_dict.items %}
@@ -70,11 +95,11 @@
 
                         <!-- video player End   -->
 
-                        <div class="share-sec">
+                        <!-- <div class="share-sec">
                             <div class="share-alg">
                                 <a href="#" class="mem-blu-link">S<span class="share-small-f">HARE</span></a>
                             </div>
-                            <div class="like-dislike-btn">
+                            <div class="like-dislike-btn like_dislike">
                                 <span><a class="like_video cursor-pointer remove-decoration" id="{{project.id}}">
                                     {% if like_obj.like_or_dislike == 'like' %}
                                     <i class="fa fa-thumbs-up" aria-hidden="true"></i>
@@ -92,7 +117,7 @@
                                 </a> {{project.dislikes}}
                                 </span>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Like Dislike section End   -->
 
@@ -121,6 +146,7 @@
 
     <!-- Footer  -->
 </div>
+
 {% endblock %}
 
 {% block extrajs %}
@@ -144,7 +170,15 @@
                     xhr.setRequestHeader ("Authorization", token);
                 },
                 success: function (response){
-                    window.location.reload();
+                    $('#success_message').fadeIn().html(response['message']);
+                    setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+                    $.get('/project/like-dislike-replace-html/', {"id":project_id})
+                    .done(function(data) {
+                        if(data.results!='')
+                            {
+                                $('.like_dislike').html(data['like_dislike_html'])
+                            }
+                    });
                 }
             });
 
@@ -165,10 +199,20 @@
                     xhr.setRequestHeader ("Authorization", token);
                 },
                 success: function (response){
-                    window.location.reload();
+                    $('#success_message').fadeIn().html(response['message']);
+                    setTimeout(function() {$('#success_message').fadeOut("slow");}, 2000 );
+
+                    $.get('/project/like-dislike-replace-html/', {"id":project_id})
+                    .done(function(data) {
+                        if(data.results!='')
+                            {
+                                $('.like_dislike').html(data['like_dislike_html'])
+                            }
+                    });
                 }
             });
 
         });
 </script>
+
 {% endblock %}
