@@ -258,7 +258,7 @@
                     {% if not user.is_authenticated %}
 
                         <li class="nav-item">
-                            <a id="showcase_non_clickable" class="nav-link-non-clickable" href="">SHOWCASE</a>
+                            <a id="showcase_non_clickable" class="nav-link-new" href="">SHOWCASE</a>
                         </li>
                         <li class="nav-item">
                             <a id="screeing_room_non_clickable" class="nav-link-non-clickable" href="">SCREENING ROOM</a>
@@ -556,20 +556,17 @@ $("#showcase_non_clickable").click(function () {
 
         })
     })
-    $(function () {
-        $('#modalClose2').on('click', function () {
-            $('#loginModal').modal('hide');
-
-        })
-    })
-    $(function () {
-        $('#modalClose3').on('click', function () {
-            $('#loginModal').modal('hide');
-
-        })
-    })
 
 
+</script>
+<script>
+
+    $('#modalClose2').click(function(event){
+        $('#loginModal').modal('hide');
+    });
+    $('#modalClose3').click(function(event){
+        $('#loginModal').modal('hide');
+    });
 
 </script>
 <script>
