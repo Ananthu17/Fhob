@@ -296,6 +296,8 @@ class CustomUser(AbstractUser):
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
+        elif self.first_name == None and self.last_name ==None:
+            name = ""
         else:
             name = self.first_name+" "+self.last_name
         return name
