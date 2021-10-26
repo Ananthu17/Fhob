@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Character, Sides, Audition, ProjectTracking, \
     AuditionRating, AuditionRatingCombined, ProjectRating, Comment, \
     SceneImages, ProjectCrew, CrewApplication, AttachedCrewMember, \
-    ReportVideo
+    ReportVideo, ProjectVideoLikeAndDislike
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
@@ -99,5 +99,11 @@ class ReportVideoAdmin(admin.ModelAdmin):
         return format_html("<a href='{url}' target='_blank'>{url}</a>", url=obj.video_url)
 
 
+class ProjectVideoLikeAndDislikeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'project', 'like_or_dislike')
+
+
 admin.site.register(ProjectTracking, ProjectTrackingAdmin)
 admin.site.register(ReportVideo, ReportVideoAdmin)
+admin.site.register(ProjectVideoLikeAndDislike,
+                    ProjectVideoLikeAndDislikeAdmin)
