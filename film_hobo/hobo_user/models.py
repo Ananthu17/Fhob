@@ -668,6 +668,10 @@ class Project(models.Model):
     rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
                                  MaxValueValidator(5)], null=True, blank=True,
                                  default=1)
+    video_rating = models.IntegerField(_("Video Rating"),
+                                       validators=[MinValueValidator(0),
+                                       MaxValueValidator(5)], null=True, blank=True,
+                                       default=1)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
