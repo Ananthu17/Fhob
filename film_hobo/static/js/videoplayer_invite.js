@@ -2,7 +2,7 @@ origin_url = window.location.origin
 
 $('#share-link').click(function (event) {
     var modal = $("#shareModal")
-    var title = "Share with"
+    var title = "Share with Friends"
     modal.find('.modal-title').text(title)
     $("#shareModal").modal('show');
 });
@@ -78,12 +78,36 @@ $('#invite_send').click(function (event) {
 
 
 $('#url_send').click(function (event) {
-    var selectedUsers = $('#languageSelect').val();
+    var selectedUsers = $('#userSelect').val();
     var url_to_share = window.location.origin + window.location.pathname
     user_url = window.location.origin + '/hobo_user/user_home/send_url/'
     user_url_args = {
         "selectedUsers": selectedUsers,
         "project_url": url_to_share,
+        "url_type": "PROJECT"
+    }
+
+    axios.post(user_url, user_url_args, { headers: { 'Authorization': token_auth_str } })
+        .then((response) => {
+            console.log(response);
+            $("#shareModal").modal('hide');
+        }, (error) => {
+            console.log(error);
+            $("#shareModal").modal('hide');
+        });
+});
+
+
+
+
+$('#profile_url_send').click(function (event) {
+    var selectedUsers = $('#userSelect').val();
+    var url_to_share = window.location.origin + window.location.pathname
+    user_url = window.location.origin + '/hobo_user/user_home/send_url/'
+    user_url_args = {
+        "selectedUsers": selectedUsers,
+        "project_url": url_to_share,
+        "url_type": "PROFILE"
     }
 
     axios.post(user_url, user_url_args, { headers: { 'Authorization': token_auth_str } })
