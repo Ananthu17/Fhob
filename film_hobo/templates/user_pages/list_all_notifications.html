@@ -2,7 +2,7 @@
 {% load notification_tag %}
 
 
-{% get_all_notifications request.user as notifications %}
+{% get_all_notifications request.user.id as notifications %}
 {% for obj in notifications %}
 
 <li class="{% if obj.status_type == 'unread' %} mm-notf-grid-col-read {% endif %}">
