@@ -9,6 +9,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from .models import CustomUser, GuildMembership, DisabledAccount, \
     CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, CoWorker, \
     CompanyProfile, Country, Photo, Feedback, Writer
+from project.models import DraftProject
 
 
 class SignUpForm(UserCreationForm):
@@ -407,7 +408,7 @@ class CheckoutForm(forms.Form):
 class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
-        model = Project
+        model = DraftProject
         fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
                   'sag_aftra', 'cast_attachment', 'visibility',
                   'script_visibility', 'visibility_password', 'location',
@@ -415,6 +416,7 @@ class ProjectCreationForm(forms.ModelForm):
                   'cast_audition_password', 'team_select_password',
                   'video_url', 'video_type', 'video_status',
                   'video_cover_image', 'logline', 'project_info',
+                  'production'
                   )
         widgets = {
 

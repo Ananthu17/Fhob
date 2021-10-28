@@ -933,6 +933,99 @@
                        </div>
                     </div>
                 </div>
+                <!-- Row 5  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display">
+                            <span class=" txt-red  top-head-align proj-head-margin">Draft Projects</span>
+                            <ul class="proj-cnt-menu-li" id="4">
+                                <li><a></a></li>
+                                <!-- <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li> -->
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo4">
+                        <div class="owl-carousel owl-theme " id="project-owl5">
+                            {% if draft_projects %}
+                            {% for project in draft_projects %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="card proj-card-drafts pointer" >
+                                    <div class="project-line">
+                                        <span class="proj-no">
+                                            Project
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a title="{{project.get_sag_aftra_display}}">{{project.get_sag_aftra_display|truncatechars:"5"}}</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a >{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span  class="proj-symb">
+                                            <a href="{% url 'hobo_user:update-project' id=project.id  %}">Edit</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line2">
+                                        <span class="proj-title">
+                                            Title:<a>{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a>{{ project.number_of_pages }}</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <span><a>{{project.get_visibility_display}}</a></span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Creator:<a>{{project.creator}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Format:<a>{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            Location:<a title="{{project.location|truncatechars:'25'}}">{{project.location|truncatechars:"25"}}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
                 {% endif %}
             </div>
 
@@ -1051,6 +1144,39 @@
         }
     })
     $('#project-owl4').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
+    $('#project-owl5').owlCarousel({
         loop:true,
         margin:10,
         responsiveClass:true,
