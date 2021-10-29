@@ -600,6 +600,12 @@ class Project(models.Model):
         (VIMEO, 'Vimeo'),
         # (FACEBOOK, 'Facebook'),
     ]
+    SAGAFTRA = 'SAGAFTRA'
+    INDIE = 'INDIE'
+    PRODUCTION_CHOICES = [
+        (SAGAFTRA, 'SAG-AFTRA'),
+        (INDIE, 'INDIE'),
+    ]
 
     ACTION = 'ACT'
     ADVENTURE = 'ADV'
@@ -733,6 +739,14 @@ class Project(models.Model):
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
+    production = models.CharField(_("Production"),
+                                  choices=PRODUCTION_CHOICES,
+                                  max_length=150, default=SAGAFTRA)
+    draft_project = models.OneToOneField('project.DraftProject',
+                                         verbose_name=_("Draft Project"),
+                                         related_name="draft_project",
+                                         on_delete=models.SET_NULL,
+                                         null=True, blank=True)
 
     def __str__(self):
         return self.title

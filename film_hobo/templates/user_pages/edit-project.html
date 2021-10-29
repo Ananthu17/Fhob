@@ -322,23 +322,28 @@
                             </div>
                         </div>
 
-                        <!-- <div class="row">
-                            <div class="col-11 mt-2">
-                                <div class="form-check-inline">
+                        <div class="row">
+                            <div class="col-12 col-md-2 mt-2 ">
+                                <label class="form-title mem-setup-blu-f"><br>PRODUCTION:</label>
+                            </div>
+                            <div class="col-12 col-md-10 mt-2">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">SAG-AFTRA
-                                        <input type="radio" name="radiorow3" required >
+                                        <input type="radio" name="production"  value="SAGAFTRA" required
+                                        {% if project_obj.production == 'SAGAFTRA' %}checked{% endif %}>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check-inline ml-3">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">INDIE
-                                        <input type="radio" name="radiorow3">
+                                        <input type="radio" name="production" value="INDIE"
+                                        {% if project_obj.production == 'INDIE' %}checked{% endif %}>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
 
                             </div>
-                        </div> -->
+                        </div>
 
                         <div class="row">
                             <div class="col-2 ">
@@ -474,7 +479,7 @@
                                 </form>
                             </div>
                             
-                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3">Your Crew and Cast will
+                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3 visibility_password_text">Your Crew and Cast will
                                 need this Password when they click on the Project Number to get to
                                 the Project Page.
                             </div>
@@ -494,23 +499,12 @@
                                 </select>
                             </div>
                         </div>
-                        {% if mode_operation == 'update' %}
-                        <div class="row mt-3">
-                            <a href="{% url 'project:add-characters' id=project_obj.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
-
-                        <div class="row mt-3">
-                            <a href="{% url  'project:add-project-crew' id=project_obj.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
-                        {% endif %}
                         <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span>(Status And
+                            <div class="col-12 col-md-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span><br>(Status And
                                     Minimum Rating):</label>
                             </div>
-                            <div class="col-md-9 mt-3">
+                            <div class="col-12 col-md-10 mt-3">
                                 {{form.cast_samr}}
                                 <div class="form-check-inline">
                                     <div class="cast-star-rating1"> 
@@ -595,11 +589,11 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span>(Status And
+                            <div class="col-12 col-md-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span><br>(Status And
                                     Minimum Rating):</label>
                             </div>
-                            <div class="col-md-9 mt-3">
+                            <div class="col-12 col-md-10 mt-3">
                                 {{form.crew_samr}}
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating1"> 
@@ -683,10 +677,10 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-12 col-md-2">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
-                            <div class="col-md-6 mt-3">
+                            <div class="col-12 col-md-10 mt-3">
                                 <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
@@ -710,9 +704,9 @@
                         </div>
                       </div>
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-12 col-md-2">
                             </div>
-                            <div class="col-md-8 mt-3">
+                            <div class="col-12 col-md-8 mt-3">
                                 <div class="form-check-inline">
                                     <label class="containerradio bold" style="margin-right: 2em;">Private
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" {% if project_obj.script_visibility == project_obj.PRIVATE %}checked{% endif%} required>
@@ -768,16 +762,31 @@
                         <hr class="prjct-log-blck-hr">
 
                         <div class="row mb-4">
-                            <div class="col-2">
+                            <!-- <div class="col-2">
                                 <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
-                            </div>
+                            </div> -->
                             <div class="col-3">
-                                <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
+                                <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
                             </div>
                         </div>
+                        <hr class="prjct-log-blck-hr">
+                        {% if mode_operation == 'update' %}
+                        <div class="row mt-3">
+                            <a href="{% url 'project:add-characters' id=project_obj.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
+                                class="mt-2 ml-3 bold">({{cast_count}})</span>
+                        </div>
+
+                        <div class="row mt-3">
+                            <a href="{% url  'project:add-project-crew' id=project_obj.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
+                                class="mt-2 ml-3 bold">({{crew_count}})</span>
+                        </div>
+                        {% endif %}
+                        <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
                             <div class="col-2">
-                                <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button>
+                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
+                                <a style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger  post_project">POST YOUR PROJECT</a>
                             </div>
                         </div>
 
@@ -837,9 +846,11 @@
     })
     $('#private').on(('click'),()=>{
         $('#visibility_password').removeClass('d-none')
+        $('.visibility_password_text').css('visibility', 'visible');
     })
     $('#public').on(('click'),()=>{
         $('#visibility_password').addClass('d-none')
+        $('.visibility_password_text').css('visibility', 'hidden');
     })
     $('#id_script').on(('change'),()=>{
         var filename = $('#id_script').val().split('\\').pop();

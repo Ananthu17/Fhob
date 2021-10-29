@@ -830,8 +830,22 @@ input.pw {
     color : #1637f9!important;
     text-decoration: underline;
  }
- /* .video-frame-2
+ .visibility_password_text
  {
-  width: 100%;
-  height: 100%;
- } */
+ visibility:hidden;
+ }
+ .cursor-disabled
+  {
+    cursor:not-allowed!important;
+  }
+
+  .proj-card-drafts{
+    font-size:12px; 
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid black;
+    border-radius: 1px;
+ }
+ .proj-card-drafts a{
+    color : #0960be;
+ }
