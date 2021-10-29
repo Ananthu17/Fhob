@@ -97,6 +97,21 @@
                         Top Ten
                     </div>
                 </div>
+                <div  class=" proj-calender-sec mt-3">
+                    <div class="proj-location-sec">
+                        <div class="proj-location-sec-head">
+                            Location
+                        </div>
+                        <div class="proj-location-select-sec">
+                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
+                                {% for place in locations %}
+                                <option disabled selected hidden>Choose Location</option>
+                                <option value="{{place.id}}">{{place}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt mb-3">
                         <label class="swc-left-scenes-sec ">Scenes</label>
@@ -1235,6 +1250,22 @@
         .then((response) => {
                 console.log("Response:",response.data)
                 dataInsertion(response.data, parent)
+        }, (error) => {console.log(error);})
+    }
+    function locationFilter(){
+        var location = document.getElementById("locationfilter");
+        var  id = location.value;
+        console.log("LOC",location,"VAL:",id)
+
+        post_url = origin_url + `/hobo_user/showcase/projects/?location=${id}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response:",response.data)
+                dataInsertion(response.data)
         }, (error) => {console.log(error);})
     }
 

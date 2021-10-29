@@ -376,13 +376,16 @@ class ShowCase(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["scenes"] = Project.objects.filter(
-                            format="SCH").order_by('-likes')[:10]
+                            format="SCH").filter(rating__gte=4).order_by(
+                            '-likes')[:10]
         context["toprated_scenes"] = Project.objects.filter(
-                                     format="SHO").order_by('-likes')[:10]
+                                     format="SHO").filter(
+                                     rating__gte=4).order_by('-likes')[:10]
         context["filims"] = Project.objects.filter(
                             format="SCH").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-id')
+        context['locations'] = Location.objects.all()
         return context
 
 
