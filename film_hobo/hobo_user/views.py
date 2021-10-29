@@ -309,7 +309,7 @@ class CustomUserSignupHobo(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                new_user.registration_complete = True
+                # new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -753,6 +753,11 @@ class ExtendedSignupVerify(SignupVerify):
                 email = signup_code.user
                 user_membership = CustomUser.objects.get(
                                   email=email.email).membership
+                if (user_membership == 'HOB'):
+                    user_obj = CustomUser.objects.get(
+                                  email=email.email)
+                    user_obj.registration_complete = True
+                    user_obj.save()
                 signup_code.delete()
             except SignupCode.DoesNotExist:
                 pass
@@ -5498,6 +5503,10 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             # print('form error writer', writerform.errors)
             if projectform.is_valid():
                 # writer = writerform.save()
+                # Save for later
+                # for field in projectform.fields:
+                #     projectform.fields[field].required = False
+
                 project = projectform.save()
                 project.cast_samr = cast_star_smar
                 project.crew_samr = crew_star_smar
