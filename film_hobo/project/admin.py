@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Character, Sides, Audition, ProjectTracking, \
     AuditionRating, AuditionRatingCombined, ProjectRating, Comment, \
     SceneImages, ProjectCrew, CrewApplication, AttachedCrewMember, \
-    ReportVideo, ProjectVideoLikeAndDislike
+    ReportVideo, ProjectVideoLikeAndDislike, DraftProject
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 from import_export.admin import ImportExportModelAdmin
@@ -103,6 +103,7 @@ class ProjectVideoLikeAndDislikeAdmin(admin.ModelAdmin):
     list_display = ('user', 'project', 'like_or_dislike')
 
 
+admin.site.register(DraftProject)
 admin.site.register(ProjectTracking, ProjectTrackingAdmin)
 admin.site.register(ReportVideo, ReportVideoAdmin)
 admin.site.register(ProjectVideoLikeAndDislike,

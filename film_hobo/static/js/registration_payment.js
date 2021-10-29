@@ -49,7 +49,7 @@ $( document ).ready(function() {
     }
 
     // check if the user is beta user and
-    var betacode = getUrlParameter('beta_code');
+    var betacode = getUrlParameter('beta_code').split('?')[0];
     if (betacode){
         // check if beta-user code is valid
         check_beta_tester_code_args = {"code": betacode}

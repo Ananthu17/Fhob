@@ -94,7 +94,7 @@
 
     </head>
     <div class="wrapper flex-grow-1">
-        <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data">
+        <form href="{% url 'hobo_user:new-project' %}" method="POST" enctype="multipart/form-data" id="newProject">
         {% csrf_token %}
         <div class="container-fluid member-setup-sec">
             <div class="row mb-4">
@@ -346,16 +346,19 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-11 mt-2">
-                                <div class="form-check-inline">
+                            <div class="col-12 col-md-2 mt-2 ">
+                                <label class="form-title mem-setup-blu-f"><br>PRODUCTION:</label>
+                            </div>
+                            <div class="col-12 col-md-10 mt-2">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">SAG-AFTRA
-                                        <input type="radio" name="radiorow3" required>
+                                        <input type="radio" name="production" value="SAGAFTRA" required>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check-inline ml-3">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">INDIE
-                                        <input type="radio" name="radiorow3">
+                                        <input type="radio" name="production" value="INDIE">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
@@ -491,21 +494,20 @@
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.visibility_password  }}
                                         <i class="bi bi-eye-slash" id="togglePassword1"></i>
-
                                     </div>
                                 </form>
                             </div>
-                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3">Your Crew and Cast will
+                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3 visibility_password_text">Your Crew and Cast will
                                 need this Password when they click on the Project Number to get to
                                 the Project Page.
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-2 ">
+                            <div class="col-12 col-md-2">
                                 <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
-                            <div class="col-6">
-                                <br><select class=" inp-line  modal-location" id ="location_1"
+                            <div class="col-12 col-md-10">
+                                <br><select class="inp-line  modal-location" id ="location_1"
                                 name="location" required >
 
                                 {% for item in form.location %}
@@ -515,23 +517,13 @@
                                 </select>
                             </div>
                         </div>
-                        {% if mode_operation != 'create' %}
-                        <div class="row mt-3">
-                            <a href="#" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
 
-                        <div class="row mt-3">
-                            <a href="#" class="btn prjct-log-btn">CREW SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
-                        {% endif %}
                         <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span>(Status And
+                            <div class="col-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span><br>(Status And
                                     Minimum Rating):</label>
                             </div>
-                            <div class="col-md-9 mt-3">
+                            <div class="col-md-10 mt-3">
                                 {{form.cast_samr}}
                                 <div class="form-check-inline">
                                     <div class="cast-star-rating1">
@@ -579,11 +571,11 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span>(Status And
+                            <div class="col-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span><br>(Status And
                                     Minimum Rating):</label>
                             </div>
-                            <div class="col-md-9 mt-3">
+                            <div class="col-md-10 mt-3">
                                 <div class="form-check-inline">
                                     <div class="crew-star-rating1"> 
                                         <label class="containerradio bold">Indie
@@ -630,10 +622,10 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-2">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
-                            <div class="col-md-3 mt-3">
+                            <div class="col-md-10 mt-3">
                                 <div class="form-check-inline cus-file-upload">
                                     {{form.script_visibility}}
                                     <label class="containerradio bold">Public
@@ -653,9 +645,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-2">
                             </div>
-                            <div class="col-md-8 mt-3">
+                            <div class="col-md-10 mt-3">
                                 <div class="form-check-inline">
                                     <label class="containerradio bold" style="margin-right: 2em;">Private
                                         <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" required>
@@ -707,18 +699,52 @@
                         </div>
 
                         <hr class="prjct-log-blck-hr">
+                        
+                                <!-- Modal -->
+                                <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                    <h4 class="modal-title warning-modal-title" id="reviewModalLabel">   </h4>
+                                                    <button type="button" id="reviewClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                            </div>
+                                            <div class="modal-body" style="text-align:center;">
+                                                <p></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal"  id="reviewClose1">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+
+                                <!-- The Modal -->
                         <div class="row mb-4">
-                            <div class="col-2">
+                            <!-- <div class="col-2">
                                 <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
-                            </div>
+                            </div> -->
                             <div class="col-3">
-                                <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
+                                <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
                             </div>
                         </div>
+                        <hr class="prjct-log-blck-hr">
+                        <p class="all-error-msg">Cast/Sides Set-Up and Team Set-Up will be available on this page after you click the "Save"  button</p>
+                        <div class="row mt-3">
+                            <a  class="btn prjct-log-btn cursor-disabled">CAST & SIDES SET UP</a> <span
+                                class="mt-2 ml-3 bold">(0)</span>
+                        </div>
+
+                        <div class="row mt-3">
+                            <a  class="btn prjct-log-btn cursor-disabled">CREW SET UP</a> <span
+                                class="mt-2 ml-3 bold">(0)</span>
+                        </div>
+                        <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
                             <div class="col-2">
-                                <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button>
+                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
+                                <a style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger cursor-disabled post_project">POST YOUR PROJECT</a>
                             </div>
                         </div>
 
@@ -783,9 +809,11 @@
     })
     $('#private').on(('click'),()=>{
         $('#visibility_password').removeClass('d-none')
+        $('.visibility_password_text').css('visibility', 'visible');
     })
     $('#public').on(('click'),()=>{
         $('#visibility_password').addClass('d-none')
+        $('.visibility_password_text').css('visibility', 'hidden');
     })
     $('#id_script').on(('change'),()=>{
         var filename = $('#id_script').val().split('\\').pop();
@@ -1188,5 +1216,66 @@ $('input:radio[id="feat"]').change(function() {
            
         })
     })
+
+
+
+
+    
+
+$("#reviewButton").click(function() {
+  ValidateForm();
+});
+
+
+function ValidateForm() {
+
+var formInvalid = false;
+$('#newProject input').each(function() {
+  if ($(this).val() === '') {
+      console.log($(this).val())
+    formInvalid = true;
+  }
+  else 
+  {
+    formInvalid = false;
+  }
+});
+
+if (formInvalid){
+    var modal = $("#reviewModal")
+    var title = "Warning !"
+    var modal_text = "Please Fill up the form for Review Project"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+}
+else
+{
+    var modal = $("#reviewModal")
+    var title = "Message"
+    var modal_text = "Project reviewed successfully, You can Post the Project Now !"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+
+}
+$(function () {
+        $('#reviewClose').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#reviewClose1').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+  
+
+
+}
+
 </script>
+
 {% endblock %}
