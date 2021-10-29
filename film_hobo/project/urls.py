@@ -29,7 +29,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI, \
      GetUserInterestNotificationAjaxView, ReportVideoAPI, ShowcaseVideoView, \
      LikeProjectVideoView, DislikeProjectVideoView, \
-     ProjectVideoLikeDislikeAjaxView
+     ProjectVideoLikeDislikeAjaxView, PostProjectAPI
 
 
 urlpatterns = [
@@ -212,4 +212,6 @@ urlpatterns = [
           name='dislike-project-video-api'),
      path('like-dislike-replace-html/', ProjectVideoLikeDislikeAjaxView.as_view(),
           name='like-dislike-replace-html'),
+     path('post-project-api/', PostProjectAPI.as_view(),
+          name='post-project-api'),
     ]

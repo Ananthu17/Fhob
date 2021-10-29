@@ -673,12 +673,10 @@ class Project(models.Model):
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
-    rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
-                                 MaxValueValidator(5)], null=True, blank=True,
+    rating = models.IntegerField(_("Rating"), null=True, blank=True,
                                  default=1)
     video_rating = models.IntegerField(_("Video Rating"),
-                                       validators=[MinValueValidator(0),
-                                       MaxValueValidator(5)], null=True, blank=True,
+                                       null=True, blank=True,
                                        default=1)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
@@ -725,7 +723,8 @@ class Project(models.Model):
                                           help_text="Image size:370 X 248.")
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
-                                         max_length=150, default=PUBLIC)
+                                         max_length=150, null=True,
+                                         blank=True)
     script_password = models.CharField(max_length=12, null=True,
                                        blank=True)
     team_select_password = models.CharField(max_length=12, null=True,

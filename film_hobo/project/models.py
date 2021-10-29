@@ -730,7 +730,8 @@ class DraftProject(models.Model):
                                           help_text="Image size:370 X 248.")
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
-                                         max_length=150, default=PUBLIC)
+                                         max_length=150,  null=True,
+                                         blank=True)
     script_password = models.CharField(max_length=12, null=True,
                                        blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
@@ -746,6 +747,10 @@ class DraftProject(models.Model):
     production = models.CharField(_("Production"),
                                   choices=PRODUCTION_CHOICES,
                                   max_length=150, default=SAGAFTRA)
+    is_posted = models.BooleanField(
+                        default=False,
+                        verbose_name=_("Is posted")
+                    )
 
     def __str__(self):
         return self.title

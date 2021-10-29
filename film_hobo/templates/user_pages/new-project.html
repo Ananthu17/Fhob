@@ -524,49 +524,72 @@
                                     Minimum Rating):</label>
                             </div>
                             <div class="col-md-10 mt-3">
-                                {{form.cast_samr}}
-                                <div class="form-check-inline">
-                                    <div class="cast-star-rating1">
-                                        <label class="containerradio bold">Indie
-                                                <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                                <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                                <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                                <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                                <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                                <input type="hidden" name="cast-star1" class="rating-value1" >
-                                                <input type="radio" name="radiorow7" id="star1" onclick="selectsamr(this)" value="0" required>
-                                                <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                        <div class="cast-star-rating2">
-                                            <label class="containerradio bold">Pro
-                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                                    <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                                    <input type="hidden" name="cast-star2" class="rating-value2">
-                                                   <input type="radio" name="radiorow7" id="star2" onclick="selectsamr(this)" value="5">
-                                                 <span class="checkmarkagree"></span>
-                                            </label>
-                                        </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="cast-star-rating3">
-                                        <label class="containerradio bold">Indie & Pro
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            <input type="hidden" name="cast-star3" class="rating-value3" >
-                                            <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)" value="10">
-                                            <span class="checkmarkagree"></span>
-                                      </label>
-                                    </div>
-                                </div>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="cast_samr" value="indie" required>
+                                        <span class="cast_rate"> Indie &nbsp;
+                                                <input type="radio" id="indie_samr_rate_5" name="indie_samr_rate" value="5"/>
+                                                <label for="indie_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_4" name="indie_samr_rate" value="4"/>
+                                                <label for="indie_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_3" name="indie_samr_rate" value="3"/>
+                                                <label for="indie_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_2" name="indie_samr_rate" value="2"/>
+                                                <label for="indie_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_1" name="indie_samr_rate" value="1"/>
+                                                <label for="indie_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="cast_samr" value="pro">
+                                        <span class="cast_rate"> Pro &nbsp;
+                                                <input type="radio" id="pro_samr_rate_5" name="pro_samr_rate" value="5"/>
+                                                <label for="pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_4" name="pro_samr_rate" value="4"/>
+                                                <label for="pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_3" name="pro_samr_rate" value="3"/>
+                                                <label for="pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_2" name="pro_samr_rate" value="2"/>
+                                                <label for="pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_1" name="pro_samr_rate" value="1"/>
+                                                <label for="pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="cast_samr" value="indie_and_pro">
+                                        <span class="cast_rate"> Indie & Pro &nbsp;
+                                                <input type="radio" id="indie_and_pro_samr_rate_5" name="indie_and_pro_samr_rate" value="5"/>
+                                                <label for="indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_4" name="indie_and_pro_samr_rate" value="4"/>
+                                                <label for="indie_and_pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_3" name="indie_and_pro_samr_rate" value="3"/>
+                                                <label for="indie_and_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_2" name="indie_and_pro_samr_rate" value="2"/>
+                                                <label for="indie_and_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_1" name="indie_and_pro_samr_rate" value="1"/>
+                                                <label for="indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
                             </div>
                         </div>
 
@@ -576,48 +599,72 @@
                                     Minimum Rating):</label>
                             </div>
                             <div class="col-md-10 mt-3">
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating1"> 
-                                        <label class="containerradio bold">Indie
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" >
-                                            <input type="radio" name="radiorow8" id="crew1" onclick="selectsamr(this)" value="1">
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating2">
-                                        <label class="containerradio bold">Pro
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" >
-                                            <input type="radio" name="radiorow8" id="crew2" onclick="selectsamr(this)" value="6">
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating3">
-                                        <label class="containerradio bold">Indie & Pro
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" >
-                                            <input type="radio" name="radiorow8"   id="crew3" onclick="selectsamr(this)" value="11">
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="crew_samr" value="indie" required>
+                                        <span class="cast_rate"> Indie &nbsp;
+                                                <input type="radio" id="crew_indie_samr_rate_5" name="crew_indie_samr_rate" value="5"/>
+                                                <label for="crew_indie_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_4" name="crew_indie_samr_rate" value="4"/>
+                                                <label for="crew_indie_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_3" name="crew_indie_samr_rate" value="3"/>
+                                                <label for="crew_indie_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_2" name="crew_indie_samr_rate" value="2"/>
+                                                <label for="crew_indie_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_1" name="crew_indie_samr_rate" value="1"/>
+                                                <label for="crew_indie_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="crew_samr" value="pro">
+                                        <span class="cast_rate"> Pro &nbsp;
+                                                <input type="radio" id="crew_pro_samr_rate_5" name="crew_pro_samr_rate" value="5"/>
+                                                <label for="crew_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_4" name="crew_pro_samr_rate" value="4"/>
+                                                <label for="crew_pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_3" name="crew_pro_samr_rate" value="3"/>
+                                                <label for="crew_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_2" name="crew_pro_samr_rate" value="2"/>
+                                                <label for="crew_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_1" name="crew_pro_samr_rate" value="1"/>
+                                                <label for="crew_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left"
+                                        style="position: initial;" name="crew_samr" value="indie_and_pro">
+                                        <span class="cast_rate"> Indie & Pro &nbsp;
+                                                <input type="radio" id="crew_Sindie_and_pro_samr_rate_5" name="crew_indie_and_pro_samr_rate" value="5"/>
+                                                <label for="crew_indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_4" name="crew_indie_and_pro_samr_rate" value="4"/>
+                                                <label for="crew_indie_and_pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_3" name="crew_indie_and_pro_samr_rate" value="3"/>
+                                                <label for="crew_indie_and_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_2" name="crew_indie_and_pro_samr_rate" value="2"/>
+                                                <label for="crew_indie_and_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_1" name="crew_indie_and_pro_samr_rate" value="1"/>
+                                                <label for="crew_indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
                             </div>
                         </div>
 
@@ -634,7 +681,7 @@
                                     </label>
 
                                     <label class="snf-file-upload d-flex flex-row align-items-left" style="margin-right: 2em; margin-left: 1em;">
-                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload" required>Upload</span>
+                                        {{form.script}}<span  class="mem-setup-blu-f underline ml-1 cus-file-upload" >Upload</span>
                                         (PDF)
                                     </label>
                                     <div class="fileuploaddiv d-none" id="filenameblock">
@@ -650,7 +697,7 @@
                             <div class="col-md-10 mt-3">
                                 <div class="form-check-inline">
                                     <label class="containerradio bold" style="margin-right: 2em;">Private
-                                        <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" required>
+                                        <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" >
                                         <span class="checkmarkagree"></span>
                                     </label>
                                     <div class="flex-row align-items-center d-none" id="script_pass" style="width: -webkit-fill-available;">
@@ -768,10 +815,10 @@
         $('option:selected','#id_visibility').attr('selected', false);
         $(`#id_visibility>option:eq(${data.value})`).attr('selected', true);
     }
-    function selectsamr(data){
-        $('option:selected','#id_cast_samr').attr('selected', false);
-        $(`#id_cast_samr>option:eq(${data.value})`).attr('selected', true);
-    }
+    // function selectsamr(data){
+    //     $('option:selected','#id_cast_samr').attr('selected', false);
+    //     $(`#id_cast_samr>option:eq(${data.value})`).attr('selected', true);
+    // }
     function selectscript(data){
         $('option:selected','#id_script_visibility').attr('selected', false);
         $(`#id_script_visibility>option:eq(${data.value})`).attr('selected', true);
@@ -1187,15 +1234,15 @@ $('input:radio[id="feat"]').change(function() {
     $(function () {
         $('#modalClose').on('click', function () {
             $('#myModal').modal('hide');
-           
         })
     })
     $(function () {
         $('#modalClose1').on('click', function () {
             $('#myModal').modal('hide');
-           
         })
     })
 </script>
+
+<script src="{% static 'js/cast_crew_samr.js' %}"></script>
 
 {% endblock %}
