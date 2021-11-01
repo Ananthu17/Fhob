@@ -106,9 +106,9 @@
                                             <span class="to-input">To</span>
                                                 <div id="all_mail" class="all-mail">
                                                 </div>
-                                               
-                                            
-                                             
+
+
+
                                                 <select class="form-control" name="userSelect" multiple id="userSelect">
                                                     {% for friend in friends %}
                                                     <option value="{{friend.id}}" >{{friend}} </option>
@@ -117,11 +117,11 @@
                                                 <div class="modal-footer">
                                                     <button id="url_send" type="submit" class="btn btn-primary">Send</button>
                                                     <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        
+
                                                 </div>
                                         </div>
                                     </div>
-                        
+
                                 </div>
                             </div>
                         </div>
@@ -211,7 +211,7 @@
 <script>
     $(".top_rated_members").click(function(){
       return false;
-  });
+    });
 
 // like video
   $('body').on('click' , '.like_video', function(){
