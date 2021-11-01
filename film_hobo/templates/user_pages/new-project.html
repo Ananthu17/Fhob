@@ -32,25 +32,25 @@
             border: none;
             cursor: pointer;
         }
-        .select2-container--default .select2-selection--single
+        /* .select2-container--default .select2-selection--single
         {
             border-radius: 0!important;
             border:none!important;
             border-bottom:1px solid#9c9c9c!important;
-        }
-        .select2-container .select2-selection--single {
+        } */
+        /* .select2-container .select2-selection--single {
             height:19px!important;
 
-            }
-        .select2-container--default .select2-selection--single .select2-selection__rendered
+            } */
+        /* .select2-container--default .select2-selection--single .select2-selection__rendered
             {
                 line-height:19px;
-            }
-        .select2-container--default .select2-selection--single .select2-selection__arrow
+            } */
+        /* .select2-container--default .select2-selection--single .select2-selection__arrow
             {
             height:15px;
 
-        }
+        } */
         .star-rating__ico{
 
             padding-left: 2px;
@@ -89,7 +89,30 @@
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
-
+        .select2-container {
+            width: 100%;
+                }
+        .select2-container--default .select2-selection--single
+            {
+                border-radius: 0!important;
+                border:none!important;
+                border-bottom:1px solid #000!important;
+            }
+        .select2-container .select2-selection--single {
+            height:19px!important;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__rendered
+            {
+                line-height:19px;
+                background-color:#f3f3f3;
+                border-bottom:1px solid #000!important;
+                font-size:13px;
+                color:#000;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__arrow
+            {
+                height:15px;
+            }
     </style>
 
     </head>
@@ -506,7 +529,7 @@
                             <div class="col-12 col-md-2">
                                 <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
-                            <div class="col-12 col-md-10">
+                            <div class="col-9 col-md-8 col-lg-6">
                                 <br><select class="inp-line  modal-location" id ="location_1"
                                 name="location" required >
 
@@ -526,9 +549,9 @@
                             <div class="col-md-10 mt-3">
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="cast_samr" value="indie" required>
-                                        <span class="cast_rate"> Indie &nbsp;
+                                        <span class="cast_rate  mt-1"> Indie &nbsp;
                                                 <input type="radio" id="indie_samr_rate_5" name="indie_samr_rate" value="5"/>
                                                 <label for="indie_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -548,9 +571,9 @@
                                 </span>
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="cast_samr" value="pro">
-                                        <span class="cast_rate"> Pro &nbsp;
+                                        <span class="cast_rate mt-1"> Pro &nbsp;
                                                 <input type="radio" id="pro_samr_rate_5" name="pro_samr_rate" value="5"/>
                                                 <label for="pro_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -570,9 +593,9 @@
                                 </span>
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="cast_samr" value="indie_and_pro">
-                                        <span class="cast_rate"> Indie & Pro &nbsp;
+                                        <span class="cast_rate  mt-1"> Indie & Pro &nbsp;
                                                 <input type="radio" id="indie_and_pro_samr_rate_5" name="indie_and_pro_samr_rate" value="5"/>
                                                 <label for="indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -601,9 +624,9 @@
                             <div class="col-md-10 mt-3">
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="crew_samr" value="indie" required>
-                                        <span class="cast_rate"> Indie &nbsp;
+                                        <span class="cast_rate  mt-1"> Indie &nbsp;
                                                 <input type="radio" id="crew_indie_samr_rate_5" name="crew_indie_samr_rate" value="5"/>
                                                 <label for="crew_indie_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -623,9 +646,9 @@
                                 </span>
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="crew_samr" value="pro">
-                                        <span class="cast_rate"> Pro &nbsp;
+                                        <span class="cast_rate  mt-1"> Pro &nbsp;
                                                 <input type="radio" id="crew_pro_samr_rate_5" name="crew_pro_samr_rate" value="5"/>
                                                 <label for="crew_pro_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -645,9 +668,9 @@
                                 </span>
                                 <span class="ml-4">
                                     <label class="form-check-label">
-                                        <input type="radio" class=" form-check-input float-left"
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
                                         style="position: initial;" name="crew_samr" value="indie_and_pro">
-                                        <span class="cast_rate"> Indie & Pro &nbsp;
+                                        <span class="cast_rate  mt-1"> Indie & Pro &nbsp;
                                                 <input type="radio" id="crew_Sindie_and_pro_samr_rate_5" name="crew_indie_and_pro_samr_rate" value="5"/>
                                                 <label for="crew_indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
 
@@ -668,7 +691,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <!-- <div class="row">
                             <div class="col-2">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
@@ -706,6 +729,56 @@
                                         <i class="bi bi-eye-slash ml-0" id="togglePassword2" style="position: relative;left: -22px;"></i>
                                     </div>
                               </div>
+                            </div>
+                        </div> -->
+                        <div class="row">
+                            <div class="col-12 col-md-2">
+                                <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
+                            </div>
+                            <div class="col-12 col-md-10 mt-3">
+                                <div class="form-check-inline cus-file-upload">
+                                    <label class=" bold">
+                                        <input type="radio" id="public_script" onclick="selectscript(this)"
+                                        class="script_visibility custom_check_box" name="script_visibility" value="public">Public
+                                        <!-- <span class="checkmarkagree"></span> -->
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <label class=" bold" style="margin-right: 2em;">
+                                        <input type="radio" id="private_script" onclick="selectscript(this)"
+                                         class="script_visibility custom_check_box" name="script_visibility" value="private">Private
+                                        <!-- <span class="checkmarkagree"></span> -->
+                                    </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <div class="flex-row align-items-center d-none" id="script_pass" style="width: -webkit-fill-available;">
+                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit; ">
+                                            (Create a Password) </label>
+                                            {{form.script_password}}
+                                         <i class="bi bi-eye-slash  ml-0" id="togglePassword2" style="position: relative;left: -22px;"></i>
+                                    </div>
+                                </div>
+                        </div>
+                      </div>
+                       
+                        <div class="row">
+                            <div class="col-12 col-md-2">
+                            </div>
+                            <div class="col-12 col-md-8 mt-3">
+                                <div class="form-check-inline cus-file-upload">
+                                    <label class="snf-file-upload d-flex flex-row align-items-center" style=" margin-right: 2em; ">
+                                        {{form.script}}<span class="mem-setup-blu-f underline ml-1" >
+                                        Upload</span>
+                                        (PDF) <span style="margin-left: 1em; color:royalblue;"> 
+                                            {% if project_obj.script %}
+                                            <a href= "{{ project_obj.script.url }}" >{{ project_obj.script }}</a> </span>
+                                            {% endif %}
+                                    </label>
+                                    <div class="fileuploaddiv d-none" id="filenameblock">
+                                        <span id="filename" class="mr-1"> </span>
+                                        <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {% if mode_operation != 'create' %}
@@ -777,15 +850,18 @@
                             </div>
                         </div>
                         <hr class="prjct-log-blck-hr">
-                        <p class="all-error-msg">Cast/Sides Set-Up and Team Set-Up will be available on this page after you click the "Save"  button</p>
+                        <p class="all-error-msg">Cast/Sides Set-Up and Team Set-Up will be available on this page after you click "Post" the project</p>
                         <div class="row mt-3">
-                            <a  class="btn prjct-log-btn cursor-disabled">CAST & SIDES SET UP</a> <span
+                            <a  class="btn prjct-log-btn cursor-disabled" title="Cast setup will be available after you post the project.">CAST & SIDES SET UP</a> <span
                                 class="mt-2 ml-3 bold">(0)</span>
                         </div>
 
                         <div class="row mt-3">
-                            <a  class="btn prjct-log-btn cursor-disabled">CREW SET UP</a> <span
+                            <a  class="btn prjct-log-btn cursor-disabled" title="Crew setup will be available after you post the project.">CREW SET UP</a> <span
                                 class="mt-2 ml-3 bold">(0)</span>
+                        </div>
+                        <div class="row mt-3">
+                            <a class="btn prjct-log-btn cursor-disabled" title="Project home will be visible after you post the project.">PROJECT HOME</a>
                         </div>
                         <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
