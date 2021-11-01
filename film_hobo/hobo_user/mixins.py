@@ -38,6 +38,24 @@ class SegregatorMixin():
         )
         return context
 
+    def pilot_segregator(self, project):
+        context = {}
+        context["top_scenes"] = self.project_to_json(
+            project.filter(format="PIL").filter(rating__gte=4)
+            .order_by('-likes')[:10]
+        )
+        context["top_shorts"] = self.project_to_json(
+            project.filter(format="FTR").filter(rating__gte=4)
+            .order_by('-likes')[:10]
+        )
+        context["new_scenes"] = self.project_to_json(
+            project.filter(format="PIL").order_by('-id')
+        )
+        context["new_shorts"] = self.project_to_json(
+            project.filter(format="FTR").order_by('-id')
+        )
+        return context
+
     def project_to_json(self, project):
         project_dict = {}
         for item in project:
