@@ -5333,14 +5333,10 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context["toprated_scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-rating')
         context["filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-id')
         context["toprated_filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-rating')
-        posted_projects = Project.objects.filter(
-                                Q(creator=self.request.user) &
-                                ~Q(draft_project=None)
-                            )
         draft_projects = DraftProject.objects.filter(
-                                    Q(creator=self.request.user)
-                                    ).exclude(id__in=posted_projects).order_by('-timestamp')
-        print("draft_projects ", draft_projects)
+                                    Q(creator=self.request.user) &
+                                    Q(is_posted=False)
+                                    ).order_by('-timestamp')
         context["draft_projects"] = draft_projects
         return context
 
@@ -5557,96 +5553,88 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
         print(request.POST)
         projectform = ProjectCreationForm(request.POST or None, request.FILES)
         cast_pay = request.POST.get('radiorow4')
-        cast_star1 = request.POST.get('cast-star1')
-        cast_star2 = request.POST.get('cast-star2')
-        cast_star3 = request.POST.get('cast-star3')
-        cast_star_smar = 0
+        cast_samr = request.POST.get('cast_samr')
+        crew_samr = request.POST.get('crew_samr')
 
-        if (cast_star1 != ''):
-            if (cast_star1 == '1'):
-                cast_star1 = Project.INDIE_WITH_RATING_1_STAR
-            elif(cast_star1 == '2'):
-                cast_star1 = Project.INDIE_WITH_RATING_2_STAR
-            elif(cast_star1 == '3'):
-                cast_star1 = Project.INDIE_WITH_RATING_3_STAR
-            elif(cast_star1 == '4'):
-                cast_star1 = Project.INDIE_WITH_RATING_4_STAR
-            elif(cast_star1 == '5'):
-                cast_star1 = Project.INDIE_WITH_RATING_5_STAR
-            cast_star_smar = cast_star1
-        elif(cast_star2 != ''):
-            if (cast_star2 == '1'):
-                cast_star2 = Project.PRO_WITH_RATING_1_STAR
-            elif(cast_star2 == '2'):
-                cast_star2 = Project.PRO_WITH_RATING_2_STAR
-            elif(cast_star2 == '3'):
-                cast_star2 = Project.PRO_WITH_RATING_3_STAR
-            elif(cast_star2 == '4'):
-                cast_star2 = Project.PRO_WITH_RATING_4_STAR
-            elif(cast_star2 == '5'):
-                cast_star2 = Project.PRO_WITH_RATING_5_STAR
-            cast_star_smar = cast_star2
-        elif(cast_star3 != ''):
-            if (cast_star3 == '1'):
-                cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_1_STAR
-            elif(cast_star3 == '2'):
-                cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_2_STAR
-            elif(cast_star3 == '3'):
-                cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_3_STAR
-            elif(cast_star3 == '4'):
-                cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_4_STAR
-            elif(cast_star3 == '5'):
-                cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_5_STAR
-            cast_star_smar = cast_star3
+        if cast_samr == 'indie':
+            indie_samr_rate = request.POST.get('indie_samr_rate')
+            if indie_samr_rate == '1':
+                project_cast_samr = 'indie_with_rating_1_star'
+            if indie_samr_rate == '2':
+                project_cast_samr = 'indie_with_rating_2_star'
+            if indie_samr_rate == '3':
+                project_cast_samr = 'indie_with_rating_3_star'
+            if indie_samr_rate == '4':
+                project_cast_samr = 'indie_with_rating_4_star'
+            if indie_samr_rate == '5':
+                project_cast_samr = 'indie_with_rating_5_star'
+        if cast_samr == 'pro':
+            pro_samr_rate = request.POST.get('pro_samr_rate')
+            if pro_samr_rate == '1':
+                project_cast_samr = 'pro_with_rating_1_star'
+            if pro_samr_rate == '2':
+                project_cast_samr = 'pro_with_rating_2_star'
+            if pro_samr_rate == '3':
+                project_cast_samr = 'pro_with_rating_3_star'
+            if pro_samr_rate == '4':
+                project_cast_samr = 'pro_with_rating_4_star'
+            if pro_samr_rate == '5':
+                project_cast_samr = 'pro_with_rating_5_star'
+        if cast_samr == 'indie_and_pro' :
+            indie_and_pro_samr_rate = request.POST.get('indie_and_pro_samr_rate')
+            if indie_and_pro_samr_rate == '1':
+                project_cast_samr = 'indie_and_pro_with_rating_1_star'
+            if indie_and_pro_samr_rate == '2':
+                project_cast_samr = 'indie_and_pro_with_rating_2_star'
+            if indie_and_pro_samr_rate == '3':
+                project_cast_samr = 'indie_and_pro_with_rating_3_star'
+            if indie_and_pro_samr_rate == '4':
+                project_cast_samr = 'indie_and_pro_with_rating_4_star'
+            if indie_and_pro_samr_rate == '5':
+                project_cast_samr = 'indie_and_pro_with_rating_5_star'
 
-        # Passing crew_star rating
-        crew_star1 = request.POST.get('crew-star1')
-        crew_star2 = request.POST.get('crew-star2')
-        crew_star3 = request.POST.get('crew-star3')
+        if crew_samr == 'indie':
+            crew_indie_samr_rate = request.POST.get('crew_indie_samr_rate')
+            if crew_indie_samr_rate == '1':
+                project_crew_samr = 'indie_with_rating_1_star'
+            if crew_indie_samr_rate == '2':
+                project_crew_samr = 'indie_with_rating_2_star'
+            if crew_indie_samr_rate == '3':
+                project_crew_samr = 'indie_with_rating_3_star'
+            if crew_indie_samr_rate == '4':
+                project_crew_samr = 'indie_with_rating_4_star'
+            if crew_indie_samr_rate == '5':
+                project_crew_samr = 'indie_with_rating_5_star'
+        if crew_samr == 'pro':
+            crew_pro_samr_rate = request.POST.get('crew_pro_samr_rate')
+            if crew_pro_samr_rate == '1':
+                project_crew_samr = 'pro_with_rating_1_star'
+            if crew_pro_samr_rate == '2':
+                project_crew_samr = 'pro_with_rating_2_star'
+            if crew_pro_samr_rate == '3':
+                project_crew_samr = 'pro_with_rating_3_star'
+            if crew_pro_samr_rate == '4':
+                project_crew_samr = 'pro_with_rating_4_star'
+            if crew_pro_samr_rate == '5':
+                project_crew_samr = 'pro_with_rating_5_star'
+        if crew_samr == 'indie_and_pro' :
+            crew_indie_and_pro_samr_rate = request.POST.get('crew_indie_and_pro_samr_rate')
+            if crew_indie_and_pro_samr_rate == '1':
+                project_crew_samr = 'indie_and_pro_with_rating_1_star'
+            if crew_indie_and_pro_samr_rate == '2':
+                project_crew_samr = 'indie_and_pro_with_rating_2_star'
+            if crew_indie_and_pro_samr_rate == '3':
+                project_crew_samr = 'indie_and_pro_with_rating_3_star'
+            if crew_indie_and_pro_samr_rate == '4':
+                project_crew_samr = 'indie_and_pro_with_rating_4_star'
+            if crew_indie_and_pro_samr_rate == '5':
+                project_crew_samr = 'indie_and_pro_with_rating_5_star'
 
-        crew_star_smar = 0
-
-        if (crew_star1 != ''):
-            if (crew_star1 == '1'):
-                crew_star1 = Project.INDIE_WITH_RATING_1_STAR
-            elif (crew_star1 == '2'):
-                crew_star1 = Project.INDIE_WITH_RATING_2_STAR
-            elif (crew_star1 == '3'):
-                crew_star1 = Project.INDIE_WITH_RATING_3_STAR
-            elif (crew_star1 == '4'):
-                crew_star1 = Project.INDIE_WITH_RATING_4_STAR
-            elif (crew_star1 == '5'):
-                crew_star1 = Project.INDIE_WITH_RATING_5_STAR
-            crew_star_smar = crew_star1
-        if (crew_star2 != ''):
-            if (crew_star2 == '1'):
-                crew_star2 = Project.PRO_WITH_RATING_1_STAR
-            elif (crew_star2 == '2'):
-                crew_star2 = Project.PRO_WITH_RATING_2_STAR
-            elif (crew_star2 == '3'):
-                crew_star2 = Project.PRO_WITH_RATING_3_STAR
-            elif (crew_star2 == '4'):
-                crew_star2 = Project.PRO_WITH_RATING_4_STAR
-            elif (crew_star2 == '5'):
-                crew_star2 = Project.PRO_WITH_RATING_5_STAR
-            crew_star_smar = crew_star2
-        if (crew_star3 != ''):
-            if (crew_star3 == '1'):
-                crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_1_STAR
-            if (crew_star3 == '2'):
-                crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_2_STAR
-            if (crew_star3 == '3'):
-                crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_3_STAR
-            if (crew_star3 == '4'):
-                crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_4_STAR
-            if (crew_star3 == '5'):
-                crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_5_STAR
-            crew_star_smar = crew_star3
 
         if projectform.is_valid():
             project = projectform.save()
-            project.cast_samr = cast_star_smar
-            project.crew_samr = crew_star_smar
+            project.cast_samr = project_cast_samr
+            project.crew_samr = project_crew_samr
             project.cast_pay_rate = cast_pay
             project.save()
             interest = UserInterest.objects.all()
@@ -5697,14 +5685,55 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
         context['form'] = ProjectCreationForm(instance=draft_project_obj)
         # context['writerform'] = WriterForm(instance=writer)
         context['user'] = user
+        context['draft_project_obj'] = draft_project_obj
 
         try:
             project = Project.objects.get(draft_project=draft_project_obj)
             context['cast_count'] = Character.objects.filter(project=draft_project_obj.draft_project).count()
             context['crew_count'] = ProjectCrew.objects.filter(project=draft_project_obj.draft_project).count()
+            context['project'] = project
         except Project.DoesNotExist:
             context['cast_count'] = 0
             context['crew_count'] = 0
+        
+        if ((draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
+                context['cast_samr_option'] = 'indie'
+        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
+                context['cast_samr_option'] = 'pro'
+        elif ((draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
+                context['cast_samr_option'] = 'indie_and_pro'
+ 
+        if ((draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
+                context['crew_samr_option'] = 'indie'
+        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
+                context['crew_samr_option'] = 'pro'
+        elif ((draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
+                context['crew_samr_option'] = 'indie_and_pro'
+
         return context
 
     # def post(self, request, **kwargs):
@@ -5834,101 +5863,94 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
         print(request.POST)
+        remove_script = request.POST.get('remove_script')
         cast_pay = request.POST.get('radiorow4')
-        cast_star1 = request.POST.get('cast-star1')
-        cast_star2 = request.POST.get('cast-star2')
-        cast_star3 = request.POST.get('cast-star3')
+        cast_samr = request.POST.get('cast_samr')
+        crew_samr = request.POST.get('crew_samr')
 
-        cast_star_smar = 0
+        if cast_samr == 'indie':
+            indie_samr_rate = request.POST.get('indie_samr_rate')
+            if indie_samr_rate == '1':
+                project_cast_samr = 'indie_with_rating_1_star'
+            if indie_samr_rate == '2':
+                project_cast_samr = 'indie_with_rating_2_star'
+            if indie_samr_rate == '3':
+                project_cast_samr = 'indie_with_rating_3_star'
+            if indie_samr_rate == '4':
+                project_cast_samr = 'indie_with_rating_4_star'
+            if indie_samr_rate == '5':
+                project_cast_samr = 'indie_with_rating_5_star'
+        if cast_samr == 'pro':
+            pro_samr_rate = request.POST.get('pro_samr_rate')
+            if pro_samr_rate == '1':
+                project_cast_samr = 'pro_with_rating_1_star'
+            if pro_samr_rate == '2':
+                project_cast_samr = 'pro_with_rating_2_star'
+            if pro_samr_rate == '3':
+                project_cast_samr = 'pro_with_rating_3_star'
+            if pro_samr_rate == '4':
+                project_cast_samr = 'pro_with_rating_4_star'
+            if pro_samr_rate == '5':
+                project_cast_samr = 'pro_with_rating_5_star'
+        if cast_samr == 'indie_and_pro' :
+            indie_and_pro_samr_rate = request.POST.get('indie_and_pro_samr_rate')
+            if indie_and_pro_samr_rate == '1':
+                project_cast_samr = 'indie_and_pro_with_rating_1_star'
+            if indie_and_pro_samr_rate == '2':
+                project_cast_samr = 'indie_and_pro_with_rating_2_star'
+            if indie_and_pro_samr_rate == '3':
+                project_cast_samr = 'indie_and_pro_with_rating_3_star'
+            if indie_and_pro_samr_rate == '4':
+                project_cast_samr = 'indie_and_pro_with_rating_4_star'
+            if indie_and_pro_samr_rate == '5':
+                project_cast_samr = 'indie_and_pro_with_rating_5_star'
 
-        if (cast_star1 != ''):
-            if (cast_star1 == '1'):
-                cast_star1 = project.INDIE_WITH_RATING_1_STAR
-            elif(cast_star1 == '2'):
-                cast_star1 = project.INDIE_WITH_RATING_2_STAR
-            elif(cast_star1 == '3'):
-                cast_star1 = project.INDIE_WITH_RATING_3_STAR
-            elif(cast_star1 == '4'):
-                cast_star1 = project.INDIE_WITH_RATING_4_STAR
-            elif(cast_star1 == '5'):
-                cast_star1 = project.INDIE_WITH_RATING_5_STAR
-            cast_star_smar = cast_star1
-        elif(cast_star2 != ''):
-            if (cast_star2 == '1'):
-                cast_star2 = project.PRO_WITH_RATING_1_STAR
-            elif(cast_star2 == '2'):
-                cast_star2 = project.PRO_WITH_RATING_2_STAR
-            elif(cast_star2 == '3'):
-                cast_star2 = project.PRO_WITH_RATING_3_STAR
-            elif(cast_star2 == '4'):
-                cast_star2 = project.PRO_WITH_RATING_4_STAR
-            elif(cast_star2 == '5'):
-                cast_star2 = project.PRO_WITH_RATING_5_STAR
-            cast_star_smar = cast_star2
-        elif(cast_star3 != ''):
-            if (cast_star3 == '1'):
-                cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
-            elif(cast_star3 == '2'):
-                cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
-            elif(cast_star3 == '3'):
-                cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
-            elif(cast_star3 == '4'):
-                cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
-            elif(cast_star3 == '5'):
-                cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
-            cast_star_smar = cast_star3
-
-        # Updating crew_star rating
-        crew_star1 = request.POST.get('crew-star1')
-        crew_star2 = request.POST.get('crew-star2')
-        crew_star3 = request.POST.get('crew-star3')
-
-        crew_star_smar = 0
-
-        if (crew_star1 != ''):
-            if (crew_star1 == '1'):
-                crew_star1 = project.INDIE_WITH_RATING_1_STAR
-            elif (crew_star1 == '2'):
-                crew_star1 = project.INDIE_WITH_RATING_2_STAR
-            elif (crew_star1 == '3'):
-                crew_star1 = project.INDIE_WITH_RATING_3_STAR
-            elif (crew_star1 == '4'):
-                crew_star1 = project.INDIE_WITH_RATING_4_STAR
-            elif (crew_star1 == '5'):
-                crew_star1 = project.INDIE_WITH_RATING_5_STAR
-            crew_star_smar = crew_star1
-        if (crew_star2 != ''):
-            if (crew_star2 == '1'):
-                crew_star2 = project.PRO_WITH_RATING_1_STAR
-            elif (crew_star2 == '2'):
-                crew_star2 = project.PRO_WITH_RATING_2_STAR
-            elif (crew_star2 == '3'):
-                crew_star2 = project.PRO_WITH_RATING_3_STAR
-            elif (crew_star2 == '4'):
-                crew_star2 = project.PRO_WITH_RATING_4_STAR
-            elif (crew_star2 == '5'):
-                crew_star2 = project.PRO_WITH_RATING_5_STAR
-            crew_star_smar = crew_star2
-        if (crew_star3 != ''):
-            if (crew_star3 == '1'):
-                crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
-            if (crew_star3 == '2'):
-                crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
-            if (crew_star3 == '3'):
-                crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
-            if (crew_star3 == '4'):
-                crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
-            if (crew_star3 == '5'):
-                crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
-            crew_star_smar = crew_star3
+        if crew_samr == 'indie':
+            crew_indie_samr_rate = request.POST.get('crew_indie_samr_rate')
+            if crew_indie_samr_rate == '1':
+                project_crew_samr = 'indie_with_rating_1_star'
+            if crew_indie_samr_rate == '2':
+                project_crew_samr = 'indie_with_rating_2_star'
+            if crew_indie_samr_rate == '3':
+                project_crew_samr = 'indie_with_rating_3_star'
+            if crew_indie_samr_rate == '4':
+                project_crew_samr = 'indie_with_rating_4_star'
+            if crew_indie_samr_rate == '5':
+                project_crew_samr = 'indie_with_rating_5_star'
+        if crew_samr == 'pro':
+            crew_pro_samr_rate = request.POST.get('crew_pro_samr_rate')
+            if crew_pro_samr_rate == '1':
+                project_crew_samr = 'pro_with_rating_1_star'
+            if crew_pro_samr_rate == '2':
+                project_crew_samr = 'pro_with_rating_2_star'
+            if crew_pro_samr_rate == '3':
+                project_crew_samr = 'pro_with_rating_3_star'
+            if crew_pro_samr_rate == '4':
+                project_crew_samr = 'pro_with_rating_4_star'
+            if crew_pro_samr_rate == '5':
+                project_crew_samr = 'pro_with_rating_5_star'
+        if crew_samr == 'indie_and_pro' :
+            crew_indie_and_pro_samr_rate = request.POST.get('crew_indie_and_pro_samr_rate')
+            if crew_indie_and_pro_samr_rate == '1':
+                project_crew_samr = 'indie_and_pro_with_rating_1_star'
+            if crew_indie_and_pro_samr_rate == '2':
+                project_crew_samr = 'indie_and_pro_with_rating_2_star'
+            if crew_indie_and_pro_samr_rate == '3':
+                project_crew_samr = 'indie_and_pro_with_rating_3_star'
+            if crew_indie_and_pro_samr_rate == '4':
+                project_crew_samr = 'indie_and_pro_with_rating_4_star'
+            if crew_indie_and_pro_samr_rate == '5':
+                project_crew_samr = 'indie_and_pro_with_rating_5_star'
 
         projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
 
         if projectform.is_valid():
             project = projectform.save()
-            project.cast_samr = cast_star_smar
-            project.crew_samr = crew_star_smar
+            project.cast_samr = project_cast_samr
+            project.crew_samr = project_crew_samr
             project.cast_pay_rate = cast_pay
+            if remove_script == "on":
+                project.script = ""
             project.save()
             messages.success(request, "Project Updated Successfully.")
             return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))

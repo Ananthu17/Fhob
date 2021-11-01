@@ -412,12 +412,12 @@ class ProjectCreationForm(forms.ModelForm):
         fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
                   'sag_aftra', 'cast_attachment', 'visibility',
                   'script_visibility', 'visibility_password', 'location',
-                  'cast_samr', 'script', 'script_password',
+                  'script', 'script_password',
                   'cast_audition_password', 'team_select_password',
-                  'video_url', 'video_type', 'video_status',
-                  'video_cover_image', 'logline', 'project_info',
                   'production'
                   )
+                #   'video_url', 'video_type', 'video_status',
+                #   'video_cover_image', 'logline', 'project_info',
         widgets = {
 
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
@@ -436,7 +436,7 @@ class ProjectCreationForm(forms.ModelForm):
                                                            'placeholder': 'password' ,'data-toggle': 'password' ,'type':'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
-                'cast_samr': forms.Select(attrs={'class': 'd-none'}),
+                # 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
                 'script': forms.FileInput(attrs={'accept':'application/pdf'}),
                     'script_password': forms.TextInput(attrs={
                                                                 "class": "form-control form-control-input mem-b-placeholder",
@@ -452,6 +452,10 @@ class ProjectCreationForm(forms.ModelForm):
                                                             })
 
                 }
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectCreationForm, self).__init__(*args, **kwargs)
+        self.fields['script'].widget.attrs['id'] = 'id_script'
 
 
 class WriterForm(forms.ModelForm):

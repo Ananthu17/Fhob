@@ -849,3 +849,30 @@ input.pw {
  .proj-card-drafts a{
     color : #0960be;
  }
+ .cast_rate {
+  float: left;
+  height: 14px;
+ }
+ .cast_rate:not(:checked) > input {
+  /* position:absolute;
+  top:-9999px; */
+  visibility:hidden;
+  display:none;
+ }
+ .cast_rate:not(:checked) > label {
+  float:right;
+  width: .80em;
+  overflow:hidden;
+  white-space:nowrap;
+  cursor:pointer;
+  font-size: 17px;
+  color: #ccc;
+  position: relative;
+  top: -3px;
+ }
+ .cast_rate:not(:checked) > label:before {
+  content: "\2605";
+ }
+ .cast_rate > input:checked ~ label {
+  color: #e88b22;    
+ }
