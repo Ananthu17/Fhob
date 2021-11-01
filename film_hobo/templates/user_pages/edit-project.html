@@ -805,15 +805,40 @@
                         </div>
 
                         <hr class="prjct-log-blck-hr">
+                            <!-- Modal -->
+                        <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h4 class="modal-title warning-modal-title" id="reviewModalLabel">   </h4>
+                                            <button type="button" id="reviewClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body" style="text-align:center;">
+                                        <p></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"  id="reviewClose1">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+
+                        <!-- The Modal -->
                         <div class="row mb-4">
                             <!-- <div class="col-2">
                                 <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
                             </div> -->
-                            <div class="col-3">
-                                <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
+                            <!-- <div class="col-3">
+                                <a href="" class="prjct-log-link underline">SAVE</a>
                                 <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
+                            </div> -->
+                            <div class="col-2">
+                                <a type="button" id="reviewButton" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
                             </div>
+                            <!-- <div class="col-3">
+                                <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
+                            </div> -->
                         </div>
                         <hr class="prjct-log-blck-hr">
                         {% if mode_operation == 'update' %}
@@ -1312,6 +1337,59 @@ $('input:radio[id="feat"]').change(function() {
         })
     })
 
+    $("#reviewButton").click(function() {
+  ValidateForm();
+});
+
+
+function ValidateForm() {
+
+var formInvalid = false;
+$('#newProject input').each(function() {
+  if ($(this).val() === '') {
+      console.log($(this).val())
+    formInvalid = true;
+  }
+  else 
+  {
+    formInvalid = false;
+  }
+});
+
+if (formInvalid){
+    var modal = $("#reviewModal")
+    var title = "Warning !"
+    var modal_text = "Please Fill up the form for Review Project"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+}
+else
+{
+    var modal = $("#reviewModal")
+    var title = "Message"
+    var modal_text = "Project reviewed successfully, You can Post the Project Now !"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+
+}
+$(function () {
+        $('#reviewClose').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#reviewClose1').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+  
+
+
+}
 
 </script>
 

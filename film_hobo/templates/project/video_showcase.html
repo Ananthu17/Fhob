@@ -55,7 +55,7 @@
                                 <div class="share-sec">
                                     <div class="share-alg">
                                         {% if request.user.membership != 'HOB' %}
-                                        <a class="cursor-pointer mem-blu-link">S<span class="share-small-f">HARE</span></a>
+                                        <a id="share-link" class="cursor-pointer mem-blu-link">S<span class="share-small-f">HARE</span></a>
                                         {% endif %}
                                     </div>
                                     <div class="like-dislike-btn like_dislike">
@@ -92,6 +92,43 @@
                             {% endfor %}
                          </div>
                         </div>
+
+
+
+                        <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content col-12">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="col-sm-12 email-id-row">
+                                            <span class="to-input">To</span>
+                                                <div id="all_mail" class="all-mail">
+                                                </div>
+
+
+
+                                                <select class="form-control" name="userSelect" multiple id="userSelect">
+                                                    {% for friend in friends %}
+                                                    <option value="{{friend.id}}" >{{friend}} </option>
+                                                        {% endfor %}
+                                                </select>
+                                                <div class="modal-footer">
+                                                    <button id="url_send" type="submit" class="btn btn-primary">Send</button>
+                                                    <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                                                </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Share Modal End -->
+
+
+
 
                         <!-- video player End   -->
 
@@ -150,10 +187,31 @@
 {% endblock %}
 
 {% block extrajs %}
+
+
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
+<link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
+
+
+<script>
+    jQuery('#userSelect').multiselect({
+    columns: 1,
+    placeholder: 'Select Users',
+    search: true,
+    selectAll: true
+});
+</script>
+
+
+
 <script>
     $(".top_rated_members").click(function(){
       return false;
-  });
+    });
 
 // like video
   $('body').on('click' , '.like_video', function(){

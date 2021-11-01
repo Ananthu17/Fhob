@@ -309,7 +309,7 @@ class CustomUserSignupHobo(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                new_user.registration_complete = True
+                # new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -376,13 +376,16 @@ class ShowCase(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["scenes"] = Project.objects.filter(
-                            format="SCH").order_by('-likes')[:10]
+                            format="SCH").filter(rating__gte=4).order_by(
+                            '-likes')[:10]
         context["toprated_scenes"] = Project.objects.filter(
-                                     format="SHO").order_by('-likes')[:10]
+                                     format="SHO").filter(
+                                     rating__gte=4).order_by('-likes')[:10]
         context["filims"] = Project.objects.filter(
                             format="SCH").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-id')
+        context['locations'] = Location.objects.all()
         return context
 
 
@@ -753,6 +756,11 @@ class ExtendedSignupVerify(SignupVerify):
                 email = signup_code.user
                 user_membership = CustomUser.objects.get(
                                   email=email.email).membership
+                if (user_membership == 'HOB'):
+                    user_obj = CustomUser.objects.get(
+                                  email=email.email)
+                    user_obj.registration_complete = True
+                    user_obj.save()
                 signup_code.delete()
             except SignupCode.DoesNotExist:
                 pass
@@ -5545,7 +5553,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     #         messages.warning(request, "Can't read data")
     #         return HttpResponseRedirect(
     #                                 reverse('hobo_user:projects'))
-    
+
     def post(self, request):
         # print(request.POST)
         projectform = ProjectCreationForm(request.POST or None, request.FILES)
@@ -5692,7 +5700,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
         except Project.DoesNotExist:
             context['cast_count'] = 0
             context['crew_count'] = 0
-        
+
         if ((draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
