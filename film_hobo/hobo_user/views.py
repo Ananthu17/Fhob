@@ -5547,7 +5547,7 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     #                                 reverse('hobo_user:projects'))
     
     def post(self, request):
-        print(request.POST)
+        # print(request.POST)
         projectform = ProjectCreationForm(request.POST or None, request.FILES)
         cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
@@ -5859,7 +5859,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        print(request.POST)
+        # print(request.POST)
         remove_script = request.POST.get('remove_script')
         cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
@@ -5946,6 +5946,12 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
             project.cast_pay_rate = cast_pay
+            if project.script_visibility == 'public':
+                project.script_password = ""
+                project.save()
+            if project.visibility == 'public':
+                project.visibility_password = ""
+                project.save()
             if remove_script == "on":
                 project.script = ""
             project.save()

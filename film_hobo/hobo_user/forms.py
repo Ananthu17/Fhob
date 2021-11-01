@@ -456,6 +456,7 @@ class ProjectCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProjectCreationForm, self).__init__(*args, **kwargs)
         self.fields['script'].widget.attrs['id'] = 'id_script'
+        self.fields['script'].required = False
 
 
 class WriterForm(forms.ModelForm):
