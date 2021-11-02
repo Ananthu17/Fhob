@@ -215,7 +215,7 @@
                             </div>
                         </li>
 
-                        
+
                         <!-- Dropdown -->
                         {% if user.membership == 'PRO' or user.membership == 'COM'  %}
                             <li class="nav-item dropdown">
@@ -601,6 +601,9 @@ $( document ).ready(function() {
     }
     else if (desired_path == '/hobo_user/projectview/?format=SHO'){
         $("#shorts-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
+        $("#pilots-features-nav-item").addClass('active');
     }
     else{
 
