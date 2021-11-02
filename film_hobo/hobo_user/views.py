@@ -345,12 +345,18 @@ class HomePage(TemplateView):
         context["format"] = project_format
         context["scenes"] = Project.objects.filter(
                             format="SCH").order_by('-id')
+
         context["toprated_scenes"] = Project.objects.filter(
                                      format="SCH").order_by('-rating')
         context["filims"] = Project.objects.filter(
                             format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-rating')
+
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
         return context
 
@@ -462,7 +468,12 @@ class ShowCase(TemplateView):
                             format="SCH").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-id')
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
+
         return context
 
 
@@ -5419,6 +5430,11 @@ class ProjectView(LoginRequiredMixin, TemplateView):
                                     Q(creator=self.request.user) &
                                     Q(is_posted=False)
                                     ).order_by('-timestamp')
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
+        context['locations'] = Location.objects.all()
         context["draft_projects"] = draft_projects
         return context
 

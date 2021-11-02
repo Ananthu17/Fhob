@@ -216,8 +216,12 @@
                                 PILOTS/FEATURES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Projects</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR">Projects</a>
+                                {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
+                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR">Films</a>
+                                {% else %}
                                 <a class="dropdown-item" href="#">Films</a>
+                                {% endif %}
                             </div>
                         </li>
                         <li class="nav-item">
