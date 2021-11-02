@@ -179,7 +179,11 @@
                                 <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Scenes</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Shorts</a>
-                                <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
+                                {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
+                                {% else %}
+                                    <a class="dropdown-item" onclick="togglePopup()">Pilots/Features</a>
+                                {% endif %}
                             </div>
                         </li>
                         <!-- Dropdown -->
