@@ -351,6 +351,7 @@ class HomePage(TemplateView):
                             format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-rating')
+        context['locations'] = Location.objects.all()
         return context
 
 
