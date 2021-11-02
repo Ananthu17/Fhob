@@ -70,7 +70,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ProjectSearchView, ShowCase, ReportAProblemWebView, \
                    ShowCaseAPIView, ScreeningProjectUrlSendView, \
                    ShowCaseSearchView, ShowCaseDateFilterAPI, \
-                   VideoPlayer
+                   VideoPlayer, PilotAndFeature, PilotAndFeatureAPIView, \
+                   PilotAndFeatureSearchView, PilotAndFeatureDateFilterAPI
 
 
 app_name = "hobo_user"
@@ -345,6 +346,8 @@ urlpatterns = [
          name="top-rated-videos"),
     path('projectview/', ProjectView.as_view(),
          name='projects'),
+    path('pilotandfeature/', PilotAndFeature.as_view(),
+         name='pilots'),
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
     path('projectview/update/<int:id>/', EditProjectView.as_view(),
@@ -365,5 +368,11 @@ urlpatterns = [
          name='showcase-search'),
     path('showcase/date/', ShowCaseDateFilterAPI.as_view(),
          name='showcase-date'),
+    path('pilots/search/', PilotAndFeatureSearchView.as_view(),
+         name='pilot-search'),
+    path('pilots/projects/', PilotAndFeatureAPIView.as_view(),
+         name='pilot-project-list'),
+    path('pilots/date/', PilotAndFeatureDateFilterAPI.as_view(),
+         name='pilots-date'),
     path('video/<int:id>/', VideoPlayer.as_view(), name='user_video')
 ]

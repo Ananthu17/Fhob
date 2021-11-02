@@ -369,6 +369,82 @@ class VideoPlayer(TemplateView):
         return context
 
 
+class PilotAndFeature(TemplateView):
+    template_name = 'user_pages/pilotandfeature.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenes"] = Project.objects.filter(
+                            format="PIL").order_by(
+                            '-likes')[:10]
+        context["toprated_scenes"] = Project.objects.filter(
+                                     format="FTR").order_by('-likes')[:10]
+        context["filims"] = Project.objects.filter(
+                            format="PIL").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="FTR").order_by('-id')
+        context['locations'] = Location.objects.all()
+        return context
+
+
+class PilotAndFeatureAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+        context = self.pilot_segregator(queryset)
+        return Response(context)
+
+
+class PilotAndFeatureSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.pilot_segregator(queryset)
+        return Response(context)
+
+
+class PilotAndFeatureDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.pilot_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.pilot_segregator(project)
+            return Response(context)
+
+
 class ShowCase(TemplateView):
     template_name = 'user_pages/showcasetwo.html'
     login_url = '/hobo_user/user_login/'
@@ -5868,7 +5944,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        print(request.POST)
+        # print(request.POST)
         remove_script = request.POST.get('remove_script')
         cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
@@ -5955,6 +6031,12 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
             project.cast_pay_rate = cast_pay
+            if project.script_visibility == 'public':
+                project.script_password = ""
+                project.save()
+            if project.visibility == 'public':
+                project.visibility_password = ""
+                project.save()
             if remove_script == "on":
                 project.script = ""
             project.save()
