@@ -873,8 +873,13 @@
 
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
-                </div>
+                {% if user.membership == 'HOB' %}
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members make_div_unclickable">
+                    </div>
+                {% else %}
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
+                    </div>
+                {% endif %}
             </div>
         </div>
         </form>
@@ -1179,7 +1184,7 @@ var $cw_star_rating1 = $('.crew-star-rating1 .fa');
 var Cw_SetRatingStar1 = function() {
   return $cw_star_rating1.each(function() {
     if (parseInt($cw_star_rating1.siblings('input.cw-rating-value1').val()) >= parseInt($(this).data('rating'))) {
-       
+
       return $(this).removeClass('fa-star-o').addClass('fa-star');
     } else {
       return $(this).removeClass('fa-star').addClass('fa-star-o');
@@ -1197,13 +1202,13 @@ $cw_radio_star1.on('click', function(){
 });
 
 $('input:radio[name=radiorow8]').change(function(){
-    
+
     $cw_star_rating1.each(function(index,value) {
         console.log(value);
-        
+
         return $(value).removeClass('fa-star').addClass('fa-star-o');
-    
-  }); 
+
+  });
 
 });
 
@@ -1218,7 +1223,7 @@ var $cw_star_rating2 = $('.crew-star-rating2 .fa');
 var Cw_SetRatingStar2 = function() {
   return $cw_star_rating2.each(function() {
     if (parseInt($cw_star_rating2.siblings('input.cw-rating-value2').val()) >= parseInt($(this).data('rating'))) {
-       
+
       return $(this).removeClass('fa-star-o').addClass('fa-star');
     } else {
       return $(this).removeClass('fa-star').addClass('fa-star-o');
@@ -1237,13 +1242,13 @@ $cw_radio_star2.on('click', function(){
 });
 
 $('input:radio[name=radiorow8]').change(function(){
-    
+
     $cw_star_rating2.each(function(index,value) {
         console.log(value);
-        
+
         return $(value).removeClass('fa-star').addClass('fa-star-o');
-    
-  }); 
+
+  });
 
 });
 
@@ -1260,7 +1265,7 @@ var $cw_star_rating3 = $('.crew-star-rating3 .fa');
 var Cw_SetRatingStar3 = function() {
   return $cw_star_rating3.each(function() {
     if (parseInt($cw_star_rating3.siblings('input.cw-rating-value3').val()) >= parseInt($(this).data('rating'))) {
-       
+
       return $(this).removeClass('fa-star-o').addClass('fa-star');
     } else {
       return $(this).removeClass('fa-star').addClass('fa-star-o');
@@ -1278,13 +1283,13 @@ $cw_radio_star3.on('click', function(){
 });
 
 $('input:radio[name=radiorow8]').change(function(){
-    
+
     $cw_star_rating3.each(function(index,value) {
         console.log(value);
-        
+
         return $(value).removeClass('fa-star').addClass('fa-star-o');
-    
-  }); 
+
+  });
 
 });
 
@@ -1293,7 +1298,7 @@ Cw_SetRatingStar3();
 
 
 // // the selector will match all input controls of type :checkbox
-// // and attach a click event handler 
+// // and attach a click event handler
 // $("input:checkbox").on('click', function() {
 //   // in the handler, 'this' refers to the box clicked on
 //   var $box = $(this);
@@ -1322,7 +1327,6 @@ $('input:radio[id="feat"]').change(function() {
    if($(this).is(':checked') ) {
         $('#myModal').modal('show');
         $("input:radio[id='feat']").prop("checked", false);
-        
    }
 });
 
@@ -1338,11 +1342,6 @@ $('input:radio[id="feat"]').change(function() {
         })
     })
 
-
-
-
-    
-
 $("#reviewButton").click(function() {
   ValidateForm();
 });
@@ -1356,7 +1355,7 @@ $('#newProject input').each(function() {
       console.log($(this).val())
     formInvalid = true;
   }
-  else 
+  else
   {
     formInvalid = false;
   }
@@ -1383,16 +1382,16 @@ $('#reviewModal').modal('show');
 $(function () {
         $('#reviewClose').on('click', function () {
             $('#reviewModal').modal('hide');
-           
+
         })
     })
     $(function () {
         $('#reviewClose1').on('click', function () {
             $('#reviewModal').modal('hide');
-           
+
         })
     })
-  
+
 
 
 }
@@ -1405,9 +1404,12 @@ $(function () {
 // });
 // });
 
-
 </script>
 
 <script src="{% static 'js/cast_crew_samr.js' %}"></script>
-
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
+    });
+</script>
 {% endblock %}

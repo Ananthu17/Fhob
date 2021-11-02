@@ -933,10 +933,13 @@
 
             <!-- Center section End  -->
             <!-- Right section  -->
-
-            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
-            </div>
-
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
+                </div>
+            {% endif %}
             <!-- Right section End  -->
         </div>
     </div>
@@ -1641,5 +1644,11 @@
         $("#top_rated_div").addClass("proj-right-sec-bg");
     });
 
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
+    });
 </script>
 {% endblock %}
