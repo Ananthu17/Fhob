@@ -674,10 +674,10 @@ class Project(models.Model):
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
     rating = models.IntegerField(_("Rating"), null=True, blank=True,
-                                 default=1)
+                                 default=0)
     video_rating = models.IntegerField(_("Video Rating"),
                                        null=True, blank=True,
-                                       default=1)
+                                       default=0)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
