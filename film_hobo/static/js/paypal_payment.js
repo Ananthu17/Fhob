@@ -90,7 +90,6 @@ $( document ).ready(function() {
     var promocode = localStorage.getItem("promocode");
     var betacode_split = beta_code.split('?');
     var betacode = betacode_split[0];
-    console.log(betacode)
     var plan_id = ""
     if(betacode){
         beta_plan_details_api = origin_url + '/payment/get_beta_user_plan_details'
@@ -110,7 +109,6 @@ $( document ).ready(function() {
         }, (error) => {
             console.log(error);
         })
-        setTimeout(function(){ console.log("Hello"); }, 3000);
     }
     else if(promocode && promocode.length > 0){
         discount_details_api = origin_url + '/payment/get_discount_details'
