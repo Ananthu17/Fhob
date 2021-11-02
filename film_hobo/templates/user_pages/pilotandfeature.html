@@ -1121,7 +1121,7 @@
     const dataInsertion = (data, id=5)=>{
         if (id!=5){
             console.log(`#demo${id}`)
-            let rows = {'1':data.scenes,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
+            let rows = {'1':data.new_scenes,'2':data.top_scenes,'3':data.new_shorts, '4':data.top_shorts}
             $(`#demo${id}`).html(`<div class='owl-carousel owl-theme ' id='project-owl${id}'>`);
             jQuery.each(rows[id], function() {
                 let div1 = `<div class='item'>\
@@ -1196,7 +1196,7 @@
             $('#demo3').html("<div class='owl-carousel owl-theme ' id='project-owl3'>");
             $('#demo4').html("<div class='owl-carousel owl-theme ' id='project-owl4'>");
             // Scenes
-            jQuery.each(data.scenes, function() {
+            jQuery.each(data.new_scenes, function() {
                 let div1 = `<div class='item'>\
                         <div class='card proj-card pointer' >\
                             <div class='project-line'>\
@@ -1328,7 +1328,7 @@
             var owl = $("#project-owl2");
             owlSettings(owl);
             // Filims
-            jQuery.each(data.filims, function() {
+            jQuery.each(data.new_shorts, function() {
                 let div1 = `<div class='item'>\
                         <div class='card proj-card pointer' >\
                             <div class='project-line'>\
@@ -1394,7 +1394,7 @@
             var owl = $("#project-owl3");
             owlSettings(owl);
             // Top filims
-            jQuery.each(data.top_filims, function() {
+            jQuery.each(data.top_shorts, function() {
                 let div1 = `<div class='item'>\
                         <div class='card proj-card pointer' >\
                             <div class='project-line'>\
@@ -1593,14 +1593,14 @@
         parent = data.parentNode.parentNode.getAttribute("id");
         console.log("PARENT", parent)
 
-        post_url = origin_url + `/hobo_user/pilots/?genre=${genre[keyword]}`
+        post_url = origin_url + `/hobo_user/pilots/projects/?genre=${genre[keyword]}`
         axios({
             method: 'get',
             url: post_url,
             headers: {"Authorization":$("#token").val()}
         })
         .then((response) => {
-                console.log("Response",response)
+                console.log("Response",response.data)
                 dataInsertion(response.data, parent)
         }, (error) => {console.log(error);})
     }
