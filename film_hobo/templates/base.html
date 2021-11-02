@@ -179,7 +179,11 @@
                                 <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Scenes</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Shorts</a>
-                                <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
+                                {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
+                                {% else %}
+                                    <a class="dropdown-item" onclick="togglePopup()">Pilots/Features</a>
+                                {% endif %}
                             </div>
                         </li>
                         <!-- Dropdown -->
@@ -210,22 +214,32 @@
                                 {% endif %}
                             </div>
                         </li>
+
+                        
                         <!-- Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                PILOTS/FEATURES
-                            </a>
-                            <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR">Projects</a>
-                                {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
-                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR">Films</a>
-                                {% else %}
-                                <a class="dropdown-item" href="#">Films</a>
-                                {% endif %}
-                            </div>
-                        </li>
+                        {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                            <li class="nav-item dropdown">
+                                <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    PILOTS/FEATURES
+                                </a>
+                                <div class="dropdown-menu FH-dropdown-font">
+                                    <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR">Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR">Films</a>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-item dropdown">
+                                <a id="pilots-features-nav-item" onclick="togglePopup()" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    PILOTS/FEATURES
+                                </a>
+                                <!-- <div class="dropdown-menu FH-dropdown-font">
+                                    <a class="dropdown-item" href="#">Projects</a>
+                                    <a class="dropdown-item" href="#">Films</a>
+                                </div> -->
+                            </li>
+                        {% endif %}
                         <li class="nav-item">
-                            <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                            <a id="how_to" class="nav-link" href="{% url 'hobo_user:pilots' %}">HOW TO</a>
                         </li>
 
                     {% elif user.is_authenticated and user.registration_complete and user.membership == 'HOB' %}
@@ -498,7 +512,7 @@
     crossorigin="anonymous"></script>
     <script>
                 // Function to show and hide the popup
-                function togglePopup() {
+        function togglePopup() {
             $(".mem-content").toggle();
         }
     /*

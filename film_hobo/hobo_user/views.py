@@ -382,14 +382,14 @@ class PilotAndFeature(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scenes"] = Project.objects.filter(
-                            format="PIL").order_by(
-                            '-likes')[:10]
         context["toprated_scenes"] = Project.objects.filter(
-                                     format="FTR").order_by('-likes')[:10]
-        context["filims"] = Project.objects.filter(
-                            format="PIL").order_by('-id')
+                            format="PIL").order_by(
+                            '-rating')[:10]
         context["toprated_filims"] = Project.objects.filter(
+                                     format="FTR").order_by('-rating')[:10]
+        context["scenes"] = Project.objects.filter(
+                            format="PIL").order_by('-id')
+        context["filims"] = Project.objects.filter(
                                      format="FTR").order_by('-id')
         context['locations'] = Location.objects.all()
         return context
