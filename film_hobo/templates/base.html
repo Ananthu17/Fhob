@@ -211,15 +211,27 @@
                             </div>
                         </li>
                         <!-- Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                PILOTS/FEATURES
-                            </a>
-                            <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="#">Projects</a>
-                                <a class="dropdown-item" href="#">Films</a>
-                            </div>
-                        </li>
+                        {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                            <li class="nav-item dropdown">
+                                <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    PILOTS/FEATURES
+                                </a>
+                                <div class="dropdown-menu FH-dropdown-font">
+                                    <a class="dropdown-item" href="#">Projects</a>
+                                    <a class="dropdown-item" href="#">Films</a>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-item dropdown">
+                                <a id="pilots-features-nav-item" onclick="togglePopup()" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                                    PILOTS/FEATURES
+                                </a>
+                                <!-- <div class="dropdown-menu FH-dropdown-font">
+                                    <a class="dropdown-item" href="#">Projects</a>
+                                    <a class="dropdown-item" href="#">Films</a>
+                                </div> -->
+                            </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:pilots' %}">HOW TO</a>
                         </li>
@@ -494,7 +506,7 @@
     crossorigin="anonymous"></script>
     <script>
                 // Function to show and hide the popup
-                function togglePopup() {
+        function togglePopup() {
             $(".mem-content").toggle();
         }
     /*
