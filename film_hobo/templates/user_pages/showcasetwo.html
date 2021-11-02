@@ -278,14 +278,13 @@
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
@@ -353,14 +352,13 @@
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
@@ -431,14 +429,13 @@
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
@@ -509,14 +506,13 @@
                                                     title="2245">#{{project.id}}</a></span></span>
                                         <span class="">{{project.get_format_display}}</span>
                                         <span class="hom-rate-star">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="swc-img-project-name-txt">
@@ -756,16 +752,15 @@
                 let div2 = `<div class="swc-img-project-txt ">
                                     <span>Project<span class="swc-pro-width-overflow"><a href="'${origin_url}/project/single-film-project/${this.id}/'"
                                         title="2245"> #${this.id}</a></span></span>
-                                    <span class="">Scene</span><span class="hom-rate-star">`
-                let div3 = ""
-                    for (let i = 0; i < this.rating; i++) {
-                        div3 += "<span class='fa fa-star checked'></span>"
-                    }
-                let div4 = ""
-                    for (let i = 0; i < 5-this.rating; i++) {
-                        div4 += "<span class='fa fa-star-o'></span>"
-                    }
-                let div5 =`</span></div>
+                                    <span class="">Scene</span><span class="hom-rate-star">
+                                        <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                        </span></div>
                                 <div class="swc-img-project-name-txt">
                                     <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="Cart Ride">${this.title}</a></span>
@@ -780,7 +775,7 @@
                                     </div>
                                 </div>
                             </div>`
-                let div = div1+divimg+div2+div3+div4+div5
+                let div = div1+divimg+div2
                 // appending div to results
                 $(`#project-owl${id}`).append(div);
             })
@@ -835,16 +830,15 @@
                 let div2 = `<div class="swc-img-project-txt ">
                                     <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="2245"> #${this.id}</a></span></span>
-                                    <span class="">Scene</span><span class="hom-rate-star">`
-                let div3 = ""
-                    for (let i = 0; i < this.rating; i++) {
-                        div3 += "<span class='fa fa-star checked'></span>"
-                    }
-                let div4 = ""
-                    for (let i = 0; i < 5-this.rating; i++) {
-                        div4 += "<span class='fa fa-star-o'></span>"
-                    }
-                let div5 =`</span></div>
+                                    <span class="">Scene</span><span class="hom-rate-star">
+                                        <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                        </span></div>
                                 <div class="swc-img-project-name-txt">
                                     <span class="hom-name-width-overflow">Name:<a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="Cart Ride">${this.title}</a></span>
@@ -859,7 +853,7 @@
                                     </div>
                                 </div>
                             </div>`
-                let div = div1+div0+divimg+div2+div3+div4+div5
+                let div = div1+div0+divimg+div2
                 // appending div to results
                 $('#project-owl1').append(div);
             })
@@ -914,16 +908,15 @@
                 let div2 = `<div class="swc-img-project-txt ">
                                     <span>Project<span class="swc-pro-width-overflow"><a href='${origin_url}/project/single-film-project/${this.id}/'
                                         title="2245"> #${this.id}</a></span></span>
-                                    <span class="">Scene</span><span class="hom-rate-star">`
-                let div3 = ""
-                    for (let i = 0; i < this.rating; i++) {
-                        div3 += "<span class='fa fa-star checked'></span>"
-                    }
-                let div4 = ""
-                    for (let i = 0; i < 5-this.rating; i++) {
-                        div4 += "<span class='fa fa-star-o'></span>"
-                    }
-                let div5 =`</span></div>
+                                    <span class="">Scene</span><span class="hom-rate-star">
+                                        <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                        </span></div>
                                 <div class="swc-img-project-name-txt">
                                     <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
@@ -938,7 +931,7 @@
                                     </div>
                                 </div>
                             </div>`
-                let div = div1+div0+divimg+div2+div3+div4+div5
+                let div = div1+div0+divimg+div2
                 // appending div to results
                 $('#project-owl2').append(div);
             })
@@ -963,16 +956,15 @@
                 let div2 = `<div class="swc-img-project-txt ">
                                     <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="2245"> #${this.id}</a></span></span>
-                                    <span class="">Scene</span><span class="hom-rate-star">`
-                let div3 = ""
-                    for (let i = 0; i < this.rating; i++) {
-                        div3 += "<span class='fa fa-star checked'></span>"
-                    }
-                let div4 = ""
-                    for (let i = 0; i < 5-this.rating; i++) {
-                        div4 += "<span class='fa fa-star-o'></span>"
-                    }
-                let div5 =`</span></div>
+                                    <span class="">Scene</span><span class="hom-rate-star">
+                                        <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                        </span></div>
                                 <div class="swc-img-project-name-txt">
                                     <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
@@ -987,7 +979,7 @@
                                     </div>
                                 </div>
                             </div>`
-                let div = div1+divimg+div2+div3+div4+div5
+                let div = div1+divimg+div2
                 // appending div to results
                 $('#project-owl3').append(div);
             })
@@ -1012,16 +1004,15 @@
                 let div2 = `<div class="swc-img-project-txt ">
                                     <span>Project<span class="swc-pro-width-overflow"><a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="2245"> #${this.id}</a></span></span>
-                                    <span class="">Scene</span><span class="hom-rate-star">`
-                let div3 = ""
-                    for (let i = 0; i < this.rating; i++) {
-                        div3 += "<span class='fa fa-star checked'></span>"
-                    }
-                let div4 = ""
-                    for (let i = 0; i < 5-this.rating; i++) {
-                        div4 += "<span class='fa fa-star-o'></span>"
-                    }
-                let div5 =`</span></div>
+                                    <span class="">Scene</span><span class="hom-rate-star">
+                                        <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                        </span></div>
                                 <div class="swc-img-project-name-txt">
                                     <span class="hom-name-width-overflow">Name:<a href="${origin_url}/project/single-film-project/${this.id}/"
                                         title="Cart Ride">${this.title}</a></span>
@@ -1036,7 +1027,7 @@
                                     </div>
                                 </div>
                             </div>`
-                let div = div1+divimg+div2+div3+div4+div5
+                let div = div1+divimg+div2
                 // appending div to results
                 $('#project-owl4').append(div);
             })
