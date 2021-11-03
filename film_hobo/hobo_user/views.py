@@ -458,19 +458,20 @@ class ShowCase(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scenes"] = Project.objects.filter(
+        projects = Project.objects.filter(video_status='posted')
+        context["scenes"] = projects.filter(
                             format="SCH").filter(rating__gte=4).order_by(
                             '-likes')[:10]
-        context["toprated_scenes"] = Project.objects.filter(
+        context["toprated_scenes"] = projects.filter(
                                      format="SHO").filter(
                                      rating__gte=4).order_by('-likes')[:10]
-        context["filims"] = Project.objects.filter(
+        context["filims"] = projects.filter(
                             format="SCH").order_by('-id')
-        context["toprated_filims"] = Project.objects.filter(
+        context["toprated_filims"] = projects.filter(
                                      format="SHO").order_by('-id')
-        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+        context["pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR'))
-        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+        context["toprated_pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
 
@@ -478,7 +479,7 @@ class ShowCase(TemplateView):
 
 
 class ShowCaseAPIView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
@@ -496,7 +497,7 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
 
 
 class ShowCaseSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
@@ -518,17 +519,22 @@ class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
         if 'year' in received_data and 'month' in received_data:
             month = received_data['month']
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[
-                                             year+"-"+month+"-01",
-                                             year+"-"+month+"-30"
-                                             ])
+            project = Project.objects.filter(
+                Q(timestamp__range=[
+                                    year+"-"+month+"-01",
+                                    year+"-"+month+"-30"
+                                    ]) &
+                Q(video_status='posted')
+                                    )
             context = self.showcase_segregator(project)
             return Response(context)
 
         elif 'year' in received_data:
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"])
+            project = Project.objects.filter(
+                        Q(timestamp__range=[year+"-01-01", year+"-12-30"]) &
+                        Q(video_status='posted')
+                        )
             context = self.showcase_segregator(project)
             return Response(context)
 
