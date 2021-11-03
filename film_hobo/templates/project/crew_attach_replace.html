@@ -390,8 +390,13 @@
 {% endif %}
                 </div>
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
-            </div>
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members">
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -602,7 +607,12 @@
                 });
             }
         });
-        
+    });
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
     });
 </script>
 {% endblock %}

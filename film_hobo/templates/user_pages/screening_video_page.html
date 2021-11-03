@@ -269,9 +269,13 @@
 
                 <!-- Center section  End-->
                 <!-- Right section -->
-
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
-                </div>
+                {% if user.membership == 'HOB' %}
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members make_div_unclickable">
+                    </div>
+                {% else %}
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-2 mb-3 top_rated_members">
+                    </div>
+                {% endif %}
 
                 <!-- Right section  End-->
 
@@ -334,4 +338,9 @@
 <!-- <script src="{% static 'js/screening_video_page.js' %}"></script> -->
 <!-- <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script> -->
 <!-- <script src="{% static 'js/email_invite.js' %}"></script> -->
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
+    });
+</script>
 {% endblock %}

@@ -345,12 +345,19 @@ class HomePage(TemplateView):
         context["format"] = project_format
         context["scenes"] = Project.objects.filter(
                             format="SCH").order_by('-id')
+
         context["toprated_scenes"] = Project.objects.filter(
                                      format="SCH").order_by('-rating')
         context["filims"] = Project.objects.filter(
                             format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-rating')
+
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
+        context['locations'] = Location.objects.all()
         return context
 
 
@@ -368,6 +375,82 @@ class VideoPlayer(TemplateView):
         return context
 
 
+class PilotAndFeature(TemplateView):
+    template_name = 'user_pages/pilotandfeature.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["toprated_scenes"] = Project.objects.filter(
+                            format="PIL").order_by(
+                            '-rating')[:10]
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="FTR").order_by('-rating')[:10]
+        context["scenes"] = Project.objects.filter(
+                            format="PIL").order_by('-id')
+        context["filims"] = Project.objects.filter(
+                                     format="FTR").order_by('-id')
+        context['locations'] = Location.objects.all()
+        return context
+
+
+class PilotAndFeatureAPIView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator', 'title', 'format', 'genre',
+                        'rating', 'video_url', 'video_type',
+                        'last_date', 'location', 'visibility',
+                        'visibility_password', 'cast_attachment',
+                        'cast_pay_rate', 'cast_samr', 'timestamp']
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        print(queryset)
+        context = self.pilot_segregator(queryset)
+        return Response(context)
+
+
+class PilotAndFeatureSearchView(ListAPIView, SegregatorMixin):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "format", "genre",
+                     "rating", "timestamp"]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        context = self.pilot_segregator(queryset)
+        return Response(context)
+
+
+class PilotAndFeatureDateFilterAPI(APIView, SegregatorMixin):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        received_data = json.loads(request.body)
+        # day = received_data['day']
+        if 'year' in received_data and 'month' in received_data:
+            month = received_data['month']
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[
+                                             year+"-"+month+"-01",
+                                             year+"-"+month+"-30"
+                                             ])
+            context = self.pilot_segregator(project)
+            return Response(context)
+
+        elif 'year' in received_data:
+            year = received_data['year']
+            project = Project.objects.filter(timestamp__range=[year+"-01-01",
+                                                               year+"-12-30"])
+            context = self.pilot_segregator(project)
+            return Response(context)
+
+
 class ShowCase(TemplateView):
     template_name = 'user_pages/showcasetwo.html'
     login_url = '/hobo_user/user_login/'
@@ -375,22 +458,28 @@ class ShowCase(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scenes"] = Project.objects.filter(
+        projects = Project.objects.filter(video_status='posted')
+        context["scenes"] = projects.filter(
                             format="SCH").filter(rating__gte=4).order_by(
                             '-likes')[:10]
-        context["toprated_scenes"] = Project.objects.filter(
+        context["toprated_scenes"] = projects.filter(
                                      format="SHO").filter(
                                      rating__gte=4).order_by('-likes')[:10]
-        context["filims"] = Project.objects.filter(
+        context["filims"] = projects.filter(
                             format="SCH").order_by('-id')
-        context["toprated_filims"] = Project.objects.filter(
+        context["toprated_filims"] = projects.filter(
                                      format="SHO").order_by('-id')
+        context["pilotsfeatures"] = projects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = projects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
+
         return context
 
 
 class ShowCaseAPIView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
@@ -408,7 +497,7 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
 
 
 class ShowCaseSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
@@ -430,17 +519,22 @@ class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
         if 'year' in received_data and 'month' in received_data:
             month = received_data['month']
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[
-                                             year+"-"+month+"-01",
-                                             year+"-"+month+"-30"
-                                             ])
+            project = Project.objects.filter(
+                Q(timestamp__range=[
+                                    year+"-"+month+"-01",
+                                    year+"-"+month+"-30"
+                                    ]) &
+                Q(video_status='posted')
+                                    )
             context = self.showcase_segregator(project)
             return Response(context)
 
         elif 'year' in received_data:
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"])
+            project = Project.objects.filter(
+                        Q(timestamp__range=[year+"-01-01", year+"-12-30"]) &
+                        Q(video_status='posted')
+                        )
             context = self.showcase_segregator(project)
             return Response(context)
 
@@ -5342,6 +5436,11 @@ class ProjectView(LoginRequiredMixin, TemplateView):
                                     Q(creator=self.request.user) &
                                     Q(is_posted=False)
                                     ).order_by('-timestamp')
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
+        context['locations'] = Location.objects.all()
         context["draft_projects"] = draft_projects
         return context
 

@@ -22,7 +22,27 @@
     <div class="container-fluid">
         <div class="row">
             <!-- left section  -->
+
+            
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
+
+
+                <div  class=" proj-calender-sec mt-3">
+                    <div class="proj-location-sec">
+                        <div class="proj-location-sec-head">
+                            Location
+                        </div>
+                        <div class="proj-location-select-sec">
+                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
+                                {% for place in locations %}
+                                <option disabled selected hidden>Choose Location</option>
+                                <option value="{{place.id}}">{{place}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt">
                         <label class="d-flex justify-content-center ">Search by:</label>
@@ -114,6 +134,9 @@
                             </tbody>
                         </table>
                 </div>
+
+
+                
                 <div class="proj-calender-sec  p-2 mb-3 ">
                     <div class="add-space d-flex justify-content-center">
                      <a href="{% url 'hobo_user:new-project' %}" class="create-a-project">Create a Project</a>
@@ -536,6 +559,208 @@
                     </div>
                 </div>
                 
+
+
+
+                {% elif format == 'PIL-FTR' %}  
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display">
+                            <span class=" txt-orange float-left top-head-align proj-head-margin">New Pilots/Features</span>
+                            <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo3">
+                        <div class="owl-carousel owl-theme " id="project-owl3">
+                            {% if pilotsfeatures != None  %}
+                            {% for project in pilotsfeatures %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="card proj-card pointer" >
+                                    <div class="project-line">
+                                        <span class="proj-no">
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">{{project.sag_aftra}}</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span  class="proj-symb">
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line2">
+                                        <span class="proj-title">
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a>{{ project.number_of_pages }}</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Creator:<a href="">{{project.creator}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            Location:<a>{{project.location}}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+                <!-- Row 4  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display">
+                            <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
+                            <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo4">
+                        <div class="owl-carousel owl-theme " id="project-owl4">
+                            {% if toprated_pilotsfeatures != None  %}
+                            {% for project in toprated_pilotsfeatures %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="card proj-card pointer" >
+                                    <div class="project-line">
+                                        <span class="proj-no">
+                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a href="">{{project.sag_aftra}}</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a href="">{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span  class="proj-symb">
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line2">
+                                        <span class="proj-title">
+                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a>{{ project.number_of_pages }}</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Creator:<a href="">{{project.creator}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Format:<a href="">{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            Location:<a>{{project.location}}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+
+
+
                 {% else %}
                 <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
@@ -933,10 +1158,13 @@
 
             <!-- Center section End  -->
             <!-- Right section  -->
-
-            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
-            </div>
-
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
+                </div>
+            {% endif %}
             <!-- Right section End  -->
         </div>
     </div>
@@ -1461,6 +1689,24 @@
         return Object.keys(object).find(key => object[key] === value);
     }
 
+    function locationFilter(){
+        var location = document.getElementById("locationfilter");
+        var  id = location.value;
+        console.log("LOC",location,"VAL:",id)
+
+        post_url = origin_url + `/hobo_user/user_home/projects/?location=${id}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response:",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+
     function toTitleCase(str) {
         return str.replace(
             /\w\S*/g,
@@ -1613,6 +1859,9 @@
         else if (desired_path == '/hobo_user/user_home/?format=SHO'){
             $("#shorts-nav-item").addClass('active');
         }
+        else if (desired_path == '/hobo_user/user_home/?format=PIL-FTR'){
+            $("#shorts-nav-item").addClass('active');
+        }
         else{
 
         }
@@ -1636,5 +1885,11 @@
         $("#top_rated_div").addClass("proj-right-sec-bg");
     });
 
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
+    });
 </script>
 {% endblock %}

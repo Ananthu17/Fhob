@@ -149,10 +149,20 @@
                     </ul>
                 </div> -->
                 <div class="left-mode-sec mt-3 p-2  mem-ad-banner-2">
-                    <ul class="list-unstyled p-2 mb-0">
+                    <!-- <ul class="list-unstyled p-2 mb-0">
                         <li><a href="#" class="red-f bold ">A<span class="mem-small-f">D</span> B<span
                                     class="mem-small-f">ANNER</span></a></li>
-                    </ul>
+                    </ul> -->
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2568931363821177"
+                        crossorigin="anonymous"></script>
+                    <!-- 728x90, created 2/23/09 -->
+                    <ins class="adsbygoogle"
+                        style="display:inline-block;width:728px;height:90px"
+                        data-ad-client="ca-pub-2568931363821177"
+                        data-ad-slot="9556686269"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
                 </div>
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
@@ -843,10 +853,13 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
-
-
-            </div>
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
+                </div>
+            {% endif %}
         </div>
     </div>
 {% else %}
@@ -936,6 +949,12 @@
             }
         });
 
+    });
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
     });
 </script>
 {% endblock %}
