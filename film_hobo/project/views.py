@@ -4750,6 +4750,7 @@ class PostProjectAPI(APIView):
                 project.save()
                 draft_project.is_posted = True
                 draft_project.save()
+                messages.success(self.request, "Project posted.")
                 response = {'message': "Project posted.", 'status':
                             status.HTTP_200_OK}
 
