@@ -572,7 +572,7 @@ class DraftProject(models.Model):
 
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
-    ULB = 'SAG_ultra _low_budget'
+    ULB = 'SAG_ultra_low_budget'
     MLB = 'SAG_moderate_low_budget'
     LB = 'SAG_low_budget'
     ThB = 'SAG_theatrical_budget'

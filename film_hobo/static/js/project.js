@@ -94,3 +94,22 @@ $('.script_visibility').on('click', function(e) {
         radioState = this;
     }
 });
+
+// production radio button
+$('input[type=radio][name=production]').change(function() {
+    if (this.value == 'INDIE') {
+       $("#choice_no_payment").attr('disabled', true);
+       $("#choice_no_payment").prop('checked', false);
+       $("#choice_no_payment").css('border','1px solid #7f7676');
+
+       $("#choice_negotiable").attr('disabled', true);
+       $("#choice_negotiable").prop('checked', false);
+       $("#choice_negotiable").css('border','1px solid #7f7676');
+    }
+    else{
+        $("#choice_no_payment").attr('disabled', false);
+        $("#choice_negotiable").attr('disabled', false);
+        $("#choice_no_payment").css('border','1px solid #f32121');
+        $("#choice_negotiable").css('border','1px solid #f32121');
+    }
+});

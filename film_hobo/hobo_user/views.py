@@ -5650,7 +5650,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         # print(request.POST)
         projectform = ProjectCreationForm(request.POST or None, request.FILES)
-        cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
 
@@ -5733,7 +5732,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             project = projectform.save()
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
-            project.cast_pay_rate = cast_pay
             project.save()
             interest = UserInterest.objects.all()
             for usin in interest:
@@ -5819,7 +5817,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie'
-        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
@@ -5831,7 +5829,6 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie_and_pro'
-
         return context
 
     # def post(self, request, **kwargs):
@@ -5960,11 +5957,12 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        # print(request.POST)
+        print(request.POST)
         remove_script = request.POST.get('remove_script')
-        cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
+        # project_cast_samr = 'indie_with_rating_1_star'
+        # project_crew_samr = 'indie_with_rating_1_star'
 
         if cast_samr == 'indie':
             indie_samr_rate = request.POST.get('indie_samr_rate')
@@ -6046,7 +6044,6 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project = projectform.save()
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
-            project.cast_pay_rate = cast_pay
             if project.script_visibility == 'public':
                 project.script_password = ""
                 project.save()

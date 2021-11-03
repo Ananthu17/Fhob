@@ -393,60 +393,71 @@
                                 <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
                             <!-- </div> -->
                             <div class="col-md-10 col-sm-6 mt-3">
-                                {{form.sag_aftra}}
-                                <div class="form-check form-check-inline">
-                                    
-                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;  ">$ 0
-                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"  style="margin-top: 0.3em;"></span>
+                                <div class="form-check form-check-inline " >
+                                    <label class=" bold" style="font-weight: bolder;font-size: 17px;">
+                                        <input type="radio" name="sag_aftra"  onclick="selectsagAftra(this)"
+                                        {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="no_payment"
+                                         id="choice_no_payment"  class="custom_check_box
+                                         {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
+                                         {% if project_obj.production == 'INDIE' %}disabled{% endif %}>$ 0
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline" >
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="payment_is_negotiable"
+                                           id="choice_negotiable" class="custom_check_box
+                                           {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
+                                           {% if project_obj.production == 'INDIE' %}disabled{% endif %}>Negotiable
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Negotiable
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ULB %}checked{% endif%}
+                                           value="SAG_ultra_low_budget"  class="custom_check_box" required>Ultra Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Ultra Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ULB %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.MLB %}checked{% endif%}
+                                            value="SAG_moderate_low_budget" class="custom_check_box">Moderate Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Moderate Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.MLB %}checked{% endif%}  value="3">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                           {% if project_obj.sag_aftra == project_obj.LB %}checked{% endif%}
+                                             value="SAG_low_budget" class="custom_check_box">Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"   {% if project_obj.sag_aftra == project_obj.LB %}checked{% endif%}  value="4">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ThB %}checked{% endif%}
+                                            value="SAG_theatrical_budget" class="custom_check_box">Theatrical
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Theatrical
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ThB %}checked{% endif%}  value="5">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ShB %}checked{% endif%}
+                                            value="SAG_short_film_budget" class="custom_check_box">Short
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Short
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ShB %}checked{% endif%}  value="6">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                         {% if project_obj.sag_aftra == project_obj.MiB %}checked{% endif%}
+                                           value="SAG_micro_budget" class="custom_check_box">Micro
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Micro
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" {% if project_obj.sag_aftra == project_obj.MiB %}checked{% endif%}  value="7">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Student
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" {% if project_obj.sag_aftra == project_obj.StB %}checked{% endif%}  value="8">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                         {% if project_obj.sag_aftra == project_obj.StB %}checked{% endif%}
+                                           value="SAG_studet_budget" class="custom_check_box">Student
                                     </label>
                                 </div>
                             </div>
@@ -619,7 +630,7 @@
                         <div class="row">
                             <div class="col-12 col-md-2">
                                 <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span><br>(Status And
-                                    Minimum Rating):</label>
+                                    Minimum Rating):{{crew_samr_option}}</label>
                             </div>
                             <div class="col-12 col-md-10 mt-3">
                                 <span class="ml-4">
@@ -825,7 +836,7 @@
 
 
                         <!-- The Modal -->
-                        <div class="row mb-4">
+                        <!-- <div class="row mb-4"> -->
                             <!-- <div class="col-2">
                                 <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
                             </div> -->
@@ -833,12 +844,30 @@
                                 <a href="" class="prjct-log-link underline">SAVE</a>
                                 <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
                             </div> -->
-                            <div class="col-2">
+                            <!-- <div class="col-2">
                                 <a type="button" id="reviewButton" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
-                            </div>
+                            </div> -->
                             <!-- <div class="col-3">
                                 <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
                             </div> -->
+                        <!-- </div> -->
+                        <div class="row mb-4">
+                            <!-- <div class="col-2">
+                                <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
+                            </div> -->
+                            <div class="col-3">
+                                <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
+                            </div>
+                        </div>
+                        <hr class="prjct-log-blck-hr">
+                        <div class="row mb-4">
+                            <div class="col-2">
+                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
+                                <a style="border: 0;margin-bottom: 1rem;"
+                                class="prjct-log-link underline text-danger  post_project cursor-pointer"
+                                id="{{draft_project_obj.id}}">POST YOUR PROJECT</a>
+                            </div>
                         </div>
                         <hr class="prjct-log-blck-hr">
                         {% if mode_operation == 'update' %}
@@ -873,14 +902,6 @@
                             {% endif %}
                         {% endif %}
                         <hr class="prjct-log-blck-hr">
-                        <div class="row mb-4">
-                            <div class="col-2">
-                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
-                                <a style="border: 0;margin-bottom: 1rem;"
-                                class="prjct-log-link underline text-danger  post_project cursor-pointer"
-                                id="{{draft_project_obj.id}}">POST YOUR PROJECT</a>
-                            </div>
-                        </div>
 
                     </div>
                 </div>
@@ -1418,5 +1439,5 @@ $(function () {
     });
 
 </script>
-<script src="{% static 'js/cast_crew_samr.js' %}"></script>
+<script src="{% static 'js/project.js' %}"></script>
 {% endblock %}
