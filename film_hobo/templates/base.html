@@ -223,8 +223,8 @@
                                     PILOTS/FEATURES
                                 </a>
                                 <div class="dropdown-menu FH-dropdown-font">
-                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR">Projects</a>
-                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR">Films</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR&nav=PIL-FTR">Projects</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR&nav=PIL-FTR">Films</a>
                                 </div>
                             </li>
                         {% else %}
@@ -337,7 +337,7 @@
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="user-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 {% if user.is_superuser %}
                                     Admin
                                 {% else %}
@@ -346,9 +346,9 @@
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
                                 {% if user.is_superuser %}
-                                    <a class="dropdown-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
-                                    <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
-                                    <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
+                                    <a class="dropdown-item user-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
+                                    <a class="dropdown-item user-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
+                                    <a class="dropdown-item " href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
@@ -596,6 +596,9 @@ $( document ).ready(function() {
     if (desired_path == '/hobo_user/projectview/create/'){
         $("#project-nav-item").addClass('active');
     }
+    else if (desired_path == '/hobo_user/how_to/'){
+        $("#how_to").addClass('active');
+    }
     else if (desired_path == '/hobo_user/showcase/'){
         $("#showcase").addClass('active');
     }
@@ -620,14 +623,14 @@ $( document ).ready(function() {
     else if (desired_path == '/hobo_user/user_home/?format=SHO&nav=SHO'){
         $("#shorts-nav-item").addClass('active');
     }
-    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
+    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR&nav=PIL-FTR'){
         $("#pilots-features-nav-item").addClass('active');
     }
-    else if (desired_path == '/hobo_user/user_home/?format=PIL-FTR'){
+    else if (desired_path == '/hobo_user/user_home/?format=PIL-FTR&nav=PIL-FTR'){
         $("#pilots-features-nav-item").addClass('active');
     }
     else{
-
+        $("#user-nav-item").addClass('active');
     }
 });
 
