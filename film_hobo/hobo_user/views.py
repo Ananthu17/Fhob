@@ -153,8 +153,8 @@ class CustomUserLogin(DjangoLogin):
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html', 
-                                                        {'user': request.user})
+            return render(request, 'user_pages/user_home.html',
+                          {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -170,9 +170,14 @@ class CustomUserLogin(DjangoLogin):
                 return redirect('/hobo_user/enable-account')
             else:
                 if user is not None:
-                    login(request, user)
-                    return render(request, 'user_pages/user_home.html',
-                            {'user': user})
+                    if user.membership == 'HOB':
+                        login(request, user)
+                        return render(request, 'user_pages/showcasetwo.html',
+                                      {'user': user})
+                    else:
+                        login(request, user)
+                        return render(request, 'user_pages/edit-profile.html',
+                                      {'user': user})
                 else:
                     return HttpResponse(
                         'Unable to log in with provided credentials.')
