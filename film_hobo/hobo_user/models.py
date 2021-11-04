@@ -313,7 +313,7 @@ class CustomUser(AbstractUser):
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
-        elif self.first_name == None and self.last_name ==None:
+        elif self.first_name == None and self.last_name == None:
             name = ""
         elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
@@ -738,7 +738,8 @@ class Project(models.Model):
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
     likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
-    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(
+        _("Dislikes"), null=True, blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
@@ -819,17 +820,23 @@ class PromoCode(models.Model):
                                  choices=USER_TYPE_CHOICES,
                                  max_length=150, default=HOBO)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.promo_code)
@@ -1977,17 +1984,23 @@ class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.code)
