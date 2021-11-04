@@ -249,82 +249,108 @@
                                 <label class="form-title mem-setup-blu-f">GENRE:</label>
                             </div>
                             <div class="col-md-9 col-sm-12 mt-3">
-                                {{form.genre}}
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold"> DRAMA
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="8"  {% if project_obj.genre == project_obj.DRAMA %}checked{% endif%} required>
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         value="DRA"
+                                          {% if project_obj.genre == project_obj.DRAMA %}checked{% endif%} required>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">COMEDY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.COMEDY %}checked{% endif%}  value="5">
+                                        <input type="radio" name="genre" 
+                                        onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.COMEDY %}checked{% endif%}
+                                          value="COM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">CRIME
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.CRIME %}checked{% endif%} value="6">
+                                        <input type="radio" name="genre"
+                                         onclick="selectgenre(this)" {% if project_obj.genre == project_obj.CRIME %}checked{% endif%}
+                                          value="CRI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ROMANCE&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"    {% if project_obj.genre == project_obj.ROMANCE %}checked{% endif%}  value="20">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                            {% if project_obj.genre == project_obj.ROMANCE %}checked{% endif%}
+                                              value="ROM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">SCI-FI&nbsp; 
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.SCIENCE_FICTION %}checked{% endif%}   value="21">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.SCIENCE_FICTION %}checked{% endif%}
+                                            value="SCI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">HORROR&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.HORROR %}checked{% endif%}  value="14">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.HORROR %}checked{% endif%}
+                                            value="HOR">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ACTION / ADVENTURE
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.ACTION %}checked{% endif%}   value="1">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.ACTION_ADVENTURE %}checked{% endif%}
+                                            value="ACT_ADV">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold"  >FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}     value="9">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}
+                                              value="FAM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.MYSTERY  %}checked{% endif%}     value="18">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.MYSTERY_THRILLER  %}checked{% endif%}
+                                              value="MYS_THR">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold" >LGBTQ 
-                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.LGBTQ %}checked{% endif%}     value="15">
+                                       <input type="radio" name="genre" onclick="selectgenre(this)"
+                                        {% if project_obj.genre == project_obj.LGBTQ %}checked{% endif%}
+                                             value="LGB">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline"> 
                                     <label class="containerradio bold " style="margin:left 7px;">MUSICAL &nbsp;&nbsp;
-                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.MUSICAL %}checked{% endif%}    value="17">
+                                       <input type="radio" name="genre" onclick="selectgenre(this)"
+                                        {% if project_obj.genre == project_obj.MUSICAL %}checked{% endif%}
+                                            value="MUS">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">SPORT
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.SPORT %}checked{% endif%}    value="22">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.SPORT %}checked{% endif%}
+                                             value="SPO">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">FANTASY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FANTASY %}checked{% endif%}    value="10">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.FANTASY %}checked{% endif%}
+                                             value="FAN">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
@@ -332,14 +358,18 @@
                                
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">WAR / MILITARY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.MILITARY%}checked{% endif%}  value="16">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.MILITARY%}checked{% endif%}
+                                            value="MIL">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.ANIMATION %}checked{% endif%}     value="3">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.ANIMATION %}checked{% endif%}
+                                               value="ANI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
