@@ -179,7 +179,7 @@
                                 <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH&nav=PRO">Scenes</a>
                                 <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO&nav=PRO">Shorts</a>
-                                {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM'  %}
+                                {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM' or user.membership == 'ADMIN' %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
                                 {% else %}
                                     <a class="dropdown-item" onclick="togglePopup()">Pilots/Features</a>
@@ -217,7 +217,7 @@
 
 
                         <!-- Dropdown -->
-                        {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM'  %}
+                        {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM' or user.membership == 'ADMIN'  %}
                             <li class="nav-item dropdown">
                                 <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                     PILOTS/FEATURES

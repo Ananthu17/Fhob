@@ -2092,7 +2092,8 @@ class PersonalDetailsAPI(APIView):
         personal_settings['hair_length'] = user.hair_length
         personal_settings['eyes'] = user.eyes
         personal_settings['eyes'] = user.eyes
-        personal_settings['ethnic_appearance'] = user.ethnic_appearance.ethnic_appearance
+        personal_settings['ethnic_appearance'] = \
+            user.ethnic_appearance.ethnic_appearance
 
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
@@ -2435,7 +2436,8 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
         # exclude super user and current user
         user_ids = []
-        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        super_users = \
+            CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
         for id in super_users:
             user_ids.append(id)
         user_ids.append(user.id)
@@ -2469,8 +2471,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
         context['tracking_projects_count'] = tracking_projects.count
         context['tracking_projects'] = tracking_projects[:6]
-        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
-        context['my_interests_count'] = UserInterest.objects.filter(user=user).count()
+        context['my_projects_count'] = \
+            Project.objects.filter(creator=self.request.user).count()
+        context['my_interests_count'] = \
+            UserInterest.objects.filter(user=user).count()
         return context
 
     def post(self, request, *args, **kwargs):
