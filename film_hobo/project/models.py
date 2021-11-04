@@ -613,8 +613,8 @@ class DraftProject(models.Model):
         (INDIE, 'INDIE'),
     ]
 
-    ACTION = 'ACT'
-    ADVENTURE = 'ADV'
+    # ACTION = 'ACT'
+    # ADVENTURE = 'ADV'
     ANIMATION = 'ANI'
     BIOGRAPHY = 'BIO'
     COMEDY = 'COM'
@@ -630,17 +630,19 @@ class DraftProject(models.Model):
     LGBTQ = 'LGB'
     MILITARY = 'MIL'
     MUSICAL = 'MUS'
-    MYSTERY = 'MYS'
+    # MYSTERY = 'MYS'
     REALITY_TV = 'REA'
     ROMANCE = 'ROM'
     SCIENCE_FICTION = 'SCI'
     SPORT = 'SPO'
     TALK_SHOW = 'TAL'
-    THRILLER = 'THR'
+    # THRILLER = 'THR'
     WESTERN = 'WES'
+    MYSTERY_THRILLER = 'MYS_THR'
+    ACTION_ADVENTURE = 'ACT_ADV'
     GENRE_CHOICES = [
-        (ACTION, 'Action'),
-        (ADVENTURE, 'Adventure'),
+        # (ACTION, 'Action'),
+        # (ADVENTURE, 'Adventure'),
         (ANIMATION, 'Animation'),
         (BIOGRAPHY, 'Biography'),
         (COMEDY, 'Comedy'),
@@ -656,14 +658,16 @@ class DraftProject(models.Model):
         (LGBTQ, 'LGBTQ'),
         (MILITARY, 'Military'),
         (MUSICAL, 'Musical'),
-        (MYSTERY, 'Mystery'),
+        # (MYSTERY, 'Mystery'),
         (REALITY_TV, 'Reality TV'),
         (ROMANCE, 'Romance'),
         (SCIENCE_FICTION, 'Science Fiction'),
         (SPORT, 'Sport'),
         (TALK_SHOW, 'Talk Show'),
-        (THRILLER, 'Thriller'),
-        (WESTERN, 'Western')
+        # (THRILLER, 'Thriller'),
+        (WESTERN, 'Western'),
+        (ACTION_ADVENTURE, 'Action/Adventure'),
+        (MYSTERY_THRILLER, 'Mystery/Thriller'),
     ]
 
     creator = models.ForeignKey('hobo_user.CustomUser',
