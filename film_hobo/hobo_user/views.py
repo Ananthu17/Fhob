@@ -351,6 +351,7 @@ class HomePage(TemplateView):
                             format="SHO").order_by('-id')
         context["toprated_filims"] = Project.objects.filter(
                                      format="SHO").order_by('-rating')
+        context['locations'] = Location.objects.all()
         return context
 
 
@@ -5409,6 +5410,7 @@ class ProjectView(LoginRequiredMixin, TemplateView):
         context["toprated_scenes"] = Project.objects.filter(format="SCH").filter(creator=user).order_by('-rating')
         context["filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-id')
         context["toprated_filims"] = Project.objects.filter(format="SHO").filter(creator=user).order_by('-rating')
+        context['locations'] = Location.objects.all()
         return context
 
     def get(self, request, *args, **kwargs):
