@@ -109,7 +109,10 @@
   .custom_check_box:checked {
       background-color: #f32121;
     }
-
+.disabled_check_box
+    {
+      border:1px solid #7f7676;
+    }
   .guild_membership label
     {
       margin-bottom:0;

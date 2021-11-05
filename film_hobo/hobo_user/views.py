@@ -153,8 +153,8 @@ class CustomUserLogin(DjangoLogin):
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html', 
-                                                        {'user': request.user})
+            return render(request, 'user_pages/user_home.html',
+                          {'user': request.user})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -170,9 +170,14 @@ class CustomUserLogin(DjangoLogin):
                 return redirect('/hobo_user/enable-account')
             else:
                 if user is not None:
-                    login(request, user)
-                    return render(request, 'user_pages/user_home.html',
-                            {'user': user})
+                    if user.membership == 'HOB':
+                        login(request, user)
+                        return render(request, 'user_pages/showcasetwo.html',
+                                      {'user': user})
+                    else:
+                        login(request, user)
+                        return render(request, 'user_pages/edit-profile.html',
+                                      {'user': user})
                 else:
                     return HttpResponse(
                         'Unable to log in with provided credentials.')
@@ -458,19 +463,20 @@ class ShowCase(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scenes"] = Project.objects.filter(
+        projects = Project.objects.filter(video_status='posted')
+        context["scenes"] = projects.filter(
                             format="SCH").filter(rating__gte=4).order_by(
                             '-likes')[:10]
-        context["toprated_scenes"] = Project.objects.filter(
+        context["toprated_scenes"] = projects.filter(
                                      format="SHO").filter(
                                      rating__gte=4).order_by('-likes')[:10]
-        context["filims"] = Project.objects.filter(
+        context["filims"] = projects.filter(
                             format="SCH").order_by('-id')
-        context["toprated_filims"] = Project.objects.filter(
+        context["toprated_filims"] = projects.filter(
                                      format="SHO").order_by('-id')
-        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+        context["pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR'))
-        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+        context["toprated_pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
 
@@ -478,7 +484,7 @@ class ShowCase(TemplateView):
 
 
 class ShowCaseAPIView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [DjangoFilterBackend]
@@ -495,7 +501,7 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
 
 
 class ShowCaseSearchView(ListAPIView, SegregatorMixin):
-    queryset = Project.objects.all()
+    queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
@@ -517,17 +523,22 @@ class ShowCaseDateFilterAPI(APIView, SegregatorMixin):
         if 'year' in received_data and 'month' in received_data:
             month = received_data['month']
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[
-                                             year+"-"+month+"-01",
-                                             year+"-"+month+"-30"
-                                             ])
+            project = Project.objects.filter(
+                Q(timestamp__range=[
+                                    year+"-"+month+"-01",
+                                    year+"-"+month+"-30"
+                                    ]) &
+                Q(video_status='posted')
+                                    )
             context = self.showcase_segregator(project)
             return Response(context)
 
         elif 'year' in received_data:
             year = received_data['year']
-            project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"])
+            project = Project.objects.filter(
+                        Q(timestamp__range=[year+"-01-01", year+"-12-30"]) &
+                        Q(video_status='posted')
+                        )
             context = self.showcase_segregator(project)
             return Response(context)
 
@@ -2085,7 +2096,8 @@ class PersonalDetailsAPI(APIView):
         personal_settings['hair_length'] = user.hair_length
         personal_settings['eyes'] = user.eyes
         personal_settings['eyes'] = user.eyes
-        personal_settings['ethnic_appearance'] = user.ethnic_appearance.ethnic_appearance
+        personal_settings['ethnic_appearance'] = \
+            user.ethnic_appearance.ethnic_appearance
 
         athletic_skill_list = AthleticSkillInline.objects.filter(
                               creator=user).values_list('athletic_skill', flat=True)
@@ -2428,7 +2440,8 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
         # exclude super user and current user
         user_ids = []
-        super_users = CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
+        super_users = \
+            CustomUser.objects.filter(is_staff=True).values_list('id', flat=True)
         for id in super_users:
             user_ids.append(id)
         user_ids.append(user.id)
@@ -2462,8 +2475,10 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         tracking_projects = ProjectTracking.objects.filter(tracked_by=user)
         context['tracking_projects_count'] = tracking_projects.count
         context['tracking_projects'] = tracking_projects[:6]
-        context['my_projects_count'] = Project.objects.filter(creator=self.request.user).count()
-        context['my_interests_count'] = UserInterest.objects.filter(user=user).count()
+        context['my_projects_count'] = \
+            Project.objects.filter(creator=self.request.user).count()
+        context['my_interests_count'] = \
+            UserInterest.objects.filter(user=user).count()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -5649,7 +5664,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
     def post(self, request):
         # print(request.POST)
         projectform = ProjectCreationForm(request.POST or None, request.FILES)
-        cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
 
@@ -5732,7 +5746,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             project = projectform.save()
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
-            project.cast_pay_rate = cast_pay
             project.save()
             interest = UserInterest.objects.all()
             for usin in interest:
@@ -5818,7 +5831,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie'
-        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
@@ -5830,7 +5843,6 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie_and_pro'
-
         return context
 
     # def post(self, request, **kwargs):
@@ -5959,11 +5971,12 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        # print(request.POST)
+        print(request.POST)
         remove_script = request.POST.get('remove_script')
-        cast_pay = request.POST.get('radiorow4')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
+        # project_cast_samr = 'indie_with_rating_1_star'
+        # project_crew_samr = 'indie_with_rating_1_star'
 
         if cast_samr == 'indie':
             indie_samr_rate = request.POST.get('indie_samr_rate')
@@ -6045,7 +6058,6 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             project = projectform.save()
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
-            project.cast_pay_rate = cast_pay
             if project.script_visibility == 'public':
                 project.script_password = ""
                 project.save()

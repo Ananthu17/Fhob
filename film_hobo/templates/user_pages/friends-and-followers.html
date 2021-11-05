@@ -45,7 +45,7 @@
                         <li class="mt-4"><a href="{% url 'hobo_user:projects' %}" class="membr-setup-m">My Projects ({{my_projects_count}})</a></li>
                     </ul>
                 </div>
-                <div class="left-mode-sec mt-3 p-2 blank-add-scene">
+                <div style="min-height: 88% !important;" class="left-mode-sec mt-3 p-2 blank-add-scene">
                 </div>
             </div>
             <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 mt-3">
@@ -709,14 +709,14 @@
                             <label class=" my-interest-2 ml-2 mt-2">My Interests ({{myinterests.count}})</label>
                             <table class="table mem-table table-responsive-sm">
                                 <colgroup>
-                                    <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 15%;">
-                                    <col span="1" style="width: 30%;">
+                                    <col span="1" style="width: 10%;">
+                                    <col span="1" style="width: 10%;">
                                     <col span="1" style="width: 25%;">
-                                    <col span="1" style="width: 15%;">
-                                    <!-- <col span="1" style="width: 5%;">
-                                    <col span="1" style="width: 6%;"> -->
-                                    <col span="1" style="width: 20%;">
+                                    <col span="1" style="width: 10%;">
+                                    <col span="1" style="width: 10%;">
+                                     <col span="1" style="width: 25%;">
+                                    <!--<col span="1" style="width: 6%;"> -->
+                                    <col span="1" style="width: 10%;">
                                  </colgroup>
                             {% for obj in myinterests %}
                                 <tr class="interest-font my-interest-table-th" >
@@ -725,9 +725,9 @@
                                     <th>Location: <u>{{obj.location}}</u></th>
                                     <th>{% if obj.position.slug == 'actoractress' %}Age:<u>{{obj.get_age_display}}{% endif %}</u></th>
                                     <th>{% if obj.position.slug == 'actoractress' %}Gender:<u>{{obj.gender}}{% endif %}</u></th>
+                                    <th>Budget: {{obj.get_budget_display}}</th>
                                     <th><a href="" data-toggle="modal" data-target="#edit-{{obj.id}}">Edit</a></th>
-                                    <th></th>
-                                    <th></th>
+                                    
                                 </tr>
                                 {% get_dict_value_if_exists cast_jobs_dict obj.id as cast_job_list %}
                                 {% if cast_job_list %}
@@ -926,12 +926,11 @@
                         </div>
                         <!-- End My Interest Row -->
                     </div>
-                    <hr class="mem-set-acc-hr-1">
+                     <hr class="mem-set-acc-hr-1">
                     <div class="row">
                         <hr class="mem-set-acc-hr-1">
-                        <!-- Add your post -->
                         <div class="container mt-5">
-                            <div class="card mb-12 collapse-dropdwn">
+                            <!-- <div class="card mb-12 collapse-dropdwn">
                                 <div class="row ml-2 mr-2">
                                     <div class="col-md-8 col-sm-12  mt-3 mb-2">
                                         <button type="button" class="btn  text-secondary border btn-block" id="msg-drop"
@@ -979,16 +978,16 @@
                                          </div>
                                     </div>
                                     <div class="col-md-3 col-sm-12 float-right mt-3 mb-1  ">
-                                        <!-- <input class="form-control text-center " name="myBrowser" placeholder="Messenger" /> -->
+                                        <input class="form-control text-center " name="myBrowser" placeholder="Messenger" /> 
                                         <button type="button" class="btn  text-secondary border btn-block" >Messenger</button>
                                     </div>
                                 </div>
-                             </div>
+                             </div> -->
 
                         </div>
                         
-                        <!-- End Add your post -->
-                    </div>
+                        
+                    </div> 
                 </div>
 
             <!-- End screen row -->

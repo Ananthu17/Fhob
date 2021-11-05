@@ -131,6 +131,21 @@
                             </tbody>
                         </table>
                 </div>
+                <div  class=" proj-calender-sec mt-3 mb-3">
+                    <div class="proj-location-sec">
+                        <div class="proj-location-sec-head">
+                            Location
+                        </div>
+                        <div class="proj-location-select-sec">
+                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
+                                {% for place in locations %}
+                                <option disabled selected hidden>Choose Location</option>
+                                <option value="{{place.id}}">{{place}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <div class="proj-calender-sec  p-2 mb-3 ">
                     <div class="add-space d-flex justify-content-center">
                      <a href="" class="create-a-project">Create a Project</a>
@@ -162,7 +177,7 @@
                 <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
-                            <span class=" txt-red  top-head-align proj-head-margin">New Scenes</span>
+                            <span class=" txt-red  top-head-align proj-head-margin">New Projects</span>
                             <ul class="proj-cnt-menu-li" id="1">
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -185,7 +200,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-                       
+
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -357,12 +372,12 @@
                                     </div>
                                 </div>
 
-                   {% elif format == 'SHO' %}    
+                   {% elif format == 'SHO' %}
                                 <!-- Row 3  -->
-                                <div class="proj-input-sec-bg mt-3">
+                                <div class="proj-input-sec-bg">
                                     <div class="proj-menu-align">
                                         <div class="proj-menu-display">
-                                            <span class=" txt-red  top-head-align proj-head-margin">New Films</span>
+                                            <span class=" txt-red  top-head-align proj-head-margin">New Projects</span>
                                             <ul class="proj-cnt-menu-li" id="3">
                                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -455,8 +470,8 @@
                                         <!-- owl-carousel End -->
                                        </div>
                                     </div>
-                                </div>    
-                                
+                                </div>
+
                                 <!-- Row 4  -->
                                 <div class="proj-input-sec-bg mt-3">
                                     <div class="proj-menu-align">
@@ -556,15 +571,15 @@
                                     </div>
                                 </div>
 
-                
 
 
 
 
 
-                                {% elif format == 'PIL-FTR' %}    
+
+                                {% elif format == 'PIL-FTR' %}
                                 <!-- Row 3  -->
-                                <div class="proj-input-sec-bg mt-3">
+                                <div class="proj-input-sec-bg">
                                     <div class="proj-menu-align">
                                         <div class="proj-menu-display">
                                             <span class=" txt-red  top-head-align proj-head-margin">New Pilots/Features</span>
@@ -660,8 +675,8 @@
                                         <!-- owl-carousel End -->
                                        </div>
                                     </div>
-                                </div>    
-                                
+                                </div>
+
                                 <!-- Row 4  -->
                                 <div class="proj-input-sec-bg mt-3">
                                     <div class="proj-menu-align">
@@ -762,7 +777,7 @@
                                 </div>
 
 
-                {% else %} 
+                {% else %}
 
                 <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
@@ -790,7 +805,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-                       
+
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -1974,6 +1989,24 @@ function locationFilter(){
         .then((response) => {
                 console.log("Response",response)
                 dataInsertion(response.data, parent)
+        }, (error) => {console.log(error);})
+    }
+
+    // location filter
+    function locationFilter(){
+        var location = document.getElementById("locationfilter");
+        var  id = location.value;
+        console.log("LOC",location,"VAL:",id)
+
+        post_url = origin_url + `/hobo_user/projects/?location=${id}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response:",response.data)
+                dataInsertion(response.data)
         }, (error) => {console.log(error);})
     }
 </script>

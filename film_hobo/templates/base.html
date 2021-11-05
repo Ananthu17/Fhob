@@ -177,9 +177,9 @@
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
                                 <a class="dropdown-item" href="{% url 'hobo_user:new-project' %}">Start a Project</a>
-                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Scenes</a>
-                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Shorts</a>
-                                {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH&nav=PRO">Scenes</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO&nav=PRO">Shorts</a>
+                                {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM' or user.membership == 'ADMIN' %}
                                     <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}">Pilots/Features</a>
                                 {% else %}
                                     <a class="dropdown-item" onclick="togglePopup()">Pilots/Features</a>
@@ -192,9 +192,9 @@
                                 SCENES
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH">Projects</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SCH&nav=SCE">Projects</a>
                                 {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
-                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=SCH">Films</a>
+                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=SCH&nav=SCE">Films</a>
                                 {% else %}
                                 <a class="dropdown-item" href="#">Films</a>
                                 {% endif %}
@@ -206,25 +206,25 @@
                                 SHORTS
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
-                                <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=SHO">Projects</a>
+                                <a class="dropdown-item shorts-item" href="{% url 'hobo_user:projects' %}?format=SHO&nav=SHO">Projects</a>
                                 {% if user.is_authenticated and user.registration_complete and user.membership != 'HOB' %}
-                                <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=SHO">Films</a>
+                                <a class="dropdown-item shorts-item" href="{% url 'hobo_user:user_home' %}?format=SHO&nav=SHO">Films</a>
                                 {% else %}
-                                <a class="dropdown-item" href="#">Films</a>
+                                <a class="dropdown-item shorts-item" href="#">Films</a>
                                 {% endif %}
                             </div>
                         </li>
 
-                        
+
                         <!-- Dropdown -->
-                        {% if user.membership == 'PRO' or user.membership == 'COM'  %}
+                        {% if user.membership == 'IND' or user.membership == 'PRO' or user.membership == 'COM' or user.membership == 'ADMIN'  %}
                             <li class="nav-item dropdown">
                                 <a id="pilots-features-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                     PILOTS/FEATURES
                                 </a>
                                 <div class="dropdown-menu FH-dropdown-font">
-                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR">Projects</a>
-                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR">Films</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR&nav=PIL-FTR">Projects</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR&nav=PIL-FTR">Films</a>
                                 </div>
                             </li>
                         {% else %}
@@ -239,7 +239,7 @@
                             </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a id="how_to" class="nav-link" href="{% url 'hobo_user:pilots' %}">HOW TO</a>
+                            <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
                         </li>
 
                     {% elif user.is_authenticated and user.registration_complete and user.membership == 'HOB' %}
@@ -337,7 +337,7 @@
                     <!-- Dropdown -->
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                            <a id="user-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 {% if user.is_superuser %}
                                     Admin
                                 {% else %}
@@ -346,9 +346,9 @@
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
                                 {% if user.is_superuser %}
-                                    <a class="dropdown-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
-                                    <a class="dropdown-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
-                                    <a class="dropdown-item" href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
+                                    <a class="dropdown-item user-item" href="{% url 'general:beta_user_admin' %}">Admin Beta User Settings</a>
+                                    <a class="dropdown-item user-item" href="{% url 'payment:payment_admin' %}">Admin Payment</a>
+                                    <a class="dropdown-item " href="{% url 'hobo_user:settings' %}">Settings & Privacy</a>
                                     <a class="dropdown-item" href="{% url 'hobo_user:edit-profile' %}">Edit Profile</a>
                                     <a class="dropdown-item dropdown-toggle" href="#" data-toggle="dropdown">Help</a>
                                     <div class="dropdown-menu FH-dropdown-font">
@@ -596,19 +596,48 @@ $( document ).ready(function() {
     if (desired_path == '/hobo_user/projectview/create/'){
         $("#project-nav-item").addClass('active');
     }
-    else if (desired_path == '/hobo_user/projectview/?format=SCH'){
+    else if (desired_path == '/hobo_user/how_to/'){
+        $("#how_to").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/showcase/'){
+        $("#showcase").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SCH&nav=PRO'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SHO&nav=PRO'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/pilotandfeature/'){
+        $("#project-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SCH&nav=SCE'){
         $("#scene-nav-item").addClass('active');
     }
-    else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+    else if (desired_path == '/hobo_user/user_home/?format=SCH&nav=SCE'){
+        $("#scene-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=SHO&nav=SHO'){
+        $("#shorts-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/user_home/?format=SHO&nav=SHO'){
         $("#shorts-nav-item").addClass('active');
 
     else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
         $("#shorts-nav-item").addClass('active');
     }
+    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR&nav=PIL-FTR'){
+        $("#pilots-features-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/user_home/?format=PIL-FTR&nav=PIL-FTR'){
+        $("#pilots-features-nav-item").addClass('active');
+    }
     else{
-
+        $("#user-nav-item").addClass('active');
     }
 });
+
+
 </script>
 <script>
     // $(document).on('click.bs.dropdown.data-api', '#dropdown-notification', function (e) {

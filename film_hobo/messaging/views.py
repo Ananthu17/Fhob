@@ -1,19 +1,17 @@
 
 import ast
-import operator
 import requests
 import json
 import mammoth
 from braces.views import JSONResponseMixin
-from pydocx import PyDocX
-# import pandas as pd 
+# from pydocx import PyDocX
+# import pandas as pd
 from xlsx2html import xlsx2html
 
-from django.db.models import Count
-from django.shortcuts import render
-from django.http import FileResponse, Http404, HttpResponse
+# from django.shortcuts import render
+# from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
-from django.db.models import Count, Sum
+# from django.db.models import Count, Sum
 from django.template import loader
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
