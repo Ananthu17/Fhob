@@ -21,7 +21,7 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django.core.mail import send_mail
 
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response

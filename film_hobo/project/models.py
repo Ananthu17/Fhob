@@ -1,12 +1,12 @@
-import PyPDF2
+# import PyPDF2
 import datetime
-import requests
-from io import BytesIO
-from django.core import files
-from django.conf import settings
-from ckeditor.widgets import CKEditorWidget
-from ckeditor.fields import RichTextField
-from ckeditor_uploader.fields import RichTextUploadingField
+# import requests
+# from io import BytesIO
+# from django.core import files
+# from django.conf import settings
+# from ckeditor.widgets import CKEditorWidget
+# from ckeditor.fields import RichTextField
+# from ckeditor_uploader.fields import RichTextUploadingField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from django.db import models

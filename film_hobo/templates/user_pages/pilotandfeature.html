@@ -1587,7 +1587,7 @@
 
         date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
         console.log(date)
-        post_url = origin_url + `/hobo_user/pilots/?timestamp=${date}`
+        post_url = origin_url + `/hobo_user/pilots/projects/?timestamp=${date}`
         axios({
             method: 'get',
             url: post_url,

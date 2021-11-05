@@ -184,7 +184,7 @@ span.user-group i{
    font-weight:600;
    text-decoration: none;
    font-size: 16px;
-   font-family: "Courier Bold";
+   font-family: sans-serif;
 }
 .inp-interest {
    border:none;
@@ -244,10 +244,10 @@ span.user-group i{
    padding-right: 19px;
 }
 .interest-font{
-   font-family: "Courier";
+   font-family: sans-serif;
 }
 .interest-font-bold{
-   font-family: "Courier Bold";
+   font-family: sans-serif;
 }
 .drop-btn-1{
    font-family: "Courier Bold";
@@ -273,12 +273,12 @@ span.user-group i{
 }
 .intrest-lab-tit{
    font-size: 12px;
-   font-family: "Courier Bold";
+   font-family: sans-serif;
 }
 
 .intrest-lab-md{
    font-size: 12px;
-   font-family: "Courier Bold";
+   font-family: sans-serif;
 }
 .intrest-input > div{
    padding: 0px 14px;
@@ -295,7 +295,7 @@ span.user-group i{
    font-weight:600;
    text-decoration: none;
    font-size: 16px;
-   font-family: "Courier Bold";
+   font-family: sans-serif;
    position: relative;
 }
 .net-drop-btn{
@@ -304,7 +304,7 @@ span.user-group i{
 }
 .ad-or-save{
    font-size: 11px;
-   font-family: "Courier Bold";
+   font-family: sans-serif;
    padding: 0px 2px;
 }
 .tbl-tag{
@@ -336,6 +336,7 @@ a.modal-tag{
 .mem-table td, .mem-table th {
    border: none;
    column-width: auto;
+   font-weight: 500;
 }
 .drop-all{
    font-family: "Courier Bold";

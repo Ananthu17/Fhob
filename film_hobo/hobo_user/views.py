@@ -4010,8 +4010,10 @@ class EditUserInterestAPI(APIView):
                 obj.location = Location.objects.get(pk=data_dict['location'])
                 obj.format = data_dict['format']
                 obj.budget = data_dict['budget']
-                obj.age = data_dict['age']
-                obj.gender = data_dict['gender']
+                if 'age' in data_dict:
+                    obj.age = data_dict['age']
+                if 'gender' in data_dict:
+                    obj.gender = data_dict['gender']
                 obj.save()
                 response = {'message': "User interest updated.",
                            'status': status.HTTP_200_OK}

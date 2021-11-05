@@ -428,8 +428,8 @@
                                         <input type="radio" name="sag_aftra"  onclick="selectsagAftra(this)"
                                         {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="no_payment"
                                          id="choice_no_payment"  class="custom_check_box
-                                         {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
-                                         {% if project_obj.production == 'INDIE' %}disabled{% endif %}>$ 0
+                                         {% if project_obj.production == 'SAGAFTRA' %}disabled_check_box{% endif %}"
+                                         {% if project_obj.production == 'SAGAFTRA' %}disabled{% endif %}>$ 0
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline" >
@@ -437,8 +437,8 @@
                                         <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
                                           {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="payment_is_negotiable"
                                            id="choice_negotiable" class="custom_check_box
-                                           {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
-                                           {% if project_obj.production == 'INDIE' %}disabled{% endif %}>Negotiable
+                                           {% if project_obj.production == 'SAGAFTRA' %}disabled_check_box{% endif %}"
+                                           {% if project_obj.production == 'SAGAFTRA' %}disabled{% endif %}>Negotiable
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">

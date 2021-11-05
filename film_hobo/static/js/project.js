@@ -97,7 +97,7 @@ $('.script_visibility').on('click', function(e) {
 
 // production radio button
 $('input[type=radio][name=production]').change(function() {
-    if (this.value == 'INDIE') {
+    if (this.value == 'SAGAFTRA') {
        $("#choice_no_payment").attr('disabled', true);
        $("#choice_no_payment").prop('checked', false);
        $("#choice_no_payment").css('border','1px solid #7f7676');
