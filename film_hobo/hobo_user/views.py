@@ -490,7 +490,6 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        print(queryset)
         context = self.showcase_segregator(queryset)
         return Response(context)
 
@@ -553,7 +552,7 @@ class HomeProjectAPIView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        context = self.project_segregator(queryset)
+        context = self.project_segregator(queryset) 
         return Response(context)
 
 

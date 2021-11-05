@@ -223,8 +223,8 @@
                                     PILOTS/FEATURES
                                 </a>
                                 <div class="dropdown-menu FH-dropdown-font">
-                                    <a class="dropdown-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR">Projects</a>
-                                    <a class="dropdown-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR">Films</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR">Projects</a>
+                                    <a class="dropdown-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR">Films</a>
                                 </div>
                             </li>
                         {% else %}
@@ -600,6 +600,9 @@ $( document ).ready(function() {
         $("#scene-nav-item").addClass('active');
     }
     else if (desired_path == '/hobo_user/projectview/?format=SHO'){
+        $("#shorts-nav-item").addClass('active');
+
+    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
         $("#shorts-nav-item").addClass('active');
     }
     else{

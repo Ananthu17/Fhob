@@ -1694,7 +1694,7 @@
         var  id = location.value;
         console.log("LOC",location,"VAL:",id)
 
-        post_url = origin_url + `/hobo_user/user_home/projects/?location=${id}`
+        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
         axios({
             method: 'get',
             url: post_url,
