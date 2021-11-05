@@ -1117,6 +1117,8 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
 
+    location = serializers.StringRelatedField()
+    creator = serializers.StringRelatedField()
     class Meta:
         model = Project
         fields = ['id', 'creator', 'title', 'format', 'genre', 'rating',
