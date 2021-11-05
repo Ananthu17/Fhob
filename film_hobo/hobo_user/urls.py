@@ -350,7 +350,7 @@ urlpatterns = [
          name='pilots'),
     path('projectview/create/', CreateProjectView.as_view(),
          name='new-project'),
-    path('projectview/update/<int:id>', EditProjectView.as_view(),
+    path('projectview/update/<int:id>/', EditProjectView.as_view(),
          name='update-project'),
     path('projects/search/',  ProjectSearchView.as_view(),
          name="project-search"),

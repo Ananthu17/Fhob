@@ -54,12 +54,12 @@
                      <a href="{% url 'project:single-film-project' notification.project.id %}"
                      class="notification_link mm-notf-tag" id ="{{notification.id}}">
                          {{notification.project.title}}</a> as {{notification.rating|floatformat:0}} stars
-                {% if notification.notification_type == 'audition_status' %}
+                {% elif notification.notification_type == 'audition_status' %}
                     <a href="{% url 'project:single-film-project' notification.project.id %}"
                     id ="{{notification.id}}" class="notification_link remove-decoration msg-txt-color">
                     {{ notification.message|safe }}
                     </a>
-                {% if notification.notification_type == 'video_rating' %}
+                {% elif notification.notification_type == 'video_rating' %}
                     <a href="{% url 'project:video' notification.project.id %}"
                     id ="{{notification.id}}" class="notification_link remove-decoration msg-txt-color">
                     {{ notification.message|safe }}

@@ -493,3 +493,272 @@ class ProjectVideoLikeAndDislike(models.Model):
     class Meta:
         verbose_name = 'Project Video Like And Dislike'
         verbose_name_plural = 'Project Video Likes And Dislikes'
+
+
+class DraftProject(models.Model):
+    """
+    A model to store all project related details
+    """
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+    VISIBILITY_CHOICES = [
+        (PUBLIC, 'Public'),
+        (PRIVATE, 'Private'),
+    ]
+    UPLOADED = 'uploaded'
+    POSTED = 'posted'
+    NOT_AVAILABLE = 'not_available'
+    VIDEO_STATUS_CHOICES = [
+        (UPLOADED, 'Uploaded'),
+        (POSTED, 'Posted'),
+        (NOT_AVAILABLE, 'Not Available'),
+    ]
+    NATION_WIDE = 'nation_wide'
+    LOCAL_ONLY = 'local_only'
+    CAST_ATTACHMENT_CHOICES = [
+        (NATION_WIDE, 'Nation Wide'),
+        (LOCAL_ONLY, 'Local Only'),
+    ]
+    INDIE_WITH_RATING_1_STAR = 'indie_with_rating_1_star'
+    INDIE_WITH_RATING_2_STAR = 'indie_with_rating_2_star'
+    INDIE_WITH_RATING_3_STAR = 'indie_with_rating_3_star'
+    INDIE_WITH_RATING_4_STAR = 'indie_with_rating_4_star'
+    INDIE_WITH_RATING_5_STAR = 'indie_with_rating_5_star'
+    PRO_WITH_RATING_1_STAR = 'pro_with_rating_1_star'
+    PRO_WITH_RATING_2_STAR = 'pro_with_rating_2_star'
+    PRO_WITH_RATING_3_STAR = 'pro_with_rating_3_star'
+    PRO_WITH_RATING_4_STAR = 'pro_with_rating_4_star'
+    PRO_WITH_RATING_5_STAR = 'pro_with_rating_5_star'
+    INDIE_AND_PRO_WITH_RATING_1_STAR = 'indie_and_pro_with_rating_1_star'
+    INDIE_AND_PRO_WITH_RATING_2_STAR = 'indie_and_pro_with_rating_2_star'
+    INDIE_AND_PRO_WITH_RATING_3_STAR = 'indie_and_pro_with_rating_3_star'
+    INDIE_AND_PRO_WITH_RATING_4_STAR = 'indie_and_pro_with_rating_4_star'
+    INDIE_AND_PRO_WITH_RATING_5_STAR = 'indie_and_pro_with_rating_5_star'
+    CAST_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
+    ]
+
+    CREW_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
+        (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
+        (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
+        (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
+        (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
+        (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
+        (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
+        (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
+        (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
+        (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
+        (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
+        (INDIE_AND_PRO_WITH_RATING_4_STAR, 'Indie and Pro with rating 4 star'),
+        (INDIE_AND_PRO_WITH_RATING_5_STAR, 'Indie and Pro with rating 5 star'),
+    ]
+
+    No_PAYMENT = 'no_payment'
+    NEGOTIABLE = 'payment_is_negotiable'
+    ULB = 'SAG_ultra_low_budget'
+    MLB = 'SAG_moderate_low_budget'
+    LB = 'SAG_low_budget'
+    ThB = 'SAG_theatrical_budget'
+    ShB = 'SAG_short_film_budget'
+    MiB = 'SAG_micro_budget'
+    StB = 'SAG_studet_budget'
+    CAST_PAY_RATE_CHOICES = [
+                    (No_PAYMENT, 'No Payment'),
+                    (NEGOTIABLE, 'Payment is Negotiable'),
+                    (ULB, 'SAG Ultra Low Budget'),
+                    (MLB, 'SAG Moderate Low Budget'),
+                    (LB, 'SAG Low Budget'),
+                    (ThB, 'SAG Theatrical Budget'),
+                    (ShB, 'SAG Short Film Budget'),
+                    (MiB, 'SAG Micro Budget'),
+                    (StB, 'SAG Studet Budget'),
+                    ]
+    SCENE = 'SCH'
+    SHORTS = 'SHO'
+    PILOT = 'PIL'
+    FEATURE = 'FTR'
+    FORMAT_CHOICES = [
+        (SCENE, 'Scene'),
+        (SHORTS, 'Shorts'),
+        (PILOT, 'Pilot'),
+        (FEATURE, 'Feature'),
+    ]
+    YOUTUBE = 'youtube'
+    VIMEO = 'vimeo'
+    VIDEO_TYPE_CHOICES = [
+        (YOUTUBE, 'Youtube'),
+        (VIMEO, 'Vimeo'),
+    ]
+    SAGAFTRA = 'SAGAFTRA'
+    INDIE = 'INDIE'
+    PRODUCTION_CHOICES = [
+        (SAGAFTRA, 'SAG-AFTRA'),
+        (INDIE, 'INDIE'),
+    ]
+
+    # ACTION = 'ACT'
+    # ADVENTURE = 'ADV'
+    ANIMATION = 'ANI'
+    BIOGRAPHY = 'BIO'
+    COMEDY = 'COM'
+    CRIME = 'CRI'
+    DOCUMENTARY = 'DOC'
+    DRAMA = 'DRA'
+    FAMILY = 'FAM'
+    FANTASY = 'FAN'
+    FILM_NOIR = 'FIL'
+    GAME_SHOW = 'GAM'
+    HISTORY = 'HIS'
+    HORROR = 'HOR'
+    LGBTQ = 'LGB'
+    MILITARY = 'MIL'
+    MUSICAL = 'MUS'
+    # MYSTERY = 'MYS'
+    REALITY_TV = 'REA'
+    ROMANCE = 'ROM'
+    SCIENCE_FICTION = 'SCI'
+    SPORT = 'SPO'
+    TALK_SHOW = 'TAL'
+    # THRILLER = 'THR'
+    WESTERN = 'WES'
+    MYSTERY_THRILLER = 'MYS_THR'
+    ACTION_ADVENTURE = 'ACT_ADV'
+    GENRE_CHOICES = [
+        # (ACTION, 'Action'),
+        # (ADVENTURE, 'Adventure'),
+        (ANIMATION, 'Animation'),
+        (BIOGRAPHY, 'Biography'),
+        (COMEDY, 'Comedy'),
+        (CRIME, 'Crime'),
+        (DOCUMENTARY, 'Documentary'),
+        (DRAMA, 'Drama'),
+        (FAMILY, 'Family'),
+        (FANTASY, 'Fantasy'),
+        (FILM_NOIR, 'Film Noir'),
+        (GAME_SHOW, 'Game Show'),
+        (HISTORY, 'History'),
+        (HORROR, 'Horror'),
+        (LGBTQ, 'LGBTQ'),
+        (MILITARY, 'Military'),
+        (MUSICAL, 'Musical'),
+        # (MYSTERY, 'Mystery'),
+        (REALITY_TV, 'Reality TV'),
+        (ROMANCE, 'Romance'),
+        (SCIENCE_FICTION, 'Science Fiction'),
+        (SPORT, 'Sport'),
+        (TALK_SHOW, 'Talk Show'),
+        # (THRILLER, 'Thriller'),
+        (WESTERN, 'Western'),
+        (ACTION_ADVENTURE, 'Action/Adventure'),
+        (MYSTERY_THRILLER, 'Mystery/Thriller'),
+    ]
+
+    creator = models.ForeignKey('hobo_user.CustomUser',
+                                verbose_name=_("Creator"),
+                                on_delete=models.CASCADE)
+    title = models.CharField(max_length=1000)
+    format = models.CharField(_("Format Type"),
+                              choices=FORMAT_CHOICES,
+                              max_length=150, null=True, blank=True)
+
+    number_of_pages = models.IntegerField(_("Number of Pages"),
+                                          null=True, blank=True)
+    genre = models.CharField(_("Genre Type"),
+                             choices=GENRE_CHOICES,
+                             max_length=150, null=True, blank=True)
+    rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
+                                 MaxValueValidator(5)], null=True, blank=True,
+                                 default=0)
+    video_rating = models.IntegerField(_("Video Rating"),
+                                       validators=[MinValueValidator(0),
+                                       MaxValueValidator(5)], null=True, blank=True,
+                                       default=0)
+    video_url = models.CharField(max_length=1000,
+                                 null=True, blank=True)
+    video_type = models.CharField(_("Video Type"),
+                                  choices=VIDEO_TYPE_CHOICES,
+                                  max_length=150, null=True, blank=True)
+    last_date = models.DateField(_("Last date for submitting video"),
+                                 null=True, blank=True,)
+    location = models.ForeignKey("hobo_user.Location",
+                                 on_delete=models.SET_NULL,
+                                 related_name='draft_project_location',
+                                 verbose_name=_("Location"),
+                                 null=True, blank=True)
+    script = models.FileField(upload_to='script/', null=True, blank=True)
+    visibility = models.CharField(_("Visibility"),
+                                  choices=VISIBILITY_CHOICES,
+                                  max_length=150, default=PRIVATE)
+    visibility_password = models.CharField(max_length=12, null=True,
+                                           blank=True)
+    cast_attachment = models.CharField(_("Cast Attachment"),
+                                       choices=CAST_ATTACHMENT_CHOICES,
+                                       max_length=150, default=NATION_WIDE)
+    cast_pay_rate = models.IntegerField(_("Castpay Rate"),
+                                        null=True, blank=True)
+    sag_aftra = models.CharField(_("SAG AFTRA"),
+                                 choices=CAST_PAY_RATE_CHOICES,
+                                 max_length=150, default=NEGOTIABLE)
+    cast_samr = models.CharField(_("Cast SAMR"),
+                                 choices=CAST_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    crew_samr = models.CharField(_("Crew SAMR"),
+                                 choices=CREW_SAMR_CHOICES,
+                                 max_length=150,
+                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+    video_status = models.CharField(_("Video Status"),
+                                    choices=VIDEO_STATUS_CHOICES,
+                                    max_length=150,
+                                    default=NOT_AVAILABLE,
+                                    null=True, blank=True)
+    video_cover_image = models.ImageField(upload_to='thumbnail/',
+                                          blank=True, null=True,
+                                          help_text="Image size:370 X 248.")
+    script_visibility = models.CharField(_("Script Visibility"),
+                                         choices=VISIBILITY_CHOICES,
+                                         max_length=150,  null=True,
+                                         blank=True)
+    script_password = models.CharField(max_length=12, null=True,
+                                       blank=True)
+    team_select_password = models.CharField(max_length=12, null=True,
+                                            blank=True)
+    cast_audition_password = models.CharField(max_length=12,
+                                              null=True, blank=True)
+    logline = models.CharField(max_length=1000,  null=True, blank=True)
+    project_info = models.TextField(_("Project Info"), null=True, blank=True)
+    likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
+
+    timestamp = models.DateField(auto_now_add=True)
+    production = models.CharField(_("Production"),
+                                  choices=PRODUCTION_CHOICES,
+                                  max_length=150, default=SAGAFTRA)
+    is_posted = models.BooleanField(
+                        default=False,
+                        verbose_name=_("Is posted")
+                    )
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Draft Project'
+        verbose_name_plural = 'Draft Projects'

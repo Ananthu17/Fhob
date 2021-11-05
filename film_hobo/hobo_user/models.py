@@ -313,6 +313,8 @@ class CustomUser(AbstractUser):
             name = "Admin"
         elif self.middle_name:
             name = self.first_name+" "+self.middle_name+" "+self.last_name
+        elif self.first_name == None and self.last_name == None:
+            name = ""
         elif self.first_name and self.last_name:
             name = self.first_name+" "+self.last_name
         else:
@@ -561,7 +563,7 @@ class Project(models.Model):
 
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
-    ULB = 'SAG_ultra _low_budget'
+    ULB = 'SAG_ultra_low_budget'
     MLB = 'SAG_moderate_low_budget'
     LB = 'SAG_low_budget'
     ThB = 'SAG_theatrical_budget'
@@ -598,9 +600,15 @@ class Project(models.Model):
         (VIMEO, 'Vimeo'),
         # (FACEBOOK, 'Facebook'),
     ]
+    SAGAFTRA = 'SAGAFTRA'
+    INDIE = 'INDIE'
+    PRODUCTION_CHOICES = [
+        (SAGAFTRA, 'SAG-AFTRA'),
+        (INDIE, 'INDIE'),
+    ]
 
-    ACTION = 'ACT'
-    ADVENTURE = 'ADV'
+    # ACTION = 'ACT'
+    # ADVENTURE = 'ADV'
     ANIMATION = 'ANI'
     BIOGRAPHY = 'BIO'
     COMEDY = 'COM'
@@ -616,17 +624,19 @@ class Project(models.Model):
     LGBTQ = 'LGB'
     MILITARY = 'MIL'
     MUSICAL = 'MUS'
-    MYSTERY = 'MYS'
+    # MYSTERY = 'MYS'
     REALITY_TV = 'REA'
     ROMANCE = 'ROM'
     SCIENCE_FICTION = 'SCI'
     SPORT = 'SPO'
     TALK_SHOW = 'TAL'
-    THRILLER = 'THR'
+    # THRILLER = 'THR'
     WESTERN = 'WES'
+    MYSTERY_THRILLER = 'MYS_THR'
+    ACTION_ADVENTURE = 'ACT_ADV'
     GENRE_CHOICES = [
-        (ACTION, 'Action'),
-        (ADVENTURE, 'Adventure'),
+        # (ACTION, 'Action'),
+        # (ADVENTURE, 'Adventure'),
         (ANIMATION, 'Animation'),
         (BIOGRAPHY, 'Biography'),
         (COMEDY, 'Comedy'),
@@ -642,14 +652,16 @@ class Project(models.Model):
         (LGBTQ, 'LGBTQ'),
         (MILITARY, 'Military'),
         (MUSICAL, 'Musical'),
-        (MYSTERY, 'Mystery'),
+        # (MYSTERY, 'Mystery'),
         (REALITY_TV, 'Reality TV'),
         (ROMANCE, 'Romance'),
         (SCIENCE_FICTION, 'Science Fiction'),
         (SPORT, 'Sport'),
         (TALK_SHOW, 'Talk Show'),
-        (THRILLER, 'Thriller'),
-        (WESTERN, 'Western')
+        # (THRILLER, 'Thriller'),
+        (WESTERN, 'Western'),
+        (ACTION_ADVENTURE, 'Action/Adventure'),
+        (MYSTERY_THRILLER, 'Mystery/Thriller'),
     ]
 
     creator = models.ForeignKey('hobo_user.CustomUser',
@@ -665,9 +677,11 @@ class Project(models.Model):
     genre = models.CharField(_("Genre Type"),
                              choices=GENRE_CHOICES,
                              max_length=150, null=True, blank=True)
-    rating = models.IntegerField(_("Rating"), validators=[MinValueValidator(0),
-                                 MaxValueValidator(5)], null=True, blank=True,
-                                 default=1)
+    rating = models.IntegerField(_("Rating"), null=True, blank=True,
+                                 default=0)
+    video_rating = models.IntegerField(_("Video Rating"),
+                                       null=True, blank=True,
+                                       default=0)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
@@ -713,7 +727,8 @@ class Project(models.Model):
                                           help_text="Image size:370 X 248.")
     script_visibility = models.CharField(_("Script Visibility"),
                                          choices=VISIBILITY_CHOICES,
-                                         max_length=150, default=PUBLIC)
+                                         max_length=150, null=True,
+                                         blank=True)
     script_password = models.CharField(max_length=12, null=True,
                                        blank=True)
     team_select_password = models.CharField(max_length=12, null=True,
@@ -723,10 +738,19 @@ class Project(models.Model):
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
     likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
-    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(
+        _("Dislikes"), null=True, blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     # test = models.CharField(max_length=1000,  null=True, blank=True)
+    production = models.CharField(_("Production"),
+                                  choices=PRODUCTION_CHOICES,
+                                  max_length=150, default=SAGAFTRA)
+    draft_project = models.OneToOneField('project.DraftProject',
+                                         verbose_name=_("Draft Project"),
+                                         related_name="draft_project",
+                                         on_delete=models.SET_NULL,
+                                         null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -796,17 +820,23 @@ class PromoCode(models.Model):
                                  choices=USER_TYPE_CHOICES,
                                  max_length=150, default=HOBO)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.promo_code)
@@ -1356,7 +1386,7 @@ class UserInterest(models.Model):
     FEATURE = 'FTR'
     No_PAYMENT = 'no_payment'
     NEGOTIABLE = 'payment_is_negotiable'
-    ULB = 'SAG_ultra _low_budget'
+    ULB = 'SAG_ultra_low_budget'
     MLB = 'SAG_moderate_low_budget'
     LB = 'SAG_low_budget'
     ThB = 'SAG_theatrical_budget'
@@ -1954,17 +1984,23 @@ class BetaTesterCodes(models.Model):
     code = models.CharField(_("Code"), max_length=10, unique=True)
     days = models.IntegerField(_("Days"), blank=False)
     indie_monthly_plan_id = models.CharField(
-        _("Indie Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     indie_yearly_plan_id = models.CharField(
-        _("Indie Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Indie Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_monthly_plan_id = models.CharField(
-        _("Pro Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     pro_yearly_plan_id = models.CharField(
-        _("Pro Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Pro Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_monthly_plan_id = models.CharField(
-        _("Company Monthly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Monthly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
     company_yearly_plan_id = models.CharField(
-        _("Company Yearly Plan ID"), max_length=40, unique=True, blank=True, null=True)
+        _("Company Yearly Plan ID"),
+        max_length=40, unique=True, blank=True, null=True)
 
     def __str__(self):
         return str(self.code)

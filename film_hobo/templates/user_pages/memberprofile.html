@@ -138,7 +138,7 @@
                                     {% endif %}
                             {% endif %}
                         </li>
-                        <li class="mt-1"><a href="#" class="mem-blu-link">S<span class="mem-small-f">HARE</span></a>
+                        <li id="share-link" class="mt-1"><a href="#" class="mem-blu-link log-fnt-weight">S<span class="mem-small-f">HARE</span></a>
                         </li>
                     </ul>
                 </div>
@@ -149,10 +149,20 @@
                     </ul>
                 </div> -->
                 <div class="left-mode-sec mt-3 p-2  mem-ad-banner-2">
-                    <ul class="list-unstyled p-2 mb-0">
+                    <!-- <ul class="list-unstyled p-2 mb-0">
                         <li><a href="#" class="red-f bold ">A<span class="mem-small-f">D</span> B<span
                                     class="mem-small-f">ANNER</span></a></li>
-                    </ul>
+                    </ul> -->
+                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2568931363821177"
+                        crossorigin="anonymous"></script>
+                    <!-- 728x90, created 2/23/09 -->
+                    <ins class="adsbygoogle"
+                        style="display:inline-block;width:728px;height:90px"
+                        data-ad-client="ca-pub-2568931363821177"
+                        data-ad-slot="9556686269"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
                 </div>
             </div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 pl-1 pr-1">
@@ -390,6 +400,41 @@
                                 class="mem-setup-blu-f underline ">more</a>
                         </div>
                     </div>
+
+
+                    <!-- Share Modal Start -->
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content col-12">
+            <div class="modal-header">
+                <h5 class="modal-title">Share</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span id="shareModalClose" aria-hidden="true">&times;</span> </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 email-id-row">
+                    <span class="to-input">To</span>
+                        <div id="all_mail" class="all-mail">
+                        </div>
+                       
+                    
+                     
+                        <select class="form-control" name="userSelect" multiple id="userSelect">
+                            {% for friend in friends %}
+                            <option value="{{friend.id}}" >{{friend}} </option>
+                                {% endfor %}
+                        </select>
+                        <div class="modal-footer">
+                            <button id="profile_url_send" type="submit" class="btn btn-primary">Send</button>
+                            <button  data-dismiss="modal" id="cancel_url" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                        </div>
+                   
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
                     <!-- The Modal -->
                     <div class="modal fade" id="more_tab">
                         <div class="modal-dialog">
@@ -808,10 +853,13 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
-
-
-            </div>
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 top_rated_members">
+                </div>
+            {% endif %}
         </div>
     </div>
 {% else %}
@@ -823,6 +871,20 @@
 
 {% block extrajs %}
 <!-- <script src="{% static 'js/user-rating.js' %}"></script> -->
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://phpcoder.tech/multiselect/css/jquery.multiselect.css">
+
+<script src="https://phpcoder.tech/multiselect/js/jquery.multiselect.js"></script>
+
+<script>
+    jQuery('#userSelect').multiselect({
+    columns: 1,
+    placeholder: 'Select Users',
+    search: true,
+    selectAll: true
+});
+</script>
 <script>
         $('.cast-owl').owlCarousel({
         loop:false,
@@ -887,6 +949,12 @@
             }
         });
 
+    });
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
     });
 </script>
 {% endblock %}

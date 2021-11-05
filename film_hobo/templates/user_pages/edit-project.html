@@ -68,6 +68,30 @@
         /* .containerradio input:checked .checkmarkagree{
             background-color: #f32121 !important;
         } */
+        .select2-container {
+            width: 100%;
+                }
+        .select2-container--default .select2-selection--single
+            {
+                border-radius: 0!important;
+                border:none!important;
+                border-bottom:1px solid #000!important;
+            }
+        .select2-container .select2-selection--single {
+            height:19px!important;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__rendered
+            {
+                line-height:19px;
+                background-color:#f3f3f3;
+                border-bottom:1px solid #000!important;
+                font-size:13px;
+                color:#000;
+            }
+        .select2-container--default .select2-selection--single .select2-selection__arrow
+            {
+                height:15px;
+            }
 
     </style>
     <div class="wrapper flex-grow-1">
@@ -225,82 +249,108 @@
                                 <label class="form-title mem-setup-blu-f">GENRE:</label>
                             </div>
                             <div class="col-md-9 col-sm-12 mt-3">
-                                {{form.genre}}
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold"> DRAMA
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" value="8"  {% if project_obj.genre == project_obj.DRAMA %}checked{% endif%} required>
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         value="DRA"
+                                          {% if project_obj.genre == project_obj.DRAMA %}checked{% endif%} required>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">COMEDY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.COMEDY %}checked{% endif%}  value="5">
+                                        <input type="radio" name="genre" 
+                                        onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.COMEDY %}checked{% endif%}
+                                          value="COM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">CRIME
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.CRIME %}checked{% endif%} value="6">
+                                        <input type="radio" name="genre"
+                                         onclick="selectgenre(this)" {% if project_obj.genre == project_obj.CRIME %}checked{% endif%}
+                                          value="CRI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ROMANCE&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"    {% if project_obj.genre == project_obj.ROMANCE %}checked{% endif%}  value="20">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                            {% if project_obj.genre == project_obj.ROMANCE %}checked{% endif%}
+                                              value="ROM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">SCI-FI&nbsp; 
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.SCIENCE_FICTION %}checked{% endif%}   value="21">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.SCIENCE_FICTION %}checked{% endif%}
+                                            value="SCI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">HORROR&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.HORROR %}checked{% endif%}  value="14">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.HORROR %}checked{% endif%}
+                                            value="HOR">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ACTION / ADVENTURE
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.ACTION %}checked{% endif%}   value="1">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.ACTION_ADVENTURE %}checked{% endif%}
+                                            value="ACT_ADV">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold"  >FAMILY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}     value="9">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.FAMILY %}checked{% endif%}
+                                              value="FAM">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">MYSTERY /THRILLER &nbsp;&nbsp;
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.MYSTERY  %}checked{% endif%}     value="18">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.MYSTERY_THRILLER  %}checked{% endif%}
+                                              value="MYS_THR">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold" >LGBTQ 
-                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.LGBTQ %}checked{% endif%}     value="15">
+                                       <input type="radio" name="genre" onclick="selectgenre(this)"
+                                        {% if project_obj.genre == project_obj.LGBTQ %}checked{% endif%}
+                                             value="LGB">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline"> 
                                     <label class="containerradio bold " style="margin:left 7px;">MUSICAL &nbsp;&nbsp;
-                                       <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.MUSICAL %}checked{% endif%}    value="17">
+                                       <input type="radio" name="genre" onclick="selectgenre(this)"
+                                        {% if project_obj.genre == project_obj.MUSICAL %}checked{% endif%}
+                                            value="MUS">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">SPORT
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.SPORT %}checked{% endif%}    value="22">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.SPORT %}checked{% endif%}
+                                             value="SPO">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">FANTASY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)" {% if project_obj.genre == project_obj.FANTASY %}checked{% endif%}    value="10">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                         {% if project_obj.genre == project_obj.FANTASY %}checked{% endif%}
+                                             value="FAN">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
@@ -308,37 +358,46 @@
                                
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">WAR / MILITARY
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.MILITARY%}checked{% endif%}  value="16">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.MILITARY%}checked{% endif%}
+                                            value="MIL">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                                
                                 <div class="form-check form-check-inline">
                                     <label class="containerradio bold">ANIMATION
-                                        <input type="radio" name="radiorow2" onclick="selectgenre(this)"  {% if project_obj.genre == project_obj.ANIMATION %}checked{% endif%}     value="3">
+                                        <input type="radio" name="genre" onclick="selectgenre(this)"
+                                          {% if project_obj.genre == project_obj.ANIMATION %}checked{% endif%}
+                                               value="ANI">
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- <div class="row">
-                            <div class="col-11 mt-2">
-                                <div class="form-check-inline">
+                        <div class="row">
+                            <div class="col-12 col-md-2 mt-2 ">
+                                <label class="form-title mem-setup-blu-f"><br>PRODUCTION:</label>
+                            </div>
+                            <div class="col-12 col-md-10 mt-2">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">SAG-AFTRA
-                                        <input type="radio" name="radiorow3" required >
+                                        <input type="radio" name="production"  value="SAGAFTRA" required
+                                        {% if project_obj.production == 'SAGAFTRA' %}checked{% endif %}>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
-                                <div class="form-check-inline ml-3">
+                                <div class="form-check form-check-inline mt-4">
                                     <label class="containerradio mem-setup-blu-f">INDIE
-                                        <input type="radio" name="radiorow3">
+                                        <input type="radio" name="production" value="INDIE"
+                                        {% if project_obj.production == 'INDIE' %}checked{% endif %}>
                                         <span class="checkmarkagree"></span>
                                     </label>
                                 </div>
 
                             </div>
-                        </div> -->
+                        </div>
 
                         <div class="row">
                             <div class="col-2 ">
@@ -364,60 +423,71 @@
                                 <label class="form-title mem-setup-blu-f">SAG-AFTRA:</label> -->
                             <!-- </div> -->
                             <div class="col-md-10 col-sm-6 mt-3">
-                                {{form.sag_aftra}}
-                                <div class="form-check form-check-inline">
-                                    
-                                    <label class="containerradio bold" style="font-weight: bolder;font-size: 17px;  ">$ 0
-                                        <input type="radio" name="radiorow4"  onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"  style="margin-top: 0.3em;"></span>
+                                <div class="form-check form-check-inline " >
+                                    <label class=" bold" style="font-weight: bolder;font-size: 17px;">
+                                        <input type="radio" name="sag_aftra"  onclick="selectsagAftra(this)"
+                                        {% if project_obj.sag_aftra == project_obj.No_PAYMENT %}checked{% endif%} value="no_payment"
+                                         id="choice_no_payment"  class="custom_check_box
+                                         {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
+                                         {% if project_obj.production == 'INDIE' %}disabled{% endif %}>$ 0
+                                    </label>
+                                </div>
+                                <div class="form-check form-check-inline" >
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="payment_is_negotiable"
+                                           id="choice_negotiable" class="custom_check_box
+                                           {% if project_obj.production == 'INDIE' %}disabled_check_box{% endif %}"
+                                           {% if project_obj.production == 'INDIE' %}disabled{% endif %}>Negotiable
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Negotiable
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.NEGOTIABLE %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ULB %}checked{% endif%}
+                                           value="SAG_ultra_low_budget"  class="custom_check_box" required>Ultra Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Ultra Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ULB %}checked{% endif%} value="2" required>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.MLB %}checked{% endif%}
+                                            value="SAG_moderate_low_budget" class="custom_check_box">Moderate Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Moderate Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.MLB %}checked{% endif%}  value="3">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                           {% if project_obj.sag_aftra == project_obj.LB %}checked{% endif%}
+                                             value="SAG_low_budget" class="custom_check_box">Low
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Low
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"   {% if project_obj.sag_aftra == project_obj.LB %}checked{% endif%}  value="4">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ThB %}checked{% endif%}
+                                            value="SAG_theatrical_budget" class="custom_check_box">Theatrical
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Theatrical
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ThB %}checked{% endif%}  value="5">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                          {% if project_obj.sag_aftra == project_obj.ShB %}checked{% endif%}
+                                            value="SAG_short_film_budget" class="custom_check_box">Short
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Short
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)"  {% if project_obj.sag_aftra == project_obj.ShB %}checked{% endif%}  value="6">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                         {% if project_obj.sag_aftra == project_obj.MiB %}checked{% endif%}
+                                           value="SAG_micro_budget" class="custom_check_box">Micro
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Micro
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" {% if project_obj.sag_aftra == project_obj.MiB %}checked{% endif%}  value="7">
-                                        <span class="checkmarkagree"></span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <label class="containerradio bold">Student
-                                        <input type="radio" name="radiorow4" onclick="selectsagAftra(this)" {% if project_obj.sag_aftra == project_obj.StB %}checked{% endif%}  value="8">
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" name="sag_aftra" onclick="selectsagAftra(this)"
+                                         {% if project_obj.sag_aftra == project_obj.StB %}checked{% endif%}
+                                           value="SAG_studet_budget" class="custom_check_box">Student
                                     </label>
                                 </div>
                             </div>
@@ -466,7 +536,7 @@
                            
                             <div class="col-md-3 col-sm-6 mt-3">
                                 <form class="form-inline">
-                                    <div class="form-group d-none" id="visibility_password">
+                                    <div class="form-group {% if project_obj.visibility == 'public' %}d-none{% endif %}" id="visibility_password">
                                         <label for="inputPassword2" class="bold mr-1">(Create a Password) </label>
                                         {{form.visibility_password }}
                                         <i class="bi bi-eye-slash" id="togglePassword1"></i>
@@ -474,17 +544,17 @@
                                 </form>
                             </div>
                             
-                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3">Your Crew and Cast will
+                            <div class="col-md-4 col-sm-6 bold fs-9  mt-3 visibility_password_text">Your Crew and Cast will
                                 need this Password when they click on the Project Number to get to
                                 the Project Page.
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-2 ">
+                            <div class="col-12 col-md-2 ">
                                 <label class="form-title mem-setup-blu-f">LOCATION:</label>
                             </div>
-                            <div class="col-6">
+                            <div class="col-9 col-md-8 col-lg-6">
                                 <br><select class=" inp-line  modal-location" id ="location_1"
                                 name="location" required >
                                
@@ -494,240 +564,250 @@
                                 </select>
                             </div>
                         </div>
-                        {% if mode_operation == 'update' %}
-                        <div class="row mt-3">
-                            <a href="{% url 'project:add-characters' id=project_obj.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
-
-                        <div class="row mt-3">
-                            <a href="{% url  'project:add-project-crew' id=project_obj.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
-                                class="mt-2 ml-3 bold">(0)</span>
-                        </div>
-                        {% endif %}
-                        <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span>(Status And
+                         <div class="row">
+                            <div class="col-12 col-md-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CAST SAMR</span><br>(Status And
                                     Minimum Rating):</label>
                             </div>
-                            <div class="col-md-9 mt-3">
-                                {{form.cast_samr}}
-                                <div class="form-check-inline">
-                                    <div class="cast-star-rating1"> 
-                                        <label class="containerradio bold">Indie
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.cast_samr == project_obj.INDIE_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" value="1" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" value="2" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" value="3" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" value="4" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" value="5" >
-                                            {% else %}
-                                            <input type="hidden" name="cast-star1" class="rating-value1" >
-                                            {% endif %}
-                                            <input type="radio" name="radiorow7" id="star1" onclick="selectsamr(this)" value="0" {% if project_obj.cast_samr == project_obj.INDIE_WITH_RATING_1_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_2_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_3_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_4_STAR or  project_obj.cast_samr == project_obj.INDIE_WITH_RATING_5_STAR %} checked{% endif %}    required>
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="cast-star-rating2"> 
-                                        <label class="containerradio bold">Pro
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
+                            <div class="col-12 col-md-10 mt-3">
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="cast_samr" value="indie" 
+                                        {% if cast_samr_option == 'indie' %}checked{% endif %} required>
+                                        <span class="cast_rate mt-1"> Indie &nbsp;
+                                                <input type="radio" id="indie_samr_rate_5" name="indie_samr_rate" value="5"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="indie_samr_rate_5" class="form-check-label">5 stars</label>
 
-                                            {% if project_obj.cast_samr == project_obj.PRO_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2" value="1" >
-                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2" value="2" >
-                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2" value="3" >
-                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2" value="4" >
-                                            {% elif project_obj.cast_samr == project_obj.PRO_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2" value="5" >
-                                            {% else %}
-                                            <input type="hidden" name="cast-star2" class="rating-value2">
-                                            {% endif %}
-                                            <input type="radio" name="radiorow7" id="star2" onclick="selectsamr(this)" value="5"  {% if project_obj.cast_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.PRO_WITH_RATING_5_STAR  %} checked{% endif %} >
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="cast-star-rating3"> 
-                                        <label class="containerradio bold">Indie & Pro
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" value="1" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" value="2" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" value="3" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" value="4" >
-                                            {% elif project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" value="5" >
-                                            {% else %}
-                                            <input type="hidden" name="cast-star3" class="rating-value3" >
-                                            {% endif %}
-                                            <input type="radio" name="radiorow7" id="star3" onclick="selectsamr(this)"   value="10"   {% if project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.cast_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
+                                                <input type="radio" id="indie_samr_rate_4" name="indie_samr_rate" value="4"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="indie_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_3" name="indie_samr_rate" value="3"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="indie_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_2" name="indie_samr_rate" value="2"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="indie_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="indie_samr_rate_1" name="indie_samr_rate" value="1"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="indie_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="cast_samr" value="pro"
+                                        {% if cast_samr_option == 'pro' %}checked{% endif %}>
+                                        <span class="cast_rate mt-1"> Pro &nbsp;
+                                                <input type="radio" id="pro_samr_rate_5" name="pro_samr_rate" value="5"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_4" name="pro_samr_rate" value="4"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_3" name="pro_samr_rate" value="3"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_2" name="pro_samr_rate" value="2"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="pro_samr_rate_1" name="pro_samr_rate" value="1"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="cast_samr" value="indie_and_pro"
+                                        {% if cast_samr_option == 'indie_and_pro' %}checked{% endif %}>
+                                        <span class="cast_rate mt-1"> Indie & Pro &nbsp;
+                                                <input type="radio" id="indie_and_pro_samr_rate_5" name="indie_and_pro_samr_rate" value="5"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_4" name="indie_and_pro_samr_rate" value="4"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="indie_and_pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_3" name="indie_and_pro_samr_rate" value="3"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="indie_and_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_2" name="indie_and_pro_samr_rate" value="2"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="indie_and_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="indie_and_pro_samr_rate_1" name="indie_and_pro_samr_rate" value="1"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
-                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span>(Status And
-                                    Minimum Rating):</label>
+                            <div class="col-12 col-md-2">
+                                <label class="form-title bold"><span class="mem-setup-blu-f">CREW SAMR</span><br>(Status And
+                                    Minimum Rating):{{crew_samr_option}}</label>
                             </div>
-                            <div class="col-md-9 mt-3">
-                                {{form.crew_samr}}
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating1"> 
-                                        <label class="containerradio bold">Indie
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.crew_samr == project_obj.INDIE_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="1" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="2" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="3" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="4" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" value="5" >
-                                            {% else %}
-                                            <input type="hidden" name="crew-star1" class="cw-rating-value1" >
-                                            {% endif %}
-                                            <input type="radio" name="radiorow8" id="crew1" onclick="selectsamr(this)"  value="1"  {% if project_obj.crew_samr == project_obj.INDIE_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_WITH_RATING_5_STAR  %} checked{% endif %}  required >
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating2"> 
-                                        <label class="containerradio bold">Pro 
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.crew_samr == project_obj.PRO_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="1">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="2">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="3">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="4">
-                                            {% elif project_obj.crew_samr == project_obj.PRO_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" value="5">
-                                            {% else %}
-                                            <input type="hidden" name="crew-star2" class="cw-rating-value2" >
-                                            {% endif %}
-                                            <input type="radio" name="radiorow8"  id="crew2" onclick="selectsamr(this)" value="6" {% if project_obj.crew_samr == project_obj.PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.PRO_WITH_RATING_5_STAR %} checked{% endif %} >
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-check-inline">
-                                    <div class="crew-star-rating3"> 
-                                        <label class="containerradio bold">Indie & Pro 
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="1"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="2"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="3"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="4"></span>
-                                            <span class=" star-rating__ico fa fa-star-o" data-rating="5"></span>
-                                            {% if project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="1" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="2" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="3" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="4" >
-                                            {% elif project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" value="5" >
-                                            {% else %}
-                                            <input type="hidden" name="crew-star3" class="cw-rating-value3" >
-                                            {% endif %}
-                                            <input type="radio" name="radiorow8" id="crew3" onclick="selectsamr(this)" value="11"  {% if project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_1_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_2_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_3_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_4_STAR or project_obj.crew_samr == project_obj.INDIE_AND_PRO_WITH_RATING_5_STAR  %} checked{% endif %}>
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>   
-                                </div>
+                            <div class="col-12 col-md-10 mt-3">
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="crew_samr" value="indie"
+                                        {% if crew_samr_option == 'indie' %}checked{% endif %} required>
+                                        <span class="cast_rate mt-1"> Indie &nbsp;
+                                                <input type="radio" id="crew_indie_samr_rate_5" name="crew_indie_samr_rate" value="5"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_4" name="crew_indie_samr_rate" value="4"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_3" name="crew_indie_samr_rate" value="3"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_2" name="crew_indie_samr_rate" value="2"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_indie_samr_rate_1" name="crew_indie_samr_rate" value="1"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="crew_samr" value="pro"
+                                        {% if crew_samr_option == 'pro' %}checked{% endif %}>
+                                        <span class="cast_rate mt-1"> Pro &nbsp;
+                                                <input type="radio" id="crew_pro_samr_rate_5" name="crew_pro_samr_rate" value="5"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="crew_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_4" name="crew_pro_samr_rate" value="4"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="crew_pro_samr_rate_4" class="form-check-label" >4 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_3" name="crew_pro_samr_rate" value="3"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="crew_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_2" name="crew_pro_samr_rate" value="2"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="crew_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_pro_samr_rate_1" name="crew_pro_samr_rate" value="1"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="crew_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
+                                <span class="ml-4">
+                                    <label class="form-check-label">
+                                        <input type="radio" class=" form-check-input float-left custom_check_box"
+                                        style="position: initial;" name="crew_samr" value="indie_and_pro"
+                                        {% if crew_samr_option == 'indie_and_pro' %}checked{% endif %}>
+                                        <span class="cast_rate mt-1"> Indie & Pro &nbsp;
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_5" name="crew_indie_and_pro_samr_rate" value="5"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_5_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_and_pro_samr_rate_5" class="form-check-label">5 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_4" name="crew_indie_and_pro_samr_rate" value="4"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_4_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_and_pro_samr_rate_4" class="form-check-label">4 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_3" name="crew_indie_and_pro_samr_rate" value="3"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_3_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_and_pro_samr_rate_3" class="form-check-label">3 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_2" name="crew_indie_and_pro_samr_rate" value="2"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_2_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_and_pro_samr_rate_2" class="form-check-label">2 stars</label>
+
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_1" name="crew_indie_and_pro_samr_rate" value="1"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_1_star' %}checked{% endif %}/>
+                                                <label for="crew_indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
+                                        </span>
+                                    </label>
+                                </span>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-12 col-md-2">
                                 <label class="form-title bold mem-setup-blu-f">SCREENPLAY:</label>
                             </div>
-                            <div class="col-md-6 mt-3">
+                            <div class="col-12 col-md-10 mt-3">
                                 <div class="form-check-inline cus-file-upload">
-                                    {{form.script_visibility}}
-                                    <label class="containerradio bold">Public
-                                        
-                                        <input type="radio" name="radiorow9" id="public_script" onclick="selectscript(this)" value="0" {% if project_obj.script_visibility == project_obj.PUBLIC %}checked{% endif%}>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold">
+                                        <input type="radio" id="public_script" onclick="selectscript(this)"
+                                        {% if project_obj.script_visibility == 'public' %}checked{% endif%}
+                                        class="script_visibility custom_check_box" name="script_visibility" value="public">Public
+                                        <!-- <span class="checkmarkagree"></span> -->
                                     </label>
-                                <label class="snf-file-upload d-flex flex-row align-items-center" style=" margin-right: 2em; margin-left: 1em;">
-                                    {{form.script}}<span class="mem-setup-blu-f underline ml-1" >
-                                    Upload</span>
-                                    (PDF) <span style="margin-left: 1em; color:royalblue;"> 
-                                        {% if project_obj.script %}
-                                        <a href= "{{ project_obj.script.url }}"  download>{{ project_obj.script }}</a> </span>
-                                        {% endif %}
-                                </label>
-                                <div class="fileuploaddiv d-none" id="filenameblock">
-                                    <span id="filename" class="mr-1"> </span>
-                                    <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
                                 </div>
-                            </div>
-                        </div>
-                      </div>
-                        <div class="row">
-                            <div class="col-3">
-                            </div>
-                            <div class="col-md-8 mt-3">
                                 <div class="form-check-inline">
-                                    <label class="containerradio bold" style="margin-right: 2em;">Private
-                                        <input type="radio" name="radiorow9" id="private_script" onclick="selectscript(this)" value="1" {% if project_obj.script_visibility == project_obj.PRIVATE %}checked{% endif%} required>
-                                        <span class="checkmarkagree"></span>
+                                    <label class=" bold" style="margin-right: 2em;">
+                                        <input type="radio" id="private_script" onclick="selectscript(this)"
+                                         {% if project_obj.script_visibility == 'private' %}checked{% endif%}
+                                         class="script_visibility custom_check_box" name="script_visibility" value="private">Private
+                                        <!-- <span class="checkmarkagree"></span> -->
                                     </label>
-                                    <div class="flex-row align-items-center d-none" id="script_password" style="width: -webkit-fill-available;">
-                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit; ">(Create a Password) </label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <div class="flex-row align-items-center {% if project_obj.script_visibility == 'public' %}d-none{% endif %}" id="script_password" style="width: -webkit-fill-available;">
+                                        <label for="script_password" class="mr-2 mb-0 font-weight-bold" style="width: inherit; ">
+                                            (Create a Password) </label>
                                             {{form.script_password}}
                                          <i class="bi bi-eye-slash  ml-0" id="togglePassword2" style="position: relative;left: 145px; bottom: 22px; "></i>        
-                                    </div> 
+                                    </div>
+                                </div>
+                        </div>
+                      </div>
+                       
+                        <div class="row">
+                            <div class="col-12 col-md-2">
+                            </div>
+                            <div class="col-12 col-md-8 mt-3">
+                                <div class=" cus-file-upload">
+                                    <label class="snf-file-upload d-flex flex-row align-items-center" style=" margin-right: 2em; ">
+                                        {{form.script}}<span class="mem-setup-blu-f underline ml-1" >
+                                        Upload</span>
+                                        (PDF) <span style="margin-left: 1em; color:royalblue;"> 
+                                            {% if project_obj.script %}
+                                            <a href= "{{ project_obj.script.url }}" >{{ project_obj.script }}</a> </span>
+                                            {% endif %}
+                                    </label>
+                                    <div>
+                                        {% if project_obj.script %}
+                                        <input type="checkbox" id="remove_script" name="remove_script">
+                                        <label for="remove_script">Remove</label><br>
+                                        {% endif %}
+                                    </div>
+                                    <div class="fileuploaddiv d-none" id="filenameblock">
+                                        <span id="filename" class="mr-1"> </span>
+                                        <a href="javascript:void(0)" id="fileremove" class="text-danger mr-1">Remove</a>
+                                    </div>
                                 </div>
                             </div>
-                        
                         </div>
-                        
                         <!-- {% if mode_operation == 'update' %}
                         <div class="row mt-3">
                             <a href="#" class="btn prjct-log-btn-wht">ADD ANOTHER SCRIPT</a> <span
@@ -766,20 +846,92 @@
                         </div>
 
                         <hr class="prjct-log-blck-hr">
+                            <!-- Modal -->
+                        <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h4 class="modal-title warning-modal-title" id="reviewModalLabel">   </h4>
+                                            <button type="button" id="reviewClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body" style="text-align:center;">
+                                        <p></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"  id="reviewClose1">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="row mb-4">
-                            <div class="col-2">
+
+                        <!-- The Modal -->
+                        <!-- <div class="row mb-4"> -->
+                            <!-- <div class="col-2">
                                 <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
-                            </div>
-                            <div class="col-3">
+                            </div> -->
+                            <!-- <div class="col-3">
+                                <a href="" class="prjct-log-link underline">SAVE</a>
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
+                            </div> -->
+                            <!-- <div class="col-2">
+                                <a type="button" id="reviewButton" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
+                            </div> -->
+                            <!-- <div class="col-3">
                                 <a href="" class="prjct-log-link underline">SAVE IT FOR LATER</a>
+                            </div> -->
+                        <!-- </div> -->
+                        <div class="row mb-4">
+                            <!-- <div class="col-2">
+                                <a href="" class="prjct-log-link underline">REVIEW YOUR PROJECT</a>
+                            </div> -->
+                            <div class="col-3">
+                                <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
                             </div>
                         </div>
+                        <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
                             <div class="col-2">
-                                <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button>
+                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
+                                <a style="border: 0;margin-bottom: 1rem;"
+                                class="prjct-log-link underline text-danger  post_project cursor-pointer"
+                                id="{{draft_project_obj.id}}">POST YOUR PROJECT</a>
                             </div>
                         </div>
+                        <hr class="prjct-log-blck-hr">
+                        {% if mode_operation == 'update' %}
+                            {% if project %}
+                                <div class="row mt-3">
+                                    <a href="{% url 'project:add-characters' id=project_obj.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
+                                        class="mt-2 ml-3 bold">({{cast_count}})</span>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <a href="{% url  'project:add-project-crew' id=project_obj.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
+                                        class="mt-2 ml-3 bold">({{crew_count}})</span>
+                                </div>
+                                <div class="row mt-3">
+                                    <a href="{% url  'project:single-film-project' id=project.id  %}"
+                                    class="btn prjct-log-btn">PROJECT HOME</a>
+                                </div>
+                            {% else %}
+                                <p class="all-error-msg">Cast/Sides Set-Up and Team Set-Up will be available on this page after you post the project</p>
+                                <div class="row mt-3">
+                                    <a  class="btn prjct-log-btn cursor-disabled" title="Cast setup will be available after you post the project.">CAST & SIDES SET UP</a> <span
+                                        class="mt-2 ml-3 bold">(0)</span>
+                                </div>
+        
+                                <div class="row mt-3">
+                                    <a  class="btn prjct-log-btn cursor-disabled" title="Crew setup will be available after you post the project.">CREW SET UP</a> <span
+                                        class="mt-2 ml-3 bold">(0)</span>
+                                </div>
+                                <div class="row mt-3">
+                                    <a class="btn prjct-log-btn cursor-disabled" title="Project home will be visible after you post the project.">PROJECT HOME</a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        <hr class="prjct-log-blck-hr">
 
                     </div>
                 </div>
@@ -837,9 +989,11 @@
     })
     $('#private').on(('click'),()=>{
         $('#visibility_password').removeClass('d-none')
+        $('.visibility_password_text').css('visibility', 'visible');
     })
     $('#public').on(('click'),()=>{
         $('#visibility_password').addClass('d-none')
+        $('.visibility_password_text').css('visibility', 'hidden');
     })
     $('#id_script').on(('change'),()=>{
         var filename = $('#id_script').val().split('\\').pop();
@@ -1234,6 +1388,86 @@ $('input:radio[id="feat"]').change(function() {
         })
     })
 
+    $("#reviewButton").click(function() {
+  ValidateForm();
+});
+
+
+function ValidateForm() {
+
+var formInvalid = false;
+$('#newProject input').each(function() {
+  if ($(this).val() === '') {
+      console.log($(this).val())
+    formInvalid = true;
+  }
+  else 
+  {
+    formInvalid = false;
+  }
+});
+
+if (formInvalid){
+    var modal = $("#reviewModal")
+    var title = "Warning !"
+    var modal_text = "Please Fill up the form for Review Project"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+}
+else
+{
+    var modal = $("#reviewModal")
+    var title = "Message"
+    var modal_text = "Project reviewed successfully, You can Post the Project Now !"
+    modal.find('.modal-title').text(title)
+    modal.find('.modal-body').text(modal_text)
+$('#reviewModal').modal('show');
+
+}
+$(function () {
+        $('#reviewClose').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+    $(function () {
+        $('#reviewClose1').on('click', function () {
+            $('#reviewModal').modal('hide');
+           
+        })
+    })
+  
+
+
+}
 
 </script>
+
+
+<script>
+    $('body').on('click' , '.post_project', function(){
+        var token = $("#token").val();
+        var id = $(this).attr('id');
+        var data_dict = {}
+        data_dict['id'] = id;
+        console.log(data_dict)
+        $.ajax
+            ({
+                type: "POST",
+                url: "/project/post-project-api/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function (response){
+                    window.location.href = "/hobo_user/projectview/";
+                }
+            });
+    });
+
+</script>
+<script src="{% static 'js/project.js' %}"></script>
 {% endblock %}

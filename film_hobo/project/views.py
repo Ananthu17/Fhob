@@ -1,7 +1,7 @@
 import ast
 import io
 import json
-from django.db.models.deletion import PROTECT
+# from django.db.models.deletion import PROTECT
 import requests
 # import boto3
 # import datetime
@@ -24,17 +24,15 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.db.models import Q
-from django.db.models import Sum
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.shortcuts import render, redirect
-from django.contrib.auth.hashers import check_password
+# from django.contrib.auth.hashers import check_password
 
 from rest_framework.exceptions import ParseError
 from rest_framework.authtoken.models import Token
@@ -52,7 +50,7 @@ from hobo_user.models import Location, Team, ProjectMemberRating, CustomUser, \
 from .models import Audition, AuditionRating, AuditionRatingCombined, \
     Character, Comment, CrewApplication, ProjectCrew, ReportVideo, SceneImages, Sides, \
     ProjectTracking, ProjectRating, \
-    AttachedCrewMember, ProjectVideoLikeAndDislike
+    AttachedCrewMember, ProjectVideoLikeAndDislike, DraftProject
 from .serializers import RateUserSkillsSerializer, ProjectVideoURLSerializer, \
       CharacterSerializer, UpdateCharacterSerializer, \
       ProjectLastDateSerializer, RemoveCastSerializer, ReplaceCastSerializer, \
@@ -1795,7 +1793,7 @@ class CastVideoAuditionView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        audition_id = self.kwargs.get('id')
+        audition_id  = self.kwargs.get('id')
         audition = get_object_or_404(Audition, pk=audition_id)
         context['audition'] = audition
 
@@ -4705,3 +4703,60 @@ class ProjectVideoLikeDislikeAjaxView(View, JSONResponseMixin):
                                  'project':project})
         context['like_dislike_html'] = like_dislike_html
         return self.render_json_response(context)
+
+
+class PostProjectAPI(APIView):
+    serializer_class = IdSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            id = data_dict['id']
+            user = self.request.user
+            try:
+                draft_project = DraftProject.objects.get(pk=id)
+                try:
+                    project = Project.objects.get(
+                                Q(draft_project=draft_project) &
+                                Q(creator=user)
+                            )
+                except Project.DoesNotExist:
+                    project = Project()
+
+                project.creator = draft_project.creator
+                project.title = draft_project.title
+                project.format = draft_project.format
+                project.number_of_pages = draft_project.number_of_pages
+                project.genre = draft_project.genre
+                project.location = draft_project.location
+                project.script = draft_project.script
+                project.visibility = draft_project.visibility
+                project.visibility_password = draft_project.visibility_password
+                project.cast_attachment = draft_project.cast_attachment
+                project.sag_aftra = draft_project.sag_aftra
+                project.cast_samr = draft_project.cast_samr
+                project.crew_samr = draft_project.crew_samr
+                project.script_visibility = draft_project.script_visibility
+                project.script_password = draft_project.script_password
+                project.team_select_password = draft_project.team_select_password
+                project.cast_audition_password = draft_project.cast_audition_password
+                project.production = draft_project.production
+                project.draft_project = draft_project
+                project.save()
+                draft_project.is_posted = True
+                draft_project.save()
+                messages.success(self.request, "Project posted.")
+                response = {'message': "Project posted.", 'status':
+                            status.HTTP_200_OK}
+
+            except DraftProject.DoesNotExist:
+                response = {'error': "Invalid ID", 'status':
+                            status.HTTP_200_OK}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)

@@ -109,7 +109,10 @@
   .custom_check_box:checked {
       background-color: #f32121;
     }
-
+.disabled_check_box
+    {
+      border:1px solid #7f7676;
+    }
   .guild_membership label
     {
       margin-bottom:0;
@@ -830,8 +833,49 @@ input.pw {
     color : #1637f9!important;
     text-decoration: underline;
  }
- /* .video-frame-2
+ .visibility_password_text
  {
-  width: 100%;
-  height: 100%;
- } */
+ visibility:hidden;
+ }
+ .cursor-disabled
+  {
+    cursor:not-allowed!important;
+  }
+
+  .proj-card-drafts{
+    font-size:12px; 
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid black;
+    border-radius: 1px;
+ }
+ .proj-card-drafts a{
+    color : #0960be;
+ }
+ .cast_rate {
+  float: left;
+  height: 14px;
+ }
+ .cast_rate:not(:checked) > input {
+  /* position:absolute;
+  top:-9999px; */
+  visibility:hidden;
+  display:none;
+ }
+ .cast_rate:not(:checked) > label {
+  float:right;
+  width: .80em;
+  overflow:hidden;
+  white-space:nowrap;
+  cursor:pointer;
+  font-size: 17px;
+  color: #ccc;
+  position: relative;
+  top: -3px;
+ }
+ .cast_rate:not(:checked) > label:before {
+  content: "\2605";
+ }
+ .cast_rate > input:checked ~ label {
+  color: #e88b22;    
+ }

@@ -152,14 +152,14 @@
             <!-- left section end  -->
             <!-- center section  -->
 
-            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
                 <!-- Row 1  -->
 
                 {% if format == 'SCH' %}
                 <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
-                            <span class=" txt-red  top-head-align proj-head-margin">New Scenes</span>
+                            <span class=" txt-red  top-head-align proj-head-margin">New Projects</span>
                             <ul class="proj-cnt-menu-li" id="1">
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -182,7 +182,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-                       
+
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -199,14 +199,13 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -299,14 +298,13 @@
                                                             <a href="">{{project.get_genre_display}}</a>
                                                         </span>
                                                         <span  class="proj-symb">
-                                                            {% if project.rating != None %}
-                                                            {% for item in project.rating|times %}
-                                                            <span class="fa fa-star checked "></span>
-                                                            {% endfor %}
-                                                            {% for item in project.rating|blank %}
-                                                            <span class="fa fa-star-o"></span>
-                                                            {% endfor %}
-                                                            {% endif %}
+                                                            <span class="log-star">
+                                                                <div class="">
+                                                                    <div class="cta-stars-outer">
+                                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                                      </div>
+                                                                </div>
+                                                        </span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line2">
@@ -356,12 +354,12 @@
                                     </div>
                                 </div>
 
-                   {% elif format == 'SHO' %}    
+                   {% elif format == 'SHO' %}
                                 <!-- Row 3  -->
-                                <div class="proj-input-sec-bg mt-3">
+                                <div class="proj-input-sec-bg">
                                     <div class="proj-menu-align">
                                         <div class="proj-menu-display">
-                                            <span class=" txt-red  top-head-align proj-head-margin">New Films</span>
+                                            <span class=" txt-red  top-head-align proj-head-margin">New Projects</span>
                                             <ul class="proj-cnt-menu-li" id="3">
                                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -400,12 +398,13 @@
                                                             <a href="">{{project.get_genre_display}}</a>
                                                         </span>
                                                         <span  class="proj-symb">
-                                                            {% for item in project.rating|times %}
-                                                            <span class="fa fa-star checked "></span>
-                                                            {% endfor %}
-                                                            {% for item in project.rating|blank %}
-                                                            <span class="fa fa-star-o"></span>
-                                                            {% endfor %}
+                                                            <span class="log-star">
+                                                                <div class="">
+                                                                    <div class="cta-stars-outer">
+                                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                                      </div>
+                                                                </div>
+                                                        </span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line2">
@@ -453,8 +452,8 @@
                                         <!-- owl-carousel End -->
                                        </div>
                                     </div>
-                                </div>    
-                                
+                                </div>
+
                                 <!-- Row 4  -->
                                 <div class="proj-input-sec-bg mt-3">
                                     <div class="proj-menu-align">
@@ -498,12 +497,13 @@
                                                             <a href="">{{project.get_genre_display}}</a>
                                                         </span>
                                                         <span  class="proj-symb">
-                                                            {% for item in project.rating|times %}
-                                                            <span class="fa fa-star checked "></span>
-                                                            {% endfor %}
-                                                            {% for item in project.rating|blank %}
-                                                            <span class="fa fa-star-o"></span>
-                                                            {% endfor %}
+                                                            <span class="log-star">
+                                                                <div class="">
+                                                                    <div class="cta-stars-outer">
+                                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                                      </div>
+                                                                </div>
+                                                        </span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line2">
@@ -553,8 +553,213 @@
                                     </div>
                                 </div>
 
-                
-                {% else %} 
+
+
+
+
+
+
+                                {% elif format == 'PIL-FTR' %}
+                                <!-- Row 3  -->
+                                <div class="proj-input-sec-bg">
+                                    <div class="proj-menu-align">
+                                        <div class="proj-menu-display">
+                                            <span class=" txt-red  top-head-align proj-head-margin">New Pilots/Features</span>
+                                            <ul class="proj-cnt-menu-li" id="3">
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                                            </ul>
+                                        </div>
+                                       <div class="proj-owl-right-margin">
+                                        <!-- owl-carousel  -->
+                                        <div id="demo3">
+                                        <div class="owl-carousel owl-theme " id="project-owl3">
+                                            {% if pilotsfeatures != None  %}
+                                            {% for project in pilotsfeatures %}
+                                            <!-- item 1  -->
+                                            <div class="item">
+                                                <div class="card proj-card pointer" >
+                                                    <div class="project-line">
+                                                        <span class="proj-no">
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
+                                                        </span>
+                                                        <span class="proj-pay">
+                                                            $<a href="">{{project.sag_aftra}}</a>
+                                                        </span>
+                                                        <span class="proj-gener-align">
+                                                            <a href="">{{project.get_genre_display}}</a>
+                                                        </span>
+                                                        <span  class="proj-symb">
+                                                            <span class="log-star">
+                                                                <div class="">
+                                                                    <div class="cta-stars-outer">
+                                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                                      </div>
+                                                                </div>
+                                                        </span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line2">
+                                                        <span class="proj-title">
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                                        </span>
+                                                        <span class="proj-page-no">
+                                                            Page:<a>{{ project.number_of_pages }}</a>
+                                                        </span>
+                                                        <span class="proj-public">
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            Creator:<a href="">{{project.creator}}</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            Format:<a href="">{{project.get_format_display}}</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line">
+                                                        <span class="proj-format">
+                                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line">
+                                                        <span class="proj-format">
+                                                            Location:<a>{{project.location}}</a>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <!-- owl-carousel End -->
+                                       </div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4  -->
+                                <div class="proj-input-sec-bg mt-3">
+                                    <div class="proj-menu-align">
+                                        <div class="proj-menu-display">
+                                            <span class=" txt-red  top-head-align proj-head-margin">Top Rated</span>
+                                            <ul class="proj-cnt-menu-li" id="4">
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
+                                            </ul>
+                                        </div>
+                                       <div class="proj-owl-right-margin">
+                                        <!-- owl-carousel  -->
+                                        <div id="demo4">
+                                        <div class="owl-carousel owl-theme " id="project-owl4">
+                                            {% if toprated_pilotsfeatures != None  %}
+                                            {% for project in toprated_pilotsfeatures %}
+                                            <!-- item 1  -->
+                                            <div class="item">
+                                                <div class="card proj-card pointer" >
+                                                    <div class="project-line">
+                                                        <span class="proj-no">
+                                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
+                                                        </span>
+                                                        <span class="proj-pay">
+                                                            $<a href="">{{project.sag_aftra}}</a>
+                                                        </span>
+                                                        <span class="proj-gener-align">
+                                                            <a href="">{{project.get_genre_display}}</a>
+                                                        </span>
+                                                        <span  class="proj-symb">
+                                                            <span class="log-star">
+                                                                <div class="">
+                                                                    <div class="cta-stars-outer">
+                                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                                      </div>
+                                                                </div>
+                                                        </span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line2">
+                                                        <span class="proj-title">
+                                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                                        </span>
+                                                        <span class="proj-page-no">
+                                                            Page:<a>{{ project.number_of_pages }}</a>
+                                                        </span>
+                                                        <span class="proj-public">
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            Creator:<a href="">{{project.creator}}</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            Format:<a href="">{{project.get_format_display}}</a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line-single-span">
+                                                        <span class="proj-format">
+                                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line">
+                                                        <span class="proj-format">
+                                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                                        </span>
+                                                    </div>
+                                                    <div class="project-line">
+                                                        <span class="proj-format">
+                                                            Location:<a>{{project.location}}</a>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        </div>
+                                        <!-- owl-carousel End -->
+                                       </div>
+                                    </div>
+                                </div>
+
+
+                {% else %}
 
                 <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
@@ -582,7 +787,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-                       
+
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -599,14 +804,13 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -698,14 +902,13 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
-                                            {% if project.rating != None %}
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
-                                            {% endif %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -797,12 +1000,13 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -894,12 +1098,13 @@
                                             <a href="">{{project.get_genre_display}}</a>
                                         </span>
                                         <span  class="proj-symb">
-                                            {% for item in project.rating|times %}
-                                            <span class="fa fa-star checked "></span>
-                                            {% endfor %}
-                                            {% for item in project.rating|blank %}
-                                            <span class="fa fa-star-o"></span>
-                                            {% endfor %}
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
                                     <div class="project-line2">
@@ -948,14 +1153,111 @@
                        </div>
                     </div>
                 </div>
+                <!-- Row 5  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display">
+                            <span class=" txt-red  top-head-align proj-head-margin">Draft Projects</span>
+                            <ul class="proj-cnt-menu-li" id="4">
+                                <li><a></a></li>
+                                <!-- <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li> -->
+                            </ul>
+                        </div>
+                       <div class="proj-owl-right-margin">
+                        <!-- owl-carousel  -->
+                        <div id="demo4">
+                        <div class="owl-carousel owl-theme " id="project-owl5">
+                            {% if draft_projects %}
+                            {% for project in draft_projects %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="card proj-card-drafts pointer" >
+                                    <div class="project-line">
+                                        <span class="proj-no">
+                                            Project
+                                        </span>
+                                        <span class="proj-pay">
+                                            $<a title="{{project.get_sag_aftra_display}}">{{project.get_sag_aftra_display|truncatechars:"5"}}</a>
+                                        </span>
+                                        <span class="proj-gener-align">
+                                            <a >{{project.get_genre_display}}</a>
+                                        </span>
+                                        <span  class="proj-symb">
+                                            <a href="{% url 'hobo_user:update-project' id=project.id  %}">Edit</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line2">
+                                        <span class="proj-title">
+                                            Title:<a>{{project.title}}</a>
+                                        </span>
+                                        <span class="proj-page-no">
+                                            Page:<a>{{ project.number_of_pages }}</a>
+                                        </span>
+                                        <span class="proj-public">
+                                            <span><a>{{project.get_visibility_display}}</a></span>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Creator:<a>{{project.creator}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            Format:<a>{{project.get_format_display}}</a>
+                                        </span>
+                                    </div>
+                                    <div class="project-line-single-span">
+                                        <span class="proj-format">
+                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
+                                        </span>
+                                    </div>
+                                    <div class="project-line">
+                                        <span class="proj-format">
+                                            Location:<a title="{{project.location|truncatechars:'25'}}">{{project.location|truncatechars:"25"}}</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
                 {% endif %}
             </div>
 
             <!-- Center section End  -->
             <!-- Right section  -->
-
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
-            </div>
+            {% if user.membership == 'HOB' %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members make_div_unclickable">
+                </div>
+            {% else %}
+                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 top_rated_members">
+                </div>
+            {% endif %}
 
             <!-- Right section End  -->
         </div>
@@ -1098,6 +1400,39 @@
             },
         }
     })
+    $('#project-owl5').owlCarousel({
+        loop:true,
+        margin:10,
+        responsiveClass:true,
+        nav: true,
+        navText: [
+        "<i class='fa fa-caret-left'></i>",
+        "<i class='fa fa-caret-right'></i>"
+        ],
+        responsive:{
+            0:{
+                items:1,
+                nav:true
+            },
+            641:{
+                items:2,
+                nav:true
+            },
+            885:{
+                items:3,
+                nav:true
+            },
+            992:{
+                items:2,
+                nav:true
+            },
+            1200:{
+                items:3,
+                nav:true,
+                loop:false
+            },
+        }
+    })
 
 
     const origin_url = window.location.origin
@@ -1156,16 +1491,15 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>`
-                let div2 = ""
-                for (let i = 0; i < this.rating; i++) {
-                    div2 += "<span class='fa fa-star checked'></span>"
-                }
-                let div3 = ""
-                for (let i = 0; i < 5-this.rating; i++) {
-                    div3 += "<span class='fa fa-star-o'></span>"
-                }
-                let div4 = `</span></div>\
+                                <span  class='proj-symb'>
+                                    <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                    </span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1202,7 +1536,7 @@
                             </div>\
                         </div>\
                     </div></div>`
-                let div = div1+div2+div3+div4
+                let div = div1
                 // appending div to results
                 $(`#project-owl${id}`).append(div);
             })
@@ -1228,16 +1562,15 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>`
-                let div2 = ""
-                for (let i = 0; i < this.rating; i++) {
-                    div2 += "<span class='fa fa-star checked'></span>"
-                }
-                let div3 = ""
-                for (let i = 0; i < 5-this.rating; i++) {
-                    div3 += "<span class='fa fa-star-o'></span>"
-                }
-                let div4 = `</span></div>\
+                                <span  class='proj-symb'>
+                                    <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
+                                    </span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1274,7 +1607,7 @@
                             </div>\
                         </div>\
                     </div></div>`
-                let div = div1+div2+div3+div4
+                let div = div1
                 // appending div to results
                 $('#project-owl1').append(div);
             })
@@ -1294,16 +1627,15 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>`
-                let div2 = ""
-                for (let i = 0; i < this.rating; i++) {
-                    div2 += "<span class='fa fa-star checked'></span>"
-                }
-                let div3 = ""
-                for (let i = 0; i < 5-this.rating; i++) {
-                    div3 += "<span class='fa fa-star-o'></span>"
-                }
-                let div4 = `</span></div>\
+                                <span  class='proj-symb'>
+                                    <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                    </span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1340,7 +1672,7 @@
                             </div>\
                         </div>\
                     </div></div>`
-                let div = div1+div2+div3+div4
+                let div = div1
                 // appending div to results
                 $('#project-owl2').append(div);
             })
@@ -1360,16 +1692,15 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>`
-                let div2 = ""
-                for (let i = 0; i < this.rating; i++) {
-                    div2 += "<span class='fa fa-star checked'></span>"
-                }
-                let div3 = ""
-                for (let i = 0; i < 5-this.rating; i++) {
-                    div3 += "<span class='fa fa-star-o'></span>"
-                }
-                let div4 = `</span></div>\
+                                <span  class='proj-symb'>
+                                    <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                    </span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1406,7 +1737,7 @@
                             </div>\
                         </div>\
                     </div></div>`
-                let div = div1+div2+div3+div4
+                let div = div1
                 // appending div to results
                 $('#project-owl3').append(div);
             })
@@ -1426,16 +1757,15 @@
                                 <span class='proj-gener-align'>\
                                     <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
                                 </span>\
-                                <span  class='proj-symb'>`
-                let div2 = ""
-                for (let i = 0; i < this.rating; i++) {
-                    div2 += "<span class='fa fa-star checked'></span>"
-                }
-                let div3 = ""
-                for (let i = 0; i < 5-this.rating; i++) {
-                    div3 += "<span class='fa fa-star-o'></span>"
-                }
-                let div4 = `</span></div>\
+                                <span  class='proj-symb'>
+                                    <span class="log-star">
+                                            <div class="">
+                                                <div class="cta-stars-outer">
+                                                    <div class="cta-stars-inner" style="width:${this.rating}%;"></div>
+                                                    </div>
+                                            </div>
+                                    </span>
+                                    </span></div>\
                             <div class='project-line2'>\
                                 <span class='proj-title'>\
                                     Title:<a href=''>${this.title}</a>\
@@ -1472,7 +1802,7 @@
                             </div>\
                         </div>\
                     </div></div>`
-                let div = div1+div2+div3+div4
+                let div = div1
                 // appending div to results
                 $('#project-owl4').append(div);
             })
@@ -1643,13 +1973,26 @@
     }
 </script>
 <script>
+    // to redirect to porject details page
     $(".proj-card").click(function(){
         var proj_card_ele = $(this)
         var project_obj = proj_card_ele[0].children[0].children[0].innerText
         var project_id = project_obj.split("#").pop();
         var origin_url = window.location.origin
-        var redirect_url = origin_url + '/project/video/' + project_id + '/'
+        var redirect_url = origin_url + '/project/single-film-project/' + project_id + '/'
         window.location.replace(redirect_url);
+    });
+
+    //change the css class to adjust the divs
+    $(window).on('load', function() {
+        $("#top_rated_div").addClass("proj-right-sec-bg");
+    });
+
+</script>
+
+<script>
+    $(".make_div_unclickable").click(function(){
+        return false;
     });
 </script>
 {% endblock %}

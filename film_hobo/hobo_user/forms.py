@@ -9,6 +9,7 @@ from phonenumber_field.formfields import PhoneNumberField
 from .models import CustomUser, GuildMembership, DisabledAccount, \
     CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, CoWorker, \
     CompanyProfile, Country, Photo, Feedback, Writer
+from project.models import DraftProject
 
 
 class SignUpForm(UserCreationForm):
@@ -407,15 +408,16 @@ class CheckoutForm(forms.Form):
 class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
-        model = Project
+        model = DraftProject
         fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
                   'sag_aftra', 'cast_attachment', 'visibility',
                   'script_visibility', 'visibility_password', 'location',
-                  'cast_samr', 'script', 'script_password',
+                  'script', 'script_password',
                   'cast_audition_password', 'team_select_password',
-                  'video_url', 'video_type', 'video_status',
-                  'video_cover_image', 'logline', 'project_info',
+                  'production'
                   )
+                #   'video_url', 'video_type', 'video_status',
+                #   'video_cover_image', 'logline', 'project_info',
         widgets = {
 
                 'title': forms.TextInput(attrs={"class": "inp-line"}),
@@ -434,7 +436,7 @@ class ProjectCreationForm(forms.ModelForm):
                                                            'placeholder': 'password' ,'data-toggle': 'password' ,'type':'password'
                                                            }),
                 'location': forms.Select(attrs={'class': 'inp-line',"required":""}),
-                'cast_samr': forms.Select(attrs={'class': 'd-none'}),
+                # 'cast_samr': forms.Select(attrs={'class': 'd-none'}),
                 'script': forms.FileInput(attrs={'accept':'application/pdf'}),
                     'script_password': forms.TextInput(attrs={
                                                                 "class": "form-control form-control-input mem-b-placeholder",
@@ -450,6 +452,11 @@ class ProjectCreationForm(forms.ModelForm):
                                                             })
 
                 }
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectCreationForm, self).__init__(*args, **kwargs)
+        self.fields['script'].widget.attrs['id'] = 'id_script'
+        self.fields['script'].required = False
 
 
 class WriterForm(forms.ModelForm):

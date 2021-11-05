@@ -67,7 +67,7 @@
                        
                     
                      
-                        <select class="form-control" name="languageSelect" multiple id="languageSelect">
+                        <select class="form-control" name="userSelect" multiple id="userSelect">
                             {% for friend in friends %}
                             <option value="{{friend.id}}" >{{friend}} </option>
                                 {% endfor %}
@@ -156,7 +156,8 @@
                         {% if project.creator.id == request.user.id %}
                          
                         <span class="">
-                            <a class="mem-blu-link log-fnt-weight cursor-pointer " id="{{project.title}}" href="{% url 'hobo_user:update-project' id=project.id  %}" >E<span class="mem-small-f">DIT</span></a>
+                            <a class="mem-blu-link log-fnt-weight cursor-pointer " id="{{project.title}}"
+                            href="{% url 'hobo_user:update-project' id=project.draft_project.id  %}" >E<span class="mem-small-f">DIT</span></a>
                         </span>
                         {% endif %}
 
@@ -294,11 +295,15 @@
                                     {% endif %}
                                 </div>
                                 {% endfor %}
-                                
+
                             </div>
                             <div class="">
+                                <span class="sgl-black-txt">
+                                    <a href="{% url 'project:add-project-crew' project.id %}" class="mem-blu-link">Team Set-Up</a>
+                                </span>
                                 <span class="sgl-blue-txt sgl-full-lst-align">
-                                    <a class="enable-scroll-crew cursor-pointer">Full List</a></span>
+                                    <a class="enable-scroll-crew cursor-pointer">Full List</a>
+                                </span>
                             </div>
                             </div>
                         </div>
@@ -353,6 +358,9 @@
                                 {% endfor %}
                             </div>
                                 <div class="">
+                                    <span class="sgl-black-txt">
+                                        <a href="{% url 'project:add-characters' project.id %}" class="mem-blu-link">Cast/Sides Set-Up</a>
+                                    </span>
                                     <span class="sgl-blue-txt sgl-full-lst-align">
                                         <a class="enable-scroll cursor-pointer">Full List</a>
                                     </span>
@@ -387,7 +395,7 @@
                                         {% if project.team_select_password %}
                                         <a class="team_select_password_check cursor-pointer" id="{{project.id}}">TEAM SELECT</a>
                                         {% else %}
-                                        <a href="{% url 'project:audition-list' project.id %}" class="cursor-pointer">TEAM SELECT</a>
+                                        <a href="{% url 'project:crew-application-listing' project.id %}" class="cursor-pointer">TEAM SELECT</a>
                                         {% endif %}
                                     </span>
                                     <div>
@@ -752,7 +760,7 @@
 
 
 <script>
-    jQuery('#languageSelect').multiselect({
+    jQuery('#userSelect').multiselect({
     columns: 1,
     placeholder: 'Select Users',
     search: true,
