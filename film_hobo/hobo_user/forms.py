@@ -1,14 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
-from django_select2.forms import Select2Widget
+# from django_select2.forms import Select2Widget
 
 from bootstrap_datepicker_plus import DateTimePickerInput
-from phonenumber_field.formfields import PhoneNumberField
+# from phonenumber_field.formfields import PhoneNumberField
 
 from .models import CustomUser, GuildMembership, DisabledAccount, \
-    CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, CoWorker, \
-    CompanyProfile, Country, Photo, Feedback, Writer
+    CustomUserSettings, AthleticSkill, Project, UserInterest, UserProfile, \
+    CoWorker, CompanyProfile, Country, Photo, Feedback, Writer
 from project.models import DraftProject
 
 
@@ -53,6 +53,15 @@ class LoginForm(AuthenticationForm):
     class Meta:
         model = CustomUser
         fields = ('email', 'password1')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user_email = cleaned_data['username']
+        user_obj = CustomUser.objects.get(email=user_email)
+        if not user_obj.registration_complete:
+            raise forms.ValidationError(
+                'Please confirm your email and then login')
+        return cleaned_data
 
 
 class SignUpIndieForm(UserCreationForm):

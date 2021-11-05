@@ -14,7 +14,7 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    IndiePaymentDetailsAPI, ProPaymentDetailsAPI, \
                    PaymentProView, PaymentIndieView, CheckPromoCodeAPI, \
                    SettingsView, CustomUserLogout, \
-                   ExtendedRegisterCompanyView, PageSearchView, \
+                   ExtendedRegisterCompanyView, \
                    ChangePasswordAPI, DisableAccountAPI, EnableAccountAPI, \
                    EnableAccountView, BlockMembersAPI, UnBlockMembersAPI, \
                    PaymentCompanyView, ForgotPasswordView, \

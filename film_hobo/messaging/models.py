@@ -1,5 +1,4 @@
 import datetime
-from enum import unique
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -107,7 +106,8 @@ class MessageNotification(models.Model):
                                    max_length=150, default=UNREAD)
     created_time = models.DateTimeField(_('Created Time'), auto_now_add=True,
                                         blank=False)
-    notification_message = models.TextField(_("Message"), null=True, blank=True)
+    notification_message = models.TextField(
+        _("Message"), null=True, blank=True)
     msg_thread = models.CharField(_("Message thread ID"),
                                   max_length=1000,
                                   null=True, blank=True)
@@ -130,6 +130,7 @@ class UserMessageImages(models.Model):
 
     def __str__(self):
         return str(self.message)
+
     class Meta:
         verbose_name = 'User Message Image'
         verbose_name_plural = 'User Message Images'
