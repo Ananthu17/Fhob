@@ -3256,7 +3256,8 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
 
             rating_dict = {}
             job_dict = {}
-            for job in profile.job_types.all():
+            profile_jobs = profile.job_types.all()
+            for job in profile_jobs:
                 try:
                     rating_obj = UserRatingCombined.objects.get(
                                 Q(user=user) &
@@ -3291,6 +3292,16 @@ class MemberProfileView(LoginRequiredMixin, TemplateView):
         context['my_projects'] = my_projects
         context['favorites'] = favorites
         context['applied'] = applied
+
+        team_dict = {}
+        all_teams_objs = Team.objects.filter(user=user)
+        for team_obj in all_teams_objs:
+            if team_obj.job_type.id in team_dict:
+                team_dict[team_obj.job_type.id].append(team_obj)
+            else:
+                team_dict[team_obj.job_type.id] = []
+                team_dict[team_obj.job_type.id].append(team_obj)
+        context["team_dict"] = team_dict
         return context
 
 
@@ -5809,38 +5820,44 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
             context['cast_count'] = 0
             context['crew_count'] = 0
 
-        if ((draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
+        if ((draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_0_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'indie'
-        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_0_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
            (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'pro'
-        elif ((draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_0_STAR) or
+           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
            (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'indie_and_pro'
  
-        if ((draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
+        if ((draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_0_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie'
-        elif ((draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_0_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
            (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'pro'
-        elif ((draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+        elif ((draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_0_STAR) or
+           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
            (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or

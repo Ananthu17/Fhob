@@ -299,7 +299,14 @@
                             </div>
                             <div class="">
                                 <span class="sgl-black-txt">
-                                    <a href="{% url 'project:add-project-crew' project.id %}" class="mem-blu-link">Team Set-Up</a>
+                                    {% if request.user == project.creator %}
+                                    <a href="{% url 'project:add-project-crew' project.id %}" class="blue-link">Team Set-Up</a>
+                                    {% endif %}
+                                </span>
+                                <span class="sgl-black-txt ml-2">
+                                    {% if request.user == project.creator %}
+                                    <a href="{% url 'project:crew-attach-replace' project.id %}" class="blue-link">Description</a>
+                                    {% endif %}
                                 </span>
                                 <span class="sgl-blue-txt sgl-full-lst-align">
                                     <a class="enable-scroll-crew cursor-pointer">Full List</a>
@@ -359,7 +366,9 @@
                             </div>
                                 <div class="">
                                     <span class="sgl-black-txt">
-                                        <a href="{% url 'project:add-characters' project.id %}" class="mem-blu-link">Cast/Sides Set-Up</a>
+                                        {% if request.user == project.creator %}
+                                        <a href="{% url 'project:add-characters' project.id %}" class="blue-link">Cast/Sides Set-Up</a>
+                                        {% endif %}
                                     </span>
                                     <span class="sgl-blue-txt sgl-full-lst-align">
                                         <a class="enable-scroll cursor-pointer">Full List</a>
