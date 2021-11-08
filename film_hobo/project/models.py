@@ -100,7 +100,8 @@ class Sides(models.Model):
     scene_1_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_2_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_3_pdf = models.FileField(upload_to='script/', null=True, blank=True)
-    scenes_combined = models.FileField(upload_to='script/', null=True, blank=True)
+    scenes_combined = models.FileField(
+        upload_to='script/', null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"
@@ -169,11 +170,11 @@ class Audition(models.Model):
     status_update_date = models.DateField(_("Status updated on"),
                                           null=True, blank=True,)
     i_agree = models.BooleanField(
-                _('I Agree'),
-                default=True,
-                help_text=_(
-                    'Designates whether the user accepted the terms and conditions.'),
-            )
+        _('I Agree'),
+        default=True,
+        help_text=_(
+            'Designates whether the user accepted the terms and conditions.'),
+    )
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+"-"+self.name
@@ -220,7 +221,7 @@ class AuditionRating(models.Model):
     review = models.TextField(_("Review"), null=True, blank=True)
 
     def __str__(self):
-        return str(self.audition.name) + " -rated by " +str(self.team_member.user.get_full_name())
+        return str(self.audition.name) + " -rated by " + str(self.team_member.user.get_full_name())
 
     class Meta:
         verbose_name = 'Audition Rating'
@@ -398,11 +399,11 @@ class CrewApplication(models.Model):
     status_update_date = models.DateField(_("Status updated on"),
                                           null=True, blank=True, auto_now_add=True)
     i_agree = models.BooleanField(
-                _('I Agree'),
-                default=True,
-                help_text=_(
-                    'Designates whether the user accepted the terms and conditions.'),
-            )
+        _('I Agree'),
+        default=True,
+        help_text=_(
+            'Designates whether the user accepted the terms and conditions.'),
+    )
 
     def __str__(self):
         return str(self.project.title+" - "+str(self.crew.job_type.title)+" - "+self.user.get_full_name())

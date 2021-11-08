@@ -8,7 +8,6 @@ from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.utils import timezone
 from django.views.generic.base import View
 
@@ -1332,11 +1331,11 @@ class CreateUserOrder(APIView):
                 access_token_strting = 'Bearer ' + access_token
 
                 create_plan_user_response = requests.post(
-                                'https://api-m.sandbox.paypal.com/v1/billing/plans',
-                                data=json.dumps(data_dict),
-                                headers={'Content-type': 'application/json',
-                                         'Authorization': access_token_strting
-                                         })
+                        'https://api-m.sandbox.paypal.com/v1/billing/plans',
+                        data=json.dumps(data_dict),
+                        headers={'Content-type': 'application/json',
+                                 'Authorization': access_token_strting
+                                 })
                 if create_plan_user_response.status_code == 201:
                     plan_id = \
                         json.loads(create_plan_user_response.content)['id']
