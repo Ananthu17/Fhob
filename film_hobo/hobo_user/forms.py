@@ -150,6 +150,7 @@ class SignUpProForm(UserCreationForm):
         self.fields['address'].required = True
         self.fields['date_of_birth'].required = True
         self.fields['country'].required = True
+        self.fields['guild_membership_id'].required = True
         self.fields['first_name'].widget.attrs['class'] = 'inp-line'
         self.fields['first_name'].widget.attrs['placeholder'] = 'First'
         self.fields['middle_name'].widget.attrs['class'] = 'inp-line'

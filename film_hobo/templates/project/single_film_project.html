@@ -307,7 +307,14 @@
                             </div>
                             <div class="">
                                 <span class="sgl-black-txt">
-                                    <a href="{% url 'project:add-project-crew' project.id %}" class="mem-blu-link">Team Set-Up</a>
+                                    {% if request.user == project.creator %}
+                                    <a href="{% url 'project:add-project-crew' project.id %}" class="blue-link">Team Set-Up</a>
+                                    {% endif %}
+                                </span>
+                                <span class="sgl-black-txt ml-2">
+                                    {% if request.user == project.creator %}
+                                    <a href="{% url 'project:crew-attach-replace' project.id %}" class="blue-link">Description</a>
+                                    {% endif %}
                                 </span>
                                 <span class="sgl-blue-txt sgl-full-lst-align">
                                     <a class="enable-scroll-crew cursor-pointer">Full List</a>
@@ -367,7 +374,9 @@
                             </div>
                                 <div class="">
                                     <span class="sgl-black-txt">
-                                        <a href="{% url 'project:add-characters' project.id %}" class="mem-blu-link">Cast/Sides Set-Up</a>
+                                        {% if request.user == project.creator %}
+                                        <a href="{% url 'project:add-characters' project.id %}" class="blue-link">Cast/Sides Set-Up</a>
+                                        {% endif %}
                                     </span>
                                     <span class="sgl-blue-txt sgl-full-lst-align">
                                         <a class="enable-scroll cursor-pointer">Full List</a>
@@ -709,12 +718,12 @@
 </div>
 <!-- end of modal -->
                                 </div>
-                                <div class="card sgl-logline-card mt-4 mb-3">
+                                <!-- <div class="card sgl-logline-card mt-4 mb-3">
                                     <div class="sgl-card2-inner-align">
                                         <div >
                                             <span class="sgl-invite-txt"><a href=""><span class="sgl-fnt-lg">G</span>ROUPS</a></span>
                                             <span class="sgl-post-txt sgl-post-txt-align"><a href=""><span class="sgl-fnt-post-lg">P</span>OST <span class="sgl-fnt-post-lg">M</span>ESSAGE/<span class="sgl-fnt-post-lg">M</span>EDIA</a></span>
-                                            <!-- <span class="sgl-invite-txt sgl-video-txt-align"><a href=""><span class="sgl-fnt-lg">V</span>ideo <span class="sgl-fnt-lg">C</span>hat</a></span> -->
+                                            <span class="sgl-invite-txt sgl-video-txt-align"><a href=""><span class="sgl-fnt-lg">V</span>ideo <span class="sgl-fnt-lg">C</span>hat</a></span>
                                         </div>
                                         <div class="sgl-post-cont">
                                             <span class="sgl-post-cont-fnt"><span class="sgl-post-cont-fnt-lg">T</span>HIS <span class="sgl-post-cont-fnt-lg">B</span>OARD IS <span class="sgl-post-cont-fnt-lg">P</span>RIVATE BY <span class="sgl-post-cont-fnt-lg">D</span>EFAULT. <span class="sgl-post-cont-fnt-lg">ONLY </span><span class="sgl-post-cont-fnt-lg">M</span>EMBERS (ATTACHED CAST, FILMMAKERS AND CREW) CAN SEE THIS BOARD!</span>
@@ -729,8 +738,7 @@
                                             <span class="sgl-post-cont-fnt"><span class="sgl-post-cont-fnt-lg">W</span>HEN SOMEONE POSTS A MESSAGE EVERYONE (FROM THAT GROUP) GETS NOTIFICATION.  </span>
                                         </div>
                                     </div>
-
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </div>

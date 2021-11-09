@@ -41,3 +41,11 @@ def get_dict_value_if_exists(dict, key):
         return dict[key]
     else:
         return 0
+
+@register.simple_tag()
+def get_team_count(dict, key):
+    if key in dict:
+        team_count = len(dict[key])
+        return team_count
+    else:
+        return 0
