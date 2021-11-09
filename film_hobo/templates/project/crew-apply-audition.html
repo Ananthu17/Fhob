@@ -72,9 +72,19 @@
                             <div class="crw-creator-sec-padding">
                                 <div>
                                     <span class="sgl-black-txt">Creator:</span>
-                                    <span class="crw-blue-txt txt-capitalize" title="{{project.creator.get_full_name}}">
+                                    {% if project.creator.membership == "HOB" or project.creator.membership == "IND" or project.creator.membership == "PRO"  %}
+                                    <span class="sgl-blue-txt"><a href="{% url 'hobo_user:profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.get_full_name}}</a></span>
+                                    {% elif project.creator.membership == "COM" and project.creator.company_type == "production" %}
+                                    <span class="sgl-blue-txt"><a href="{% url 'hobo_user:production-company-profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.company_name}}</a></span>
+                                    {% elif project.creator.membership == "COM" and project.creator.company_type == "Agency/Management" %}
+                                    <span class="sgl-blue-txt"><a href="{% url 'hobo_user:agency-management-company-profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.company_name}}</a></span>
+                                    {% else %}
+                                    <span class="sgl-blue-txt"><a href="{% url 'hobo_user:profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.get_full_name}}</a></span>
+                                    {% endif %}
+                                    <!-- <span class="crw-blue-txt txt-capitalize" title="{{project.creator.get_full_name}}">
                                         <a href="">{{project.creator.get_full_name}}</a>
-                                    </span>
+
+                                    </span> -->
                                     <span class="crw-log-star">
                                         <div class="">
                                             <div class="cta-stars-outer">

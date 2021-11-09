@@ -361,14 +361,14 @@
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item dropdown">
                             <a id="user-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                {% if user.is_superuser %}
+                                {% if request.user.is_superuser %}
                                     Admin
-                                {% elif user.membership == "COM" %}
-
-                                {{ user.company_name }}
+                                {% elif request.user.membership  == "COM" %}
+                                
+                                {{ request.user.company_name }}
 
                                 {% else %}
-                                    {{ user.get_full_name }}
+                                    {{ request.user.get_full_name }}
                                 {% endif %}
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
