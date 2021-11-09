@@ -358,6 +358,10 @@
                             <a id="user-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
                                 {% if user.is_superuser %}
                                     Admin
+                                {% elif user.membership == "COM" %}
+
+                                {{ user.company_name }}
+
                                 {% else %}
                                     {{ user.get_full_name }}
                                 {% endif %}
