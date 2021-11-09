@@ -119,11 +119,11 @@ $(document).ready(function() {
                 $("#empty-title").hide();
                 $("#blocked-list-title").show();
                 $('#all_blocked_members').empty()
-                $('#all_blocked_members').append($("<option></option>")
+                $('#all_blocked_members').append($("<option>Choose a Member</option>")
                 .attr("value", " ")
                 .text(" "));
                 $.each(blocked_members_dict, function( k, v ) {
-                    $('#all_blocked_members').append($("<option></option>")
+                    $('#all_blocked_members').append($("<option>Choose a Member</option>")
                     .attr("value", k)
                     .text(v));
                 });
@@ -178,11 +178,11 @@ $(document).ready(function() {
                             $("#empty-title").hide();
                             $("#blocked-list-title").show();
                             $('#all_blocked_members').empty()
-                            $('#all_blocked_members').append($("<option></option>")
+                            $('#all_blocked_members').append($("<option>Choose a Member</option>")
                             .attr("value", " ")
                             .text(" "));
                             $.each(blocked_members_dict, function( k, v ) {
-                            $('#all_blocked_members').append($("<option></option>")
+                            $('#all_blocked_members').append($("<option>Choose a Member</option>")
                             .attr("value", k)
                             .text(v));
                             });
@@ -270,11 +270,11 @@ $(document).ready(function() {
                                 $("#empty-title").hide();
                                 $("#blocked-list-title").show();
                                 $('#all_blocked_members').empty()
-                                $('#all_blocked_members').append($("<option></option>")
+                                $('#all_blocked_members').append($("<option>Choose a Member</option>")
                                 .attr("value", " ")
                                 .text(" "));
                                 $.each(blocked_members_dict, function( k, v ) {
-                                $('#all_blocked_members').append($("<option></option>")
+                                $('#all_blocked_members').append($("<option>Choose a Member</option>")
                                 .attr("value", k)
                                 .text(v));
                                 });
