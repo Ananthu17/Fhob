@@ -148,8 +148,13 @@
 
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
-                                <img src="{% static 'images/man-user.png' %}"
+                                {% if request.user.get_profile_photo %}
+                                    <img src="{{ request.user.get_profile_photo }}"
                                     class="img-fluid header-user-img">
+                                {% else %}
+                                    <img src="{% static 'images/man-user.png' %}"
+                                    class="img-fluid header-user-img">
+                                {% endif %}
                                 </a>
                                 {% if user.membership == 'HOB' %}
                                     <span class="header-icon-pos pro-font">Hobo</span>
