@@ -5683,6 +5683,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
         if cast_samr == 'indie':
             indie_samr_rate = request.POST.get('indie_samr_rate')
+            if indie_samr_rate == '0':
+                project_cast_samr = 'indie_with_rating_0_star'
             if indie_samr_rate == '1':
                 project_cast_samr = 'indie_with_rating_1_star'
             if indie_samr_rate == '2':
@@ -5695,6 +5697,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 project_cast_samr = 'indie_with_rating_5_star'
         if cast_samr == 'pro':
             pro_samr_rate = request.POST.get('pro_samr_rate')
+            if pro_samr_rate == '0':
+                project_cast_samr = 'pro_with_rating_0_star'
             if pro_samr_rate == '1':
                 project_cast_samr = 'pro_with_rating_1_star'
             if pro_samr_rate == '2':
@@ -5707,6 +5711,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 project_cast_samr = 'pro_with_rating_5_star'
         if cast_samr == 'indie_and_pro' :
             indie_and_pro_samr_rate = request.POST.get('indie_and_pro_samr_rate')
+            if indie_and_pro_samr_rate == '0':
+                project_cast_samr = 'indie_and_pro_with_rating_0_star'
             if indie_and_pro_samr_rate == '1':
                 project_cast_samr = 'indie_and_pro_with_rating_1_star'
             if indie_and_pro_samr_rate == '2':
@@ -5720,6 +5726,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
 
         if crew_samr == 'indie':
             crew_indie_samr_rate = request.POST.get('crew_indie_samr_rate')
+            if crew_indie_samr_rate == '0':
+                project_crew_samr = 'indie_with_rating_0_star'
             if crew_indie_samr_rate == '1':
                 project_crew_samr = 'indie_with_rating_1_star'
             if crew_indie_samr_rate == '2':
@@ -5732,6 +5740,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 project_crew_samr = 'indie_with_rating_5_star'
         if crew_samr == 'pro':
             crew_pro_samr_rate = request.POST.get('crew_pro_samr_rate')
+            if crew_pro_samr_rate == '0':
+                project_crew_samr = 'pro_with_rating_0_star'
             if crew_pro_samr_rate == '1':
                 project_crew_samr = 'pro_with_rating_1_star'
             if crew_pro_samr_rate == '2':
@@ -5744,6 +5754,8 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
                 project_crew_samr = 'pro_with_rating_5_star'
         if crew_samr == 'indie_and_pro' :
             crew_indie_and_pro_samr_rate = request.POST.get('crew_indie_and_pro_samr_rate')
+            if crew_indie_and_pro_samr_rate == '0':
+                project_crew_samr = 'indie_and_pro_with_rating_0_star'
             if crew_indie_and_pro_samr_rate == '1':
                 project_crew_samr = 'indie_and_pro_with_rating_1_star'
             if crew_indie_and_pro_samr_rate == '2':
@@ -5991,7 +6003,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        print(request.POST)
+        # print(request.POST)
         remove_script = request.POST.get('remove_script')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
@@ -6000,6 +6012,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
         if cast_samr == 'indie':
             indie_samr_rate = request.POST.get('indie_samr_rate')
+            if indie_samr_rate == '0':
+                project_cast_samr = 'indie_with_rating_0_star'
             if indie_samr_rate == '1':
                 project_cast_samr = 'indie_with_rating_1_star'
             if indie_samr_rate == '2':
@@ -6012,6 +6026,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 project_cast_samr = 'indie_with_rating_5_star'
         if cast_samr == 'pro':
             pro_samr_rate = request.POST.get('pro_samr_rate')
+            if pro_samr_rate == '0':
+                project_cast_samr = 'pro_with_rating_0_star'
             if pro_samr_rate == '1':
                 project_cast_samr = 'pro_with_rating_1_star'
             if pro_samr_rate == '2':
@@ -6024,6 +6040,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 project_cast_samr = 'pro_with_rating_5_star'
         if cast_samr == 'indie_and_pro' :
             indie_and_pro_samr_rate = request.POST.get('indie_and_pro_samr_rate')
+            if indie_and_pro_samr_rate == '0':
+                project_cast_samr = 'indie_and_pro_with_rating_0_star'
             if indie_and_pro_samr_rate == '1':
                 project_cast_samr = 'indie_and_pro_with_rating_1_star'
             if indie_and_pro_samr_rate == '2':
@@ -6037,6 +6055,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
         if crew_samr == 'indie':
             crew_indie_samr_rate = request.POST.get('crew_indie_samr_rate')
+            if crew_indie_samr_rate == '0':
+                project_crew_samr = 'indie_with_rating_0_star'
             if crew_indie_samr_rate == '1':
                 project_crew_samr = 'indie_with_rating_1_star'
             if crew_indie_samr_rate == '2':
@@ -6049,6 +6069,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 project_crew_samr = 'indie_with_rating_5_star'
         if crew_samr == 'pro':
             crew_pro_samr_rate = request.POST.get('crew_pro_samr_rate')
+            if crew_pro_samr_rate == '0':
+                project_crew_samr = 'pro_with_rating_0_star'
             if crew_pro_samr_rate == '1':
                 project_crew_samr = 'pro_with_rating_1_star'
             if crew_pro_samr_rate == '2':
@@ -6061,6 +6083,8 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
                 project_crew_samr = 'pro_with_rating_5_star'
         if crew_samr == 'indie_and_pro' :
             crew_indie_and_pro_samr_rate = request.POST.get('crew_indie_and_pro_samr_rate')
+            if crew_indie_and_pro_samr_rate == '0':
+                project_crew_samr = 'indie_and_pro_with_rating_0_star'
             if crew_indie_and_pro_samr_rate == '1':
                 project_crew_samr = 'indie_and_pro_with_rating_1_star'
             if crew_indie_and_pro_samr_rate == '2':

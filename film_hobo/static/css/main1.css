@@ -2367,6 +2367,15 @@ ul.cas-cast-menu li{
       padding-left: 0px;
    }
 }
+@media(max-width:420px){
+   .cas-inp-align{
+      padding-left: 0px;
+   }
+   .cas-date-inp {
+      margin-bottom: 5px;
+   }
+}
+
 
 /* Cast and Sides End  */
 /* Sides_setup */
