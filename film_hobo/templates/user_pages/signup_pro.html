@@ -48,7 +48,9 @@
                           {{item}}
                         </div>
                         {% endfor %}
-
+                        <div class="d-flex justify-content-center">
+                          {{ form.guild_membership_id.errors }}
+                        </div>
                         <div class="mt-2">
                             <span class="pro-red-bx">Falsification of the Guild record may result in termination of your membership</span>
                           </div>

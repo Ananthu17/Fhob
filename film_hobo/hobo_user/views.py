@@ -1872,7 +1872,9 @@ class SettingsView(LoginRequiredMixin, TemplateView):
         context['disable_account_reasons'] = disable_account_reasons
         context['block_member_list'] = modified_queryset
         context['user'] = user
-        if user.membership != 'HOB':
+        if user.membership == 'INDIE' or \
+           user.membership == 'PRO' or \
+           user.membership == 'COM':
             context['transaction'] = \
                 Transaction.objects.get(user_id=user.id)
         return context
