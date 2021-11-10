@@ -25,24 +25,6 @@
 
 
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
-
-
-                <div  class=" proj-calender-sec mt-3">
-                    <div class="proj-location-sec">
-                        <div class="proj-location-sec-head">
-                            Location
-                        </div>
-                        <div class="proj-location-select-sec">
-                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
-                                {% for place in locations %}
-                                <option disabled selected hidden>Choose Location</option>
-                                <option value="{{place.id}}">{{place}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt">
                         <label class="d-flex justify-content-center ">Search by:</label>
