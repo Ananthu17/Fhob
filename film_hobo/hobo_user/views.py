@@ -6005,7 +6005,7 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        # print(request.POST)
+        print(request.POST)
         remove_script = request.POST.get('remove_script')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')

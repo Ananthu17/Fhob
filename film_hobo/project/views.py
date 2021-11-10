@@ -1,6 +1,9 @@
 import ast
 import io
 import json
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+
 # from django.db.models.deletion import PROTECT
 import requests
 # import boto3
@@ -1122,8 +1125,21 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         audition_obj.cover_image = cover_image
 
         if video_type == 'youtube':
-            url_temp = url.split("v=")[1]
-            video_url = url_temp.split("&")[0]
+            # url_temp = url.split("v=")[1]
+            # video_url = url_temp.split("&")[0]
+            # audition_obj.video_url = video_url
+            query = urlparse(url)
+            if query.hostname == 'youtu.be':
+                video_url = query.path[1:]
+            if query.hostname in ('www.youtube.com', 'youtube.com'):
+                if query.path == '/watch':
+                    p = parse_qs(query.query)
+                    video_url = p['v'][0]
+                if query.path[:7] == '/embed/':
+                    video_url = query.path.split('/')[2]
+                if query.path[:3] == '/v/':
+                    video_url = query.path.split('/')[2]
+            # print("video_url = ", video_url)
             audition_obj.video_url = video_url
         if video_type == 'vimeo':
             if url.startswith('https://vimeo.com/'):
@@ -1456,9 +1472,10 @@ class GenerateSceneImagePDFAPI(APIView):
                 # convert pixel in mm with 1px=0.264583 mm
                 width, height = float(width * 0.264583), float(height * 0.264583)
                 # given we are working with A4 format size
-                pdf_size = {'P': {'w': 210, 'h': 297}, 'L': {'w': 297, 'h': 210}}
+                pdf_size = {'P': {'w': 210, 'h': 297}, 'L': {'w': 210, 'h': 297}}
                 # get page orientation from image size
-                orientation = 'P' if width < height else 'L'
+                # orientation = 'P' if width < height else 'L'
+                orientation = 'P'
                 #  make sure image size is not greater than the pdf format size
                 width = width if width < pdf_size[orientation]['w'] else pdf_size[orientation]['w']
                 height = height if height < pdf_size[orientation]['h'] else pdf_size[orientation]['h']

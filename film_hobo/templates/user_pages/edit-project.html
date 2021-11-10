@@ -4,12 +4,12 @@
 {% block content %}
     <style>
         .fileuploaddiv{
-            border: 1px solid;
-            background-color: #cecece;
-            width: 150px;
-            text-align: right;
-            display: flex;
-            flex-direction: row;
+            /* border: 1px solid;
+            background-color: #cecece; */
+            width: auto;
+            text-align: left;
+            /* display: flex; */
+            /* flex-direction: row; */
             align-items: center;
             justify-content: space-around;
         }
@@ -596,7 +596,8 @@
                                                 {% if project_obj.cast_samr == 'indie_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="indie_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="indie_samr_rate_0" name="indie_samr_rate" value="0"/>
+                                                <input type="radio" id="indie_samr_rate_0" name="indie_samr_rate" value="0"
+                                                {% if project_obj.cast_samr == 'indie_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -626,7 +627,8 @@
                                                 {% if project_obj.cast_samr == 'pro_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="pro_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="pro_samr_rate_0" name="pro_samr_rate" value="0" />
+                                                <input type="radio" id="pro_samr_rate_0" name="pro_samr_rate" value="0"
+                                                {% if project_obj.cast_samr == 'pro_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -656,7 +658,8 @@
                                                 {% if project_obj.cast_samr == 'indie_and_pro_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="indie_and_pro_samr_rate_0" name="indie_and_pro_samr_rate" value="0"/>
+                                                <input type="radio" id="indie_and_pro_samr_rate_0" name="indie_and_pro_samr_rate" value="0"
+                                                {% if project_obj.cast_samr == 'indie_and_pro_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -695,7 +698,8 @@
                                                 {% if project_obj.crew_samr == 'indie_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="crew_indie_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="crew_indie_samr_rate_0" name="crew_indie_samr_rate" value="0"/>
+                                                <input type="radio" id="crew_indie_samr_rate_0" name="crew_indie_samr_rate" value="0"
+                                                {% if project_obj.crew_samr == 'indie_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -725,7 +729,8 @@
                                                 {% if project_obj.crew_samr == 'pro_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="crew_pro_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="crew_pro_samr_rate_0" name="crew_pro_samr_rate" value="0"/>
+                                                <input type="radio" id="crew_pro_samr_rate_0" name="crew_pro_samr_rate" value="0"
+                                                {% if project_obj.crew_samr == 'pro_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -755,7 +760,8 @@
                                                 {% if project_obj.crew_samr == 'indie_and_pro_with_rating_1_star' %}checked{% endif %}/>
                                                 <label for="crew_indie_and_pro_samr_rate_1" class="form-check-label">1 star</label>
 
-                                                <input type="radio" id="crew_indie_and_pro_samr_rate_0" name="crew_indie_and_pro_samr_rate" value="0"/>
+                                                <input type="radio" id="crew_indie_and_pro_samr_rate_0" name="crew_indie_and_pro_samr_rate" value="0"
+                                                {% if project_obj.crew_samr == 'indie_and_pro_with_rating_0_star' %}checked{% endif %}/>
                                         </span>
                                     </label>
                                 </span>
@@ -904,11 +910,12 @@
                         </div>
                         <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
-                            <div class="col-2">
+                            <div class="col-12">
                                 <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
                                 <a style="border: 0;margin-bottom: 1rem;"
                                 class="prjct-log-link underline text-danger  post_project cursor-pointer"
                                 id="{{draft_project_obj.id}}">POST YOUR PROJECT</a>
+                                <span class="small-txt">(Click "POST YOUR PROJECT" to update changes to site.)</span>
                             </div>
                         </div>
                         <hr class="prjct-log-blck-hr">
