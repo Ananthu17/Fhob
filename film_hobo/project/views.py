@@ -1,6 +1,9 @@
 import ast
 import io
 import json
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+
 # from django.db.models.deletion import PROTECT
 import requests
 # import boto3
@@ -1122,8 +1125,21 @@ class CastApplyAuditionView(LoginRequiredMixin, TemplateView):
         audition_obj.cover_image = cover_image
 
         if video_type == 'youtube':
-            url_temp = url.split("v=")[1]
-            video_url = url_temp.split("&")[0]
+            # url_temp = url.split("v=")[1]
+            # video_url = url_temp.split("&")[0]
+            # audition_obj.video_url = video_url
+            query = urlparse(url)
+            if query.hostname == 'youtu.be':
+                video_url = query.path[1:]
+            if query.hostname in ('www.youtube.com', 'youtube.com'):
+                if query.path == '/watch':
+                    p = parse_qs(query.query)
+                    video_url = p['v'][0]
+                if query.path[:7] == '/embed/':
+                    video_url = query.path.split('/')[2]
+                if query.path[:3] == '/v/':
+                    video_url = query.path.split('/')[2]
+            print("video_url = ", video_url)
             audition_obj.video_url = video_url
         if video_type == 'vimeo':
             if url.startswith('https://vimeo.com/'):

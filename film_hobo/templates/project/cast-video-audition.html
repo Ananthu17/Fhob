@@ -62,7 +62,7 @@
                     <div class="sds-menu-bg">
                         <div class="cta-menu-align">
                             <ul class="cva-menu ">
-                                <li><span class="video-menu-head">PROJECT </span><a href=""
+                                <li><span class="video-menu-head">PROJECT </span><a href="{% url 'project:single-film-project' audition.project.id %}"
                                         class="video-menu-head-tag">#{{audition.project.id}}</a></li>
                                 <li><span>Title: </span><span class="sgl-menu-blue txt-uppercase">{{audition.project.title}}</span></li>
                                 <li><span>Format: </span><span class="sgl-menu-blue txt-uppercase">{{audition.project.get_format_display}}</span></li>

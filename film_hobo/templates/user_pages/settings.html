@@ -338,6 +338,21 @@
                                             </label>
                                         </div>
                                     </li>
+                                    <li>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio"
+                                                id="no_one"
+                                                name="who_can_contact_me"
+                                                value="all_members"
+                                                {% if user_settings.who_can_contact_me == 'all_members' %}
+                                                checked
+                                                {% endif %}
+                                                class="radio-settings form-check-input float-left" style="position: initial;">
+                                                All Members
+                                            </label>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
