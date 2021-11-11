@@ -905,36 +905,39 @@
                             </div> -->
                             <div class="col-3">
                                 <!-- <a href="" class="prjct-log-link underline">SAVE</a> -->
-                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">SAVE</button>
+                                <button type="submit" class="prjct-log-link underline btn custom-save-btn">POST</button>
                             </div>
                         </div>
-                        <hr class="prjct-log-blck-hr">
+                        <!-- <hr class="prjct-log-blck-hr">
                         <div class="row mb-4">
                             <div class="col-12">
-                                <!-- <button type="submit" style="border: 0;margin-bottom: 1rem;" class="prjct-log-link underline text-danger">POST YOUR PROJECT</button> -->
                                 <a style="border: 0;margin-bottom: 1rem;"
                                 class="prjct-log-link underline text-danger  post_project cursor-pointer"
                                 id="{{draft_project_obj.id}}">POST YOUR PROJECT</a>
                                 <span class="small-txt">(Click "POST YOUR PROJECT" to update changes to site.)</span>
                             </div>
-                        </div>
+                        </div> -->
                         <hr class="prjct-log-blck-hr">
                         {% if mode_operation == 'update' %}
-                            {% if project %}
                                 <div class="row mt-3">
-                                    <a href="{% url 'project:add-characters' id=project.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
+                                    <a href="{% url 'project:add-characters' id=project_obj.id %}" class="btn prjct-log-btn">CAST & SIDES SET UP</a> <span
                                         class="mt-2 ml-3 bold">({{cast_count}})</span>
                                 </div>
 
                                 <div class="row mt-3">
-                                    <a href="{% url  'project:add-project-crew' id=project.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
+                                    <a href="{% url  'project:add-project-crew' id=project_obj.id  %}" class="btn prjct-log-btn">CREW SET UP</a> <span
                                         class="mt-2 ml-3 bold">({{crew_count}})</span>
                                 </div>
                                 <div class="row mt-3">
-                                    <a href="{% url  'project:single-film-project' id=project.id  %}"
+                                    <a href="{% url 'project:crew-attach-replace' project_obj.id %}"
+                                    class="btn prjct-log-btn">CREW DESCRIPTION</a>
+                                    <span class="mt-2 ml-3 bold"></span>
+                                </div>
+                                <div class="row mt-3">
+                                    <a href="{% url  'project:single-film-project' id=project_obj.id  %}"
                                     class="btn prjct-log-btn">PROJECT HOME</a>
                                 </div>
-                            {% else %}
+                            <!-- 
                                 <p class="all-error-msg">Cast/Sides Set-Up and Team Set-Up will be available on this page after you post the project</p>
                                 <div class="row mt-3">
                                     <a  class="btn prjct-log-btn cursor-disabled" title="Cast setup will be available after you post the project.">CAST & SIDES SET UP</a> <span
@@ -947,8 +950,7 @@
                                 </div>
                                 <div class="row mt-3">
                                     <a class="btn prjct-log-btn cursor-disabled" title="Project home will be visible after you post the project.">PROJECT HOME</a>
-                                </div>
-                            {% endif %}
+                                </div> -->
                         {% endif %}
                         <hr class="prjct-log-blck-hr">
 
