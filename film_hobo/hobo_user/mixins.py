@@ -5,7 +5,7 @@ from functools import reduce
 from django.db import models
 from rest_framework.compat import distinct
 from rest_framework.settings import api_settings
-
+from .models import CustomUser
 
 class SegregatorMixin():
     def project_segregator(self, project):
@@ -123,9 +123,18 @@ class SearchFilter():
                     break
         return False
 
+    def find_user(self, search_terms, queryset):
+        for item in CustomUser.objects.all():
+            if item.get_full_name() == " ".join(search_terms):
+                return queryset.filter(creator=item.id)
+
     def filter_queryset(self, request, queryset, view):
         search_fields = self.get_search_fields(view, request)
         search_terms = self.get_search_terms(request)
+
+        user = self.find_user(search_terms, queryset)
+        if user:
+            return user
 
         if not search_fields or not search_terms:
             return queryset

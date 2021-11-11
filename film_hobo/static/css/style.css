@@ -879,3 +879,18 @@ input.pw {
  .cast_rate > input:checked ~ label {
   color: #e88b22;    
  }
+
+ .blue-link{
+  color:#0e62b5;
+  font-weight:600;
+ }
+ .blue-link:active, .blue-link:hover, .blue-link:focus{
+  color:#0e62b5;
+  font-weight:600;
+ }
+ .project_section_modal
+  {
+    max-height:300px;
+    overflow-y:scroll;
+    overflow-x:hidden;
+  }

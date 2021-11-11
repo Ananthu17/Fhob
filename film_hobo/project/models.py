@@ -100,7 +100,8 @@ class Sides(models.Model):
     scene_1_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_2_pdf = models.FileField(upload_to='script/', null=True, blank=True)
     scene_3_pdf = models.FileField(upload_to='script/', null=True, blank=True)
-    scenes_combined = models.FileField(upload_to='script/', null=True, blank=True)
+    scenes_combined = models.FileField(
+        upload_to='script/', null=True, blank=True)
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+" - sides"
@@ -169,11 +170,11 @@ class Audition(models.Model):
     status_update_date = models.DateField(_("Status updated on"),
                                           null=True, blank=True,)
     i_agree = models.BooleanField(
-                _('I Agree'),
-                default=True,
-                help_text=_(
-                    'Designates whether the user accepted the terms and conditions.'),
-            )
+        _('I Agree'),
+        default=True,
+        help_text=_(
+            'Designates whether the user accepted the terms and conditions.'),
+    )
 
     def __str__(self):
         return self.project.title+" - "+self.character.name+"-"+self.name
@@ -220,7 +221,7 @@ class AuditionRating(models.Model):
     review = models.TextField(_("Review"), null=True, blank=True)
 
     def __str__(self):
-        return str(self.audition.name) + " -rated by " +str(self.team_member.user.get_full_name())
+        return str(self.audition.name) + " -rated by " + str(self.team_member.user.get_full_name())
 
     class Meta:
         verbose_name = 'Audition Rating'
@@ -398,11 +399,11 @@ class CrewApplication(models.Model):
     status_update_date = models.DateField(_("Status updated on"),
                                           null=True, blank=True, auto_now_add=True)
     i_agree = models.BooleanField(
-                _('I Agree'),
-                default=True,
-                help_text=_(
-                    'Designates whether the user accepted the terms and conditions.'),
-            )
+        _('I Agree'),
+        default=True,
+        help_text=_(
+            'Designates whether the user accepted the terms and conditions.'),
+    )
 
     def __str__(self):
         return str(self.project.title+" - "+str(self.crew.job_type.title)+" - "+self.user.get_full_name())
@@ -519,32 +520,38 @@ class DraftProject(models.Model):
         (NATION_WIDE, 'Nation Wide'),
         (LOCAL_ONLY, 'Local Only'),
     ]
+    INDIE_WITH_RATING_0_STAR = 'indie_with_rating_0_star'
     INDIE_WITH_RATING_1_STAR = 'indie_with_rating_1_star'
     INDIE_WITH_RATING_2_STAR = 'indie_with_rating_2_star'
     INDIE_WITH_RATING_3_STAR = 'indie_with_rating_3_star'
     INDIE_WITH_RATING_4_STAR = 'indie_with_rating_4_star'
     INDIE_WITH_RATING_5_STAR = 'indie_with_rating_5_star'
+    PRO_WITH_RATING_0_STAR = 'pro_with_rating_0_star'
     PRO_WITH_RATING_1_STAR = 'pro_with_rating_1_star'
     PRO_WITH_RATING_2_STAR = 'pro_with_rating_2_star'
     PRO_WITH_RATING_3_STAR = 'pro_with_rating_3_star'
     PRO_WITH_RATING_4_STAR = 'pro_with_rating_4_star'
     PRO_WITH_RATING_5_STAR = 'pro_with_rating_5_star'
+    INDIE_AND_PRO_WITH_RATING_0_STAR = 'indie_and_pro_with_rating_0_star'
     INDIE_AND_PRO_WITH_RATING_1_STAR = 'indie_and_pro_with_rating_1_star'
     INDIE_AND_PRO_WITH_RATING_2_STAR = 'indie_and_pro_with_rating_2_star'
     INDIE_AND_PRO_WITH_RATING_3_STAR = 'indie_and_pro_with_rating_3_star'
     INDIE_AND_PRO_WITH_RATING_4_STAR = 'indie_and_pro_with_rating_4_star'
     INDIE_AND_PRO_WITH_RATING_5_STAR = 'indie_and_pro_with_rating_5_star'
     CAST_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_0_STAR, 'Indie with 0 star rating'),
         (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
         (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
         (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
         (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
         (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_0_STAR, 'Pro with 0 star rating'),
         (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
         (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
         (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
         (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
         (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_0_STAR, 'Indie and Pro with rating 0 star'),
         (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
         (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
         (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
@@ -553,16 +560,19 @@ class DraftProject(models.Model):
     ]
 
     CREW_SAMR_CHOICES = [
+        (INDIE_WITH_RATING_0_STAR, 'Indie with 0 star rating'),
         (INDIE_WITH_RATING_1_STAR, 'Indie with 1 star rating'),
         (INDIE_WITH_RATING_2_STAR, 'Indie with 2 star rating'),
         (INDIE_WITH_RATING_3_STAR, 'Indie with 3 star rating'),
         (INDIE_WITH_RATING_4_STAR, 'Indie with 4 star rating'),
         (INDIE_WITH_RATING_5_STAR, 'Indie with 5 star rating'),
+        (PRO_WITH_RATING_0_STAR, 'Pro with 0 star rating'),
         (PRO_WITH_RATING_1_STAR, 'Pro with 1 star rating'),
         (PRO_WITH_RATING_2_STAR, 'Pro with 2 star rating'),
         (PRO_WITH_RATING_3_STAR, 'Pro with 3 star rating'),
         (PRO_WITH_RATING_4_STAR, 'Pro with 4 star rating'),
         (PRO_WITH_RATING_5_STAR, 'Pro with 5 star rating'),
+        (INDIE_AND_PRO_WITH_RATING_0_STAR, 'Indie and Pro with rating 0 star'),
         (INDIE_AND_PRO_WITH_RATING_1_STAR, 'Indie and Pro with rating 1 star'),
         (INDIE_AND_PRO_WITH_RATING_2_STAR, 'Indie and Pro with rating 2 star'),
         (INDIE_AND_PRO_WITH_RATING_3_STAR, 'Indie and Pro with rating 3 star'),
@@ -719,11 +729,11 @@ class DraftProject(models.Model):
     cast_samr = models.CharField(_("Cast SAMR"),
                                  choices=CAST_SAMR_CHOICES,
                                  max_length=150,
-                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+                                 default=INDIE_AND_PRO_WITH_RATING_0_STAR)
     crew_samr = models.CharField(_("Crew SAMR"),
                                  choices=CREW_SAMR_CHOICES,
                                  max_length=150,
-                                 default=INDIE_AND_PRO_WITH_RATING_1_STAR)
+                                 default=INDIE_AND_PRO_WITH_RATING_0_STAR)
     video_status = models.CharField(_("Video Status"),
                                     choices=VIDEO_STATUS_CHOICES,
                                     max_length=150,

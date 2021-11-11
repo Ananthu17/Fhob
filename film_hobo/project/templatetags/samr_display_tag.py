@@ -10,6 +10,10 @@ def get_samr_display_value(project_id):
     samr = project.cast_samr
     samr_data = []
 
+    if samr == 'indie_with_rating_0_star':
+        samr_data.append("Indie")
+        samr_data.append(0)
+        samr_data.append(['IND'])
     if samr == 'indie_with_rating_1_star':
         samr_data.append("Indie")
         samr_data.append(1)
@@ -30,6 +34,10 @@ def get_samr_display_value(project_id):
         samr_data.append("Indie")
         samr_data.append(5)
         samr_data.append(['IND'])
+    if samr == 'pro_with_rating_0_star':
+        samr_data.append("Pro")
+        samr_data.append(0)
+        samr_data.append(['PRO'])
     if samr == 'pro_with_rating_1_star':
         samr_data.append("Pro")
         samr_data.append(1)
@@ -50,6 +58,10 @@ def get_samr_display_value(project_id):
         samr_data.append("Pro")
         samr_data.append(5)
         samr_data.append(['PRO'])
+    if samr == 'indie_and_pro_with_rating_0_star':
+        samr_data.append("Indie/Pro")
+        samr_data.append(0)
+        samr_data.append(['IND', 'PRO'])
     if samr == 'indie_and_pro_with_rating_1_star':
         samr_data.append("Indie/Pro")
         samr_data.append(1)
@@ -79,6 +91,10 @@ def get_crew_samr_display_value(project_id):
     print("----------------", samr)
     samr_data = []
 
+    if samr == 'indie_with_rating_0_star':
+        samr_data.append("Indie")
+        samr_data.append(0)
+        samr_data.append(['IND'])
     if samr == 'indie_with_rating_1_star':
         samr_data.append("Indie")
         samr_data.append(1)
@@ -99,6 +115,10 @@ def get_crew_samr_display_value(project_id):
         samr_data.append("Indie")
         samr_data.append(5)
         samr_data.append(['IND'])
+    if samr == 'pro_with_rating_0_star':
+        samr_data.append("Pro")
+        samr_data.append(0)
+        samr_data.append(['PRO'])
     if samr == 'pro_with_rating_1_star':
         samr_data.append("Pro")
         samr_data.append(1)
@@ -119,6 +139,10 @@ def get_crew_samr_display_value(project_id):
         samr_data.append("Pro")
         samr_data.append(5)
         samr_data.append(['PRO'])
+    if samr == 'indie_and_pro_with_rating_0_star':
+        samr_data.append("Indie/Pro")
+        samr_data.append(0)
+        samr_data.append(['IND', 'PRO'])
     if samr == 'indie_and_pro_with_rating_1_star':
         samr_data.append("Indie/Pro")
         samr_data.append(1)

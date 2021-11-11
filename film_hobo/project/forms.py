@@ -1,9 +1,9 @@
 from django import forms
 from hobo_user.models import Project
-from .models import Sides
+# from .models import Sides
 from .models import Audition
 from bootstrap_datepicker_plus import DateTimePickerInput
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
+# from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 
 class VideoSubmissionLastDateForm(forms.ModelForm):

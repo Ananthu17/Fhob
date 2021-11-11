@@ -7,6 +7,10 @@
         {
         visibility:hidden;
         }
+        .cancel_btn_span, .save_btn_span
+        {
+        display:none;
+        }
 
 </style>
 {% endblock %}
@@ -120,13 +124,13 @@
                                 <form method="post" action="{% url 'project:add-project-crew' project.id %}">
                                     {% csrf_token %}
                                 <div class="craa-save-edit-sec">
-                                    <span>
+                                    <span class="save_btn_span">
                                         <input type="submit" value="Save" class="crr-save-btn save_btn ">
                                     </span>
-                                    <span>
-                                        <a class="crr-save-btn cursor-pointer edit_btn">Edit</a>
+                                    <span class="edit_btn_span">
+                                        <a class="crr-save-btn cursor-pointer edit_btn">Start Selection/Edit</a>
                                     </span>
-                                    <span>
+                                    <span class="cancel_btn_span">
                                         <a class="crr-save-btn cursor-pointer cancel_btn ">Cancel</a>
                                     </span>
                                 </div>
@@ -356,6 +360,8 @@
         $(".edit_btn").css('display', 'none');
         $(".cancel_btn").css('visibility', 'visible');
         $(".save_btn").css('visibility', 'visible');
+        $(".cancel_btn_span").css('display', 'block');
+        $(".save_btn_span").css('display', 'block');
         $(".attach_btn").css('visibility', 'visible');
         $(".plus_minus_btn").css('visibility', 'visible');
         $(".remove_btn").css('visibility', 'visible');

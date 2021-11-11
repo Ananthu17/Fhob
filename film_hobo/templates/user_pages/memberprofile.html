@@ -2,6 +2,7 @@
 {% load user_account_tag %}
 {% load user_tracking_tag %}
 {% load check_profile_visibility_tag %}
+{% load project_rating_tag %}
 {% load friend_request_tag %}
 {% load token static %}
 
@@ -381,9 +382,62 @@
                             {% endif %}
                         </div>
                         <div class="col-2  mt-3">
-                            Projects:<span class="mem-setup-blu-f underline ml-1">5</span>
+                            {% get_team_count team_dict job  as team_count %}
+                            Projects:<span class="mem-setup-blu-f underline ml-1 cursor-pointer"
+                            data-target="#project_{{job}}" data-toggle="modal">{{team_count}}</span>
                         </div>
                     </div>
+
+
+<!-- The Modal -->
+<div class="modal fade" id="project_{{job}}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h6 class="modal-title mem-setup-blu-f">Worked as {{job_title}}</h6>
+                <button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="project_section_modal">
+                <div class="row">
+                    <div class="col-12 col-md-2 all-p"><b>ID</b></div>
+                    <div class="col-12 col-md-6 all-p"><b>Title</b></div>
+                    <div class="col-12 col-md-4 all-p"><b>Format</b></div>
+                        {% get_dict_value_if_exists team_dict job  as team_list %}
+                        {% if team_list%}
+                            {% for team_obj in team_list %}
+                                <div class="col-12 col-md-2">
+                                    <a href="{% url 'project:single-film-project' team_obj.project.id %}">#{{team_obj.project.id}}</a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {{team_obj.project.title}}
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {{team_obj.project.get_format_display}}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                </div>
+            </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger btn-sm close-modal"
+                data-dismiss="modal">close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+
+
 
                     {% endfor %}
                     {% endif %}

@@ -151,7 +151,7 @@
                         <div id="password-tab" class="row ml-2 collapse">
                             <div class="col-8 ml-4">
                                 <i class="bi bi-eye-slash" id="togglePassword1"></i>
-                                <input class="inp-line" type="password" id="old-pass" autocomplete="off" name="old_password" placeholder="Old Password" />
+                                <input class="inp-line" type="password" id="old-pass" autocomplete="off" name="old_password" placeholder="Old Password"  />
                                 <p class="old_password-error" style="margin-bottom:0; color:red;"></p>
                                 <i class="bi bi-eye-slash" id="togglePassword2"></i>
                                 <input class="inp-line" type="password" id="new-pass" autocomplete="off" name="new_password1" placeholder="New Password" />
@@ -456,8 +456,7 @@
                                 <select
                                 class="form-control form-control-input block-placeholder border-cls"
                                 id="all_blocked_members">
-                                
-                                <option value="">Select User</option>
+                                <option value="" selected disabled hidden>Choose a name</option>
                                 </select>
                             </div>
                             <div class="col-2 mt-4">
