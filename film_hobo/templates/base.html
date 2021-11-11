@@ -156,15 +156,15 @@
                                     class="img-fluid header-user-img">
                                 {% endif %}
                                 </a>
-                                {% if user.membership == 'HOB' %}
+                                {% if request.user.membership == 'HOB' %}
                                     <span class="header-icon-pos pro-font">Hobo</span>
-                                {% elif user.membership == 'IND' %}
+                                {% elif request.user.membership == 'IND' %}
                                     <span class="header-icon-pos pro-font">Indie</span>
-                                {% elif user.membership == 'PRO' %}
+                                {% elif request.user.membership == 'PRO' %}
                                     <span class="header-icon-pos pro-font">Pro</span>
-                                {% elif user.membership == 'COM' %}
+                                {% elif request.user.membership == 'COM' %}
                                     <span class="header-icon-pos pro-font">Company</span>
-                                {% elif user.membership == 'ADMIN' %}
+                                {% elif request.user.membership == 'ADMIN' %}
                                     <span class="header-icon-pos pro-font">Admin</span>
                                 {% else %}
                                     <span class="header-icon-pos pro-font"></span>

@@ -48,6 +48,72 @@
                         <label class="d-flex justify-content-center txt-orange">Month</label>
                     </div>
                     <div class="d-flex justify-content-center left-mode-sec">
+                        <select id="month-filter" class="proj-location-select">
+                            <option disabled selected hidden>Choose Month</option>
+                           
+                            <option value="January" class="list-group-item border-0 month-algn" > 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">January</li>
+                                </a>
+                            </option>
+                            <option value="February" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">February</li>
+                                </a>
+                            </option>
+                            <option value="March" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">March</li>
+                                </a>
+                            </option>
+                            <option value="April" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">April</li>
+                                </a>
+                            </option>
+                            <option value="May" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">May</li>
+                                </a>
+                            </option>
+                            <option value="June" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">June</li>
+                                </a>
+                            </option>
+                            <option value="July" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">July</li>
+                                </a>
+                            </option>
+                            <option value="August" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">August</li>
+                                </a>
+                            </option>
+                            <option value="September" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">September</li>
+                                </a>
+                            </option>
+                            <option value="October" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">October</li>
+                                </a>
+                            </option>
+                            <option value="November" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">November</li>
+                                </a>
+                            </option>
+                            <option value="December" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">December</li>
+                                </a>
+                            </option>
+                        </select>
+                    </div>
+                    <!-- <div class="d-flex justify-content-center left-mode-sec">
                         <ul class="list-group home-month">
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">January</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">February</li></a>
@@ -62,7 +128,7 @@
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">November</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">December</li></a>
                           </ul>
-                    </div>
+                    </div> -->
                     <div>
                         <label class="d-flex justify-content-center txt-orange">Day</label>
                     </div>
@@ -1701,13 +1767,21 @@ $(".item").click(function(){
                  'WESTERN':'WES'}
 
     let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
-
+   
     // Month and Year filter (Date Filter)
-    function monthFilter(data){
-        $('.list-group a li').removeClass('text-primary selected');
-        $('.list-group a li').removeAttr('id');
-        data.setAttribute("class", "text-primary");
-        data.setAttribute("id", "selected");
+   
+    var MonthVal ;
+    
+    $('select#month-filter').change(function() {
+        var theValue = $(this).find('option:selected').text();
+        theValue=$.trim(theValue)
+        console.log(theValue);
+        MonthVal=theValue;
+    // function monthFilter(data){
+    //     $('.list-group a li').removeClass('text-primary selected');
+    //     $('.list-group a li').removeAttr('id');
+    //     data.setAttribute("class", "text-primary");
+    //     data.setAttribute("id", "selected");
 
         post_url = origin_url + `/hobo_user/user_home-projects/date/`
         axios({
@@ -1716,22 +1790,23 @@ $(".item").click(function(){
             headers: {"Authorization":$("#token").val()},
             data: {
                 year : document.getElementById('year').innerHTML,
-                month : months[document.getElementById('selected').innerHTML]
+                month : months[theValue]
             }
         })
         .then((response) => {
                 console.log("Response",response.data)
                 dataInsertion(response.data)
         }, (error) => {console.log(error);})
-    }
+    //}
 
+    });
+    
     // Filter Projects according to full date (Date Filter)
     function date_filter(data){
         $('table a').addClass('text-dark');
         $('table a').removeClass('font-weight-bold');
         data.setAttribute("class", "text-primary font-weight-bold");
-
-        date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
+        date = `${document.getElementById('year').innerHTML}-${months[MonthVal]}-${data.innerHTML}`
         console.log(date)
         post_url = origin_url + `/hobo_user/user_home-projects/?timestamp=${date}`
         axios({
