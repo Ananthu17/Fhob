@@ -148,8 +148,13 @@
 
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
-                                <img src="{% static 'images/man-user.png' %}"
+                                {% if request.user.get_profile_photo %}
+                                    <img src="{{ request.user.get_profile_photo }}"
                                     class="img-fluid header-user-img">
+                                {% else %}
+                                    <img src="{% static 'images/man-user.png' %}"
+                                    class="img-fluid header-user-img">
+                                {% endif %}
                                 </a>
                                 {% if user.membership == 'HOB' %}
                                     <span class="header-icon-pos pro-font">Hobo</span>
@@ -356,14 +361,14 @@
                     {% if user.is_authenticated and user.registration_complete %}
                         <li class="nav-item dropdown">
                             <a id="user-nav-item" class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                                {% if user.is_superuser %}
+                                {% if request.user.is_superuser %}
                                     Admin
-                                {% elif user.membership == "COM" %}
-
-                                {{ user.company_name }}
+                                {% elif request.user.membership  == "COM" %}
+                                
+                                {{ request.user.company_name }}
 
                                 {% else %}
-                                    {{ user.get_full_name }}
+                                    {{ request.user.get_full_name }}
                                 {% endif %}
                             </a>
                             <div class="dropdown-menu FH-dropdown-font">
@@ -404,16 +409,33 @@
                         </li>
                     {% elif user.i_agree == True %}
                     <li class="nav-item">
-                        <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
-                    </li>
-                    <li class="nav-item" style="margin-left: 48em;">
-                        <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
-
+                        <a id="showcase_non_clickable" class="nav-link" href="">SHOWCASE</a>
                     </li>
                     <li class="nav-item">
+                        <a id="screeing_room_non_clickable" class="nav-link-non-clickable">SCREENING ROOM</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="projects_non_clickable" class="nav-link-non-clickable" onclick="toggleModal1()"  >PROJECTS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="scenes_non_clickable" class="nav-link-non-clickable" onclick="toggleModal1()">SCENES</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="shorts_non_clickable" class="nav-link-non-clickable" onclick="toggleModal1()">SHORTS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="pilots_features_non_clickable" class="nav-link-non-clickable" onclick="toggleModal1()">PILOTS/FEATURES</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="login_link" class="nav-link" href="{% url 'hobo_user:user_login' %}">LOGIN/SIGN UP</a>
+                    </li>
+                    <!-- <li class="nav-item">
                         <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
 
-                    </li>
+                    </li> -->
                     {% else %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
@@ -538,6 +560,11 @@
                 // Function to show and hide the popup
         function togglePopup() {
             $(".mem-content").toggle();
+        }
+
+        function toggleModal1() {
+            $('#myModal').modal('show');
+            return false;
         }
     /*
     code to store token info into local storage on login
