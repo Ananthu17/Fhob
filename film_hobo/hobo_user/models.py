@@ -214,8 +214,7 @@ class CustomUser(AbstractUser):
                                         )
     company_phone = models.CharField(_("Phone Number"),
                                      validators=[phone_number_regex],
-                                     max_length=16, null=True,
-                                     unique=True)
+                                     max_length=16, null=True)
     # company_phone = PhoneNumberField(_("Phone Number"), null=True,
     #                                  unique=True)
     title = models.CharField(_('Title'),
@@ -260,8 +259,7 @@ class CustomUser(AbstractUser):
                                         )
     phone_number = models.CharField(_("Phone Number"),
                                     validators=[phone_number_regex],
-                                    max_length=16, null=True,
-                                    unique=True)
+                                    max_length=16, null=True)
     # phone_number = PhoneNumberField(_("Phone Number"), null=True,
     #                                 unique=True)
     date_of_birth = models.DateField(_("Date of Birth"),
@@ -1746,7 +1744,7 @@ class UserAgentManager(models.Model):
     agent_phone = models.CharField(_("Agent's phone number"),
                                    validators=[phone_number_regex],
                                    max_length=16, null=True,
-                                   blank=True, unique=True)
+                                   blank=True)
     # agent_phone = PhoneNumberField(_("Agent's phone number"),
     #                                null=True,
     #                                blank=True
