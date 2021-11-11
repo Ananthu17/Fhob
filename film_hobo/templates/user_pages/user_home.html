@@ -116,21 +116,24 @@
                             </tbody>
                         </table>
                 </div>
-                <div  class=" proj-calender-sec mt-3 mb-3">
+
+                <div class=" proj-calender-sec mt-3 mb-3">
                     <div class="proj-location-sec">
                         <div class="proj-location-sec-head">
                             Location
                         </div>
                         <div class="proj-location-select-sec">
-                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
-                                {% for place in locations %}
+                            <input list="location" id="locvalue" name="location" class="proj-location-select" onchange="locationFilter()" placeholder="Choose Location"/>
+                            <datalist id="location" class="proj-location-select">
                                 <option disabled selected hidden>Choose Location</option>
-                                <option value="{{place.id}}">{{place}}</option>
+                                {% for place in locations %}
+                                    <option data-value={{place.id}} value="{{place}}"></option>
                                 {% endfor %}
-                            </select>
+                            </datalist>
                         </div>
                     </div>
                 </div>
+
                 <div class="proj-calender-sec  p-2 mb-3 ">
                     <div class="add-space d-flex justify-content-center">
                      <a href="{% url 'hobo_user:new-project' %}" class="create-a-project">Create a Project</a>
@@ -1683,22 +1686,22 @@
         return Object.keys(object).find(key => object[key] === value);
     }
 
-    function locationFilter(){
-        var location = document.getElementById("locationfilter");
-        var  id = location.value;
-        console.log("LOC",location,"VAL:",id)
+    // function locationFilter(){
+    //     var location = document.getElementById("locationfilter");
+    //     var  id = location.value;
+    //     console.log("LOC",location,"VAL:",id)
 
-        post_url = origin_url + `/hobo_user/user_home/projects/?location=${id}`
-        axios({
-            method: 'get',
-            url: post_url,
-            headers: {"Authorization":$("#token").val()}
-        })
-        .then((response) => {
-                console.log("Response:",response.data)
-                dataInsertion(response.data)
-        }, (error) => {console.log(error);})
-    }
+    //     post_url = origin_url + `/hobo_user/user_home/projects/?location=${id}`
+    //     axios({
+    //         method: 'get',
+    //         url: post_url,
+    //         headers: {"Authorization":$("#token").val()}
+    //     })
+    //     .then((response) => {
+    //             console.log("Response:",response.data)
+    //             dataInsertion(response.data)
+    //     }, (error) => {console.log(error);})
+    // }
 
 
     function toTitleCase(str) {
@@ -1826,8 +1829,6 @@
         let keyword = data.innerHTML.toUpperCase()
         data.setAttribute("class", "clicked");
         parent = data.parentNode.parentNode.getAttribute("id");
-        console.log("PARENT", parent)
-
         post_url = origin_url + `/hobo_user/user_home-projects/?genre=${genre[keyword]}`
         axios({
             method: 'get',
@@ -1842,11 +1843,14 @@
 
     // location filter
     function locationFilter(){
-        var location = document.getElementById("locationfilter");
-        var  id = location.value;
-        console.log("LOC",location,"VAL:",id)
-
+        var loc_value = document.getElementById("locvalue").value;
+        jQuery.each(document.getElementById("location").children, function() {
+            if (loc_value === this.value){
+                id = parseInt(this.getAttribute("data-value"))
+            }
+        })
         post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        console.log("Token",$("#token").val())
         axios({
             method: 'get',
             url: post_url,
