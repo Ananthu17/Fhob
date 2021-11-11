@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.actions import delete_selected \
+    as django_delete_selected
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
@@ -38,8 +40,8 @@ from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     VideoRatingCombinedResource, UserTrackingResource, \
                     FriendResource, GroupUsersResource, UserProfileResource, \
                     CompanyProfileResource, ProjectMemberRatingResource, \
-                    UserRatingResource, UserNotificationResource, TeamResource, \
-                    UserRatingCombinedResource
+                    UserRatingResource, UserNotificationResource, \
+                    TeamResource, UserRatingCombinedResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -100,6 +102,17 @@ class CustomUserAdmin(UserAdmin, ImportExportModelAdmin):
         AthleticSkillInlineInline
     ]
     change_form_template = 'admin/custom/change_form.html'
+    # actions = ['delete_selected']
+
+    # def delete_model(modeladmin, request, obj):
+    #     # do something with the user instance
+    #     obj.delete()
+
+    # def delete_selected(modeladmin, request, queryset):
+    #     # do something with the users in the queryset
+    #     return django_delete_selected(modeladmin, request, queryset)
+    # delete_selected.short_description = \
+    #     django_delete_selected.short_description
 
     class Media:
         css = {
@@ -409,9 +422,4 @@ class TeamAdmin(ImportExportModelAdmin):
 
 admin.site.register(Team, TeamAdmin)
 # admin.site.register(BetaTesterCodes)
-
-
-
-
 # admin.site.register(Project, ProjectAdmin)
-
