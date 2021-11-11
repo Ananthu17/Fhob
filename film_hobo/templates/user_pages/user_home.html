@@ -176,209 +176,10 @@
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
                 <!-- Row 1  -->
                 {% if format == 'SCH' %}
-                <div class="proj-input-sec-bg">
-                    <div class="proj-menu-align">
-                        <div class="proj-menu-display">
-                            <span class=" txt-orange float-left top-head-align proj-head-margin">New Films</span>
-                            <ul class="proj-cnt-menu-li" id="1">
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                       <div class="proj-owl-right-margin">
-                            <!-- owl-carousel  -->
-                        <div id="demo1">
-                        <div class="owl-carousel owl-theme " id="project-owl1">
-                            {% if scenes != None  %}
-                            {% for project in scenes %}
-                            <!-- item 1  -->
-                            <div class="item">
-                                <div class="card proj-card pointer" >
-                                    <div class="project-line">
-                                        <span class="proj-no">
-                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">{{project.sag_aftra}}</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span  class="proj-symb">
-                                            <span class="log-star">
-                                                <div class="">
-                                                    <div class="cta-stars-outer">
-                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
-                                                      </div>
-                                                </div>
-                                        </span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line2">
-                                        <span class="proj-title">
-                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Pages:<a>{{ project.number_of_pages }}</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            <!-- Team:<a href="">Actor,Director +</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            Location:<a>{{project.location}}</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        </div>
-                        <!-- owl-carousel End -->
-                       </div>
-                    </div>
-                </div>
-                <!-- Row 2  -->
                 <div class="proj-input-sec-bg mt-3">
                     <div class="proj-menu-align">
-                        <div class="proj-menu-display">
-                            <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
-                            <ul class="proj-cnt-menu-li" id="2">
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li>
-                            </ul>
-                        </div>
-                       <div class="proj-owl-right-margin">
-                            <!-- owl-carousel  -->
-                        <div id="demo2">
-                        <div class="owl-carousel owl-theme " id="project-owl2">
-                            {% if toprated_scenes != None  %}
-                            {% for project in toprated_scenes %}
-                            <!-- item 1  -->
-                            <div class="item">
-                                <div class="card proj-card pointer" >
-                                    <div class="project-line">
-                                        <span class="proj-no">
-                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">{{project.sag_aftra}}</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span  class="proj-symb">
-                                            <span class="log-star">
-                                                <div class="">
-                                                    <div class="cta-stars-outer">
-                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
-                                                      </div>
-                                                </div>
-                                        </span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line2">
-                                        <span class="proj-title">
-                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
-                                        </span>
-                                        <span class="proj-page-no">
-                                            Page:<a>{{ project.number_of_pages }}</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            <!-- Team:<a href="">Actor,Director +</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            Location:<a>{{project.location}}</a>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                        </div>
-                        <!-- owl-carousel End -->
-                       </div>
-                    </div>
-                </div>
-
-
-
-                {% elif format == 'SHO' %}
-                <div class="proj-input-sec-bg">
-                    <div class="proj-menu-align">
-                        <div class="proj-menu-display">
-                            <span class=" txt-orange float-left top-head-align proj-head-margin">New Films</span>
+                        <div class="proj-menu-display align-items-center">
+                            <div class="swc-owl-list-head mt-0 mr-3">Scenes</div>
                             <ul class="proj-cnt-menu-li" id="3">
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -401,22 +202,23 @@
                         <!-- owl-carousel  -->
                         <div id="demo3">
                         <div class="owl-carousel owl-theme " id="project-owl3">
-                            {% if filims != None  %}
-                            {% for project in filims %}
+                            {% if scenes != None  %}
+                            {% for project in scenes %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card pointer" >
-                                    <div class="project-line">
-                                        <span class="proj-no">
-                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">{{project.sag_aftra}}</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span  class="proj-symb">
+                                <div class="swc-img-div-width">
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
                                             <span class="log-star">
                                                 <div class="">
                                                     <div class="cta-stars-outer">
@@ -426,40 +228,18 @@
                                         </span>
                                         </span>
                                     </div>
-                                    <div class="project-line2">
-                                        <span class="proj-title">
-                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
                                         </span>
-                                        <span class="proj-page-no">
-                                            Page:<a>{{ project.number_of_pages }}</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            <!-- Team:<a href="">Actor,Director +</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            Location:<a>{{project.location}}</a>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -472,11 +252,87 @@
                        </div>
                     </div>
                 </div>
-                <!-- Row 4  -->
-                <div class="proj-input-sec-bg mt-3">
+                <!-- Row 2  -->
+                <div class="proj-input-sec-bg">
                     <div class="proj-menu-align">
-                        <div class="proj-menu-display">
-                            <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
+                        <div class="proj-menu-display mb-1">
+                        </div>
+                       <div class="proj-owl-right-margin">
+                            <!-- owl-carousel  -->
+                        <div id="demo1">
+                        <div class="owl-carousel owl-theme " id="project-owl1">
+                            {% if scenes != None  %}
+                            {% for project in scenes %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    {% if scenes.0 == project %}
+                                    <div class="swc-owl-img-number flex-row justify-content-between">
+                                        <div class="swc-owl-list-head">Scenes</div>
+                                        <span class="swc-owl-img-trophy-sec mr-3">
+                                            <img src="{% static 'images/trophy.png' %}" alt=""
+                                                class="swc-owl-img-trophy">
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                    {% else %}
+                                    <div class="swc-owl-img-number">
+                                        {{forloop.counter}}
+                                    </div>
+                                    {% endif %}
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
+                                        </span>
+                                    </div>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
+                                        </span>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+
+
+
+                {% elif format == 'SHO' %}
+                                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display align-items-center">
+                            <div class="swc-owl-list-head mt-0 mr-3">Shorts</div>
                             <ul class="proj-cnt-menu-li" id="4">
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
@@ -499,22 +355,23 @@
                         <!-- owl-carousel  -->
                         <div id="demo4">
                         <div class="owl-carousel owl-theme " id="project-owl4">
-                            {% if toprated_filims != None  %}
-                            {% for project in toprated_filims %}
+                            {% if filims != None  %}
+                            {% for project in filims %}
                             <!-- item 1  -->
                             <div class="item">
-                                <div class="card proj-card pointer" >
-                                    <div class="project-line">
-                                        <span class="proj-no">
-                                            Project<a href="{% url 'project:single-film-project' id=project.id  %}">#{{project.id}}</a>
-                                        </span>
-                                        <span class="proj-pay">
-                                            $<a href="">{{project.sag_aftra}}</a>
-                                        </span>
-                                        <span class="proj-gener-align">
-                                            <a href="">{{project.get_genre_display}}</a>
-                                        </span>
-                                        <span  class="proj-symb">
+                                <div class="swc-img-div-width">
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
                                             <span class="log-star">
                                                 <div class="">
                                                     <div class="cta-stars-outer">
@@ -524,40 +381,92 @@
                                         </span>
                                         </span>
                                     </div>
-                                    <div class="project-line2">
-                                        <span class="proj-title">
-                                            Title:<a href="{% url 'project:single-film-project' id=project.id  %}">{{project.title}}</a>
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
                                         </span>
-                                        <span class="proj-page-no">
-                                            Page:<a>{{ project.number_of_pages }}</a>
-                                        </span>
-                                        <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
-                                        </span>
-                                    </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Creator:<a href="">{{project.creator}}</a>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
                                         </span>
                                     </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            Format:<a href="">{{project.get_format_display}}</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        </div>
+                        <!-- owl-carousel End -->
+                       </div>
+                    </div>
+                </div>
+                <!-- Row 4  -->
+                <div class="proj-input-sec-bg mt-3">
+                    <div class="proj-menu-align">
+                        <div class="proj-menu-display mb-1">
+
+                        </div>
+                       <div class="proj-owl-right-margin">
+                            <!-- owl-carousel  -->
+                        <div id="demo2">
+                        <div class="owl-carousel owl-theme " id="project-owl2">
+                            {% if toprated_filims != None  %}
+                            {% for project in toprated_filims %}
+                            <!-- item 1  -->
+                            <div class="item">
+                                <div class="swc-img-div-width">
+                                    {% if toprated_scenes.0 == project %}
+                                    <div class="swc-owl-img-number flex-row justify-content-between">
+                                        <div class="swc-owl-list-head">Shorts</div>
+                                        <span class="swc-owl-img-trophy-sec mr-3">
+                                            <img src="{% static 'images/trophy.png' %}" alt=""
+                                                class="swc-owl-img-trophy">
+                                        </span>
+                                        <span></span>
+                                    </div>
+                                    {% else %}
+                                    <div class="swc-owl-img-number">
+                                        {{forloop.counter}}
+                                    </div>
+                                    {% endif %}
+                                    <div class="swc-image-frame">
+                                        {% if project.video_cover_image %}
+                                            <img src="/media/{{project.video_cover_image }}" class="swc-video-img ">
+                                        {% else %}
+                                            <img src="{% static 'images/1.jpeg' %}" class="swc-video-img ">
+                                        {% endif %}
+                                    </div>
+                                    <div class="swc-img-project-txt ">
+                                        <span>Project<span class="swc-pro-width-overflow"><a href="{% url 'project:single-film-project' project.id %}"
+                                                    title="2245">#{{project.id}}</a></span></span>
+                                        <span class="">{{project.get_format_display}}</span>
+                                        <span class="hom-rate-star">
+                                            <span class="log-star">
+                                                <div class="">
+                                                    <div class="cta-stars-outer">
+                                                        <div class="cta-stars-inner" style="width:{{project.rating}}%;"></div>
+                                                      </div>
+                                                </div>
+                                        </span>
                                         </span>
                                     </div>
-                                    <div class="project-line-single-span">
-                                        <span class="proj-format">
-                                            <!-- Team:<a href="">Actor,Director +</a> -->
+                                    <div class="swc-img-project-name-txt">
+                                        <span class="hom-name-width-overflow">Name:<a href="{% url 'project:single-film-project' project.id %}"
+                                                title="Cart Ride">{{project.title}}</a></span>
+                                        <span>
+                                            <!-- Team<a href="">#{{project.team}}</a> -->
                                         </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
-                                        </span>
-                                    </div>
-                                    <div class="project-line">
-                                        <span class="proj-format">
-                                            Location:<a>{{project.location}}</a>
+                                        <span class="swc-like-sec">
+                                            <span class="swc-img-span">
+                                                <img src="{% static 'images/Like-sm.png' %}" alt=""
+                                                    class="swc-like-image">
+                                            </span>
+                                            <span>{{project.likes}}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -1185,6 +1094,21 @@
 
 {% block extrajs %}
 <script>
+
+$(".item").click(function(){
+        var proj_card_ele = $(this)
+        if (proj_card_ele[0].children[0].children[1].className == "swc-img-project-txt "){
+            var project_obj = proj_card_ele[0].children[0].children[1].children[0].children[0].children[0].innerHTML.slice(1)
+        }
+        else{
+            var project_obj = proj_card_ele[0].children[0].children[2].children[0].children[0].children[0].innerHTML.slice(1)
+        }
+        var project_id = project_obj.split("#").pop();
+        var origin_url = window.location.origin
+        var redirect_url = origin_url + '/project/showcase-video/' + project_id + '/'
+        window.location.replace(redirect_url);
+    });
+    
     // OwlCarousel Script
     $('#project-owl1').owlCarousel({
         loop:true,

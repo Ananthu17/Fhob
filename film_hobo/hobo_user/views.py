@@ -457,7 +457,7 @@ class PilotAndFeatureDateFilterAPI(APIView, SegregatorMixin):
 
 
 class ShowCase(TemplateView):
-    template_name = 'user_pages/showcasetwo.html'
+    template_name = 'user_pages/showcasetwo.html' 
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
