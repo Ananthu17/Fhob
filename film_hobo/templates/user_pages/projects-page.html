@@ -22,6 +22,7 @@
         <div class="row">
             <!-- left section  -->
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
+
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt">
                         <label class="d-flex justify-content-center ">Search by:</label>
@@ -1248,6 +1249,26 @@
 
 {% block extrajs %}
 <script>
+
+
+function locationFilter(){
+        var location = document.getElementById("locationfilter");
+        var  id = location.value;
+        console.log("LOC",location,"VAL:",id)
+
+        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        axios({
+            method: 'get',
+            url: post_url,
+            headers: {"Authorization":$("#token").val()}
+        })
+        .then((response) => {
+                console.log("Response:",response.data)
+                dataInsertion(response.data)
+        }, (error) => {console.log(error);})
+    }
+
+
     // OwlCarousel Script
     $('#project-owl1').owlCarousel({
         loop:true,
