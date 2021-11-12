@@ -403,7 +403,7 @@
                                 </div>
                                 <!-- end of modal -->
                                 {% endif %}
-    
+                                {% if user.company_website %}
                                 <div class="row">
                                     <div class="col-3">
                                         <label class="form-title mem-setup-blu-f">Website:</label>
@@ -412,6 +412,7 @@
                                         <a href="{{user.company_website}}"><span class="underline orng-f">{{user.company_website}}</span></a>
                                     </div>
                                 </div>
+                                {% endif %}
                                 <div class="row">
                                     <div class="col-6">
                                         <label class="form-title mem-setup-blu-f">Submission Policy - SAMR:</label>

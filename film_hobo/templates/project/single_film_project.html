@@ -1013,6 +1013,12 @@ $('body').on('click' , '.publish_video', function(){
 </script>
 
 <script src="{% static 'js/project_tracking.js' %}"></script>
+
+<script>
+    $(window).on('load', function() {
+        $('#visibility_password_check').modal('show');
+    });
+</script>
 {% endblock %}
 
 
