@@ -217,7 +217,7 @@
                                             Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -316,7 +316,7 @@
                                                             Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
-                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line-single-span">
@@ -416,7 +416,7 @@
                                                             Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
-                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line-single-span">
@@ -515,7 +515,7 @@
                                                             Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
-                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line-single-span">
@@ -621,7 +621,7 @@
                                                             Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
-                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line-single-span">
@@ -720,7 +720,7 @@
                                                             Page:<a>{{ project.number_of_pages }}</a>
                                                         </span>
                                                         <span class="proj-public">
-                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                                         </span>
                                                     </div>
                                                     <div class="project-line-single-span">
@@ -822,7 +822,7 @@
                                             Pages:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -920,7 +920,7 @@
                                             Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -1018,7 +1018,7 @@
                                             Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -1116,7 +1116,7 @@
                                             Page:<a>{{ project.number_of_pages }}</a>
                                         </span>
                                         <span class="proj-public">
-                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">Public</a></span>
+                                            <span><a href="javascript:void(0)" onclick="genereFilter(this)">{{project.get_visibility_display}}</a></span>
                                         </span>
                                     </div>
                                     <div class="project-line-single-span">
@@ -1509,7 +1509,7 @@
                                     Page:<a href=''>4</a>\
                                 </span>\
                                 <span class='proj-public'>\
-                                    <span><a href=''>Public</a></span>\
+                                    <span><a href=''>${this.visibility}</a></span>\
                                 </span>\
                             </div>\
                             <div class='project-line-single-span'>\
@@ -1580,7 +1580,7 @@
                                     Page:<a href=''>4</a>\
                                 </span>\
                                 <span class='proj-public'>\
-                                    <span><a href=''>Public</a></span>\
+                                    <span><a href=''>${this.visibility}</a></span>\
                                 </span>\
                             </div>\
                             <div class='project-line-single-span'>\
@@ -1645,7 +1645,7 @@
                                     Page:<a href=''>4</a>\
                                 </span>\
                                 <span class='proj-public'>\
-                                    <span><a href=''>Public</a></span>\
+                                    <span><a href=''>${this.visibility}</a></span>\
                                 </span>\
                             </div>\
                             <div class='project-line-single-span'>\
@@ -1710,7 +1710,7 @@
                                     Page:<a href=''>4</a>\
                                 </span>\
                                 <span class='proj-public'>\
-                                    <span><a href=''>Public</a></span>\
+                                    <span><a href=''>${this.visibility}</a></span>\
                                 </span>\
                             </div>\
                             <div class='project-line-single-span'>\
@@ -1775,7 +1775,7 @@
                                     Page:<a href=''>4</a>\
                                 </span>\
                                 <span class='proj-public'>\
-                                    <span><a href=''>Public</a></span>\
+                                    <span><a href=''>${this.visibility}</a></span>\
                                 </span>\
                             </div>\
                             <div class='project-line-single-span'>\

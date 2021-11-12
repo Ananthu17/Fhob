@@ -465,15 +465,17 @@ class ShowCase(TemplateView):
         context = super().get_context_data(**kwargs)
         projects = Project.objects.filter(video_status='posted')
         context["scenes"] = projects.filter(
-                            format="SCH").filter(rating__gte=4).order_by(
+                            format="SCH").filter(rating__gte=80).order_by(
                             '-likes')[:10]
         context["toprated_scenes"] = projects.filter(
                                      format="SHO").filter(
-                                     rating__gte=4).order_by('-likes')[:10]
+                                     rating__gte=80).order_by('-likes')[:10]
         context["filims"] = projects.filter(
-                            format="SCH").order_by('-id')
+                            format="SCH").filter(
+                                     rating__gte=80).order_by('-id')
         context["toprated_filims"] = projects.filter(
-                                     format="SHO").order_by('-id')
+                                     format="SHO").filter(
+                                     rating__gte=80).order_by('-id')
         context["pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR'))
         context["toprated_pilotsfeatures"] = projects.filter(Q(format='PIL') |
@@ -482,7 +484,7 @@ class ShowCase(TemplateView):
 
         return context
 
-
+\
 class ShowCaseAPIView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
