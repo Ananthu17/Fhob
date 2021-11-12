@@ -149,12 +149,17 @@ class CustomUserLogin(DjangoLogin):
     template_name = 'user_pages/login.html'
 
     def get(self, request):
-        if request.user.is_anonymous:
+        if request.user.is_anonymous and request.user.is_authenticated == False:
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            cust_user = CustomUser.objects.get(id=request.user.id)
+            if cust_user.registration_complete == True:
+                return render(request, 'user_pages/user_home.html',
+                {'user': request.user})
+            else:
+                form = LoginForm()
+                return render(request, 'user_pages/login.html', {'form': form})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -168,8 +173,11 @@ class CustomUserLogin(DjangoLogin):
             userobj = CustomUserSettings.objects.get(user=user)
             if userobj.account_status == userobj.DISABLED:
                 return redirect('/hobo_user/enable-account')
+            elif userobj.user.registration_complete != True:
+                return render(request, 'user_pages/login.html', {'form': form})
             else:
-                if user is not None:
+                cust_user = CustomUser.objects.get(id=user.id)
+                if user is not None and cust_user.registration_complete == True:
                     if user.membership == 'HOB':
                         login(request, user)
                         return render(request, 'user_pages/showcasetwo.html',

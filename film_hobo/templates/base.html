@@ -144,17 +144,19 @@
                             </button>
                             {% endif %}
 
-
+                            
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
-                                {% if request.user.get_profile_photo %}
+                                {% if request.user.get_profile_photo and user.registration_complete %}
                                     <img src="{{ request.user.get_profile_photo }}"
                                     class="img-fluid header-user-img">
+                                </a>
                                 {% else %}
                                     <img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img">
                                 {% endif %}
-                                </a>
+                               
+                            {% if user.is_authenticated and user.registration_complete %}
                                 {% if request.user.membership == 'HOB' %}
                                     <span class="header-icon-pos pro-font">Hobo</span>
                                 {% elif request.user.membership == 'IND' %}
@@ -169,6 +171,7 @@
                                     <span class="header-icon-pos pro-font"></span>
                                 {% endif %}
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -406,7 +409,7 @@
                                 {% endif %}
                             </div>
                         </li>
-                    {% elif user.i_agree == True %}
+                    {% elif user.i_agree == True  %}
                     <li class="nav-item">
                         <a id="showcase_non_clickable" class="nav-link" href="">SHOWCASE</a>
                     </li>
@@ -435,6 +438,8 @@
                         <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
 
                     </li> -->
+
+                    
                     {% else %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>

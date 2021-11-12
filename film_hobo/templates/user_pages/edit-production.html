@@ -276,11 +276,11 @@
                             name="{{ form.company_website.name }}"
                             value="{% if user.company_website %}{{ user.company_website}}{% endif%}"
                             autocomplete="off"/>
-                            {% if errors.company_website %}
+                            <!-- {% if errors.company_website %}
                             {% for err in errors.company_website %}
                             <p style="color: red">{{err}}</p>
                             {% endfor %}
-                            {% endif %}
+                            {% endif %} -->
                         </div>
                     </div>
                     <div class="row">

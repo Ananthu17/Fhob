@@ -28,7 +28,7 @@
                                     <label class="form-title">{{ form.username.label_tag }}</label>
                                 </div>
                                 <div class="col-8">
-                                    <input  name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="inp-line" placeholder="Email" />
+                                    <input  name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" class="inp-line" placeholder="Email" required />
                                     {% if form.errors.username %}
                                     <p style="color: red">{{ form.errors.username }}</p>
                                     {% endif %}
@@ -39,7 +39,7 @@
                                     <label class="form-title">{{ form.password.label_tag }}</label>
                                 </div>
                                 <div class="col-8 ">
-                                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="inp-line" placeholder="Password" />
+                                    <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" class="inp-line" placeholder="Password"  required/>
                                     {% if form.errors.password %}
                                     <p style="color: red">{{ form.errors.password }}</p>
                                     {% endif %}
