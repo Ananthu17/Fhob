@@ -2343,7 +2343,10 @@ class ProductionCompanyProfileAPI(APIView):
             if 'company_name' in data_dict:
                 user.company_name = data_dict['company_name']
             if 'company_website' in data_dict:
-                user.company_website = data_dict['company_website']
+                if data_dict['company_website'] == 'NONE':
+                    user.company_website = ''
+                else:
+                    user.company_website = data_dict['company_website']
             user.save()
             if 'imdb' in data_dict:
                 profile.imdb = data_dict['imdb']
@@ -2394,10 +2397,14 @@ class AgencyManagementCompanyProfileAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
+            print(data_dict)
             if 'company_name' in data_dict:
                 user.company_name = data_dict['company_name']
             if 'company_website' in data_dict:
-                user.company_website = data_dict['company_website']
+                if data_dict['company_website'] == 'NONE':
+                    user.company_website = ''
+                else:
+                    user.company_website = data_dict['company_website']
             if 'agency_management_type' in data_dict:
                 user.agency_management_type = data_dict[
                                 'agency_management_type']
@@ -2739,6 +2746,8 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         profile = CompanyProfile.objects.get(user=user)
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
+        if json_dict['company_website'] == '':
+            json_dict['company_website'] = "NONE"
         if 'submission_policy_SAMR' in json_dict:
             submission_policy_SAMR = json_dict['submission_policy_SAMR']
             if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
@@ -2864,6 +2873,8 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         profile = CompanyProfile.objects.get(user=user)
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
+        if json_dict['company_website'] == '':
+            json_dict['company_website'] = "NONE"
         if 'submission_policy_SAMR' in json_dict:
             submission_policy_SAMR = json_dict['submission_policy_SAMR']
             if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
@@ -3454,7 +3465,6 @@ class RateCompanyAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print("here----------------------")
         serializer = self.serializer_class(data=request.data)
         response = {}
         if serializer.is_valid():

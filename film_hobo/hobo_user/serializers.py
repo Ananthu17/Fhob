@@ -800,7 +800,7 @@ class AgentManagementCompanyProfileSerializer(serializers.ModelSerializer):
                     required=True,)
     company_website = serializers.CharField(
                         max_length=150,
-                        required=False,)
+                        required=False, allow_null=True)
     agency_management_type = serializers.CharField(
                             max_length=150,
                             required=False,)
@@ -810,6 +810,7 @@ class AgentManagementCompanyProfileSerializer(serializers.ModelSerializer):
         fields = ['company_name', 'company_website', 'bio',
                   'submission_policy_SAMR', 'membership',
                   'agency_management_type']
+        # extra_kwargs = {'company_website': {'required': False,}}
 
 
 class CoWorkerSerializer(serializers.ModelSerializer):

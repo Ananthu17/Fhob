@@ -4777,3 +4777,34 @@ class PostProjectAPI(APIView):
             response = {'errors': serializer.errors, 'status':
                         status.HTTP_400_BAD_REQUEST}
         return Response(response)
+
+
+class VisibilityPasswordCheckAPI(APIView):
+    serializer_class = PasswordSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        response = {}
+        if serializer.is_valid():
+            data_dict = serializer.data
+            password = data_dict['password']
+            project_id = data_dict['project_id']
+            try:
+                project = Project.objects.get(id=project_id)
+                if password == project.visibility_password:
+                    response = {'message': "Password Verified",
+                                'url': "/project/single-film-project/"+str(project_id),
+                                'status': status.HTTP_200_OK}
+                else:
+                    response = {'errors': 'Wrong Password', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+            except Project.DoesNotExist:
+                response = {'errors': 'Invalid Character ID', 'status':
+                                status.HTTP_400_BAD_REQUEST}
+        else:
+            print(serializer.errors)
+            response = {'errors': serializer.errors, 'status':
+                        status.HTTP_400_BAD_REQUEST}
+        return Response(response)
+
