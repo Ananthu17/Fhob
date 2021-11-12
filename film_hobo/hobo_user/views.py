@@ -667,7 +667,7 @@ class CustomUserSignupIndieView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -725,7 +725,7 @@ class CustomUserSignupProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -774,7 +774,7 @@ class CustomUserSignupCompany(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -5875,7 +5875,6 @@ class ScreeningProjectUrlSendView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         try:
             logged_in_user = request.user
             project_url = request.data['project_url']
@@ -5883,7 +5882,7 @@ class ScreeningProjectUrlSendView(APIView):
             users_id = request.user.id
             selectedUsers = request.data['selectedUsers']
             if url_type == "PROFILE" :
-                
+
                 project_obj = CustomUser.objects.get(id=users_id)
                 for user in selectedUsers:
                     to_user = CustomUser.objects.get(id=user)

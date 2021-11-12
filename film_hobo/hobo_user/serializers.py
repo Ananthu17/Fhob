@@ -554,15 +554,6 @@ class RegisterCompanySerializer(serializers.ModelSerializer):
     def validate_password1(self, password):
         return get_adapter().clean_password(password)
 
-    def validate_phone_number(self, phone_number):
-        try:
-            match = CustomUser.objects.get(phone_number=phone_number)
-            if match:
-                raise serializers.ValidationError(_(
-                    "A user is already registered with this phone number."))
-        except CustomUser.DoesNotExist:
-            return phone_number
-
     def validate_company_phone(self, company_phone):
         try:
             match = CustomUser.objects.get(company_phone=company_phone)
@@ -1012,7 +1003,8 @@ class EditUserInterestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInterest
-        fields = ['id', 'position', 'format', 'location', 'budget', 'age', 'gender']
+        fields = ['id', 'position', 'format', 'location',
+                  'budget', 'age', 'gender']
 
 
 class CompanyClientSerializer(serializers.ModelSerializer):
@@ -1119,6 +1111,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     location = serializers.StringRelatedField()
     creator = serializers.StringRelatedField()
+
     class Meta:
         model = Project
         fields = ['id', 'creator', 'title', 'format', 'genre', 'rating',

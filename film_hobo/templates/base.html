@@ -68,7 +68,6 @@
                                         {% endif %}
                                         <span class="message-notification">
                                             {% if request.user.is_anonymous %}
-                                                {% get_msg_notifications_count request.user as msg_count %}
                                             {% else %}
                                                 {% get_msg_notifications_count request.user.id as msg_count %}
                                             {% endif %}
@@ -673,7 +672,7 @@ $( document ).ready(function() {
     }
     else if (desired_path == '/hobo_user/user_home/?format=SHO&nav=SHO'){
         $("#shorts-nav-item").addClass('active');
-
+    }
     else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
         $("#shorts-nav-item").addClass('active');
     }
