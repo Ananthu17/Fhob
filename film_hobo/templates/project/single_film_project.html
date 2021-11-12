@@ -9,6 +9,39 @@
 {% endblock %}
 
 {% block content %}
+<!-- The Modal -->
+<div class="modal fade" id="visibility_password_check_modal" data-backdrop="static" data-keyboard="false" >
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h5 class="modal-title samr-modal-title">Enter Password</h5>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row mt-2">
+                <div class="col-12 md-offset-2 col-md-8">
+                    <p class="samr-modal-txt">Password</p>
+                    <input type="password" class="form-control" name="visibility_password"
+                    id="visibility_password" value="" />
+                    <span class="all-error-msg visibility-password-err"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <a class='btn btn-outline-danger btn-sm cursor-pointer submit_visibility_password' id='{{project.id}}'>Submit</a>
+        <button class="btn btn-outline-danger btn-sm close_password_modal"
+        data-dismiss="modal">Close</button>
+    </div>
+
+    </div>
+    </div>
+</div>
+<!-- end of modal -->
 <div class="wrapper flex-grow-1">
     <div class="container-fluid">
         <div class="row">
@@ -760,7 +793,6 @@
 {% endblock %}
 
 {% block extrajs %}
-<script src="{% static 'js/videoplayer_invite.js' %}"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 
@@ -1013,12 +1045,58 @@ $('body').on('click' , '.publish_video', function(){
 </script>
 
 <script src="{% static 'js/project_tracking.js' %}"></script>
-
+<script type="application/javascript" src="{% static 'js/js.cookie.min.js' %}"></script>
 <script>
-    $(window).on('load', function() {
-        $('#visibility_password_check').modal('show');
+
+    var visibility = "{{ project.visibility }}";
+    var password_verified_var = "password_verified_"+"{{ project.id }}"
+    var password_verified = Cookies.get(password_verified_var)
+    var creator = "{{ project.creator.id }}";
+    var logged_in_user = "{{ request.user.id }}";
+    if(visibility == 'private' & password_verified!='True' & creator != logged_in_user){
+        $('#visibility_password_check_modal').modal('show');
+    }
+    $('body').on('click' , '.submit_visibility_password', function(){
+        var project_id = $(this).attr('id');
+        var password = $("#visibility_password").val();
+        var token = $("#token").val();
+        data_dict = {}
+        data_dict['project_id'] = project_id;
+        if(password!=""){
+            data_dict['password'] = password
+            $.ajax
+            ({
+                type: "POST",
+                url: "/project/visibility-password-check/",
+                dataType: 'json',
+                async: false,
+                data: data_dict,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader ("Authorization", token);
+                },
+                success: function(response){
+                    if('errors' in response){
+                        $('.visibility-password-err').html(response['errors'])
+                    }else{
+                        var date = new Date();
+                        var minutes = 30;
+                        date.setTime(date.getTime() + (minutes * 60 * 1000));
+                        Cookies.set(password_verified_var, 'True', { expires: date });
+                        window.location.reload();
+                    };
+                }
+            });
+        }else{
+            $('.visibility-password-err').html("Password is required.")
+        }
+    });
+    $('body').on('click' , '.close_password_modal', function(){
+        // $("#visibility_password_check_modal").modal('hide');
+        history.back()
     });
 </script>
+
+<script src="{% static 'js/videoplayer_invite.js' %}"></script>
 {% endblock %}
 
 
