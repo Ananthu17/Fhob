@@ -61,9 +61,9 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    UserRating, Location, UserRatingCombined, \
+                    Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
-                    Feedback, CompanyRating, CompanyRatingCombined, \
+                    CompanyRating, CompanyRatingCombined, \
                     VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
@@ -457,7 +457,7 @@ class PilotAndFeatureDateFilterAPI(APIView, SegregatorMixin):
 
 
 class ShowCase(TemplateView):
-    template_name = 'user_pages/showcasetwo.html'
+    template_name = 'user_pages/showcasetwo.html' 
     login_url = '/hobo_user/user_login/'
     redirect_field_name = 'login_url'
 
@@ -496,7 +496,6 @@ class ShowCaseAPIView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        print(queryset)
         context = self.showcase_segregator(queryset)
         return Response(context)
 
@@ -564,7 +563,7 @@ class HomeProjectAPIView(ListAPIView, SegregatorMixin):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        context = self.project_segregator(queryset)
+        context = self.project_segregator(queryset) 
         return Response(context)
 
 
