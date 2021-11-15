@@ -1112,6 +1112,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     location = serializers.StringRelatedField()
     creator = serializers.StringRelatedField()
+    visibility = serializers.StringRelatedField()
 
     class Meta:
         model = Project

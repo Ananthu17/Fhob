@@ -23,18 +23,18 @@ class SegregatorMixin():
     def showcase_segregator(self, project):
         context = {}
         context["top_scenes"] = self.project_to_json(
-            project.filter(format="SCH").filter(rating__gte=4)
+            project.filter(format="SCH").filter(rating__gte=80)
             .order_by('-likes')[:10]
         )
         context["top_shorts"] = self.project_to_json(
-            project.filter(format="SHO").filter(rating__gte=4)
+            project.filter(format="SHO").filter(rating__gte=80)
             .order_by('-likes')[:10]
         )
         context["new_scenes"] = self.project_to_json(
-            project.filter(format="SCH").order_by('-id')
+            project.filter(format="SCH").filter(rating__gte=80).order_by('-id')
         )
         context["new_shorts"] = self.project_to_json(
-            project.filter(format="SHO").order_by('-id')
+            project.filter(format="SHO").filter(rating__gte=80).order_by('-id')
         )
         return context
 
