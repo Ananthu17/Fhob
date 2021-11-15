@@ -68,7 +68,6 @@
                                         {% endif %}
                                         <span class="message-notification">
                                             {% if request.user.is_anonymous %}
-                                                {% get_msg_notifications_count request.user.id as msg_count %}
                                             {% else %}
                                                 {% get_msg_notifications_count request.user.id as msg_count %}
                                             {% endif %}
@@ -249,8 +248,8 @@
                                     PILOTS/FEATURES
                                 </a>
                                 <div class="dropdown-menu FH-dropdown-font">
-                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:projects' %}?format=PIL-FTR&nav=PIL-FTR">Projects</a>
-                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:user_home' %}?format=PIL-FTR&nav=PIL-FTR">Films</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR&nav=PIL-FTR">Projects</a>
+                                    <a class="dropdown-item pilots-n-features-item" href="{% url 'hobo_user:pilots' %}?format=PIL-FTR&nav=PIL-FTR">Films</a>
                                 </div>
                             </li>
                         {% else %}
@@ -677,6 +676,9 @@ $( document ).ready(function() {
         $("#shorts-nav-item").addClass('active');
     }
     else if (desired_path == '/hobo_user/user_home/?format=SHO&nav=SHO'){
+        $("#shorts-nav-item").addClass('active');
+    }
+    else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
         $("#shorts-nav-item").addClass('active');
     }
     else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR&nav=PIL-FTR'){

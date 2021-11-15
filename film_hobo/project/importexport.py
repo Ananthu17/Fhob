@@ -11,12 +11,6 @@ class CharacterResource(ModelResource):
         model = Character
 
 
-class CharacterResource(ModelResource):
-
-    class Meta:
-        model = Character
-
-
 class SidesResource(ModelResource):
 
     class Meta:

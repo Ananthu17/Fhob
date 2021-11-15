@@ -178,18 +178,19 @@
                             </tbody>
                         </table>
                 </div>
-                <div  class=" proj-calender-sec mt-3 mb-3">
+                <div class=" proj-calender-sec mt-3 mb-3">
                     <div class="proj-location-sec">
                         <div class="proj-location-sec-head">
                             Location
                         </div>
                         <div class="proj-location-select-sec">
-                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
-                                {% for place in locations %}
+                            <input list="location" id="locvalue" name="location" class="proj-location-select" onchange="locationFilter()" placeholder="Choose Location"/>
+                            <datalist id="location" class="proj-location-select">
                                 <option disabled selected hidden>Choose Location</option>
-                                <option value="{{place.id}}">{{place}}</option>
+                                {% for place in locations %}
+                                    <option data-value={{place.id}} value="{{place}}"></option>
                                 {% endfor %}
-                            </select>
+                            </datalist>
                         </div>
                     </div>
                 </div>
@@ -216,7 +217,6 @@
 
             <!-- left section end  -->
             <!-- center section  -->
-
             <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
                 <!-- Row 1  -->
                 {% if format == 'PIL' %}
@@ -1693,11 +1693,14 @@
 
     // location filter
     function locationFilter(){
-        var location = document.getElementById("locationfilter");
-        var  id = location.value;
-        console.log("LOC",location,"VAL:",id)
-
-        post_url = origin_url + `/hobo_user/pilots/projects/?location=${id}`
+        var loc_value = document.getElementById("locvalue").value;
+        jQuery.each(document.getElementById("location").children, function() {
+            if (loc_value === this.value){
+                id = parseInt(this.getAttribute("data-value"))
+            }
+        })
+        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        console.log("Token",$("#token").val())
         axios({
             method: 'get',
             url: post_url,
