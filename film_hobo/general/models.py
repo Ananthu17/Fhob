@@ -1,5 +1,4 @@
 from django.db import models
-from hobo_user.models import CustomUser
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -66,8 +65,8 @@ class ReportProblem(models.Model):
     name = models.CharField(_('Name'),
                             max_length=150, null=True, blank=True)
     user_phone = models.CharField(_("Phone Number"),
-                                     max_length=16, null=True,
-                                      blank=False)
+                                  max_length=16, null=True,
+                                  blank=False)
     user_problem = models.TextField(_("User Problem"), blank=True, null=True)
 
     timestamp = models.DateTimeField(_('Created Time'), auto_now_add=True,
@@ -76,4 +75,3 @@ class ReportProblem(models.Model):
     class Meta:
         verbose_name = 'ReportProblem'
         verbose_name_plural = 'ReportProblems'
-

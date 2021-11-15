@@ -39,7 +39,8 @@ class EmailAddressAdmin(ImportExportModelAdmin):
     def make_verified(self, request, queryset):
         queryset.update(verified=True)
 
-    make_verified.short_description = "Mark selected email addresses as verified"
+    make_verified.short_description = \
+        "Mark selected email addresses as verified"
 
 
 admin.site.unregister(Token)

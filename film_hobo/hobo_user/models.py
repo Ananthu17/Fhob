@@ -1177,7 +1177,8 @@ class CustomUserSettings(models.Model):
     new_project = models.BooleanField(
         default=True,
         verbose_name=_(
-            "If someone I track has started a new project or got attached to a project")
+            "If someone I track has started a new project "
+            "or got attached to a project")
         )
     friend_request = models.BooleanField(
         default=True,

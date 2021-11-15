@@ -633,55 +633,70 @@
                                         Annual: $<span id="membership_annual_fee">{{ transaction.final_amount }}</span>
                                     </div>
                                 {% else %}
-                                    <div class="col-12">
-                                        Monthly: $<span id="membership_monthly_fee">{{ transaction.final_amount }}</span>
-                                    </div>
+                                    {% if request.user.membership == 'ADMIN' %}
+                                    {% else %}
+                                        <div class="col-12">
+                                            Monthly: $<span id="membership_monthly_fee">{{ transaction.final_amount }}</span>
+                                        </div>
+                                        <div class="col-12">
+                                            Taxes: $<span id="membership_tax_fee">0.00</span>
+                                        </div>
+                                        <div class="col-12">
+                                            Total Amount: $<span id="membership_total_fee">{{ transaction.final_amount }}</span>
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
-                                <div class="col-12">
-                                    Taxes: $<span id="membership_tax_fee">0.00</span>
-                                </div>
-                                <div class="col-12">
-                                    Total Amount: $<span id="membership_total_fee">{{ transaction.final_amount }}</span>
-                                </div>
                             </div>
+                            {% if request.user.membership == 'ADMIN' %}
+                            {% else %}
+                                <div class="row ml-2 mt-1 ">
+                                        <div class="col-3">
+                                            <label class="billing-label">Payment Option:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <div class="form-check-inline">
+                                                <label class="containerradio">Recurring
+                                                    <input id="recurring_btn" type="radio" name="radio1" checked>
+                                                    <span class="checkmarkagree"></span>
+                                                </label>
+                                            </div>
+                                            <!-- <div class="form-check-inline">
+                                                <label class="containerradio">One Time
+                                                    <input type="radio" name="radio1">
+                                                    <span class="checkmarkagree"></span>
+                                                </label>
+                                            </div> -->
+                                        </div>
+                                </div>
+                            {% endif %}
                             <div class="row ml-2 mt-1 ">
-                                <div class="col-3">
-                                    <label class="billing-label">Payment Option:</label>
-                                </div>
-                                <div class="col-9">
-                                    <div class="form-check-inline">
-                                        <label class="containerradio">Recurring
-                                            <input id="recurring_btn" type="radio" name="radio1" checked>
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                    <!-- <div class="form-check-inline">
-                                        <label class="containerradio">One Time
-                                            <input type="radio" name="radio1">
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div> -->
-                                </div>
-                            </div>
-                            <!-- <div class="row ml-2 mt-1 ">
                                 {% if transaction.payment_plan == 'annually' %}
-                                    <div id="change_tenure" class="col-3">
-                                        <label class="billing-label">Change to Monthly</label>
-                                    </div>
+                                    {% if request.user.membership == 'ADMIN' %}
+                                    {% else %}
+                                        <div id="change_tenure" class="col-3">
+                                            <label class="billing-label">Change to Monthly</label>
+                                        </div>
+                                    {% endif %}
                                 {% else %}
-                                    <div id="change_tenure" class="col-3">
-                                        <label class="billing-label">Change to Annual</label>
+                                    {% if request.user.membership == 'ADMIN' %}
+                                    {% else %}
+                                        <div id="change_tenure" class="col-3">
+                                            <label class="billing-label">Change to Annual</label>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                                {% if request.user.membership == 'ADMIN' %}
+                                {% else %}
+                                    <div class="col-9">
+                                        <div class="form-check-inline">
+                                            <label id="change_tenure_btn" class="containerradio">Yes
+                                                <input name="radio2">&nbsp;
+                                                <span class="checkmarkagree"></span>
+                                            </label>
+                                        </div>
                                     </div>
                                 {% endif %}
-                                <div class="col-9">
-                                    <div class="form-check-inline">
-                                        <label id="change_tenure_btn" class="containerradio">Yes
-                                            <input name="radio2">&nbsp;
-                                            <span class="checkmarkagree"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div> -->
+                            </div>
                         {% comment %}
                         </form>
                         {% endcomment %}

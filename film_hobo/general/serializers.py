@@ -9,7 +9,6 @@ class HelpSerializer(serializers.ModelSerializer):
         fields = ['subject', 'description', 'screenshot']
 
 
-
 class ContactUsSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -22,4 +21,3 @@ class ReportProblemSerializer(serializers.ModelSerializer):
         model = ReportProblem
         fields = ['user_email', 'name', 'user_phone', 'user_problem',
                   'timestamp']
-

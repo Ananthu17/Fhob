@@ -289,7 +289,8 @@ class Comment(models.Model):
                                         blank=False)
 
     def __str__(self):
-        return str(self.project.title+" commented by "+self.user.get_full_name())
+        return str(
+            self.project.title+" commented by "+self.user.get_full_name())
 
     class Meta:
         verbose_name = 'Comment'
@@ -698,8 +699,8 @@ class DraftProject(models.Model):
                                  default=0)
     video_rating = models.IntegerField(_("Video Rating"),
                                        validators=[MinValueValidator(0),
-                                       MaxValueValidator(5)], null=True, blank=True,
-                                       default=0)
+                                       MaxValueValidator(5)], null=True,
+                                       blank=True, default=0)
     video_url = models.CharField(max_length=1000,
                                  null=True, blank=True)
     video_type = models.CharField(_("Video Type"),
@@ -755,7 +756,8 @@ class DraftProject(models.Model):
     logline = models.CharField(max_length=1000,  null=True, blank=True)
     project_info = models.TextField(_("Project Info"), null=True, blank=True)
     likes = models.IntegerField(_("Likes"), null=True, blank=True, default=0)
-    dislikes = models.IntegerField(_("Dislikes"), null=True, blank=True, default=0)
+    dislikes = models.IntegerField(_("Dislikes"), null=True,
+                                   blank=True, default=0)
 
     timestamp = models.DateField(auto_now_add=True)
     production = models.CharField(_("Production"),

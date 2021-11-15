@@ -1,7 +1,7 @@
-from hobo_user.models import UserProject, UserRating, Project, \
-    UserRatingCombined, UserProject
-from project.models import Audition, AuditionRating, Character, Comment, CrewApplication, \
-    SceneImages, Sides, ProjectRating, Comment, ReportVideo
+from hobo_user.models import UserProject, UserRating, Project
+from project.models import Audition, AuditionRating, Character, \
+                           Comment, CrewApplication, SceneImages, \
+                           Sides, ProjectRating, ReportVideo
 from rest_framework import serializers
 
 
@@ -21,7 +21,7 @@ class RateUserSkillsSerializer(serializers.Serializer):
 
     class Meta:
         model = UserRating
-        fields = ['reason', 'rating', 'project_member_id' ]
+        fields = ['reason', 'rating', 'project_member_id']
 
 
 class ProjectVideoURLSerializer(serializers.Serializer):
@@ -55,14 +55,16 @@ class CharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['name', 'description', 'project', 'password', 'age', 'gender']
+        fields = ['name', 'description', 'project',
+                  'password', 'age', 'gender']
 
 
 class UpdateCharacterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Character
-        fields = ['name', 'description', 'project', 'password', 'age', 'gender']
+        fields = ['name', 'description', 'project',
+                  'password', 'age', 'gender']
 
 
 class SidesSerializer(serializers.ModelSerializer):
