@@ -894,3 +894,8 @@ input.pw {
     overflow-y:scroll;
     overflow-x:hidden;
   }
+  .small-txt
+    {
+      font-family:Myraid Pro;
+      font-size:12px; 
+    }

@@ -6,7 +6,7 @@ import requests
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.views.generic.base import View

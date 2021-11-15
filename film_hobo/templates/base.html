@@ -68,7 +68,6 @@
                                         {% endif %}
                                         <span class="message-notification">
                                             {% if request.user.is_anonymous %}
-                                                {% get_msg_notifications_count request.user as msg_count %}
                                             {% else %}
                                                 {% get_msg_notifications_count request.user.id as msg_count %}
                                             {% endif %}
@@ -145,31 +144,34 @@
                             </button>
                             {% endif %}
 
-
+                            
                             <li class="list-inline-item m-0">
                                 <a href="{{ request.user.get_profile_url }}">
-                                {% if request.user.get_profile_photo %}
+                                {% if request.user.get_profile_photo and user.registration_complete %}
                                     <img src="{{ request.user.get_profile_photo }}"
                                     class="img-fluid header-user-img">
+                                </a>
                                 {% else %}
                                     <img src="{% static 'images/man-user.png' %}"
                                     class="img-fluid header-user-img">
                                 {% endif %}
-                                </a>
-                                {% if user.membership == 'HOB' %}
+                               
+                            {% if user.is_authenticated and user.registration_complete %}
+                                {% if request.user.membership == 'HOB' %}
                                     <span class="header-icon-pos pro-font">Hobo</span>
-                                {% elif user.membership == 'IND' %}
+                                {% elif request.user.membership == 'IND' %}
                                     <span class="header-icon-pos pro-font">Indie</span>
-                                {% elif user.membership == 'PRO' %}
+                                {% elif request.user.membership == 'PRO' %}
                                     <span class="header-icon-pos pro-font">Pro</span>
-                                {% elif user.membership == 'COM' %}
+                                {% elif request.user.membership == 'COM' %}
                                     <span class="header-icon-pos pro-font">Company</span>
-                                {% elif user.membership == 'ADMIN' %}
+                                {% elif request.user.membership == 'ADMIN' %}
                                     <span class="header-icon-pos pro-font">Admin</span>
                                 {% else %}
                                     <span class="header-icon-pos pro-font"></span>
                                 {% endif %}
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -407,7 +409,7 @@
                                 {% endif %}
                             </div>
                         </li>
-                    {% elif user.i_agree == True %}
+                    {% elif user.i_agree == True  %}
                     <li class="nav-item">
                         <a id="showcase_non_clickable" class="nav-link" href="">SHOWCASE</a>
                     </li>
@@ -436,6 +438,8 @@
                         <a id="logout_link" class="nav-link" href="{% url 'hobo_user:user_logout' %}">LOGOUT</a>
 
                     </li> -->
+
+                    
                     {% else %}
                         <li class="nav-item">
                             <a id="how_to" class="nav-link" href="{% url 'hobo_user:how_to' %}">HOW TO</a>
@@ -673,7 +677,7 @@ $( document ).ready(function() {
     }
     else if (desired_path == '/hobo_user/user_home/?format=SHO&nav=SHO'){
         $("#shorts-nav-item").addClass('active');
-
+    }
     else if (desired_path == '/hobo_user/projectview/?format=PIL-FTR'){
         $("#shorts-nav-item").addClass('active');
     }

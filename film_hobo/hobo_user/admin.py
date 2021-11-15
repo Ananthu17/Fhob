@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.actions import delete_selected \
+    as django_delete_selected
 from django.contrib.auth.admin import UserAdmin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
@@ -38,8 +40,8 @@ from .importexport import EthnicAppearanceResource, AthleticSkillResource, \
                     VideoRatingCombinedResource, UserTrackingResource, \
                     FriendResource, GroupUsersResource, UserProfileResource, \
                     CompanyProfileResource, ProjectMemberRatingResource, \
-                    UserRatingResource, UserNotificationResource, TeamResource, \
-                    UserRatingCombinedResource
+                    UserRatingResource, UserNotificationResource, \
+                    TeamResource, UserRatingCombinedResource
 
 
 # class EthnicAppearanceInlineInline(admin.StackedInline):
@@ -100,6 +102,17 @@ class CustomUserAdmin(UserAdmin, ImportExportModelAdmin):
         AthleticSkillInlineInline
     ]
     change_form_template = 'admin/custom/change_form.html'
+    # actions = ['delete_selected']
+
+    # def delete_model(modeladmin, request, obj):
+    #     # do something with the user instance
+    #     obj.delete()
+
+    # def delete_selected(modeladmin, request, queryset):
+    #     # do something with the users in the queryset
+    #     return django_delete_selected(modeladmin, request, queryset)
+    # delete_selected.short_description = \
+    #     django_delete_selected.short_description
 
     class Media:
         css = {
@@ -243,26 +256,6 @@ admin.site.site_title = "Filmhobo Admin Portal"
 admin.site.index_title = "Welcome to Filmhobo Admin Portal"
 admin.site.unregister(CustomUser)
 admin.site.register(CustomUser, CustomUserAdmin)
-# admin.site.register(ProjectReaction)
-# admin.site.register(PromoCode)
-# admin.site.register(HoboPaymentsDetails)
-# admin.site.register(IndiePaymentDetails)
-# admin.site.register(ProPaymentDetails)
-# admin.site.register(CompanyPaymentDetails)
-# admin.site.register(DisabledAccount)
-# admin.site.register(CoWorker)
-# admin.site.register(VideoRating)
-# admin.site.register(VideoRatingCombined)
-# admin.site.register(FriendRequest)
-# admin.site.register(UserAgentManager)
-# admin.site.register(Photo)
-# admin.site.register(UserInterest)
-# admin.site.register(CompanyClient)
-# admin.site.register(NewJobType)
-# admin.site.register(FriendGroup)
-# admin.site.register(CompanyRating)
-# admin.site.register(CompanyRatingCombined)
-# admin.site.register(UserProject)
 
 
 @admin.register(EthnicAppearance)
@@ -409,9 +402,4 @@ class TeamAdmin(ImportExportModelAdmin):
 
 admin.site.register(Team, TeamAdmin)
 # admin.site.register(BetaTesterCodes)
-
-
-
-
 # admin.site.register(Project, ProjectAdmin)
-

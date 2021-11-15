@@ -95,8 +95,8 @@
                 </div>
 
                 <div class="mem-set-network-sec mt-3 mb-4">
-                    <div class="mb-1 float-left"><a href="#" class="mem-setup-orng-f">({{tracking_list.count}})Tracking</a></div>
-                    <div class="float-right"><a href="#" class="mem-setup-blu-f">({{trackers_list.count}})Trackers</a></div>
+                    <div class="mb-1 float-left"><a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-setup-orng-f">({{tracking_list.count}})Tracking</a></div>
+                    <div class="float-right"><a href="{% url 'hobo_user:friends-and-followers' %}" class="mem-setup-blu-f">({{trackers_list.count}})Trackers</a></div>
                     <hr class="mem-setup-network-hr">
                     <div class="mem-set-track-txt mb-1"><span class="underline">People</span> ({{tracking_list.count}})</div>
                     <div class="row pl-3 pr-3">

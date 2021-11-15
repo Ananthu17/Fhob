@@ -48,9 +48,11 @@
                           {{item}}
                         </div>
                         {% endfor %}
-                        <div class="d-flex justify-content-center">
+                        {% if form.guild_membership_id.errors %}
+                        <div id="guild_error_div" style="display: none;">
                           {{ form.guild_membership_id.errors }}
                         </div>
+                        {% endif %}
                         <div class="mt-2">
                             <span class="pro-red-bx">Falsification of the Guild record may result in termination of your membership</span>
                           </div>
@@ -322,6 +324,23 @@
                             </label>
                       </div>
 
+                      <div class="modal fade" id="notify_guild" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                        <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                                        <button type="button" id="modalClose" class="close notify_guild_close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                </div>
+                                <div class="modal-body" style="text-align:center;">
+                                    <p>Please select your guild membership !</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default notify_guild_close" data-dismiss="modal"  id="modalClose1">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+
                       <!-- Warning Modal -->
                       <div class="modal fade" id="betaNotifyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                         <div class="modal-dialog" role="document">
@@ -347,7 +366,7 @@
               <ul class="list-inline m-0">
                   <!-- <li class="list-inline-item fb">Back</li> -->
                   <li class="list-inline-item">
-                    <button type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
+                    <button id="pro_details_submit" type="submit" class="btn fh-sbmt-btn btn-pd-0">Next</button>
                   </li>
               </ul>
           </div>
@@ -364,33 +383,44 @@
 <script>
   $(document).ready(function() {
     $(function () {
-              $('#date_of_birth').datetimepicker({
-                format: 'YYYY-MM-DD'
-                });
-             });
+    $('#date_of_birth').datetimepicker({
+      format: 'YYYY-MM-DD'
+      });
+    });
+
+  if(document.getElementById("guild_error_div") !== null)
+  {
+    $('#notify_guild').modal('show');
+  }
+
 });
 
 
-$("a[class='link-clickable']").click(function () {
-  
-  $('#myModalpdf2').modal('show');
- 
-  return false;
-  
+$('#pro_details_submit').on('click', function () {
+  if(document.getElementById("guild_error_div") !== null)
+  {
+    $('#notify_guild').modal('show');
+  }
+})
 
+$('.notify_guild_close').on('click', function () {
+    $('#notify_guild').modal('hide');
+})
+
+$("a[class='link-clickable']").click(function () {
+  $('#myModalpdf2').modal('show');
+  return false;
 });
 
 
 $(function () {
   $('#pdfmodal2Close').on('click', function () {
       $('#myModalpdf2').modal('hide');
-     
   })
 })
 $(function () {
   $('#pdfmodal2Close1').on('click', function () {
       $('#myModalpdf2').modal('hide');
-     
   })
 })
 

@@ -61,9 +61,9 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     EthnicAppearance, UserAgentManager, UserInterest, \
                     UserNotification, Friend, FriendGroup, \
                     Project, Team, UserProfile, JobType, \
-                    UserRating, Location, UserRatingCombined, \
+                    Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
-                    Feedback, CompanyRating, CompanyRatingCombined, \
+                    CompanyRating, CompanyRatingCombined, \
                     VideoRatingCombined, BetaTesterCodes, Writer
 
 from payment.models import Transaction
@@ -149,12 +149,17 @@ class CustomUserLogin(DjangoLogin):
     template_name = 'user_pages/login.html'
 
     def get(self, request):
-        if request.user.is_anonymous:
+        if request.user.is_anonymous and request.user.is_authenticated == False:
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            cust_user = CustomUser.objects.get(id=request.user.id)
+            if cust_user.registration_complete == True:
+                return render(request, 'user_pages/user_home.html',
+                {'user': request.user})
+            else:
+                form = LoginForm()
+                return render(request, 'user_pages/login.html', {'form': form})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -168,8 +173,11 @@ class CustomUserLogin(DjangoLogin):
             userobj = CustomUserSettings.objects.get(user=user)
             if userobj.account_status == userobj.DISABLED:
                 return redirect('/hobo_user/enable-account')
+            elif userobj.user.registration_complete != True:
+                return render(request, 'user_pages/login.html', {'form': form})
             else:
-                if user is not None:
+                cust_user = CustomUser.objects.get(id=user.id)
+                if user is not None and cust_user.registration_complete == True:
                     if user.membership == 'HOB':
                         login(request, user)
                         return render(request, 'user_pages/showcasetwo.html',
@@ -667,7 +675,7 @@ class CustomUserSignupIndieView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -725,7 +733,7 @@ class CustomUserSignupProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -774,7 +782,7 @@ class CustomUserSignupCompany(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -2343,7 +2351,10 @@ class ProductionCompanyProfileAPI(APIView):
             if 'company_name' in data_dict:
                 user.company_name = data_dict['company_name']
             if 'company_website' in data_dict:
-                user.company_website = data_dict['company_website']
+                if data_dict['company_website'] == 'NONE':
+                    user.company_website = ''
+                else:
+                    user.company_website = data_dict['company_website']
             user.save()
             if 'imdb' in data_dict:
                 profile.imdb = data_dict['imdb']
@@ -2394,10 +2405,14 @@ class AgencyManagementCompanyProfileAPI(APIView):
         response = {}
         if serializer.is_valid():
             data_dict = serializer.data
+            print(data_dict)
             if 'company_name' in data_dict:
                 user.company_name = data_dict['company_name']
             if 'company_website' in data_dict:
-                user.company_website = data_dict['company_website']
+                if data_dict['company_website'] == 'NONE':
+                    user.company_website = ''
+                else:
+                    user.company_website = data_dict['company_website']
             if 'agency_management_type' in data_dict:
                 user.agency_management_type = data_dict[
                                 'agency_management_type']
@@ -2739,6 +2754,8 @@ class EditProductionCompanyView(LoginRequiredMixin, TemplateView):
         profile = CompanyProfile.objects.get(user=user)
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
+        if json_dict['company_website'] == '':
+            json_dict['company_website'] = "NONE"
         if 'submission_policy_SAMR' in json_dict:
             submission_policy_SAMR = json_dict['submission_policy_SAMR']
             if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
@@ -2864,6 +2881,8 @@ class EditAgencyManagementCompanyView(LoginRequiredMixin, TemplateView):
         profile = CompanyProfile.objects.get(user=user)
         json_response = json.dumps(request.POST)
         json_dict = ast.literal_eval(json_response)
+        if json_dict['company_website'] == '':
+            json_dict['company_website'] = "NONE"
         if 'submission_policy_SAMR' in json_dict:
             submission_policy_SAMR = json_dict['submission_policy_SAMR']
             if(submission_policy_SAMR == 'members_with_rating' and 'rate' in json_dict):
@@ -3454,7 +3473,6 @@ class RateCompanyAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        print("here----------------------")
         serializer = self.serializer_class(data=request.data)
         response = {}
         if serializer.is_valid():
@@ -5533,148 +5551,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         return context
 
-    # def post(self, request):
-    #     # try:
-    #         # print(request.POST)
-    #         projectform = ProjectCreationForm(request.POST or None, request.FILES)
-    #         # writerform = WriterForm(request.POST or None)
-    #         # project = Project()
-    #         cast_pay = request.POST.get('radiorow4')
-    #         # Passing cast_star rating
-    #         cast_star1 = request.POST.get('cast-star1')
-    #         cast_star2 = request.POST.get('cast-star2')
-    #         cast_star3 = request.POST.get('cast-star3')
-    #         cast_star_smar = 0
-
-    #         if (cast_star1 != ''):
-    #             if (cast_star1 == '1'):
-    #                 cast_star1 = Project.INDIE_WITH_RATING_1_STAR
-    #             elif(cast_star1 == '2'):
-    #                 cast_star1 = Project.INDIE_WITH_RATING_2_STAR
-    #             elif(cast_star1 == '3'):
-    #                 cast_star1 = Project.INDIE_WITH_RATING_3_STAR
-    #             elif(cast_star1 == '4'):
-    #                 cast_star1 = Project.INDIE_WITH_RATING_4_STAR
-    #             elif(cast_star1 == '5'):
-    #                 cast_star1 = Project.INDIE_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star1
-    #         elif(cast_star2 != ''):
-    #             if (cast_star2 == '1'):
-    #                 cast_star2 = Project.PRO_WITH_RATING_1_STAR
-    #             elif(cast_star2 == '2'):
-    #                 cast_star2 = Project.PRO_WITH_RATING_2_STAR
-    #             elif(cast_star2 == '3'):
-    #                 cast_star2 = Project.PRO_WITH_RATING_3_STAR
-    #             elif(cast_star2 == '4'):
-    #                 cast_star2 = Project.PRO_WITH_RATING_4_STAR
-    #             elif(cast_star2 == '5'):
-    #                 cast_star2 = Project.PRO_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star2
-    #         elif(cast_star3 != ''):
-    #             if (cast_star3 == '1'):
-    #                 cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_1_STAR
-    #             elif(cast_star3 == '2'):
-    #                 cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_2_STAR
-    #             elif(cast_star3 == '3'):
-    #                 cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_3_STAR
-    #             elif(cast_star3 == '4'):
-    #                 cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_4_STAR
-    #             elif(cast_star3 == '5'):
-    #                 cast_star3 = Project.INDIE_AND_PRO_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star3
-
-    #         # Passing crew_star rating
-    #         crew_star1 = request.POST.get('crew-star1')
-    #         crew_star2 = request.POST.get('crew-star2')
-    #         crew_star3 = request.POST.get('crew-star3')
-
-    #         crew_star_smar = 0
-
-    #         if (crew_star1 != ''):
-    #             if (crew_star1 == '1'):
-    #                 crew_star1 = Project.INDIE_WITH_RATING_1_STAR
-    #             elif (crew_star1 == '2'):
-    #                 crew_star1 = Project.INDIE_WITH_RATING_2_STAR
-    #             elif (crew_star1 == '3'):
-    #                 crew_star1 = Project.INDIE_WITH_RATING_3_STAR
-    #             elif (crew_star1 == '4'):
-    #                 crew_star1 = Project.INDIE_WITH_RATING_4_STAR
-    #             elif (crew_star1 == '5'):
-    #                 crew_star1 = Project.INDIE_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star1
-    #         if (crew_star2 != ''):
-    #             if (crew_star2 == '1'):
-    #                 crew_star2 = Project.PRO_WITH_RATING_1_STAR
-    #             elif (crew_star2 == '2'):
-    #                 crew_star2 = Project.PRO_WITH_RATING_2_STAR
-    #             elif (crew_star2 == '3'):
-    #                 crew_star2 = Project.PRO_WITH_RATING_3_STAR
-    #             elif (crew_star2 == '4'):
-    #                 crew_star2 = Project.PRO_WITH_RATING_4_STAR
-    #             elif (crew_star2 == '5'):
-    #                 crew_star2 = Project.PRO_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star2
-    #         if (crew_star3 != ''):
-    #             if (crew_star3 == '1'):
-    #                 crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_1_STAR
-    #             if (crew_star3 == '2'):
-    #                 crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_2_STAR
-    #             if (crew_star3 == '3'):
-    #                 crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_3_STAR
-    #             if (crew_star3 == '4'):
-    #                 crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_4_STAR
-    #             if (crew_star3 == '5'):
-    #                 crew_star3 = Project.INDIE_AND_PRO_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star3
-
-    #         print("valid ahno project:", projectform.is_valid())
-    #         print('form error project', projectform.errors)
-    #         # print("valid ahno writer:", writerform.is_valid())
-    #         # print('form error writer', writerform.errors)
-    #         if projectform.is_valid():
-    #             # writer = writerform.save()
-    #             project = projectform.save()
-    #             project.cast_samr = cast_star_smar
-    #             project.crew_samr = crew_star_smar
-    #             project.cast_pay_rate = cast_pay
-    #             print(project.creator)
-    #             # import pdb
-    #             # pdb.set_trace()
-    #             # writer.project = project
-    #             project.save()
-    #             # writer.save()
-    #             interest = UserInterest.objects.all()
-    #             for usin in interest:
-    #                 if (project.format == usin.format and project.location == usin.location and project.sag_aftra == usin.budget):
-    #                     user = usin.user
-    #                     # update notification table
-    #                     notification = UserNotification()
-    #                     notification.user = user
-    #                     notification.notification_type = UserNotification.PROJECT_TRACKING
-    #                     notification.from_user = project.creator
-    #                     notification.message = str(project.creator)+" added a new  project "+str(project.title)+" at location "+str(project.location)
-    #                     print(notification.message)
-    #                     notification.save()
-    #                     # send notification
-    #                     room_name = "user_"+str(user.id)
-    #                     notification_msg = {
-    #                             'type': 'send_project_tracking_notification',
-    #                             'message': str(notification.message),
-    #                             'from': str(project.creator.id),
-    #                             "event": "PROJECT_TRACKING"
-    #                         }
-    #                     notify(room_name, notification_msg)
-
-    #             messages.success(request, "New project"+"  "+str(project.title)+"  "+"added")
-    #             return HttpResponseRedirect(
-    #                                 reverse('hobo_user:projects'))
-    #         else:
-    #             messages.warning(request, "Form not valid")
-    #             return HttpResponseRedirect(reverse('hobo_user:projects'))
-    #     except:
-    #         messages.warning(request, "Can't read data")
-    #         return HttpResponseRedirect(
-    #                                 reverse('hobo_user:projects'))
 
     def post(self, request):
         # print(request.POST)
@@ -5774,28 +5650,6 @@ class CreateProjectView(LoginRequiredMixin, TemplateView):
             project.cast_samr = project_cast_samr
             project.crew_samr = project_crew_samr
             project.save()
-            interest = UserInterest.objects.all()
-            for usin in interest:
-                if (project.format == usin.format and project.location == usin.location and project.sag_aftra == usin.budget):
-                    user = usin.user
-                    # update notification table
-                    notification = UserNotification()
-                    notification.user = user
-                    notification.notification_type = UserNotification.PROJECT_TRACKING
-                    notification.from_user = project.creator
-                    notification.message = str(project.creator)+" added a new  project "+str(project.title)+" at location "+str(project.location)
-                    print(notification.message)
-                    notification.save()
-                    # send notification
-                    room_name = "user_"+str(user.id)
-                    notification_msg = {
-                            'type': 'send_project_tracking_notification',
-                            'message': str(notification.message),
-                            'from': str(project.creator.id),
-                            "event": "PROJECT_TRACKING"
-                        }
-                    notify(room_name, notification_msg)
-
             messages.success(request, "New project"+"  "+str(project.title)+"  "+"added")
             return HttpResponseRedirect("/hobo_user/projectview/update/%s" % (project.id))
         else:
@@ -5812,199 +5666,79 @@ class EditProjectView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # project = get_object_or_404(Project, id=self.kwargs.get('id'))
-        draft_project_obj = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
+        project = get_object_or_404(Project, id=self.kwargs.get('id'))
+        # draft_project_obj = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
         user = self.request.user
         mode_operation = "update"
-        # writer = Writer.objects.get(project=project.id)
         context['mode_operation'] = mode_operation
-        context['project_obj'] = draft_project_obj
-        context['form'] = ProjectCreationForm(instance=draft_project_obj)
-        # context['writerform'] = WriterForm(instance=writer)
+        context['project_obj'] = project
+        context['form'] = ProjectCreationForm(instance=project)
         context['user'] = user
-        context['draft_project_obj'] = draft_project_obj
+        # context['draft_project_obj'] = draft_project_obj
+        # try:
+        #     project = Project.objects.get(draft_project=draft_project_obj)
+        #     context['cast_count'] = Character.objects.filter(project=draft_project_obj.draft_project).count()
+        #     context['crew_count'] = ProjectCrew.objects.filter(project=draft_project_obj.draft_project).count()
+        #     context['project'] = project
+        # except Project.DoesNotExist:
+        #     context['cast_count'] = 0
+        #     context['crew_count'] = 0
+        # context['cast_count'] = Character.objects.filter(project=draft_project_obj.draft_project).count()
+        # context['crew_count'] = ProjectCrew.objects.filter(project=draft_project_obj.draft_project).count()
+        context['cast_count'] = Character.objects.filter(project=project).count()
+        context['crew_count'] = ProjectCrew.objects.filter(project=project).count()
+        # context['project'] = project
 
-        try:
-            project = Project.objects.get(draft_project=draft_project_obj)
-            context['cast_count'] = Character.objects.filter(project=draft_project_obj.draft_project).count()
-            context['crew_count'] = ProjectCrew.objects.filter(project=draft_project_obj.draft_project).count()
-            context['project'] = project
-        except Project.DoesNotExist:
-            context['cast_count'] = 0
-            context['crew_count'] = 0
 
-        if ((draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_0_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
+        if ((project.cast_samr == Project.INDIE_WITH_RATING_0_STAR) or
+           (project.cast_samr == Project.INDIE_WITH_RATING_1_STAR) or
+           (project.cast_samr == Project.INDIE_WITH_RATING_2_STAR) or
+           (project.cast_samr == Project.INDIE_WITH_RATING_3_STAR) or
+           (project.cast_samr == Project.INDIE_WITH_RATING_4_STAR) or
+           (project.cast_samr == Project.INDIE_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'indie'
-        elif ((draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_0_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
+        elif ((project.cast_samr == Project.PRO_WITH_RATING_0_STAR) or
+           (project.cast_samr == Project.PRO_WITH_RATING_1_STAR) or
+           (project.cast_samr == Project.PRO_WITH_RATING_2_STAR) or
+           (project.cast_samr == Project.PRO_WITH_RATING_3_STAR) or
+           (project.cast_samr == Project.PRO_WITH_RATING_4_STAR) or
+           (project.cast_samr == Project.PRO_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'pro'
-        elif ((draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_0_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
-           (draft_project_obj.cast_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
+        elif ((project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_0_STAR) or
+           (project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+           (project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_2_STAR) or
+           (project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_3_STAR) or
+           (project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_4_STAR) or
+           (project.cast_samr == Project.INDIE_AND_PRO_WITH_RATING_5_STAR)):
                 context['cast_samr_option'] = 'indie_and_pro'
  
-        if ((draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_0_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_1_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_2_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_3_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_4_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_WITH_RATING_5_STAR)):
+        if ((project.crew_samr == Project.INDIE_WITH_RATING_0_STAR) or
+           (project.crew_samr == Project.INDIE_WITH_RATING_1_STAR) or
+           (project.crew_samr == Project.INDIE_WITH_RATING_2_STAR) or
+           (project.crew_samr == Project.INDIE_WITH_RATING_3_STAR) or
+           (project.crew_samr == Project.INDIE_WITH_RATING_4_STAR) or
+           (project.crew_samr == Project.INDIE_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie'
-        elif ((draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_0_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_1_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_2_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_3_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_4_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.PRO_WITH_RATING_5_STAR)):
+        elif ((project.crew_samr == Project.PRO_WITH_RATING_0_STAR) or
+           (project.crew_samr == Project.PRO_WITH_RATING_1_STAR) or
+           (project.crew_samr == Project.PRO_WITH_RATING_2_STAR) or
+           (project.crew_samr == Project.PRO_WITH_RATING_3_STAR) or
+           (project.crew_samr == Project.PRO_WITH_RATING_4_STAR) or
+           (project.crew_samr == Project.PRO_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'pro'
-        elif ((draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_0_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_1_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_2_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_3_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_4_STAR) or
-           (draft_project_obj.crew_samr == DraftProject.INDIE_AND_PRO_WITH_RATING_5_STAR)):
+        elif ((project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_0_STAR) or
+           (project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_1_STAR) or
+           (project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_2_STAR) or
+           (project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_3_STAR) or
+           (project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_4_STAR) or
+           (project.crew_samr == Project.INDIE_AND_PRO_WITH_RATING_5_STAR)):
                 context['crew_samr_option'] = 'indie_and_pro'
         return context
 
-    # def post(self, request, **kwargs):
-    #     try:
-    #         project = get_object_or_404(Project, id=self.kwargs.get('id'))
-    #         # writer = Writer.objects.get(project=project.id)
-    #         print(request.POST)
-    #         cast_pay = request.POST.get('radiorow4')
-    #         # Updating  cast_star rating
-    #         cast_star1 = request.POST.get('cast-star1')
-    #         cast_star2 = request.POST.get('cast-star2')
-    #         cast_star3 = request.POST.get('cast-star3')
-
-    #         cast_star_smar = 0
-
-    #         if (cast_star1 != ''):
-    #             if (cast_star1 == '1'):
-    #                 cast_star1 = project.INDIE_WITH_RATING_1_STAR
-    #             elif(cast_star1 == '2'):
-    #                 cast_star1 = project.INDIE_WITH_RATING_2_STAR
-    #             elif(cast_star1 == '3'):
-    #                 cast_star1 = project.INDIE_WITH_RATING_3_STAR
-    #             elif(cast_star1 == '4'):
-    #                 cast_star1 = project.INDIE_WITH_RATING_4_STAR
-    #             elif(cast_star1 == '5'):
-    #                 cast_star1 = project.INDIE_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star1
-    #         elif(cast_star2 != ''):
-    #             if (cast_star2 == '1'):
-    #                 cast_star2 = project.PRO_WITH_RATING_1_STAR
-    #             elif(cast_star2 == '2'):
-    #                 cast_star2 = project.PRO_WITH_RATING_2_STAR
-    #             elif(cast_star2 == '3'):
-    #                 cast_star2 = project.PRO_WITH_RATING_3_STAR
-    #             elif(cast_star2 == '4'):
-    #                 cast_star2 = project.PRO_WITH_RATING_4_STAR
-    #             elif(cast_star2 == '5'):
-    #                 cast_star2 = project.PRO_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star2
-    #         elif(cast_star3 != ''):
-    #             if (cast_star3 == '1'):
-    #                 cast_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
-    #             elif(cast_star3 == '2'):
-    #                 cast_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
-    #             elif(cast_star3 == '3'):
-    #                 cast_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
-    #             elif(cast_star3 == '4'):
-    #                 cast_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
-    #             elif(cast_star3 == '5'):
-    #                 cast_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
-    #             cast_star_smar = cast_star3
-
-    #         # Updating crew_star rating
-    #         crew_star1 = request.POST.get('crew-star1')
-    #         crew_star2 = request.POST.get('crew-star2')
-    #         crew_star3 = request.POST.get('crew-star3')
-
-    #         crew_star_smar = 0
-
-    #         if (crew_star1 != ''):
-    #             if (crew_star1 == '1'):
-    #                 crew_star1 = project.INDIE_WITH_RATING_1_STAR
-    #             elif (crew_star1 == '2'):
-    #                 crew_star1 = project.INDIE_WITH_RATING_2_STAR
-    #             elif (crew_star1 == '3'):
-    #                 crew_star1 = project.INDIE_WITH_RATING_3_STAR
-    #             elif (crew_star1 == '4'):
-    #                 crew_star1 = project.INDIE_WITH_RATING_4_STAR
-    #             elif (crew_star1 == '5'):
-    #                 crew_star1 = project.INDIE_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star1
-    #         if (crew_star2 != ''):
-    #             if (crew_star2 == '1'):
-    #                 crew_star2 = project.PRO_WITH_RATING_1_STAR
-    #             elif (crew_star2 == '2'):
-    #                 crew_star2 = project.PRO_WITH_RATING_2_STAR
-    #             elif (crew_star2 == '3'):
-    #                 crew_star2 = project.PRO_WITH_RATING_3_STAR
-    #             elif (crew_star2 == '4'):
-    #                 crew_star2 = project.PRO_WITH_RATING_4_STAR
-    #             elif (crew_star2 == '5'):
-    #                 crew_star2 = project.PRO_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star2
-    #         if (crew_star3 != ''):
-    #             if (crew_star3 == '1'):
-    #                 crew_star3 = project.INDIE_AND_PRO_WITH_RATING_1_STAR
-    #             if (crew_star3 == '2'):
-    #                 crew_star3 = project.INDIE_AND_PRO_WITH_RATING_2_STAR
-    #             if (crew_star3 == '3'):
-    #                 crew_star3 = project.INDIE_AND_PRO_WITH_RATING_3_STAR
-    #             if (crew_star3 == '4'):
-    #                 crew_star3 = project.INDIE_AND_PRO_WITH_RATING_4_STAR
-    #             if (crew_star3 == '5'):
-    #                 crew_star3 = project.INDIE_AND_PRO_WITH_RATING_5_STAR
-    #             crew_star_smar = crew_star3
-
-    #         projectform = ProjectCreationForm(request.POST or None, request.FILES, instance=project)
-    #         # writerform = WriterForm(request.POST or None, instance=writer)
-    #         # new_writer = request.POST.get('new_writer')
-
-    #         print("valid ahno project:", projectform.is_valid())
-    #         print('form error project', projectform.errors)
-    #         # print("valid ahno writer:", writerform.is_valid())
-    #         # print('form error writer', writerform.errors)
-    #         if projectform.is_valid():
-
-    #             # writer = writerform.save()
-    #             project = projectform.save()
-    #             project.cast_samr = cast_star_smar
-    #             project.crew_samr = crew_star_smar
-    #             project.cast_pay_rate = cast_pay
-    #             # writer.project = project
-    #             # writer.name = new_writer
-    #             project.save()
-    #             # writer.save()
-    #             messages.success(request, "Project Updated Successfully.")
-    #             return HttpResponseRedirect(
-    #                                 reverse('hobo_user:projects'))
-    #         messages.error(request, "Form not valid")
-    #         return HttpResponseRedirect(
-    #                                 reverse('hobo_user:projects'))
-    #     except:
-    #         messages.error(request, "Can't read data")
-    #         return HttpResponseRedirect(
-    #                                 reverse('hobo_user:projects'))
 
     def post(self, request, **kwargs):
-        project = get_object_or_404(DraftProject, id=self.kwargs.get('id'))
-        # print(request.POST)
+        project = get_object_or_404(Project, id=self.kwargs.get('id'))
+        print(request.POST)
         remove_script = request.POST.get('remove_script')
         cast_samr = request.POST.get('cast_samr')
         crew_samr = request.POST.get('crew_samr')
@@ -6159,7 +5893,6 @@ class ScreeningProjectUrlSendView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         try:
             logged_in_user = request.user
             project_url = request.data['project_url']
@@ -6167,7 +5900,7 @@ class ScreeningProjectUrlSendView(APIView):
             users_id = request.user.id
             selectedUsers = request.data['selectedUsers']
             if url_type == "PROFILE" :
-                
+
                 project_obj = CustomUser.objects.get(id=users_id)
                 for user in selectedUsers:
                     to_user = CustomUser.objects.get(id=user)

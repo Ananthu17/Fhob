@@ -1104,6 +1104,7 @@ class CustomUserSettings(models.Model):
     ]
 
     CONTACT_CHOICES = [
+        (ALL_MEMBERS, 'All Members'),
         (MEMBERS_WITH_RATING_1_STAR, 'Members with rating 1 star'),
         (MEMBERS_WITH_RATING_2_STAR, 'Members with rating 2 star'),
         (MEMBERS_WITH_RATING_3_STAR, 'Members with rating 3 star'),
@@ -1138,7 +1139,7 @@ class CustomUserSettings(models.Model):
     who_can_contact_me = models.CharField(_("Who can contact me"),
                                           choices=CONTACT_CHOICES,
                                           max_length=150,
-                                          default=MEMBERS_WITH_RATING_1_STAR)
+                                          default=ALL_MEMBERS)
     who_can_track_me = models.CharField(_("Who can track me"),
                                         choices=TRACKING_CHOICES,
                                         max_length=150,

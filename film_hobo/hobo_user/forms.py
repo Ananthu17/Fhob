@@ -418,7 +418,7 @@ class CheckoutForm(forms.Form):
 class ProjectCreationForm(forms.ModelForm):
 
     class Meta:
-        model = DraftProject
+        model = Project
         fields = ('title', 'creator', 'number_of_pages', 'format', 'genre',
                   'sag_aftra', 'cast_attachment', 'visibility',
                   'script_visibility', 'visibility_password', 'location',

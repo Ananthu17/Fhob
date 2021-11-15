@@ -29,7 +29,7 @@ from .views import ProjectVideoPlayerView, RateUserSkillsAPI, \
      GetCrewAtachResponseNotificationAjaxView, AcceptCrewAttachRequestAPI, \
      GetUserInterestNotificationAjaxView, ReportVideoAPI, ShowcaseVideoView, \
      LikeProjectVideoView, DislikeProjectVideoView, \
-     ProjectVideoLikeDislikeAjaxView, PostProjectAPI
+     ProjectVideoLikeDislikeAjaxView, PostProjectAPI, VisibilityPasswordCheckAPI
 
 
 urlpatterns = [
@@ -220,4 +220,6 @@ urlpatterns = [
           name='like-dislike-replace-html'),
      path('post-project-api/', PostProjectAPI.as_view(),
           name='post-project-api'),
+     path('visibility-password-check/', VisibilityPasswordCheckAPI.as_view(),
+          name='visibility-password-check'),
     ]

@@ -23,23 +23,6 @@
             <!-- left section  -->
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
 
-
-                <div  class=" proj-calender-sec mt-3">
-                    <div class="proj-location-sec">
-                        <div class="proj-location-sec-head">
-                            Location
-                        </div>
-                        <div class="proj-location-select-sec">
-                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
-                                {% for place in locations %}
-                                <option disabled selected hidden>Choose Location</option>
-                                <option value="{{place.id}}">{{place}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt">
                         <label class="d-flex justify-content-center ">Search by:</label>
@@ -63,7 +46,71 @@
                         <label class="d-flex justify-content-center txt-orange">Month</label>
                     </div>
                     <div class="d-flex justify-content-center left-mode-sec">
-                        <ul class="list-group home-month">
+                        <select id="month-filter" class="proj-location-select">
+                            <option disabled selected hidden>Choose Month</option>
+                           
+                            <option value="January" class="list-group-item border-0 month-algn" > 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">January</li>
+                                </a>
+                            </option>
+                            <option value="February" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">February</li>
+                                </a>
+                            </option>
+                            <option value="March" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">March</li>
+                                </a>
+                            </option>
+                            <option value="April" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">April</li>
+                                </a>
+                            </option>
+                            <option value="May" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">May</li>
+                                </a>
+                            </option>
+                            <option value="June" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">June</li>
+                                </a>
+                            </option>
+                            <option value="July" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">July</li>
+                                </a>
+                            </option>
+                            <option value="August" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">August</li>
+                                </a>
+                            </option>
+                            <option value="September" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">September</li>
+                                </a>
+                            </option>
+                            <option value="October" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">October</li>
+                                </a>
+                            </option>
+                            <option value="November" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">November</li>
+                                </a>
+                            </option>
+                            <option value="December" class="list-group-item border-0 month-algn"> 
+                                <a class="text-dark" href="javascript:void(0)">
+                                    <li class="list-group-item border-0 month-algn">December</li>
+                                </a>
+                            </option>
+                        </select>
+                        <!-- <ul class="list-group home-month">
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">January</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">February</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">March</li></a>
@@ -76,7 +123,7 @@
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">October</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">November</li></a>
                             <a class="text-dark" href="javascript:void(0)"><li class="list-group-item border-0 month-algn" onclick="monthFilter(this)">December</li></a>
-                          </ul>
+                          </ul> -->
                     </div>
                     <div>
                         <label class="d-flex justify-content-center txt-orange">Day</label>
@@ -131,18 +178,19 @@
                             </tbody>
                         </table>
                 </div>
-                <div  class=" proj-calender-sec mt-3 mb-3">
+                <div class=" proj-calender-sec mt-3 mb-3">
                     <div class="proj-location-sec">
                         <div class="proj-location-sec-head">
                             Location
                         </div>
                         <div class="proj-location-select-sec">
-                            <select name="" id="locationfilter" class="proj-location-select" onchange="locationFilter()">
-                                {% for place in locations %}
+                            <input list="location" id="locvalue" name="location" class="proj-location-select" onchange="locationFilter()" placeholder="Choose Location"/>
+                            <datalist id="location" class="proj-location-select">
                                 <option disabled selected hidden>Choose Location</option>
-                                <option value="{{place.id}}">{{place}}</option>
+                                {% for place in locations %}
+                                    <option data-value={{place.id}} value="{{place}}"></option>
                                 {% endfor %}
-                            </select>
+                            </datalist>
                         </div>
                     </div>
                 </div>
@@ -1172,36 +1220,19 @@
                     </div>
                 </div>
                 <!-- Row 5  -->
-                <div class="proj-input-sec-bg mt-3">
+                <!-- <div class="proj-input-sec-bg mt-3">
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
                             <span class=" txt-red  top-head-align proj-head-margin">Draft Projects</span>
                             <ul class="proj-cnt-menu-li" id="4">
                                 <li><a></a></li>
-                                <!-- <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Horror</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sport</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Action</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Fantasy</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">LGBTQ</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Family</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Sci-Fi</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Crime</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Thriller</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Military</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Romance</a></li>
-                                <li><a href="javascript:void(0)" onclick="genereFilter(this)">Animation</a></li> -->
                             </ul>
                         </div>
                        <div class="proj-owl-right-margin">
-                        <!-- owl-carousel  -->
                         <div id="demo4">
                         <div class="owl-carousel owl-theme " id="project-owl5">
                             {% if draft_projects %}
                             {% for project in draft_projects %}
-                            <!-- item 1  -->
                             <div class="item">
                                 <div class="card proj-card-drafts pointer" >
                                     <div class="project-line">
@@ -1241,12 +1272,10 @@
                                     </div>
                                     <div class="project-line-single-span">
                                         <span class="proj-format">
-                                            <!-- Team:<a href="">Actor,Director +</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
                                         <span class="proj-format">
-                                            <!-- Cast:<a>Female(27),Female(35)</a> -->
                                         </span>
                                     </div>
                                     <div class="project-line">
@@ -1260,10 +1289,9 @@
                             {% endif %}
                         </div>
                         </div>
-                        <!-- owl-carousel End -->
                        </div>
                     </div>
-                </div>
+                </div> -->
                 {% endif %}
             </div>
 
@@ -1929,11 +1957,13 @@ function locationFilter(){
     let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
 
     // Month and Year filter (Date Filter)
-    function monthFilter(data){
-        $('.list-group a li').removeClass('text-primary selected');
-        $('.list-group a li').removeAttr('id');
-        data.setAttribute("class", "text-primary");
-        data.setAttribute("id", "selected");
+    var MonthVal ;
+    
+    $('select#month-filter').change(function() {
+        var theValue = $(this).find('option:selected').text();
+        theValue=$.trim(theValue)
+        console.log(theValue);
+        MonthVal=theValue;
 
         post_url = origin_url + `/hobo_user/projects/date/`
         axios({
@@ -1942,14 +1972,15 @@ function locationFilter(){
             headers: {"Authorization":$("#token").val()},
             data: {
                 year : document.getElementById('year').innerHTML,
-                month : months[document.getElementById('selected').innerHTML]
+                month : months[theValue]
             }
         })
         .then((response) => {
                 console.log("Response",response.data)
                 dataInsertion(response.data)
         }, (error) => {console.log(error);})
-    }
+    });
+    //}
 
     // Filter Projects according to full date (Date Filter)
     function date_filter(data){
@@ -1957,7 +1988,7 @@ function locationFilter(){
         $('table a').removeClass('font-weight-bold');
         data.setAttribute("class", "text-primary font-weight-bold");
 
-        date = `${document.getElementById('year').innerHTML}-${months[document.getElementById('selected').innerHTML]}-${data.innerHTML}`
+        date = `${document.getElementById('year').innerHTML}-${months[MonthVal]}-${data.innerHTML}`
         console.log(date)
         post_url = origin_url + `/hobo_user/projects/?timestamp=${date}`
         axios({
@@ -1994,11 +2025,14 @@ function locationFilter(){
 
     // location filter
     function locationFilter(){
-        var location = document.getElementById("locationfilter");
-        var  id = location.value;
-        console.log("LOC",location,"VAL:",id)
-
-        post_url = origin_url + `/hobo_user/projects/?location=${id}`
+        var loc_value = document.getElementById("locvalue").value;
+        jQuery.each(document.getElementById("location").children, function() {
+            if (loc_value === this.value){
+                id = parseInt(this.getAttribute("data-value"))
+            }
+        })
+        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        console.log("Token",$("#token").val())
         axios({
             method: 'get',
             url: post_url,
