@@ -109,6 +109,10 @@
                                     {% endfor %}
                                 </div>
                                 <div class="mt-2">
+                                    <span class="sgl-black-txt">Production:</span>
+                                    <span class="crw-blue-txt">{{project.production}}</span>
+                                </div>
+                                <div class="mt-2">
                                     <span class="sgl-black-txt">Crew SAMR:</span>
                                     {% get_crew_samr_display_value project.id as samr_data %} 
                                     <span class="crw-pro-txt">{{ samr_data.0 }}</span>
@@ -196,6 +200,7 @@
                                             required accept="application/pdf" id="file">
                                             <span>Cover Letter<i class="required-star">*</i></span>
                                         </span>
+                                        <span class="crw-pdf-txt pdf-filename">(PDF)</span>
                                         <span class="crw-pdf-txt pdf-filename">(PDF)</span>
                                     </span>
                                     <span class="crw-cover-tag crw-tag-flex">
