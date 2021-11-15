@@ -64,7 +64,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
                     CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined, BetaTesterCodes, Writer
+                    VideoRatingCombined, BetaTesterCodes
 
 from payment.models import Transaction
 from messaging.models import MessageStatus
@@ -149,12 +149,17 @@ class CustomUserLogin(DjangoLogin):
     template_name = 'user_pages/login.html'
 
     def get(self, request):
-        if request.user.is_anonymous:
+        if request.user.is_anonymous and request.user.is_authenticated == False:
             form = LoginForm()
             return render(request, 'user_pages/login.html', {'form': form})
         else:
-            return render(request, 'user_pages/user_home.html',
-                          {'user': request.user})
+            cust_user = CustomUser.objects.get(id=request.user.id)
+            if cust_user.registration_complete == True:
+                return render(request, 'user_pages/user_home.html',
+                {'user': request.user})
+            else:
+                form = LoginForm()
+                return render(request, 'user_pages/login.html', {'form': form})
 
     def post(self, request):
         form = LoginForm(data=request.POST)
@@ -168,8 +173,11 @@ class CustomUserLogin(DjangoLogin):
             userobj = CustomUserSettings.objects.get(user=user)
             if userobj.account_status == userobj.DISABLED:
                 return redirect('/hobo_user/enable-account')
+            elif userobj.user.registration_complete != True:
+                return render(request, 'user_pages/login.html', {'form': form})
             else:
-                if user is not None:
+                cust_user = CustomUser.objects.get(id=user.id)
+                if user is not None and cust_user.registration_complete == True:
                     if user.membership == 'HOB':
                         login(request, user)
                         return render(request, 'user_pages/showcasetwo.html',
@@ -465,15 +473,17 @@ class ShowCase(TemplateView):
         context = super().get_context_data(**kwargs)
         projects = Project.objects.filter(video_status='posted')
         context["scenes"] = projects.filter(
-                            format="SCH").filter(rating__gte=4).order_by(
+                            format="SCH").filter(rating__gte=80).order_by(
                             '-likes')[:10]
         context["toprated_scenes"] = projects.filter(
                                      format="SHO").filter(
-                                     rating__gte=4).order_by('-likes')[:10]
+                                     rating__gte=80).order_by('-likes')[:10]
         context["filims"] = projects.filter(
-                            format="SCH").order_by('-id')
+                            format="SCH").filter(
+                                     rating__gte=80).order_by('-id')
         context["toprated_filims"] = projects.filter(
-                                     format="SHO").order_by('-id')
+                                     format="SHO").filter(
+                                     rating__gte=80).order_by('-id')
         context["pilotsfeatures"] = projects.filter(Q(format='PIL') |
                                        Q(format='FTR'))
         context["toprated_pilotsfeatures"] = projects.filter(Q(format='PIL') |
@@ -482,7 +492,7 @@ class ShowCase(TemplateView):
 
         return context
 
-
+\
 class ShowCaseAPIView(ListAPIView, SegregatorMixin):
     queryset = Project.objects.filter(video_status='posted')
     serializer_class = ProjectSerializer
@@ -667,7 +677,7 @@ class CustomUserSignupIndieView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -725,7 +735,7 @@ class CustomUserSignupProView(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -774,7 +784,7 @@ class CustomUserSignupCompany(APIView):
             if user_response.status_code == 201:
                 new_user = CustomUser.objects.get(
                            email=request.POST['email'])
-                # new_user.registration_complete = True
+                new_user.registration_complete = True
                 new_user.save()
                 if must_validate_email:
                     ipaddr = self.request.META.get('REMOTE_ADDR', '0.0.0.0')
@@ -5885,7 +5895,6 @@ class ScreeningProjectUrlSendView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        # import pdb; pdb.set_trace()
         try:
             logged_in_user = request.user
             project_url = request.data['project_url']
@@ -5893,7 +5902,7 @@ class ScreeningProjectUrlSendView(APIView):
             users_id = request.user.id
             selectedUsers = request.data['selectedUsers']
             if url_type == "PROFILE" :
-                
+
                 project_obj = CustomUser.objects.get(id=users_id)
                 for user in selectedUsers:
                     to_user = CustomUser.objects.get(id=user)

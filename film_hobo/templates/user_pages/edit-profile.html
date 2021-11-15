@@ -22,9 +22,9 @@
                 <div class="left-mode-sec p-2 text-center">View profile in:
                     <button class="btn btn-mem-mode btn-block mt-2 selected-mode">Edit Mode</button>
                     <a class="btn btn-mem-mode btn-block mt-2 clickable-mode"
-                    href="{% url 'hobo_user:profile' request.user.id %}">
-                        Public Mode
-                    </a>
+                    href="{{request.user.get_company_public_url}}">
+                            Public Mode
+                        </a>
                 </div>
                 <div class="left-mode-sec mt-3 p-2">
                     <ul class="list-unstyled p-2 mb-0">

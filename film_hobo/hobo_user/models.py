@@ -357,6 +357,20 @@ class CustomUser(AbstractUser):
                     'hobo_user:edit-agency-management-company-profile')
         return ""
 
+    def get_company_public_url(self):
+        if self.membership != 'COM':
+            return reverse('hobo_user:profile', kwargs={'id': self.id})
+        else:
+            if self.company_type == 'production':
+                return reverse(
+                    'hobo_user:production-company-profile',
+                    kwargs={'id': self.id})
+            if self.company_type == 'agency_management':
+                return reverse(
+                    'hobo_user:agency-management-company-profile',
+                    kwargs={'id': self.id})
+        return ""
+
     @property
     def group_name(self):
         """
