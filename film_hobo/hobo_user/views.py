@@ -64,7 +64,7 @@ from .models import CoWorker, CompanyClient, CustomUser, FriendRequest, \
                     Location, UserRatingCombined, \
                     UserTracking, CompanyProfile, UserProject, \
                     CompanyRating, CompanyRatingCombined, \
-                    VideoRatingCombined, BetaTesterCodes, Writer
+                    VideoRatingCombined, BetaTesterCodes
 
 from payment.models import Transaction
 from messaging.models import MessageStatus
