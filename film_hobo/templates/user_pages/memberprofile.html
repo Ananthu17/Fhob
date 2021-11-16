@@ -124,8 +124,8 @@
                         {% endif %}
                     </span>
                     <ul class="list-unstyled">
-                        <li class="mt-2"><a href="#" class="mem-blu-link">I<span
-                                    class="mem-small-f">NVITE</span></a></li>
+                        <!-- <li class="mt-2"><a href="#" class="mem-blu-link">I<span
+                                    class="mem-small-f">NVITE</span></a></li> -->
                         <li class="mt-1">
                             {% get_tracking_list request.user profile.user as is_tracking %}
                             {% if is_tracking %}
@@ -306,9 +306,9 @@
                         <div class="col-3">
                             <label class="form-title mem-setup-blu-f">{{profile.user.get_full_name}}</label>
                         </div>
-                        <div class="col-1">
+                        <!-- <div class="col-1">
                             <i class="fa fa-envelope mail-bx" aria-hidden="true"></i>
-                        </div>
+                        </div> -->
                         <div class="col-1">
                             {% if profile.bio %}
                             <label class="form-title mem-setup-blu-f" data-toggle="modal" data-target="#bio">BIO</label>
