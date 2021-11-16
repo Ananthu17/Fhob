@@ -52,6 +52,10 @@
                                     data-toggle="modal" data-target="#respond-friend-request">
                                     <i class="fa fa-user" aria-hidden="true"></i> Respond</span>
                                 </span>
+                                {% elif can_contact == False %}
+                                <span class="friend_request">
+                                    <span class="red-f bold cursor-pointer" id="cannot_send_friend_request">Friend Request</span>
+                                </span>
                                 {% endif %}
                                 <!-- The Modal -->
                                 <div class="modal fade" id="warning-unfriend">
@@ -135,6 +139,10 @@
                                             <input type ="hidden" name="track_id" id="track_id" value ="{{profile.user.id}}" />
                                             <span class="track-btn">
                                                 <a class="mem-blu-link cursor-pointer track" id="{{profile.user.get_full_name}}">T<span class="mem-small-f">RACK</span></a>
+                                            </span>
+                                    {% elif can_track == False %}
+                                            <span class="">
+                                                <a class="mem-blu-link cursor-pointer" id="cannot_track_user">T<span class="mem-small-f">RACK</span></a>
                                             </span>
                                     {% endif %}
                             {% endif %}

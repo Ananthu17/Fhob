@@ -51,3 +51,10 @@
             }
         });
     });
+
+// Cannot track user
+$('body').on('click' , '#cannot_track_user', function(e){
+    var msg = "You cannot track this user.";
+    $('#warning_message').fadeIn().html(msg);
+    setTimeout(function() {$('#warning_message').fadeOut("slow");}, 2000 );
+});
