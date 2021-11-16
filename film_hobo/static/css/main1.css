@@ -1704,6 +1704,7 @@ ul.sgl-menu li{
 }
 .sgl-col-cnt1{
    padding-left: 7px;
+   padding-bottom: 46px;
 }
 .sgl-col-cnt1 > div{
    padding-bottom: 26px;
@@ -1768,7 +1769,7 @@ ul.sgl-menu li{
    padding-bottom: 16px;
 }
 .sgl-up-video-hr{
-   
+
    border-top: 1px solid#656565;
    width: 90%;
    margin-top: 1px;
