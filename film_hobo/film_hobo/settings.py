@@ -42,7 +42,7 @@ PROJECT_ENVIRONMENT = "DEMO_SERVER"
 
 
 if PROJECT_ENVIRONMENT == "DEMO_SERVER":
-    DEBUG = True  # for now, configure apache for server
+    DEBUG = False  # for now, configure apache for server
     # ORIGIN_URL = "http://202.88.246.92:8041"
     # ORIGIN_URL = "http://172.19.0.3:8041"
     ORIGIN_URL = "http://app:8041"
