@@ -71,7 +71,8 @@ from .views import CustomUserSignupHobo, CustomUserLogin, CustomUserList, \
                    ShowCaseAPIView, ScreeningProjectUrlSendView, \
                    ShowCaseSearchView, ShowCaseDateFilterAPI, \
                    VideoPlayer, PilotAndFeature, PilotAndFeatureAPIView, \
-                   PilotAndFeatureSearchView, PilotAndFeatureDateFilterAPI
+                   PilotAndFeatureSearchView, PilotAndFeatureDateFilterAPI, \
+                   ShowcaseHomePage
 
 
 app_name = "hobo_user"
@@ -210,6 +211,9 @@ urlpatterns = [
     # web-view endpoints
     path('how_to/', HowTo.as_view(), name='how_to'),
     path('user_home/', HomePage.as_view(), name='user_home'),
+    path('user_home_screening/',
+         ShowcaseHomePage.as_view(),
+         name='user_home_screening'),
     path('showcase/', ShowCase.as_view(), name='showcase'),
     path('user_home/<int:id>/',
          ScreeningProjectDeatilView.as_view(),

@@ -374,6 +374,33 @@ class HomePage(TemplateView):
         return context
 
 
+class ShowcaseHomePage(TemplateView):
+    template_name = 'user_pages/user_home_screening.html'
+    login_url = '/hobo_user/user_login/'
+    redirect_field_name = 'login_url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project_format = self.request.GET.get('format')
+        context["format"] = project_format
+        context["scenes"] = Project.objects.filter(
+                            format="SCH").order_by('-id')
+
+        context["toprated_scenes"] = Project.objects.filter(
+                                     format="SCH").order_by('-rating')
+        context["filims"] = Project.objects.filter(
+                            format="SHO").order_by('-id')
+        context["toprated_filims"] = Project.objects.filter(
+                                     format="SHO").order_by('-rating')
+
+        context["pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR'))
+        context["toprated_pilotsfeatures"] = Project.objects.filter(Q(format='PIL') |
+                                       Q(format='FTR')).order_by('-rating')
+        context['locations'] = Location.objects.all()
+        return context
+
+
 class VideoPlayer(TemplateView):
     template_name = 'user_pages/video_player_logistics.html'
     login_url = '/hobo_user/user_login/'
