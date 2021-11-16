@@ -146,8 +146,9 @@
 
                             
                             <li class="list-inline-item m-0">
-                                <a href="{{ request.user.get_profile_url }}">
+                                
                                 {% if request.user.get_profile_photo and user.registration_complete %}
+                                <a href="{{ request.user.get_profile_url }}">
                                     <img src="{{ request.user.get_profile_photo }}"
                                     class="img-fluid header-user-img">
                                 </a>
