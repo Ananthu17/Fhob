@@ -262,7 +262,7 @@
                                     <span class="sgl-blue-txt"><a href="{% url 'hobo_user:profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.get_full_name}}</a></span>
                                     {% elif project.creator.membership == "COM" and project.creator.company_type == "production" %}
                                     <span class="sgl-blue-txt"><a href="{% url 'hobo_user:production-company-profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.company_name}}</a></span>
-                                    {% elif project.creator.membership == "COM" and project.creator.company_type == "Agency/Management" %}
+                                    {% elif project.creator.membership == "COM" and project.creator.company_type == "agency_management" %}
                                     <span class="sgl-blue-txt"><a href="{% url 'hobo_user:agency-management-company-profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.company_name}}</a></span>
                                     {% else %}
                                     <span class="sgl-blue-txt"><a href="{% url 'hobo_user:profile'  id=project.creator.id %}" class="txt-capitalize">{{project.creator.get_full_name}}</a></span>

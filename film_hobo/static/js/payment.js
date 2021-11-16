@@ -557,15 +557,18 @@ for (var i = 0; i < btns.length; i++) {
 get details of new discount and pass to add discount api
 */
 document.getElementById("discount_add").addEventListener("click", function() {
-
+    
     add_url = origin_url + '/payment/add_discount_detail/'
 
     var amount_type_val = ""
-    if ($("#doller-percentage-toggle").text() == "$ "){
+    if ($("#doller-percentage-toggle").text() == "$"){
+        console.log($("#doller-percentage-toggle").text())
         var amount_type_val = "flat_amount"
+        console.log(amount_type_val)
     }
     else {
         var amount_type_val = "percentage"
+        console.log(amount_type_val)
     }
 
     var add_args = {
@@ -575,7 +578,9 @@ document.getElementById("discount_add").addEventListener("click", function() {
         "amount_type": amount_type_val,
         "amount": document.getElementById("discount_amount_input").value,
     }
-
+    console.log(add_args)
+    console.log(authorization_str)
+    console.log(add_url)
     axios.post(add_url, add_args, {headers: { "Authorization": authorization_str}})
     .then((response) => {
         if (response.status == 200){

@@ -736,6 +736,7 @@ class AddDiscountDetailAPI(APIView):
 
     def post(self, request, format=None):
         initial_data = request.data
+        print(initial_data)
         midnight = 'T00:00:00Z'
         initial_data['valid_from'] = initial_data['valid_from'] + midnight
         initial_data['valid_to'] = initial_data['valid_to'] + midnight
@@ -778,6 +779,7 @@ class AddDiscountDetailAPI(APIView):
                             auth=(paypal_client_id, paypal_secret),
                             headers={'Accept': 'application/json',
                                      'Accept-Language': 'en_US'})
+        print(token_user_response.status_code)
         if token_user_response.status_code == 200:
             access_token = json.loads(
                 token_user_response.content)['access_token']
@@ -799,6 +801,7 @@ class AddDiscountDetailAPI(APIView):
                             indie_monthly_plan_details_api,
                             headers={'Content-Type': 'application/json',
                                      'Authorization': access_token_strting})
+        
         if indie_monthly_plan_details_api_response.status_code == 200:
             indie_monthly_plan_value = find_values(
                 'value', indie_monthly_plan_details_api_response.text)[0]
@@ -813,6 +816,7 @@ class AddDiscountDetailAPI(APIView):
                             indie_yearly_plan_details_api,
                             headers={'Content-Type': 'application/json',
                                      'Authorization': access_token_strting})
+       
         if indie_yearly_plan_details_api_response.status_code == 200:
             indie_yearly_plan_value = find_values(
                 'value', indie_yearly_plan_details_api_response.text)[0]
@@ -1014,6 +1018,7 @@ class AddDiscountDetailAPI(APIView):
                                  'Authorization': access_token_strting,
                                  'Content-type': 'application/json'
                                  })
+            print(create_plan_user_response.status_code)
             if create_plan_user_response.status_code == 201:
                 plan_id = json.loads(create_plan_user_response.content)['id']
                 if plan_type == 'Indie Payment Monthly':
@@ -1033,6 +1038,7 @@ class AddDiscountDetailAPI(APIView):
             else:
                 return HttpResponse('Could not save data')
         initial_data.update(plan_ids)
+        print(initial_data)
         serializer = DiscountsSerializer(data=initial_data)
         if serializer.is_valid():
             serializer.save()
