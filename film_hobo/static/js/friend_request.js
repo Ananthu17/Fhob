@@ -148,3 +148,11 @@ $('body').on('click' , '.accept_friend_request', function(e){
             }
         });
 });
+
+// Cannot send friend Request
+$('body').on('click' , '#cannot_send_friend_request', function(e){
+    var msg = "You cannot send friend request to this user.";
+    $('#warning_message').fadeIn().html(msg);
+    setTimeout(function() {$('#warning_message').fadeOut("slow");}, 2000 );
+});
+
