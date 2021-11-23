@@ -498,6 +498,7 @@
                         <div class="proj-menu-display align-items-center">
                             <div class="swc-owl-list-head mt-0 mr-3">Scenes</div>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -575,6 +576,7 @@
                         <div class="proj-menu-display align-items-center">
                             <div class="swc-owl-list-head mt-0 mr-3">Shorts</div>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -1265,7 +1267,7 @@
 
     let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
     var MonthVal ;
-    
+
     $('select#month-filter').change(function() {
         var theValue = $(this).find('option:selected').text();
         theValue=$.trim(theValue)
@@ -1277,7 +1279,6 @@
         // $('.list-group a li').removeAttr('id');
         // data.setAttribute("class", "text-primary");
         // data.setAttribute("id", "selected");
-        
         post_url = origin_url + `/hobo_user/showcase/date/`
         axios({
             method: 'post',
@@ -1294,7 +1295,6 @@
         }, (error) => {console.log(error);})
     });
    // }
-   
    $('select#new-month-filter').change(function() {
         var theValue = $(this).find('option:selected').text();
         theValue=$.trim(theValue)
@@ -1315,14 +1315,13 @@
                 year : document.getElementById('year').innerHTML,
                 month : months[theValue]
             },
-            
         })
         .then((response) => {
                 console.log("Response",response.data)
                 dataInsertion(response.data)
         }, (error) => {console.log(error);})
 
-    }); 
+    });
     //}
 
     // Filter Projects according to full date (Date Filter)
@@ -1348,13 +1347,16 @@
     // Filter Projects based on genere selected (Category Filter)
     function genereFilter(data){
         console.log(data)
-        $('.proj-cnt-menu-li a').removeClass('clicked')
+        parent = data.parentNode.parentNode.getAttribute("id");
+        $(`#${parent} a`).removeClass('clicked')
         let keyword = data.innerHTML.toUpperCase()
         data.setAttribute("class", "clicked");
-        parent = data.parentNode.parentNode.getAttribute("id");
-        console.log("PARENT", parent)
-
-        post_url = origin_url + `/hobo_user/showcase/projects/?genre=${genre[keyword]}`
+        if (keyword === "ALL"){
+            post_url = origin_url + `/hobo_user/showcase/projects/`
+        }
+        else{
+            post_url = origin_url + `/hobo_user/showcase/projects/?genre=${genre[keyword]}`
+        }
         axios({
             method: 'get',
             url: post_url,
