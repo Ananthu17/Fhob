@@ -628,8 +628,8 @@ class Project(models.Model):
         (INDIE, 'INDIE'),
     ]
 
-    # ACTION = 'ACT'
-    # ADVENTURE = 'ADV'
+    ACTION = 'ACT'
+    ADVENTURE = 'ADV'
     ANIMATION = 'ANI'
     BIOGRAPHY = 'BIO'
     COMEDY = 'COM'
@@ -656,8 +656,8 @@ class Project(models.Model):
     MYSTERY_THRILLER = 'MYS_THR'
     ACTION_ADVENTURE = 'ACT_ADV'
     GENRE_CHOICES = [
-        # (ACTION, 'Action'),
-        # (ADVENTURE, 'Adventure'),
+        (ACTION, 'Action'),
+        (ADVENTURE, 'Adventure'),
         (ANIMATION, 'Animation'),
         (BIOGRAPHY, 'Biography'),
         (COMEDY, 'Comedy'),
