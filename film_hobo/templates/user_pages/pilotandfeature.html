@@ -225,6 +225,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Pilots</span>
                             <ul class="proj-cnt-menu-li" id="1">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -324,6 +325,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="2">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -426,6 +428,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Feature</span>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -523,6 +526,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -621,6 +625,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Pilots</span>
                             <ul class="proj-cnt-menu-li" id="1">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -720,6 +725,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="2">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -819,6 +825,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Feature</span>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -916,6 +923,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -1213,7 +1221,7 @@
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>`
                 let div2 = ""
@@ -1286,7 +1294,7 @@
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>`
                 let div2 = ""
@@ -1352,7 +1360,7 @@
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>`
                 let div2 = ""
@@ -1418,7 +1426,7 @@
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>`
                 let div2 = ""
@@ -1484,7 +1492,7 @@
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>`
                 let div2 = ""
@@ -1673,13 +1681,16 @@
     // Filter Projects based on genere selected (Category Filter)
     function genereFilter(data){
         console.log(data)
-        $('.proj-cnt-menu-li a').removeClass('clicked')
+        parent = data.parentNode.parentNode.getAttribute("id");
+        $(`#${parent} a`).removeClass('clicked')
         let keyword = data.innerHTML.toUpperCase()
         data.setAttribute("class", "clicked");
-        parent = data.parentNode.parentNode.getAttribute("id");
-        console.log("PARENT", parent)
-
-        post_url = origin_url + `/hobo_user/pilots/projects/?genre=${genre[keyword]}`
+        if (keyword === "ALL"){
+            post_url = origin_url + `/hobo_user/pilots/projects/`
+        }
+        else{
+            post_url = origin_url + `/hobo_user/pilots/projects/?genre=${genre[keyword]}`
+        }
         axios({
             method: 'get',
             url: post_url,
@@ -1699,7 +1710,7 @@
                 id = parseInt(this.getAttribute("data-value"))
             }
         })
-        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        post_url = origin_url + `/hobo_user/pilots/projects/?location=${id}`
         console.log("Token",$("#token").val())
         axios({
             method: 'get',

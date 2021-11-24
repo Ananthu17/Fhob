@@ -1109,7 +1109,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-
+    genre = serializers.SerializerMethodField()
     location = serializers.StringRelatedField()
     creator = serializers.StringRelatedField()
     visibility = serializers.StringRelatedField()
@@ -1121,6 +1121,9 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'visibility_password', 'cast_attachment', 'cast_pay_rate',
                   'cast_samr', 'timestamp', 'visibility', 'likes',
                   'video_cover_image']
+
+    def get_genre(self, obj):
+        return obj.get_genre_display()
 
 
 class TeamSerializer(serializers.ModelSerializer):

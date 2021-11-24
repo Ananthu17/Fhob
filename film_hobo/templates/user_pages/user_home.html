@@ -1904,7 +1904,7 @@
                 id = parseInt(this.getAttribute("data-value"))
             }
         })
-        post_url = origin_url + `/hobo_user/user_home-projects/?location=${id}`
+        post_url = origin_url + `/hobo_user/showcase/projects//?location=${id}`
         console.log("Token",$("#token").val())
         axios({
             method: 'get',

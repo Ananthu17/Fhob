@@ -230,6 +230,7 @@
                         <div class="proj-menu-display align-items-center">
                             <div class="swc-owl-list-head mt-0 mr-3">Scenes</div>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -383,6 +384,7 @@
                         <div class="proj-menu-display align-items-center">
                             <div class="swc-owl-list-head mt-0 mr-3">Shorts</div>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -538,6 +540,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Pilots/Features</span>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -636,6 +639,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -737,6 +741,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">New Scenes</span>
                             <ul class="proj-cnt-menu-li" id="1">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -835,6 +840,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="2">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -932,8 +938,9 @@
                 <div class="proj-input-sec-bg mt-3">
                     <div class="proj-menu-align">
                         <div class="proj-menu-display">
-                            <span class=" txt-orange float-left top-head-align proj-head-margin">New Films</span>
+                            <span class=" txt-orange float-left top-head-align proj-head-margin">New Filmsssss</span>
                             <ul class="proj-cnt-menu-li" id="3">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -1032,6 +1039,7 @@
                         <div class="proj-menu-display">
                             <span class=" txt-orange float-left top-head-align proj-head-margin">Top Rated</span>
                             <ul class="proj-cnt-menu-li" id="4">
+                                <li><a href="javascript:void(0)" onclick="genereFilter(this)" class="clicked">All</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Drama</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Comedy</a></li>
                                 <li><a href="javascript:void(0)" onclick="genereFilter(this)">Musical</a></li>
@@ -1823,11 +1831,16 @@ $(".item").click(function(){
     // Filter Projects based on genere selected (Category Filter)
     function genereFilter(data){
         console.log(data)
-        $('.proj-cnt-menu-li a').removeClass('clicked')
+        parent = data.parentNode.parentNode.getAttribute("id");
+        $(`#${parent} a`).removeClass('clicked')
         let keyword = data.innerHTML.toUpperCase()
         data.setAttribute("class", "clicked");
-        parent = data.parentNode.parentNode.getAttribute("id");
-        post_url = origin_url + `/hobo_user/user_home-projects/?genre=${genre[keyword]}`
+        if (keyword === "ALL"){
+            post_url = origin_url + `/hobo_user/user_home-projects/projects/`
+        }
+        else{
+            post_url = origin_url + `/hobo_user/user_home-projects/?genre=${genre[keyword]}`
+        }
         axios({
             method: 'get',
             url: post_url,
