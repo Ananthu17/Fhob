@@ -27,6 +27,24 @@
         {% endblock %}
     </head>
     <body class="d-flex flex-column min-vh-100">
+        <style>
+            .search-select{
+                padding: 1px 4px;
+                background-color: #f9f9f9;
+                border: 1px solid #000;
+                font-size: 11px;
+                font-weight: 600;
+                height: 18px;
+                border-right: 0px !important;
+            }
+            .search-container form {
+                margin-top: 12px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+        </style>
         {% if request.user.is_authenticated %}
         {% get_my_token request as token %}
         <input type = "hidden" value="{{token}}" name="token" id="token"/>
@@ -50,6 +68,10 @@
                                 <input type="text" placeholder="Search" class="search-placeholder" id="search" readonly>
                             {% else %}
                             <form action="javascript:void(0)" method="get">
+                                <select name="" id="search-input" class="search-select">
+                                    <option value="project" selected >Project</option>
+                                    <option value="user">User</option>
+                                </select>
                                 <input type="text" name="q" placeholder="Search" class="search-placeholder" id="search">
                             </form>
                             {% endif %}
@@ -646,6 +668,12 @@ $("#showcase_non_clickable").click(function () {
 </script>
 <script>
 $( document ).ready(function() {
+    $( "#search" ).focus(function() {
+        $(".search-select").css("border", "1px solid #ced4da");
+    });
+    $( "#search" ).focusout(function() {
+        $(".search-select").css("border", "1px solid #000");
+    });
     var pathurl = window.location.pathname;
     var search = window.location.search;
     var desired_path = pathurl + search

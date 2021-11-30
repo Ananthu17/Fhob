@@ -77,8 +77,8 @@
   width: 75%;
   height: 18px;
   font-size: 13px;
-  margin-top: 12px;
   border: 1px solid #000;
+  padding-left: 5px;
 }
 .header-user-img{
   height: 60px;

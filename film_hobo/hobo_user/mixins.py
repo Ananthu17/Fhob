@@ -1,4 +1,4 @@
-from .serializers import ProjectSerializer
+from .serializers import ProjectSerializer, UserSerializer
 from django.db.models.constants import LOOKUP_SEP
 import operator
 from functools import reduce
@@ -6,6 +6,7 @@ from django.db import models
 from rest_framework.compat import distinct
 from rest_framework.settings import api_settings
 from .models import CustomUser
+
 
 class SegregatorMixin():
     def project_segregator(self, project):
@@ -18,6 +19,11 @@ class SegregatorMixin():
                             format="SHO").order_by('-id'))
         context["top_filims"] = self.project_to_json(project.filter(
                                      format="SHO").order_by('-rating'))
+        return context
+
+    def user_segregator(self, project):
+        context = {}
+        context["users"] = self.project_to_json(project, "user")
         return context
 
     def showcase_segregator(self, project):
@@ -51,10 +57,14 @@ class SegregatorMixin():
         return context
         return context
 
-    def project_to_json(self, project):
+    def project_to_json(self, project, choise="project"):
         project_dict = {}
-        for item in project:
-            project_dict["A"+str(item.id)] = ProjectSerializer(item).data
+        if choise == "project":
+            for item in project:
+                project_dict["A"+str(item.id)] = ProjectSerializer(item).data
+        else:
+            for item in project:
+                project_dict["A"+str(item.id)] = UserSerializer(item).data
         return project_dict
 
 
@@ -77,6 +87,8 @@ class SearchFilter():
         passed to this method. Sub-classes can override this method to
         dynamically change the search fields based on request content.
         """
+        if getattr(view, 'choise', None) == "user":
+            return getattr(view, 'user_search_fields', None)
         return getattr(view, 'search_fields', None)
 
     def get_search_terms(self, request):
@@ -131,7 +143,6 @@ class SearchFilter():
     def filter_queryset(self, request, queryset, view):
         search_fields = self.get_search_fields(view, request)
         search_terms = self.get_search_terms(request)
-
         user = self.find_user(search_terms, queryset)
         if user:
             return user

@@ -517,6 +517,8 @@ class ShowCase(TemplateView):
                                        Q(format='FTR')).order_by('-rating')
         context['locations'] = Location.objects.all()
 
+        print("Contex:", context["toprated_scenes"])
+
         return context
 
 \
@@ -5325,8 +5327,8 @@ class ProjectDateFilterAPI(APIView, SegregatorMixin):
         elif 'year' in received_data:
             year = received_data['year']
             project = Project.objects.filter(timestamp__range=[year+"-01-01",
-                                                               year+"-12-30"]).filter(
-                                                               creator=request.user)
+                                             year+"-12-30"]).filter(
+                                             creator=request.user)
             context = self.project_segregator(project)
             return Response(context)
 
@@ -5336,14 +5338,34 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
+    choise = "project"
     search_fields = ["title", "format", "genre",
                      "rating", "timestamp"]
+    user_search_fields = ["first_name", "last_name",
+                          "middle_name", "email"]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset()).filter(
-                   creator=request.user)
-        context = self.project_segregator(queryset)
+        self.choise = request.GET['choise']
+        if self.choise == "user":
+            queryset = self.filter_queryset(self.get_queryset())
+            context = self.user_segregator(queryset)
+            self.serializer_class = UserSerializer
+        else:
+            queryset = self.filter_queryset(self.get_queryset()).filter(
+                    creator=request.user)
+            context = self.project_segregator(queryset)
         return Response(context)
+
+    def get_queryset(self):
+        if self.choise == "user":
+            return CustomUser.objects.all()
+        else:
+            return self.queryset
+
+    def filter_queryset(self, queryset):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
 
 class ProjectCreateAPIView(CreateAPIView):
@@ -5358,11 +5380,13 @@ class ProjectUpdateAPIView(UpdateAPIView):
     lookup_field = 'id'
     serializer_class = ProjectSerializer
 
+
 class ProjectDeleteAPIView(DestroyAPIView):
     queryset = Project.objects.all()
     permission_classes = (IsAuthenticated,)
     lookup_field = 'id'
     serializer_class = ProjectSerializer
+
 
 # Team CRUD
 class TeamAPIView(ListAPIView):
