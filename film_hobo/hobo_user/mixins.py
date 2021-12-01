@@ -143,9 +143,14 @@ class SearchFilter():
     def filter_queryset(self, request, queryset, view):
         search_fields = self.get_search_fields(view, request)
         search_terms = self.get_search_terms(request)
-        user = self.find_user(search_terms, queryset)
-        if user:
-            return user
+
+        if getattr(view, 'choise', None) != "user":
+            user = self.find_user(search_terms, queryset)
+            if user:
+                return user
+
+        if search_terms[0].lower() in "admin":
+            return CustomUser.objects.filter(is_superuser=True)
 
         if not search_fields or not search_terms:
             return queryset

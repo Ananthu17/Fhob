@@ -907,9 +907,14 @@ class AgentManagerSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name']
+        fields = ['first_name', 'last_name', 'full_name']
+
+    def get_full_name(self, obj):
+        return obj.get_full_name()
 
 
 class GetSettingsSerializer(serializers.ModelSerializer):
