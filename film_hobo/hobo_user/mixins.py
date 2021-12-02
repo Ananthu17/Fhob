@@ -148,9 +148,9 @@ class SearchFilter():
             user = self.find_user(search_terms, queryset)
             if user:
                 return user
-
-        if search_terms[0].lower() in "admin":
-            return CustomUser.objects.filter(is_superuser=True)
+        else:
+            if search_terms[0].lower() in "admin":
+                return CustomUser.objects.filter(is_superuser=True)
 
         if not search_fields or not search_terms:
             return queryset

@@ -222,7 +222,7 @@
 
             <!-- left section end  -->
             <!-- center section  -->
-            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin">
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin" id="mainblock">
                 <!-- Row 1  -->
                 {% if format == 'SCH' %}
                 <div class="proj-input-sec-bg mt-3">
@@ -1339,6 +1339,21 @@ $(".item").click(function(){
                     }
                 });
     }
+    const userInsertion = (data)=>{
+        $("#mainblock").empty()
+        let div1 = `<div class="rsct-center-section-align">
+                    <div class="rsct-orange-head">
+                        Search Results
+                    </div>
+                    <div>
+                        <ol class="rsct-list-cont ">`
+        jQuery.each(data.users, function() {
+            let div2 = `<li class="mt-1"><a href="" class="remove-decoration msg-txt-color">${this.full_name}</a></li>`
+            div1 += div2
+        })
+        let div3 = "</ol></div></div>"
+        $("#mainblock").append(div1 + div3)
+    }
 
     const dataInsertion = (data, id=5)=>{
         if (id!=5){
@@ -1356,7 +1371,7 @@ $(".item").click(function(){
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>
                                     <span class="log-star">
@@ -1428,7 +1443,7 @@ $(".item").click(function(){
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>
                                     <span class="log-star">
@@ -1493,7 +1508,7 @@ $(".item").click(function(){
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>
                                     <span class="log-star">
@@ -1558,7 +1573,7 @@ $(".item").click(function(){
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>
                                     <span class="log-star">
@@ -1623,7 +1638,7 @@ $(".item").click(function(){
                                     $<a href=''>0</a>\
                                 </span>\
                                 <span class='proj-gener-align'>\
-                                    <a href=''>${toTitleCase(getKeyByValue(genre,this.genre))}</a>\
+                                    <a href=''>${this.genre}</a>\
                                 </span>\
                                 <span  class='proj-symb'>
                                     <span class="log-star">
@@ -1712,15 +1727,20 @@ $(".item").click(function(){
 
     // Script for search functionality
     $('#search').on('change',()=>{
-        post_url = origin_url + `/hobo_user/user_home-projects/search/?search=${$('#search').val()}`
+        post_url = origin_url + `/hobo_user/user_home-projects/search/?search=${$('#search').val()}&&choise=${$('#search-input').val()}`
         axios({
             method: 'get',
             url: post_url,
-            headers: {"Authorization":$("#token").val()}
+            headers: {"Authorization":$("#token").val()},
         })
         .then((response) => {
-                console.log("Response",response.data)
-                dataInsertion(response.data)
+                console.log("Response",response.data.users)
+                if (response.data.users){
+                    userInsertion(response.data)
+                }
+                else{
+                    dataInsertion(response.data)
+                }
         }, (error) => {console.log(error);})
     })
 
@@ -1775,11 +1795,8 @@ $(".item").click(function(){
                  'WESTERN':'WES'}
 
     let format = {'SHO':'Shorts', 'SCH':'Scene', 'PIL':'Pilot', 'FTR':'Feature'}
-   
     // Month and Year filter (Date Filter)
-   
     var MonthVal ;
-    
     $('select#month-filter').change(function() {
         var theValue = $(this).find('option:selected').text();
         theValue=$.trim(theValue)
@@ -1808,7 +1825,6 @@ $(".item").click(function(){
     //}
 
     });
-    
     // Filter Projects according to full date (Date Filter)
     function date_filter(data){
         $('table a').addClass('text-dark');

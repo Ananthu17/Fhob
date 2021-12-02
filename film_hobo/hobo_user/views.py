@@ -635,13 +635,33 @@ class HomeProjectSearchView(ListAPIView, SegregatorMixin):
     serializer_class = ProjectSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
+    choise = "project"
     search_fields = ["title", "format", "genre",
                      "rating", "timestamp"]
+    user_search_fields = ["first_name", "last_name",
+                          "middle_name", "email"]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        context = self.project_segregator(queryset)
+        self.choise = request.GET['choise']
+        if self.choise == "user":
+            queryset = self.filter_queryset(self.get_queryset())
+            context = self.user_segregator(queryset)
+            self.serializer_class = UserSerializer
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+            context = self.project_segregator(queryset)
         return Response(context)
+
+    def get_queryset(self):
+        if self.choise == "user":
+            return CustomUser.objects.all()
+        else:
+            return self.queryset
+
+    def filter_queryset(self, queryset):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
 
 class CustomUserList(APIView):
