@@ -24,7 +24,8 @@ from .models import CustomUser, Country, GuildMembership, \
     DisabledAccount, CustomUserSettings, CompanyPaymentDetails, \
     UserAgentManager, UserNotification, UserProfile, CoWorker, UserInterest, \
     UserRating, CompanyProfile, CompanyClient, FriendRequest, FriendGroup, \
-    Feedback, Project, Team, Video, VideoRating, BetaTesterCodes
+    Feedback, Project, Team, Video, VideoRating, BetaTesterCodes, \
+    UserRatingCombined
 
 
 from authemail.models import SignupCode
@@ -908,13 +909,18 @@ class AgentManagerSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    job_types = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'full_name']
+        fields = ['first_name', 'last_name', 'full_name', 'email', 'job_types']
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+    def get_job_types(self, obj):
+        return [item.job_type.title
+                for item in UserRatingCombined.objects.filter(user=obj)]
 
 
 class GetSettingsSerializer(serializers.ModelSerializer):

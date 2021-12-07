@@ -21,9 +21,23 @@
     <div class="container-fluid">
         <div class="row">
             <!-- left section  -->
-
-
-            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 d-none" id="user_sideblock">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg caa-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12  mb-3 proj-calender-col-margin" id="side_block">
                 <div class=" proj-calender-sec mt-3">
                     <div class="mt-2 search-txt">
                         <label class="d-flex justify-content-center ">Search by:</label>
@@ -222,6 +236,9 @@
 
             <!-- left section end  -->
             <!-- center section  -->
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 ml-1 d-none" id="mainusersearch">
+
+            </div>
             <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-2 proj-center-col-margin" id="mainblock">
                 <!-- Row 1  -->
                 {% if format == 'SCH' %}
@@ -1339,23 +1356,42 @@ $(".item").click(function(){
                     }
                 });
     }
-    const userInsertion = (data)=>{
-        $("#mainblock").empty()
-        let div1 = `<div class="rsct-center-section-align">
-                    <div class="rsct-orange-head">
-                        Search Results
+    const userInsertion = (data, input)=>{
+        console.log(data.users)
+        $("#mainblock").addClass('d-none')
+        $('#mainusersearch').removeClass('d-none')
+        $('#side_block').addClass('d-none')
+        $('#user_sideblock').removeClass('d-none')
+        let div1 = `<div>
+                        <h1 class="findHeader">Results for <span class="findSearchTerm">"${input}"</span></h1>
                     </div>
-                    <div>
-                        <ol class="rsct-list-cont ">`
+                    `
         jQuery.each(data.users, function() {
-            let div2 = `<li class="mt-1"><a href="" class="remove-decoration msg-txt-color">${this.full_name}</a></li>`
+            // let div2 = `<li class="mt-1"><a href="" class="remove-decoration msg-txt-color">${this.full_name}</a></li>`
+            let div2 = `<div class="row rsct-center-section-align">
+                        <div class="col-md-2 d-flex align-items-center">
+                            <div class="findList_img ">
+                                <img  src="static/img/man-user.png" class="img-fluid">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-label bold orng-f">${this.full_name}</label>
+                            <p>${this.email}</p>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>
+                    </div>`
             div1 += div2
         })
         let div3 = "</ol></div></div>"
-        $("#mainblock").append(div1 + div3)
+        $("#mainusersearch").append(div1)
     }
 
     const dataInsertion = (data, id=5)=>{
+        $("#mainblock").removeClass('d-none')
+        $('#mainusersearch').addClass('d-none')
+        $('#side_block').removeClass('d-none')
+        $('#user_sideblock').addClass('d-none')
+
         if (id!=5){
             console.log(`#demo${id}`)
             let rows = {'1':data.scenes,'2':data.top_scenes,'3':data.filims, '4':data.top_filims}
@@ -1736,7 +1772,7 @@ $(".item").click(function(){
         .then((response) => {
                 console.log("Response",response.data.users)
                 if (response.data.users){
-                    userInsertion(response.data)
+                    userInsertion(response.data, $('#search').val())
                 }
                 else{
                     dataInsertion(response.data)
