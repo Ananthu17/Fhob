@@ -1151,6 +1151,10 @@
                 </div>
                 {% endif %}
             </div>
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members" id="right_block">
+            </div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 top_rated_members d-none p-0 ml-3" id="search_right_block">
+            </div>
 
             <!-- Center section End  -->
             <!-- Right section  -->
@@ -1165,6 +1169,15 @@
         </div>
     </div>
 </div>
+<style>
+    @media (min-width: 992px){
+        .col-lg-2 {
+        -ms-flex: 0 0 16.666667%;
+        flex: 0 0 14.666667%;
+        max-width: 14.666667%;
+    }
+    }
+</style>
 {% endblock %}
 
 {% block extrajs %}
@@ -1362,6 +1375,8 @@ $(".item").click(function(){
         $('#mainusersearch').removeClass('d-none')
         $('#side_block').addClass('d-none')
         $('#user_sideblock').removeClass('d-none')
+        $('#right_block').addClass('d-none')
+        $('#search_right_block').removeClass('d-none')
         let div1 = `<div>
                         <h1 class="findHeader">Results for <span class="findSearchTerm">"${input}"</span></h1>
                     </div>
@@ -1391,6 +1406,8 @@ $(".item").click(function(){
         $('#mainusersearch').addClass('d-none')
         $('#side_block').removeClass('d-none')
         $('#user_sideblock').addClass('d-none')
+        $('#right_block').removeClass('d-none')
+        $('#search_right_block').addClass('d-none')
 
         if (id!=5){
             console.log(`#demo${id}`)
