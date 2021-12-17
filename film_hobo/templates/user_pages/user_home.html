@@ -1699,18 +1699,18 @@
     }
 
     // Script for search functionality
-    $('#search').on('change',()=>{
-        post_url = origin_url + `/hobo_user/showcase/search/?search=${$('#search').val()}`
-        axios({
-            method: 'get',
-            url: post_url,
-            headers: {"Authorization":$("#token").val()}
-        })
-        .then((response) => {
-                console.log("Response",response.data)
-                dataInsertion(response.data)
-        }, (error) => {console.log(error);})
-    })
+    // $('#search').on('change',()=>{
+    //     post_url = origin_url + `/hobo_user/showcase/search/?search=${$('#search').val()}`
+    //     axios({
+    //         method: 'get',
+    //         url: post_url,
+    //         headers: {"Authorization":$("#token").val()}
+    //     })
+    //     .then((response) => {
+    //             console.log("Response",response.data)
+    //             dataInsertion(response.data)
+    //     }, (error) => {console.log(error);})
+    // })
 
     // Runs when year Decreases (Date Filter)
     $('#topdecrease').on('click',()=>{

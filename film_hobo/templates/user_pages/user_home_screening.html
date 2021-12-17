@@ -1779,23 +1779,23 @@ $(".item").click(function(){
     }
 
     // Script for search functionality
-    $('#search').on('change',()=>{
-        post_url = origin_url + `/hobo_user/user_home-projects/search/?search=${$('#search').val()}&&choise=${$('#search-input').val()}`
-        axios({
-            method: 'get',
-            url: post_url,
-            headers: {"Authorization":$("#token").val()},
-        })
-        .then((response) => {
-                console.log("Response",response.data.users)
-                if (response.data.users){
-                    userInsertion(response.data, $('#search').val())
-                }
-                else{
-                    dataInsertion(response.data)
-                }
-        }, (error) => {console.log(error);})
-    })
+    // $('#search').on('change',()=>{
+    //     post_url = origin_url + `/hobo_user/user_home-projects/search/?search=${$('#search').val()}&&choise=${$('#search-input').val()}`
+    //     axios({
+    //         method: 'get',
+    //         url: post_url,
+    //         headers: {"Authorization":$("#token").val()},
+    //     })
+    //     .then((response) => {
+    //             console.log("Response",response.data.users)
+    //             if (response.data.users){
+    //                 userInsertion(response.data, $('#search').val())
+    //             }
+    //             else{
+    //                 dataInsertion(response.data)
+    //             }
+    //     }, (error) => {console.log(error);})
+    // })
 
     // Runs when year Decreases (Date Filter)
     $('#decreseyear').on('click',()=>{

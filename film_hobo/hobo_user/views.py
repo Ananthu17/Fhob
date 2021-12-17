@@ -5365,15 +5365,14 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
                           "middle_name", "email"]
 
     def list(self, request, *args, **kwargs):
-        self.choise = request.GET['choise']
-        if self.choise == "user":
-            queryset = self.filter_queryset(self.get_queryset())
-            context = self.user_segregator(queryset)
-            self.serializer_class = UserSerializer
-        else:
-            queryset = self.filter_queryset(self.get_queryset()).filter(
-                    creator=request.user)
-            context = self.project_segregator(queryset)
+        queryset = self.filter_queryset(self.get_queryset())
+        context = {}
+        context["projects"] = self.project_search_segregator(queryset)
+        self.choise = "user"
+        queryset = self.filter_queryset(self.get_queryset())
+        context["users"] = self.user_segregator(queryset)
+        self.serializer_class = UserSerializer
+        print(context)
         return Response(context)
 
     def get_queryset(self):

@@ -910,17 +910,26 @@ class AgentManagerSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     job_types = serializers.SerializerMethodField()
+    profile_pic = serializers.SerializerMethodField()
+    membership = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'full_name', 'email', 'job_types']
+        fields = ['first_name', 'last_name', 'full_name', 'email',
+                  'job_types', 'profile_pic', 'membership']
 
     def get_full_name(self, obj):
         return obj.get_full_name()
 
+    def get_membership(self, obj):
+        return obj.get_membership_display()
+
     def get_job_types(self, obj):
         return [item.job_type.title
                 for item in UserRatingCombined.objects.filter(user=obj)]
+
+    def get_profile_pic(self, obj):
+        return obj.get_profile_photo()
 
 
 class GetSettingsSerializer(serializers.ModelSerializer):
@@ -1124,6 +1133,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     location = serializers.StringRelatedField()
     creator = serializers.StringRelatedField()
     visibility = serializers.StringRelatedField()
+    year = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
@@ -1131,10 +1141,13 @@ class ProjectSerializer(serializers.ModelSerializer):
                   'video_url', 'video_type', 'last_date', 'location',
                   'visibility_password', 'cast_attachment', 'cast_pay_rate',
                   'cast_samr', 'timestamp', 'visibility', 'likes',
-                  'video_cover_image']
+                  'video_cover_image', 'year']
 
     def get_genre(self, obj):
         return obj.get_genre_display()
+
+    def get_year(self, obj):
+        return obj.timestamp.strftime("%Y")
 
 
 class TeamSerializer(serializers.ModelSerializer):

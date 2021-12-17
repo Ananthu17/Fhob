@@ -267,7 +267,6 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -878,7 +877,7 @@
                             <!-- owl-carousel  -->
                         <div id="demo1">
                         <div class="owl-carousel owl-theme " id="project-owl1">
-
+                            {{scenes}}
                             {% if scenes != None  %}
                             {% for project in scenes %}
                             <!-- item 1  -->
@@ -1969,24 +1968,24 @@ function locationFilter(){
     }
 
     // Script for search functionality
-    $('#search').on('change',()=>{
-        post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}&&choise=${$('#search-input').val()}`
-        axios({
-            method: 'get',
-            url: post_url,
-            headers: {"Authorization":$("#token").val()},
-        })
-        .then((response) => {
-                console.log("Response",response.data)
-                if (response.data.users){
-                    userInsertion(response.data, $('#search').val())
-                }
-                else{
-                    console.log("True")
-                    dataInsertion(response.data)
-                }
-        }, (error) => {console.log(error);})
-    })
+    // $('#search').on('change',()=>{
+    //     post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}&&choise=${$('#search-input').val()}`
+    //     axios({
+    //         method: 'get',
+    //         url: post_url,
+    //         headers: {"Authorization":$("#token").val()},
+    //     })
+    //     .then((response) => {
+    //             console.log("Response",response.data)
+    //             if (response.data.users){
+    //                 userInsertion(response.data, $('#search').val())
+    //             }
+    //             else{
+    //                 console.log("True")
+    //                 dataInsertion(response.data)
+    //             }
+    //     }, (error) => {console.log(error);})
+    // })
 
     // Runs when year Decreases (Date Filter)
     $('#decreseyear').on('click',()=>{

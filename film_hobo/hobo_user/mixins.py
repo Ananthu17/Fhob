@@ -21,6 +21,11 @@ class SegregatorMixin():
                                      format="SHO").order_by('-rating'))
         return context
 
+    def project_search_segregator(self, project):
+        context = {}
+        context["projects"] = self.project_to_json(project)
+        return context
+
     def user_segregator(self, project):
         context = {}
         context["users"] = self.project_to_json(project, "user")
@@ -124,20 +129,17 @@ class SearchFilter():
             for part in parts:
                 field = opts.get_field(part)
                 if hasattr(field, 'get_path_info'):
-                    # This field is a relation, update opts to follow the relation
                     path_info = field.get_path_info()
                     opts = path_info[-1].to_opts
                     if any(path.m2m for path in path_info):
-                        # This field is a m2m relation so we know we need to call distinct
                         return True
                 else:
-                    # This field has a custom __ query transform but is not a relational field.
                     break
         return False
 
     def find_user(self, search_terms, queryset):
         for item in CustomUser.objects.all():
-            if item.get_full_name() == " ".join(search_terms):
+            if " ".join(search_terms) in item.get_full_name():
                 return queryset.filter(creator=item.id)
 
     def filter_queryset(self, request, queryset, view):

@@ -1,4 +1,4 @@
-/* /*fonts*/
+/*fonts*/
 
 @font-face {
   font-family: "Caliban Std"; 
@@ -66,16 +66,17 @@
   text-align: center; 
 }
 
-.search-placeholder {
+.search-placeholder{
   width: 75%;
-  height: 18px;
+  height: 22px;
   font-size: 13px;
+  margin-top: 12px;
   border: 1px solid #000;
-  padding-left: 5px;
+  border-radius: 0rem !important;
 }
 .search-placeholder:focus{
 
- border: 1px solid rgb(206, 212, 218) !important;
+ border: 1px solid #000 !important;
  border-radius: 0rem !important;
 }
 .search-box {
@@ -88,8 +89,10 @@
  border: 1px solid #000;
 }
 .header-user-img{
-  height: 60px;
-  border-radius: 50%;
+ height: 60px;
+ width: 60px;
+ border-radius: 50%;
+ margin-right: -5px;
 }
 .header-fnt-clr{
   color: #6F6F6C;
@@ -2064,5 +2067,11 @@ h1.findHeader span.findSearchTerm {
 }
 .findList_img{
  width: 34px;
+}
+.findSectionHeader{
+ color: #e88b24;
+ font-size: 17px;
+  margin: 0 0 10px 20px;
+  padding: 0px;
 }
 /*Search result page end*/
