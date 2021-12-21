@@ -751,7 +751,7 @@ const userInsertion = (data, input)=>{
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-label bold orng-f">${this.title}</label>
+                        <label class="text-label bold orng-f"><a href="${origin_url}/project/single-film-project/${this.id}/">${this.title}</a></label>
                         <p>${this.creator}</p>
                     </div>
                     <div class="col-md-4 d-flex align-items-center">${(this.genre) ? this.genre : ""} (${this.year})</div>
@@ -768,7 +768,7 @@ const userInsertion = (data, input)=>{
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-label bold orng-f">${this.full_name}</label>
+                        <label class="text-label bold orng-f"><a href="${origin_url}/hobo_user/profile/${this.id}/">${this.full_name}</a></label>
                         <p>${this.membership}</p>
                     </div>
                     <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>

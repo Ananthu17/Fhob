@@ -912,14 +912,18 @@ class UserSerializer(serializers.ModelSerializer):
     job_types = serializers.SerializerMethodField()
     profile_pic = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'full_name', 'email',
-                  'job_types', 'profile_pic', 'membership']
+                  'job_types', 'profile_pic', 'membership', 'id']
 
     def get_full_name(self, obj):
         return obj.get_full_name()
+
+    def get_id(self, obj):
+        return obj.id
 
     def get_membership(self, obj):
         return obj.get_membership_display()
