@@ -711,6 +711,100 @@ $( document ).ready(function() {
     else{
         $("#user-nav-item").addClass('active');
     }
+    const origin_url = window.location.origin
+
+const userInsertion = (data, input)=>{
+    console.log("Data:",data)
+    $('#maincontent').empty()
+
+    let div1 = `<div class="wrapper flex-grow-1">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+                <div class="caa-sec-bg caa-adblock-sec">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="caa-sec-bg caa-adblock-sec-2">
+                    <div class="caa-adblock-sec-align">
+                        <div class="caa-ad-block-inner">
+                            <span class="caa-ad-block-txt">Ad Block</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
+
+                <!-- Top section -->
+                <div>
+                    <h1 class="findHeader">${(jQuery.isEmptyObject(data.projects.projects) && jQuery.isEmptyObject(data.users.users)) ? `No results for <span class="findSearchTerm" style="color:red;">"${$('#search').val()}"</span>` : `Results for <span class="findSearchTerm">"${$('#search').val()}"</span>`}</h1>
+                </div>`
+    let div5=`<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.projects.projects)) ? "" : "Projects"}</h3>`
+    jQuery.each(data.projects.projects, function() {
+        let div2 = `<div class="row rsct-center-section-align">
+                    <div class="col-md-2 d-flex align-items-center">
+                        <div class="findList_img ">
+                            <img  src="${(this.video_cover_image) ? this.video_cover_image : "/media/thumbnail/video.png"}" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-label bold orng-f">${this.title}</label>
+                        <p>${this.creator}</p>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center">${(this.genre) ? this.genre : ""} (${this.year})</div>
+                </div>`
+        div5 += div2
+    })
+    div1 += div5
+    let div3 = `<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.users.users)) ? "" : "Users"}</h3>`
+    jQuery.each(data.users.users, function() {
+        let div2 = `<div class="row rsct-center-section-align">
+                    <div class="col-md-2 d-flex align-items-center">
+                        <div class="findList_img ">
+                            <img  src="${(this.profile_pic) ? this.profile_pic : "/media/thumbnail/profile_pic.png"}" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-label bold orng-f">${this.full_name}</label>
+                        <p>${this.membership}</p>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>
+                </div>`
+        div3 += div2
+    })
+    div1 += div3
+    let div4 = `</div>
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
+                <div class="caa-sec-bg right-sec-height">
+                    <div class="mem-list-head pb-1 d-flex justify-content-center">TOP RATED</div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>`
+    div1 += div4
+    $("#maincontent").append(div1)
+}
+
+// Script for search functionality
+$('#search').on('change',()=>{
+    post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
+    console.log(post_url)
+    axios({
+        method: 'get',
+        url: post_url,
+        headers: {"Authorization":$("#token").val()},
+    })
+    .then((response) => {
+            console.log("Response",response.data)
+            if (response.data){
+                userInsertion(response.data, $('#search').val())
+            }
+    }, (error) => {console.log(error);})
+})
 });
 
 
@@ -722,102 +816,6 @@ $( document ).ready(function() {
     $(document).on('click.bs.dropdown.data-api', '.dropdown.dropdown-notification', function (e) {
         e.stopPropagation();
         });
-</script>
-<script>
-    const origin_url = window.location.origin
-
-    const userInsertion = (data, input)=>{
-        console.log("Data:",data)
-        $('#maincontent').empty()
-
-        let div1 = `<div class="wrapper flex-grow-1">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
-                    <div class="caa-sec-bg caa-adblock-sec">
-                        <div class="caa-adblock-sec-align">
-                            <div class="caa-ad-block-inner">
-                                <span class="caa-ad-block-txt">Ad Block</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="caa-sec-bg caa-adblock-sec-2">
-                        <div class="caa-adblock-sec-align">
-                            <div class="caa-ad-block-inner">
-                                <span class="caa-ad-block-txt">Ad Block</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3 ">
-
-                    <!-- Top section -->
-                    <div>
-                        <h1 class="findHeader">Results for <span class="findSearchTerm">"${$('#search').val()}"</span></h1>
-                    </div>`
-        let div5=`<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.projects.projects)) ? "" : "Projects"}</h3>`
-        jQuery.each(data.projects.projects, function() {
-            let div2 = `<div class="row rsct-center-section-align">
-                        <div class="col-md-2 d-flex align-items-center">
-                            <div class="findList_img ">
-                                <img  src="${(this.video_cover_image) ? this.video_cover_image : "/media/thumbnail/video.png"}" class="img-fluid">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-label bold orng-f">${this.title}</label>
-                            <p>${this.creator}</p>
-                        </div>
-                        <div class="col-md-4 d-flex align-items-center">${(this.genre) ? this.genre : ""} (${this.year})</div>
-                    </div>`
-            div5 += div2
-        })
-        div1 += div5
-        let div3 = `<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.users.users)) ? "" : "Users"}</h3>`
-        jQuery.each(data.users.users, function() {
-            let div2 = `<div class="row rsct-center-section-align">
-                        <div class="col-md-2 d-flex align-items-center">
-                            <div class="findList_img ">
-                                <img  src="${(this.profile_pic) ? this.profile_pic : "/media/thumbnail/profile_pic.png"}" class="img-fluid">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-label bold orng-f">${this.full_name}</label>
-                            <p>${this.membership}</p>
-                        </div>
-                        <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>
-                    </div>`
-            div3 += div2
-        })
-        div1 += div3
-        let div4 = `</div>
-                <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
-                    <div class="caa-sec-bg right-sec-height">
-                        <div class="mem-list-head pb-1 d-flex justify-content-center">TOP RATED</div>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </div>`
-        div1 += div4
-        $("#maincontent").append(div1)
-    }
-
-    // Script for search functionality
-    $('#search').on('change',()=>{
-        post_url = origin_url + `/hobo_user/projects/search/?search=${$('#search').val()}`
-        console.log(post_url)
-        axios({
-            method: 'get',
-            url: post_url,
-            headers: {"Authorization":$("#token").val()},
-        })
-        .then((response) => {
-                console.log("Response",response.data)
-                if (response.data){
-                    userInsertion(response.data, $('#search').val())
-                }
-        }, (error) => {console.log(error);})
-    })
 </script>
 {% block extrajs %}
 {% endblock %}
