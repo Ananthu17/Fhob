@@ -521,7 +521,7 @@
     </div>
   </div>
 <!-- end notification -->
-<div id="maincontent">
+<div id="maincontent" style="flex-grow: 1;">
 {% block content %}
 {% endblock %}
 </div>
@@ -646,6 +646,10 @@ $("#showcase_non_clickable").click(function () {
         })
     })
 
+const access = (data)=>{
+    console.log('clicked')
+    alert("Page cannot be displayed for {{request.user}}")
+}
 
 </script>
 <script>
@@ -768,7 +772,7 @@ const userInsertion = (data, input)=>{
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-label bold orng-f"><a href="${origin_url}/hobo_user/profile/${this.id}/">${this.full_name}</a></label>
+                        <label class="text-label bold orng-f">${(this.settings.profile_visibility === "all_members") ? `<a href="${origin_url}/hobo_user/profile/${this.id}/">${this.full_name}</a>` : `<span onclick="access(this)"">${this.full_name}</span>`}</label>
                         <p>${this.membership}</p>
                     </div>
                     <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>

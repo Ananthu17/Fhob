@@ -913,11 +913,13 @@ class UserSerializer(serializers.ModelSerializer):
     profile_pic = serializers.SerializerMethodField()
     membership = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
+    settings = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'full_name', 'email',
-                  'job_types', 'profile_pic', 'membership', 'id']
+                  'job_types', 'profile_pic', 'membership', 'id',
+                  'settings']
 
     def get_full_name(self, obj):
         return obj.get_full_name()
@@ -934,6 +936,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_profile_pic(self, obj):
         return obj.get_profile_photo()
+
+    def get_settings(self, obj):
+        return GetSettingsSerializer(
+               CustomUserSettings.objects.get(user=obj)).data
 
 
 class GetSettingsSerializer(serializers.ModelSerializer):

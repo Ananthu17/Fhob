@@ -5359,7 +5359,7 @@ class ProjectSearchView(ListAPIView, SegregatorMixin):
     permission_classes = (IsAuthenticated,)
     filter_backends = [SearchFilter]
     choise = "project"
-    search_fields = ["title", "format", "genre",
+    search_fields = ["id", "title", "format", "genre",
                      "rating", "timestamp"]
     user_search_fields = ["first_name", "last_name",
                           "middle_name", "email"]
