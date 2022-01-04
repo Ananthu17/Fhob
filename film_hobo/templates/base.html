@@ -760,7 +760,7 @@ const userInsertion = (data, input)=>{
 
                 <!-- Top section -->
                 <div>
-                    <h1 class="findHeader">${(jQuery.isEmptyObject(data.projects.projects) && jQuery.isEmptyObject(data.users.users)) ? `No results for <span class="findSearchTerm" style="color:red;">"${$('#search').val()}"</span>` : `Results for <span class="findSearchTerm">"${$('#search').val()}"</span>`}</h1>
+                    <h1 class="findHeader">${(jQuery.isEmptyObject(data.projects.projects) && jQuery.isEmptyObject(data.users.users) && jQuery.isEmptyObject(data.users.company)) ? `No results for <span class="findSearchTerm" style="color:red;">"${$('#search').val()}"</span>` : `Results for <span class="findSearchTerm">"${$('#search').val()}"</span>`}</h1>
                 </div>`
     let div5=`<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.projects.projects)) ? "" : "Projects"}</h3>`
     jQuery.each(data.projects.projects, function() {
