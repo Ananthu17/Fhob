@@ -29,6 +29,7 @@ class SegregatorMixin():
     def user_segregator(self, project):
         context = {}
         context["users"] = self.project_to_json(project, "user")
+        context["company"] = self.project_to_json(project, "company")
         return context
 
     def showcase_segregator(self, project):
@@ -67,9 +68,15 @@ class SegregatorMixin():
         if choise == "project":
             for item in project:
                 project_dict["A"+str(item.id)] = ProjectSerializer(item).data
+        elif choise == "company":
+            for item in project:
+                if item.membership == 'COM':
+                    print(UserSerializer(item))
+                    project_dict["A"+str(item.id)] = UserSerializer(item).data
         else:
             for item in project:
-                project_dict["A"+str(item.id)] = UserSerializer(item).data
+                if not item.membership == 'COM':
+                    project_dict["A"+str(item.id)] = UserSerializer(item).data
         return project_dict
 
 

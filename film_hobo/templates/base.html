@@ -354,6 +354,23 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                            <h4 class="modal-title warning-modal-title" id="myModalLabel"> Warning!  </h4>
+                                            <button type="button" id="modalClose" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true" style="margin-top: 32em;">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body" style="text-align:center;">
+                                        <p>Page cannot be displayed for {{request.user}}!</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"  id="modalClose1">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <!-- The Login Modal -->
                         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                             <div class="modal-dialog" role="document">
@@ -648,7 +665,6 @@ $("#showcase_non_clickable").click(function () {
 
 const access = (data)=>{
     console.log('clicked')
-    alert("Page cannot be displayed for {{request.user}}")
 }
 
 </script>
@@ -780,6 +796,23 @@ const userInsertion = (data, input)=>{
         div3 += div2
     })
     div1 += div3
+    let div6 = `<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.users.company)) ? "" : "Company"}</h3>`
+    jQuery.each(data.users.company, function() {
+        let div2 = `<div class="row rsct-center-section-align">
+                    <div class="col-md-2 d-flex align-items-center">
+                        <div class="findList_img ">
+                            <img  src="${(this.profile_pic) ? this.profile_pic : "/media/thumbnail/company_logo.png"}" class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-label bold orng-f"><a href="${origin_url}/hobo_user/profile/${this.id}/">${this.full_name}</a></label>
+                        <p>${this.membership}</p>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>
+                </div>`
+        div6 += div2
+    })
+    div1 += div6
     let div4 = `</div>
             <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 mt-3 mb-3">
                 <div class="caa-sec-bg right-sec-height">
