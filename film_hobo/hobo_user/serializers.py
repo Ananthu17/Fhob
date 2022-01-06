@@ -919,13 +919,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['first_name', 'last_name', 'full_name', 'email',
                   'job_types', 'profile_pic', 'membership', 'id',
+                  'company_type'
                   ]
 
     def get_full_name(self, obj):
         return obj.get_full_name()
 
     def get_id(self, obj):
-        return obj.id
+        return int(obj.id)
 
     def get_membership(self, obj):
         return obj.get_membership_display()

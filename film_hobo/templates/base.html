@@ -798,6 +798,7 @@ const userInsertion = (data, input)=>{
     div1 += div3
     let div6 = `<h3 class="findSectionHeader">${(jQuery.isEmptyObject(data.users.company)) ? "" : "Company"}</h3>`
     jQuery.each(data.users.company, function() {
+        console.log(this.id)
         let div2 = `<div class="row rsct-center-section-align">
                     <div class="col-md-2 d-flex align-items-center">
                         <div class="findList_img ">
@@ -805,7 +806,7 @@ const userInsertion = (data, input)=>{
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="text-label bold orng-f">${this.full_name}</label>
+                        <label class="text-label bold orng-f">${(this.company_type == "production") ? `<a href="${origin_url}/hobo_user/production-company-profile/${this.id}/">${this.full_name}</a>` : ((this.company_type == "agency_management")?`<a href="${origin_url}/hobo_user/agency-management-company-profile/${this.id}/">${this.full_name}</a>`:this.full_name)}</label>
                         <p>${this.membership}</p>
                     </div>
                     <div class="col-md-4 d-flex align-items-center">${this.job_types}</div>
